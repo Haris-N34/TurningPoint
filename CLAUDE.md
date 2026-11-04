@@ -17,6 +17,14 @@ Pitch line: "McKinsey tests you on its scenario. Turning Point tests how you han
 
 Writing style for anything produced for the team: direct, short, no em dashes.
 
+## Demo scope decisions (Nov 4, Div)
+
+The end product is a demo. These override the PRD where they conflict:
+- **No database.** Everything is local: run state and cards in `localStorage`, recordings in IndexedDB. Seeded demo data ships as JSON in `fixtures/`. No Supabase, no auth server; the role picker switches roles.
+- **No API keys** except Vercel for hosting. The "AI" jobs run locally and deterministically behind an interface in `lib/ai` (question from the choice log, follow-up from the transcript, rule-based evidence extraction). Voice transcription uses the browser's built-in speech recognition where available; text mode always works.
+- **Emails are simulated:** witness links are shown on screen and copied, not sent.
+- Guardrails still apply: the quote substring check, no overall score, no auto-reject, nothing scored on face or voice.
+
 ## Hard rules (from the research; never break)
 
 - Never score faces, emotion, voice tone, accent, grammar or fluency. Score transcripts against the rubric only.
@@ -25,13 +33,13 @@ Writing style for anything produced for the team: direct, short, no em dashes.
 - Every AI evidence quote must match the transcript exactly as a substring, checked in code. Drop any quote that doesn't match.
 - Every checkpoint can be answered without a camera. Timer accommodations of 1.5x or 2x.
 - Candidates own their data: share per employer, revoke, delete everything.
-- Never put API keys in code. Read them from `.env.local`.
+- Never put secrets in code.
 
 ## Stack and layout
 
-Next.js 15 (App Router), TypeScript, Tailwind, shadcn/ui, Framer Motion, Supabase, Claude via the Vercel AI SDK, Whisper or Deepgram, Resend, Vitest, Playwright, axe-core, Vercel. Package manager: pnpm.
+Next.js 15 (App Router), TypeScript, Tailwind, shadcn/ui, Framer Motion, Zod, Vitest, Playwright, axe-core, Vercel. Package manager: pnpm. Storage is local (see Demo scope decisions).
 
-`app/` (routes per role), `components/game`, `components/card`, `lib/engine` (pure TypeScript, fully unit tested), `lib/ai` (prompts and schemas), `content/scenarios/*.json`, `supabase/migrations`, `tests/e2e`, `fixtures/`, `docs/`.
+`app/` (routes per role), `components/game`, `components/card`, `lib/engine` (pure TypeScript, fully unit tested), `lib/ai` (prompts and schemas), `content/scenarios/*.json`, `lib/store` (local storage), `tests/e2e`, `fixtures/`, `docs/`.
 
 ## The iterate-until-done loop
 

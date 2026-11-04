@@ -2,15 +2,17 @@
 
 Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only when a test covers it and the full check (`pnpm lint && pnpm typecheck && pnpm test && pnpm e2e`) is green. Owner in brackets: [D] Div, [H] Haris, [D+H] both.
 
+**Scope change (Nov 4):** local-only demo. No database, no auth server, no API keys except Vercel. See CLAUDE.md, Demo scope decisions. Criteria that assumed a server are reworded to their local equivalent.
+
 ## M0. Foundations
 
-- [ ] M0.1 [D] Repo has PRD, CLAUDE.md, PROGRESS.md
-- [ ] M0.2 [D] Next.js 15 + TS + Tailwind + shadcn/ui scaffold; `pnpm i && pnpm dev` works on a fresh clone
-- [ ] M0.3 [D] Vitest, Playwright, axe-core, ESLint and `typecheck` scripts wired
-- [ ] M0.4 [D+H] Scenario JSON schema (Zod) and DB types agreed and committed; `fixtures/attempt.json` mock card
-- [ ] M0.5 [D] Supabase migrations for every table, RLS on, 10 skills seeded, storage buckets
-- [ ] M0.6 [D] Auth: email magic link; role stored on profile
-- [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e
+- [x] M0.1 [D] Repo has PRD, CLAUDE.md, PROGRESS.md
+- [x] M0.2 [D] Next.js 15 + TS + Tailwind scaffold; `pnpm i && pnpm dev` works on a fresh clone
+- [x] M0.3 [D] Vitest, Playwright, axe-core, ESLint and `typecheck` scripts wired
+- [ ] M0.4 [D+H] Scenario JSON schema (Zod) and card types committed (done, D); `fixtures/attempt.json` mock card (done, D); Haris sign-off pending (#8)
+- [ ] M0.5 [D] Local store: runs, cards, shares, reviews in localStorage; recordings in IndexedDB; delete-all
+- [ ] M0.6 [D] Demo profile and role switching (no auth server)
+- [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e (workflow committed; first run pending)
 - [ ] M0.8 [D] Deployed to Vercel
 - [ ] M0.9 [H] Design system tokens (fonts, accent, neutrals, light and dark)
 - [ ] M0.10 [H] Landing page (screen 1)
@@ -27,9 +29,9 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] C2.6 [D+H] Keyboard-only play (arrows, Enter); all art has alt text
 - [ ] C3.1 [D] Turning point fires between 40% and 60%, full-screen transition, mutable sound
 - [ ] C3.2 [D] Resets a resource sharply and unlocks new choices
-- [ ] C3.3 [D] Disruption picked from pool by per-candidate seed
-- [ ] S.1 [D] Schema rejects unreachable nodes, missing targets, no path to end, fewer than 3 eligible nodes
-- [ ] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable
+- [x] C3.3 [D] Disruption picked from pool by per-candidate seed
+- [x] S.1 [D] Schema rejects unreachable nodes, missing targets, no path to end, fewer than 3 eligible nodes
+- [x] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable
 - [ ] S.3 [H] Launch Week written in full (15 nodes, eligible 3, 6, 9, 10, 12, 3 disruptions)
 - [ ] S.4 [H] Client Rescue template written
 - [ ] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
@@ -59,7 +61,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 
 ## M3. Capability Card
 
-- [ ] G1 [D] Exact substring quote check; unmatched quotes dropped, skill drops a level
+- [x] G1 [D] Exact substring quote check; unmatched quotes dropped, skill drops a level
 - [ ] G2 [D] Models never get name, email, university or video frames
 - [ ] G3 [D] Prompt and model version stored with every result
 - [ ] AI.2 [D] Evidence extraction per rubric (Strong, Some, Not observed); "Needs human review" fallback
@@ -124,4 +126,4 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 
 ## Blockers
 
-- GitHub issues: Claude GitHub App not installed on `Haris-N34/TurningPoint`, so the agent cannot create or comment on issues yet.
+- M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.

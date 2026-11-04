@@ -2,6 +2,8 @@
 
 Nov 4, 2026 · @div. Source: `Turning_Point_PRD.pdf`. Living doc: https://claude.ai/artifact/BrRP8vHyTKvkE7tpvJpVkx
 
+> **Scope change (Nov 4):** the build is a local-only demo. No database, no auth server, no API keys except Vercel. See `CLAUDE.md`, Demo scope decisions. Sections below that mention Supabase, Claude API, Whisper, Deepgram or Resend describe the full product, not the demo build.
+
 ## Summary
 
 We are building a working web prototype of Turning Point for the DICC 2026 pitch. Employers pick the skills they care about. Candidates play a short story-based challenge where something goes wrong partway through. Surprise checkpoints make them explain the decisions they just made by video, voice or text. Recruiters get a one-minute Capability Card instead of another resume.

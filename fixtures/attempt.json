@@ -1,0 +1,1197 @@
+{
+  "attemptId": "att_demo_maya",
+  "anonId": "Candidate 4F7K",
+  "candidate": {
+    "displayName": "Maya Chen",
+    "university": "University of Calgary",
+    "verified": true
+  },
+  "challenge": {
+    "id": "ch_demo_energy",
+    "title": "Field Operations Analyst, Summer 2027",
+    "company": "Prairie Grid Energy (fictional)"
+  },
+  "scenario": {
+    "id": "launch-week",
+    "version": 1,
+    "seed": "att_demo_maya",
+    "disruptionId": "sponsor-pulls-out"
+  },
+  "finishedAt": "2026-11-04T17:42:00.000Z",
+  "adjustedTiming": false,
+  "targetSkills": [
+    "adaptability",
+    "resilience",
+    "prioritization",
+    "collaboration"
+  ],
+  "evidence": [
+    {
+      "skill": "collaboration",
+      "level": "strong",
+      "sentence": "Weighs losing two days against losing a volunteer and picks the team.",
+      "source": {
+        "type": "clip",
+        "checkpointId": "cp1",
+        "quote": "I'd rather lose two days than lose a volunteer.",
+        "startS": 19.15,
+        "endS": 23.22
+      }
+    },
+    {
+      "skill": "prioritization",
+      "level": "strong",
+      "sentence": "Protects vendor spots over a second weekend, and says why.",
+      "source": {
+        "type": "clip",
+        "checkpointId": "cp2",
+        "quote": "I cut the second weekend instead of cutting vendor spots.",
+        "startS": 2.77,
+        "endS": 7.67
+      }
+    },
+    {
+      "skill": "adaptability",
+      "level": "some",
+      "sentence": "Replaced bought soil with a donation after funding fell through.",
+      "source": {
+        "type": "clip",
+        "checkpointId": "rl",
+        "quote": "we asked the local hardware store for donated soil instead of buying it.",
+        "startS": 18.07,
+        "endS": 24.18
+      }
+    },
+    {
+      "skill": "resilience",
+      "level": "some",
+      "sentence": "Finished the season on half the budget after the funder left.",
+      "source": {
+        "type": "clip",
+        "checkpointId": "rl",
+        "quote": "We finished the season with half the budget.",
+        "startS": 24.3,
+        "endS": 28.01
+      }
+    }
+  ],
+  "decisionPath": [
+    {
+      "nodeId": "n1",
+      "prompt": "Recruit volunteers",
+      "optionId": "b",
+      "optionLabel": "Post in three student clubs",
+      "decidedMs": 6400,
+      "at": "2026-11-04T17:26:10.000Z"
+    },
+    {
+      "nodeId": "n3",
+      "prompt": "Two volunteers want social media. Nobody wants logistics.",
+      "optionId": "b",
+      "optionLabel": "Let the team vote",
+      "decidedMs": 11800,
+      "at": "2026-11-04T17:28:02.000Z",
+      "checkpointId": "cp1"
+    },
+    {
+      "nodeId": "n4",
+      "prompt": "Choose a vendor mix",
+      "optionId": "a",
+      "optionLabel": "Mostly local food vendors",
+      "decidedMs": 9100,
+      "at": "2026-11-04T17:29:40.000Z"
+    },
+    {
+      "nodeId": "n6",
+      "prompt": "A vendor asks for a bigger cut",
+      "optionId": "c",
+      "optionLabel": "Offer a better spot instead of more money",
+      "decidedMs": 14200,
+      "at": "2026-11-04T17:31:15.000Z"
+    },
+    {
+      "nodeId": "n9",
+      "prompt": "The budget is down 60%. What goes first?",
+      "optionId": "a",
+      "optionLabel": "Cut the second weekend",
+      "decidedMs": 17600,
+      "at": "2026-11-04T17:33:50.000Z",
+      "checkpointId": "cp2"
+    },
+    {
+      "nodeId": "n11",
+      "prompt": "The team is shaken",
+      "optionId": "b",
+      "optionLabel": "Tell everyone the plan the same day",
+      "decidedMs": 8300,
+      "at": "2026-11-04T17:35:20.000Z"
+    },
+    {
+      "nodeId": "n13",
+      "prompt": "The non-profit lead says the queue was a mess",
+      "optionId": "a",
+      "optionLabel": "Ask what they would change first",
+      "decidedMs": 7700,
+      "at": "2026-11-04T17:37:05.000Z"
+    }
+  ],
+  "turningPointAfter": 3,
+  "checkpoints": [
+    {
+      "id": "cp1",
+      "nodeId": "n3",
+      "kind": "decision",
+      "question": "You let the team vote instead of assigning logistics yourself. Why?",
+      "questionSource": "generated",
+      "mode": "voice",
+      "media": "demo/cp1.webm",
+      "durationS": 23.22,
+      "transcript": {
+        "text": "I let the team vote because two people already wanted social media and nobody wanted logistics. If I assigned it, the person stuck with logistics would check out by week two. The trade-off is it cost us two days, but I'd rather lose two days than lose a volunteer.",
+        "words": [
+          {
+            "w": "I",
+            "start": 0.4,
+            "end": 0.58
+          },
+          {
+            "w": "let",
+            "start": 0.7,
+            "end": 0.93
+          },
+          {
+            "w": "the",
+            "start": 1.05,
+            "end": 1.28
+          },
+          {
+            "w": "team",
+            "start": 1.4,
+            "end": 1.71
+          },
+          {
+            "w": "vote",
+            "start": 1.83,
+            "end": 2.14
+          },
+          {
+            "w": "because",
+            "start": 2.26,
+            "end": 2.8
+          },
+          {
+            "w": "two",
+            "start": 2.92,
+            "end": 3.15
+          },
+          {
+            "w": "people",
+            "start": 3.27,
+            "end": 3.73
+          },
+          {
+            "w": "already",
+            "start": 3.85,
+            "end": 4.39
+          },
+          {
+            "w": "wanted",
+            "start": 4.51,
+            "end": 4.97
+          },
+          {
+            "w": "social",
+            "start": 5.09,
+            "end": 5.55
+          },
+          {
+            "w": "media",
+            "start": 5.67,
+            "end": 6.05
+          },
+          {
+            "w": "and",
+            "start": 6.17,
+            "end": 6.4
+          },
+          {
+            "w": "nobody",
+            "start": 6.52,
+            "end": 6.99
+          },
+          {
+            "w": "wanted",
+            "start": 7.11,
+            "end": 7.57
+          },
+          {
+            "w": "logistics.",
+            "start": 7.69,
+            "end": 8.46
+          },
+          {
+            "w": "If",
+            "start": 8.58,
+            "end": 8.76
+          },
+          {
+            "w": "I",
+            "start": 8.88,
+            "end": 9.06
+          },
+          {
+            "w": "assigned",
+            "start": 9.18,
+            "end": 9.79
+          },
+          {
+            "w": "it,",
+            "start": 9.91,
+            "end": 10.14
+          },
+          {
+            "w": "the",
+            "start": 10.26,
+            "end": 10.49
+          },
+          {
+            "w": "person",
+            "start": 10.61,
+            "end": 11.08
+          },
+          {
+            "w": "stuck",
+            "start": 11.2,
+            "end": 11.58
+          },
+          {
+            "w": "with",
+            "start": 11.7,
+            "end": 12.01
+          },
+          {
+            "w": "logistics",
+            "start": 12.13,
+            "end": 12.82
+          },
+          {
+            "w": "would",
+            "start": 12.94,
+            "end": 13.32
+          },
+          {
+            "w": "check",
+            "start": 13.44,
+            "end": 13.83
+          },
+          {
+            "w": "out",
+            "start": 13.95,
+            "end": 14.18
+          },
+          {
+            "w": "by",
+            "start": 14.3,
+            "end": 14.48
+          },
+          {
+            "w": "week",
+            "start": 14.6,
+            "end": 14.91
+          },
+          {
+            "w": "two.",
+            "start": 15.03,
+            "end": 15.34
+          },
+          {
+            "w": "The",
+            "start": 15.46,
+            "end": 15.69
+          },
+          {
+            "w": "trade-off",
+            "start": 15.81,
+            "end": 16.5
+          },
+          {
+            "w": "is",
+            "start": 16.62,
+            "end": 16.8
+          },
+          {
+            "w": "it",
+            "start": 16.92,
+            "end": 17.1
+          },
+          {
+            "w": "cost",
+            "start": 17.22,
+            "end": 17.53
+          },
+          {
+            "w": "us",
+            "start": 17.65,
+            "end": 17.83
+          },
+          {
+            "w": "two",
+            "start": 17.95,
+            "end": 18.18
+          },
+          {
+            "w": "days,",
+            "start": 18.3,
+            "end": 18.68
+          },
+          {
+            "w": "but",
+            "start": 18.8,
+            "end": 19.03
+          },
+          {
+            "w": "I'd",
+            "start": 19.15,
+            "end": 19.38
+          },
+          {
+            "w": "rather",
+            "start": 19.5,
+            "end": 19.96
+          },
+          {
+            "w": "lose",
+            "start": 20.08,
+            "end": 20.39
+          },
+          {
+            "w": "two",
+            "start": 20.51,
+            "end": 20.74
+          },
+          {
+            "w": "days",
+            "start": 20.86,
+            "end": 21.17
+          },
+          {
+            "w": "than",
+            "start": 21.29,
+            "end": 21.6
+          },
+          {
+            "w": "lose",
+            "start": 21.72,
+            "end": 22.03
+          },
+          {
+            "w": "a",
+            "start": 22.15,
+            "end": 22.33
+          },
+          {
+            "w": "volunteer.",
+            "start": 22.45,
+            "end": 23.22
+          }
+        ],
+        "status": "ready"
+      },
+      "retakeUsed": false,
+      "hidden": false
+    },
+    {
+      "id": "cp2",
+      "nodeId": "n9",
+      "kind": "decision",
+      "question": "You cut the second weekend instead of vendor spots. What did that cost you?",
+      "questionSource": "generated",
+      "mode": "video",
+      "media": "demo/cp2.webm",
+      "durationS": 20.29,
+      "transcript": {
+        "text": "When the sponsor pulled out I cut the second weekend instead of cutting vendor spots. The vendors were the reason people came, and some of them had already paid for stock. I told the team the same day so nobody heard it secondhand.",
+        "words": [
+          {
+            "w": "When",
+            "start": 0.4,
+            "end": 0.71
+          },
+          {
+            "w": "the",
+            "start": 0.83,
+            "end": 1.06
+          },
+          {
+            "w": "sponsor",
+            "start": 1.18,
+            "end": 1.72
+          },
+          {
+            "w": "pulled",
+            "start": 1.84,
+            "end": 2.3
+          },
+          {
+            "w": "out",
+            "start": 2.42,
+            "end": 2.65
+          },
+          {
+            "w": "I",
+            "start": 2.77,
+            "end": 2.95
+          },
+          {
+            "w": "cut",
+            "start": 3.07,
+            "end": 3.3
+          },
+          {
+            "w": "the",
+            "start": 3.42,
+            "end": 3.65
+          },
+          {
+            "w": "second",
+            "start": 3.77,
+            "end": 4.23
+          },
+          {
+            "w": "weekend",
+            "start": 4.35,
+            "end": 4.89
+          },
+          {
+            "w": "instead",
+            "start": 5.01,
+            "end": 5.55
+          },
+          {
+            "w": "of",
+            "start": 5.67,
+            "end": 5.85
+          },
+          {
+            "w": "cutting",
+            "start": 5.97,
+            "end": 6.51
+          },
+          {
+            "w": "vendor",
+            "start": 6.63,
+            "end": 7.09
+          },
+          {
+            "w": "spots.",
+            "start": 7.21,
+            "end": 7.67
+          },
+          {
+            "w": "The",
+            "start": 7.79,
+            "end": 8.02
+          },
+          {
+            "w": "vendors",
+            "start": 8.14,
+            "end": 8.68
+          },
+          {
+            "w": "were",
+            "start": 8.8,
+            "end": 9.11
+          },
+          {
+            "w": "the",
+            "start": 9.23,
+            "end": 9.46
+          },
+          {
+            "w": "reason",
+            "start": 9.58,
+            "end": 10.04
+          },
+          {
+            "w": "people",
+            "start": 10.16,
+            "end": 10.62
+          },
+          {
+            "w": "came,",
+            "start": 10.74,
+            "end": 11.13
+          },
+          {
+            "w": "and",
+            "start": 11.25,
+            "end": 11.48
+          },
+          {
+            "w": "some",
+            "start": 11.6,
+            "end": 11.9
+          },
+          {
+            "w": "of",
+            "start": 12.02,
+            "end": 12.2
+          },
+          {
+            "w": "them",
+            "start": 12.32,
+            "end": 12.63
+          },
+          {
+            "w": "had",
+            "start": 12.75,
+            "end": 12.98
+          },
+          {
+            "w": "already",
+            "start": 13.1,
+            "end": 13.64
+          },
+          {
+            "w": "paid",
+            "start": 13.76,
+            "end": 14.07
+          },
+          {
+            "w": "for",
+            "start": 14.19,
+            "end": 14.42
+          },
+          {
+            "w": "stock.",
+            "start": 14.54,
+            "end": 15
+          },
+          {
+            "w": "I",
+            "start": 15.12,
+            "end": 15.3
+          },
+          {
+            "w": "told",
+            "start": 15.42,
+            "end": 15.73
+          },
+          {
+            "w": "the",
+            "start": 15.85,
+            "end": 16.08
+          },
+          {
+            "w": "team",
+            "start": 16.2,
+            "end": 16.51
+          },
+          {
+            "w": "the",
+            "start": 16.63,
+            "end": 16.86
+          },
+          {
+            "w": "same",
+            "start": 16.98,
+            "end": 17.29
+          },
+          {
+            "w": "day",
+            "start": 17.41,
+            "end": 17.64
+          },
+          {
+            "w": "so",
+            "start": 17.76,
+            "end": 17.94
+          },
+          {
+            "w": "nobody",
+            "start": 18.06,
+            "end": 18.52
+          },
+          {
+            "w": "heard",
+            "start": 18.64,
+            "end": 19.02
+          },
+          {
+            "w": "it",
+            "start": 19.14,
+            "end": 19.32
+          },
+          {
+            "w": "secondhand.",
+            "start": 19.44,
+            "end": 20.29
+          }
+        ],
+        "status": "ready"
+      },
+      "retakeUsed": true,
+      "hidden": false
+    },
+    {
+      "id": "rl",
+      "nodeId": "rl",
+      "kind": "real_life",
+      "question": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "questionSource": "generated",
+      "mode": "voice",
+      "media": "demo/rl.webm",
+      "durationS": 28.01,
+      "transcript": {
+        "text": "Two summers ago I ran a community garden with about fifty student volunteers. In the second summer our funder pulled out in June. I sat down with the three team leads, we dropped the workshop series, and we asked the local hardware store for donated soil instead of buying it. We finished the season with half the budget.",
+        "words": [
+          {
+            "w": "Two",
+            "start": 0.4,
+            "end": 0.63
+          },
+          {
+            "w": "summers",
+            "start": 0.75,
+            "end": 1.29
+          },
+          {
+            "w": "ago",
+            "start": 1.41,
+            "end": 1.64
+          },
+          {
+            "w": "I",
+            "start": 1.76,
+            "end": 1.94
+          },
+          {
+            "w": "ran",
+            "start": 2.06,
+            "end": 2.29
+          },
+          {
+            "w": "a",
+            "start": 2.41,
+            "end": 2.59
+          },
+          {
+            "w": "community",
+            "start": 2.71,
+            "end": 3.4
+          },
+          {
+            "w": "garden",
+            "start": 3.52,
+            "end": 3.98
+          },
+          {
+            "w": "with",
+            "start": 4.1,
+            "end": 4.41
+          },
+          {
+            "w": "about",
+            "start": 4.53,
+            "end": 4.92
+          },
+          {
+            "w": "fifty",
+            "start": 5.04,
+            "end": 5.42
+          },
+          {
+            "w": "student",
+            "start": 5.54,
+            "end": 6.08
+          },
+          {
+            "w": "volunteers.",
+            "start": 6.2,
+            "end": 7.05
+          },
+          {
+            "w": "In",
+            "start": 7.17,
+            "end": 7.35
+          },
+          {
+            "w": "the",
+            "start": 7.47,
+            "end": 7.7
+          },
+          {
+            "w": "second",
+            "start": 7.82,
+            "end": 8.28
+          },
+          {
+            "w": "summer",
+            "start": 8.4,
+            "end": 8.86
+          },
+          {
+            "w": "our",
+            "start": 8.98,
+            "end": 9.21
+          },
+          {
+            "w": "funder",
+            "start": 9.33,
+            "end": 9.79
+          },
+          {
+            "w": "pulled",
+            "start": 9.91,
+            "end": 10.37
+          },
+          {
+            "w": "out",
+            "start": 10.49,
+            "end": 10.72
+          },
+          {
+            "w": "in",
+            "start": 10.84,
+            "end": 11.02
+          },
+          {
+            "w": "June.",
+            "start": 11.14,
+            "end": 11.53
+          },
+          {
+            "w": "I",
+            "start": 11.65,
+            "end": 11.83
+          },
+          {
+            "w": "sat",
+            "start": 11.95,
+            "end": 12.18
+          },
+          {
+            "w": "down",
+            "start": 12.3,
+            "end": 12.61
+          },
+          {
+            "w": "with",
+            "start": 12.73,
+            "end": 13.04
+          },
+          {
+            "w": "the",
+            "start": 13.16,
+            "end": 13.39
+          },
+          {
+            "w": "three",
+            "start": 13.51,
+            "end": 13.89
+          },
+          {
+            "w": "team",
+            "start": 14.01,
+            "end": 14.32
+          },
+          {
+            "w": "leads,",
+            "start": 14.44,
+            "end": 14.9
+          },
+          {
+            "w": "we",
+            "start": 15.02,
+            "end": 15.2
+          },
+          {
+            "w": "dropped",
+            "start": 15.32,
+            "end": 15.86
+          },
+          {
+            "w": "the",
+            "start": 15.98,
+            "end": 16.21
+          },
+          {
+            "w": "workshop",
+            "start": 16.33,
+            "end": 16.94
+          },
+          {
+            "w": "series,",
+            "start": 17.06,
+            "end": 17.6
+          },
+          {
+            "w": "and",
+            "start": 17.72,
+            "end": 17.95
+          },
+          {
+            "w": "we",
+            "start": 18.07,
+            "end": 18.25
+          },
+          {
+            "w": "asked",
+            "start": 18.37,
+            "end": 18.76
+          },
+          {
+            "w": "the",
+            "start": 18.88,
+            "end": 19.11
+          },
+          {
+            "w": "local",
+            "start": 19.23,
+            "end": 19.61
+          },
+          {
+            "w": "hardware",
+            "start": 19.73,
+            "end": 20.35
+          },
+          {
+            "w": "store",
+            "start": 20.47,
+            "end": 20.85
+          },
+          {
+            "w": "for",
+            "start": 20.97,
+            "end": 21.2
+          },
+          {
+            "w": "donated",
+            "start": 21.32,
+            "end": 21.86
+          },
+          {
+            "w": "soil",
+            "start": 21.98,
+            "end": 22.29
+          },
+          {
+            "w": "instead",
+            "start": 22.41,
+            "end": 22.95
+          },
+          {
+            "w": "of",
+            "start": 23.07,
+            "end": 23.25
+          },
+          {
+            "w": "buying",
+            "start": 23.37,
+            "end": 23.83
+          },
+          {
+            "w": "it.",
+            "start": 23.95,
+            "end": 24.18
+          },
+          {
+            "w": "We",
+            "start": 24.3,
+            "end": 24.48
+          },
+          {
+            "w": "finished",
+            "start": 24.6,
+            "end": 25.22
+          },
+          {
+            "w": "the",
+            "start": 25.34,
+            "end": 25.57
+          },
+          {
+            "w": "season",
+            "start": 25.69,
+            "end": 26.15
+          },
+          {
+            "w": "with",
+            "start": 26.27,
+            "end": 26.58
+          },
+          {
+            "w": "half",
+            "start": 26.7,
+            "end": 27
+          },
+          {
+            "w": "the",
+            "start": 27.12,
+            "end": 27.36
+          },
+          {
+            "w": "budget.",
+            "start": 27.48,
+            "end": 28.01
+          }
+        ],
+        "status": "ready"
+      },
+      "retakeUsed": false,
+      "hidden": false
+    },
+    {
+      "id": "fu",
+      "nodeId": "rl",
+      "kind": "follow_up",
+      "question": "You said the funder pulled out. How did you tell the volunteers?",
+      "questionSource": "generated",
+      "mode": "text",
+      "durationS": 41,
+      "transcript": {
+        "text": "I wrote to every volunteer myself before the group chat found out. I said what we were cutting and what we were keeping, and I asked who still had time. Most people stayed, a few left, and that was fine.",
+        "words": [
+          {
+            "w": "I",
+            "start": 0.4,
+            "end": 0.58
+          },
+          {
+            "w": "wrote",
+            "start": 0.7,
+            "end": 1.08
+          },
+          {
+            "w": "to",
+            "start": 1.2,
+            "end": 1.38
+          },
+          {
+            "w": "every",
+            "start": 1.5,
+            "end": 1.89
+          },
+          {
+            "w": "volunteer",
+            "start": 2.01,
+            "end": 2.7
+          },
+          {
+            "w": "myself",
+            "start": 2.82,
+            "end": 3.28
+          },
+          {
+            "w": "before",
+            "start": 3.4,
+            "end": 3.86
+          },
+          {
+            "w": "the",
+            "start": 3.98,
+            "end": 4.22
+          },
+          {
+            "w": "group",
+            "start": 4.34,
+            "end": 4.72
+          },
+          {
+            "w": "chat",
+            "start": 4.84,
+            "end": 5.15
+          },
+          {
+            "w": "found",
+            "start": 5.27,
+            "end": 5.65
+          },
+          {
+            "w": "out.",
+            "start": 5.77,
+            "end": 6.08
+          },
+          {
+            "w": "I",
+            "start": 6.2,
+            "end": 6.38
+          },
+          {
+            "w": "said",
+            "start": 6.5,
+            "end": 6.81
+          },
+          {
+            "w": "what",
+            "start": 6.93,
+            "end": 7.24
+          },
+          {
+            "w": "we",
+            "start": 7.36,
+            "end": 7.54
+          },
+          {
+            "w": "were",
+            "start": 7.66,
+            "end": 7.96
+          },
+          {
+            "w": "cutting",
+            "start": 8.08,
+            "end": 8.62
+          },
+          {
+            "w": "and",
+            "start": 8.74,
+            "end": 8.97
+          },
+          {
+            "w": "what",
+            "start": 9.09,
+            "end": 9.4
+          },
+          {
+            "w": "we",
+            "start": 9.52,
+            "end": 9.7
+          },
+          {
+            "w": "were",
+            "start": 9.82,
+            "end": 10.13
+          },
+          {
+            "w": "keeping,",
+            "start": 10.25,
+            "end": 10.86
+          },
+          {
+            "w": "and",
+            "start": 10.98,
+            "end": 11.21
+          },
+          {
+            "w": "I",
+            "start": 11.33,
+            "end": 11.51
+          },
+          {
+            "w": "asked",
+            "start": 11.63,
+            "end": 12.02
+          },
+          {
+            "w": "who",
+            "start": 12.14,
+            "end": 12.37
+          },
+          {
+            "w": "still",
+            "start": 12.49,
+            "end": 12.87
+          },
+          {
+            "w": "had",
+            "start": 12.99,
+            "end": 13.22
+          },
+          {
+            "w": "time.",
+            "start": 13.34,
+            "end": 13.73
+          },
+          {
+            "w": "Most",
+            "start": 13.85,
+            "end": 14.16
+          },
+          {
+            "w": "people",
+            "start": 14.28,
+            "end": 14.74
+          },
+          {
+            "w": "stayed,",
+            "start": 14.86,
+            "end": 15.4
+          },
+          {
+            "w": "a",
+            "start": 15.52,
+            "end": 15.7
+          },
+          {
+            "w": "few",
+            "start": 15.82,
+            "end": 16.05
+          },
+          {
+            "w": "left,",
+            "start": 16.17,
+            "end": 16.55
+          },
+          {
+            "w": "and",
+            "start": 16.67,
+            "end": 16.9
+          },
+          {
+            "w": "that",
+            "start": 17.02,
+            "end": 17.33
+          },
+          {
+            "w": "was",
+            "start": 17.45,
+            "end": 17.68
+          },
+          {
+            "w": "fine.",
+            "start": 17.8,
+            "end": 18.19
+          }
+        ],
+        "status": "ready"
+      },
+      "retakeUsed": false,
+      "hidden": false
+    }
+  ],
+  "realStory": {
+    "title": "The summer our garden lost its funding",
+    "checkpointId": "rl",
+    "followUpCheckpointId": "fu",
+    "witnesses": [
+      {
+        "id": "w1",
+        "relationship": "community_partner",
+        "status": "confirmed",
+        "skillsSeen": [
+          "resilience",
+          "collaboration"
+        ],
+        "sentence": "Maya kept every volunteer informed and we still opened on time.",
+        "confirmedAt": "2026-11-04T18:05:00.000Z"
+      }
+    ]
+  },
+  "integrity": [
+    {
+      "checkpointId": "cp2",
+      "kind": "retake_used",
+      "detail": "Retake used on checkpoint 2"
+    },
+    {
+      "checkpointId": "cp1",
+      "kind": "focus_lost",
+      "detail": "Window lost focus for 3 seconds during the answer"
+    }
+  ],
+  "audit": {
+    "extractor": "local-rules",
+    "version": "0.1.0",
+    "createdAt": "2026-11-04T17:42:30.000Z"
+  }
+}
