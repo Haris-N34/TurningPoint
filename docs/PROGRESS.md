@@ -14,7 +14,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] M0.6 [D] Demo profile and role storage (no auth server); picker UI is M0.11
 - [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e (workflow committed; first run pending)
 - [ ] M0.8 [D] Deployed to Vercel
-- [ ] M0.9 [H] Design system tokens (fonts, accent, neutrals, light and dark)
+- [x] M0.9 [H] Design system tokens, shadcn primitives and light/dark preview; 49 unit + 30 serial e2e pass (#9, implementation complete, awaiting review)
 - [ ] M0.10 [H] Landing page (screen 1)
 - [ ] M0.11 [H] Role picker (screen 2)
 - Done when: fresh clone runs with `pnpm i && pnpm dev`, CI is green, deployed URL shows landing page and role picker.
