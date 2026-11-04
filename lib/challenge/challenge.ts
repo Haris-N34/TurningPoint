@@ -78,6 +78,15 @@ export function publish(s: Store, id: string, now = new Date()): Challenge {
   return out;
 }
 
+/** Fair-review settings (E6): anonymous first review is on by default; transcript-first is optional. */
+export function updateSettings(s: Store, id: string, settings: Partial<Pick<Challenge, "anonymousReview" | "transcriptFirst">>) {
+  const c = getChallenge(s, id);
+  if (!c) throw new Error("No such challenge");
+  const out = { ...c, ...settings };
+  save(s, list(s).map((x) => (x.id === id ? out : x)));
+  return out;
+}
+
 export const challengeUrl = (origin: string, c: Pick<Challenge, "publicSlug">) => `${origin.replace(/\/$/, "")}/c/${c.publicSlug}`;
 
 /** QR code for the public link, as a data URL (E1.6). */

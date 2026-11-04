@@ -1,0 +1,124 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+
+async function seed(page: Page) {
+  await page.goto("/demo/seed");
+  await expect(page.getByTestId("seeded")).toBeVisible();
+}
+const MAYA = "att_demo_maya";
+const CARD = `/recruiter/card/${MAYA}?challenge=ch_demo_energy`;
+
+test("inbox: anonymous rows, filters, keyboard shortlist reveals the name (E2, E6.1)", async ({ page }) => {
+  await seed(page);
+  await page.goto("/recruiter");
+  const row = page.getByTestId(`row-${MAYA}`);
+  await expect(row).toContainText("Candidate 4F7K");
+  await expect(row).not.toContainText("Maya");
+  await expect(row).toContainText("Confirmed");
+  await expect(row).toContainText("Strong");
+
+  await page.getByTestId("filter-skill").selectOption("collaboration");
+  await page.getByTestId("filter-level").selectOption("strong");
+  await expect(row).toBeVisible();
+  await page.getByTestId("filter-witness").selectOption("false");
+  await expect(row).toBeHidden();
+  await page.getByTestId("filter-witness").selectOption("");
+
+  await page.locator("body").click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press("j");
+  await page.keyboard.press("s");
+  await expect(row).toContainText("Shortlisted");
+  await expect(row).toContainText("Maya Chen");
+  await expect(page.getByTestId("toast")).toContainText("Shortlisted");
+
+  await page.getByTestId("send-ats").click();
+  await expect(page.getByTestId("toast")).toContainText("Sent 1 shortlisted candidate");
+});
+
+test("Enter opens the selected card (E2.3)", async ({ page }) => {
+  await seed(page);
+  await page.goto("/recruiter");
+  await expect(page.getByTestId(`row-${MAYA}`)).toBeVisible();
+  await page.locator("body").click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/recruiter/card/${MAYA}`));
+});
+
+test("card: evidence with sources, decision path, real story, integrity, actions (E3)", async ({ page }) => {
+  await seed(page);
+  await page.goto(CARD);
+  const card = page.getByTestId("capability-card");
+  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+  await expect(card).toContainText("Verified student");
+  await expect(card).not.toContainText(/score\s*[:=]?\s*\d/i);
+  const jumps = card.locator('[data-testid^="jump-"]');
+  expect(await jumps.count()).toBe(4);
+  expect(await card.getByText("AI summary").count()).toBe(4);
+  await expect(page.getByTestId("turning-point-marker")).toBeVisible();
+  await expect(page.getByTestId("witness-line")).toHaveText("Confirmed by 1 community partner");
+  await expect(page.getByTestId("integrity")).toContainText("For context, not scored");
+
+  await page.getByTestId("jump-prioritization").click();
+  await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
+  await page.getByTestId("dot-cp1").click();
+  await expect(page.getByTestId("tab-cp1")).toHaveAttribute("aria-selected", "true");
+
+  // Pass needs a reason (E3.7).
+  await page.getByRole("button", { name: "Pass", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Confirm pass" })).toBeDisabled();
+  await page.getByLabel("Reason (required)").selectOption("Position filled");
+  await page.getByRole("button", { name: "Confirm pass" }).click();
+  await expect(page.getByTestId("decision")).toContainText("pass");
+  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+
+  await page.getByRole("button", { name: "Shortlist" }).click();
+  await expect(page.getByTestId("decision")).toContainText("Shortlisted");
+  await expect(page.getByTestId("card-name")).toHaveText("Maya Chen");
+});
+
+test("card fits one laptop screen and has no serious accessibility issues (E3, A5)", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "laptop layout only");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await seed(page);
+  await page.goto(CARD);
+  await expect(page.getByTestId("capability-card")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(900);
+  for (const url of [CARD, "/recruiter"]) {
+    await page.goto(url);
+    await page.waitForTimeout(300);
+    const a = await new AxeBuilder({ page }).analyze();
+    expect(a.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? "")).map((v) => v.id)).toEqual([]);
+  }
+});
+
+test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
+  await seed(page);
+  await page.evaluate((id) => {
+    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    shares.push({ id: `sh_${id}_ch_demo_bank`, attemptId: id, challengeId: "ch_demo_bank", reused: true, createdAt: new Date().toISOString() });
+    localStorage.setItem("tp:shares", JSON.stringify(shares));
+  }, MAYA);
+  await page.goto("/recruiter?challenge=ch_demo_bank");
+  await expect(page.getByTestId(`reused-${MAYA}`)).toContainText("Resilience");
+  await page.goto(`/recruiter/card/${MAYA}?challenge=ch_demo_bank`);
+  await expect(page.getByTestId("reused-badge")).toContainText("Reused from a previous challenge");
+
+  await page.evaluate((id) => {
+    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    for (const s of shares) if (s.attemptId === id && s.challengeId === "ch_demo_bank") s.revokedAt = new Date().toISOString();
+    localStorage.setItem("tp:shares", JSON.stringify(shares));
+  }, MAYA);
+  await page.reload();
+  await expect(page.getByTestId("withdrawn")).toContainText("Candidate withdrew this card");
+  await page.goto("/recruiter?challenge=ch_demo_bank");
+  await expect(page.getByTestId(`row-${MAYA}`)).toContainText("Candidate withdrew this card");
+});
+
+test("transcript-first hides video until revealed (E6.2)", async ({ page }) => {
+  await seed(page);
+  await page.goto("/recruiter");
+  await page.getByTestId("transcript-first-toggle").check();
+  await page.goto(CARD);
+  await page.getByTestId("tab-cp2").click();
+  await expect(page.getByRole("button", { name: "Reveal video" })).toBeVisible();
+});

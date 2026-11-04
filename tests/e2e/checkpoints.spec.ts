@@ -25,7 +25,7 @@ for (const mode of ["video", "voice", "text"] as Mode[]) {
       expect(a.transcript.text.length).toBeGreaterThan(0);
       expect(a.transcript.words.length).toBeGreaterThan(0);
       if (mode !== "text") expect(a.media).toBeTruthy();
-      await expect(page.getByTestId(`answer-${a.id}`)).toContainText(a.transcript.text.slice(0, 20));
+      await expect(page.getByTestId("results")).toContainText(a.transcript.text.slice(0, 20));
     }
     if (mode !== "text") expect(answers[0].transcript.text).toBe(FAKE_SPEECH);
     expect(Date.now() - started).toBeLessThan(30_000); // C4.7

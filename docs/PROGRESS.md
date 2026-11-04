@@ -66,19 +66,19 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] G3 [D] Extractor name and version stored with every card
 - [x] AI.2 [D] Evidence extraction per rubric (local rules) (Strong, Some, Not observed); "Needs human review" fallback
 - [x] AI.3 [D] Data APIs for inbox and card (lib/card/recruiter.ts, inbox.ts)
-- [ ] E2.1 [H] Inbox table (anon ID, date, status, top 3 skills, witness, reused)
-- [ ] E2.2 [H] Filters and sorts
-- [ ] E2.3 [H] Shortcuts J/K, Enter, S
-- [ ] E3.1 [H] Card header (verified, "adjusted timing" only)
-- [ ] E3.2 [H] Skill evidence strip; never an overall score
-- [ ] E3.3 [H] Decision path timeline with turning point and checkpoint dots
-- [ ] E3.4 [D+H] Clips; click a sentence to jump to the exact second (ClipPlayer done, D; card layout pending, H)
-- [ ] E3.5 [H] Real turning point section
-- [ ] E3.6 [H] Integrity notes, "For context, not scored"
-- [ ] E3.7 [D+H] Shortlist, Hold, Pass (pass needs a reason) (logic done, D; buttons pending, H)
-- [ ] E3.8 [H] Every AI sentence labelled "AI summary" with a source link
-- [ ] E6.1 [D+H] Anonymous first review ON by default (logic done, D; UI pending, H)
-- [ ] E6.2 [H] Transcript-first video setting
+- [x] E2.1 [D] Inbox table (anon ID, date, status, top 3 skills, witness, reused)
+- [x] E2.2 [D] Filters and sorts
+- [x] E2.3 [D] Shortcuts J/K, Enter, S
+- [x] E3.1 [D] Card header (verified, "adjusted timing" only)
+- [x] E3.2 [D] Skill evidence strip; never an overall score
+- [x] E3.3 [D] Decision path timeline with turning point and checkpoint dots
+- [x] E3.4 [D] Clips; click a sentence or word to jump to the exact second
+- [x] E3.5 [D] Real turning point section
+- [x] E3.6 [D] Integrity notes, "For context, not scored"
+- [x] E3.7 [D] Shortlist, Hold, Pass (pass needs a reason)
+- [x] E3.8 [D] Every AI sentence labelled "AI summary" with a source link
+- [x] E6.1 [D] Anonymous first review ON by default
+- [x] E6.2 [D] Transcript-first video setting
 - [ ] PV3 [D] Recordings served by 1-hour signed URLs only
 - Done when: finishing a run produces a card where every AI sentence links to a real timestamp, and a recruiter can shortlist from the inbox.
 
@@ -94,14 +94,14 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
 - [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
-- [ ] C6.4 [H] Card shows "Confirmed by ..." never the witness email
+- [x] C6.4 [D] Card shows "Confirmed by ..." never the witness email
 - [x] C6.5 [D] Reject witness email matching candidate email or domain alias
-- [ ] C7.1 [H] Candidate sees own card exactly as a recruiter would
+- [x] C7.1 [D] Candidate sees own card exactly as a recruiter would
 - [x] C7.2 [D+H] Hide a single clip (no transcript edits) (logic + basic toggle; design H)
 - [x] C7.3 [D+H] Share with another employer in one click, reused flag (logic + basic list; badge in inbox H)
 - [x] C7.4 [D] Revoke share; employer sees "Candidate withdrew this card" (cardFor returns withdrawn)
 - [x] C7.5 [D] Delete everything, immediately (deleteMyData: store + recordings)
-- [ ] E8.1 [D+H] Inbox shows reused cards with covered skills (row data `reused` + `covers` done, D; badge H)
+- [x] E8.1 [D] Inbox shows reused cards with covered skills
 - [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
 - [x] E5.2 [D] Exported candidate links back to the card
 - [ ] PV5 [H] "How we use AI" page linked from every screen
