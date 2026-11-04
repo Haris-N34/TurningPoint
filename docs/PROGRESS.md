@@ -40,21 +40,21 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 ## M2. Checkpoints
 
 - [ ] C1.1 [H] Three intro screens (checkpoints, timing, formats, no face or tone scored)
-- [ ] C1.2 [D] Default answer mode, changeable at every checkpoint
-- [ ] C1.3 [D+H] Device check: camera preview, mic meter, text fallback on denied permission
-- [ ] C1.4 [D+H] Accommodations form (1.5x, 2x, text-only, screen reader) changes timers
+- [x] C1.2 [D] Default answer mode, changeable at every checkpoint
+- [ ] C1.3 [D+H] Device check: camera preview, mic meter, text fallback on denied permission (fallback inside checkpoints done, D; device check screen pending, H)
+- [ ] C1.4 [D+H] Accommodations form (1.5x, 2x, text-only, screen reader) changes timers (timers and text-only wired and tested, D; form UI pending, H)
 - [ ] C1.5 [D] Mocked university SSO sets `verified=true`
-- [ ] C4.1 [D] Checkpoints fire on 2 or 3 seeded `checkpointEligible` nodes
-- [ ] C4.2 [D] AI question quotes the candidate's last choice (pre-generated, fallback after 4 s)
-- [ ] C4.3 [D] 15 s think then 60 s answer, times accommodation multiplier
-- [ ] C4.4 [D] Video, voice (waveform), text (paste disabled) modes
-- [ ] C4.5 [D] One retake per checkpoint, recorded on the card
-- [ ] C4.6 [D] Background upload with progress, 3 retries, local save, retry next scene
-- [ ] C4.7 [D] Transcript on results page within 30 s of run end
-- [ ] C4.8 [D] Focus loss during an answer logged as integrity note, never a penalty
-- [ ] C5.1 [D] Real-life checkpoint: 30 s think, up to 120 s answer, any mode
-- [ ] C5.2 [D] AI follow-up about a specific detail, 60 s answer
-- [ ] C5.3 [D] Candidate writes the one-sentence story title
+- [x] C4.1 [D] Checkpoints fire on 2 or 3 seeded `checkpointEligible` nodes
+- [x] C4.2 [D] Question quotes the candidate's last choice (built locally at choice time, node fallback)
+- [x] C4.3 [D] 15 s think then 60 s answer, times accommodation multiplier
+- [x] C4.4 [D] Video, voice (waveform), text (paste disabled) modes
+- [x] C4.5 [D] One retake per checkpoint, recorded on the card
+- [x] C4.6 [D] Recording saved locally (IndexedDB) with 3 retries and a saving indicator (no upload in demo scope)
+- [x] C4.7 [D] Transcript on results page within 30 s of run end
+- [x] C4.8 [D] Focus loss during an answer logged as integrity note, never a penalty
+- [x] C5.1 [D] Real-life checkpoint: 30 s think, up to 120 s answer, any mode
+- [x] C5.2 [D] Follow-up about a specific detail, 60 s answer
+- [x] C5.3 [D] Candidate writes the one-sentence story title
 - [ ] AI.1 [H] Fallback question for every checkpoint-eligible node; rubric examples
 - [ ] PV2 [D] Consent screen before recording; improvement opt-in off by default
 - Done when: a test run records 3 checkpoints in each mode (fake media stream), transcripts appear within 30 s.

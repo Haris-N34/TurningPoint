@@ -79,6 +79,10 @@ export const IntegrityNoteSchema = z.object({
   detail: z.string(),
 });
 
+/** A pass always needs a nonblank reason (E3.7, F2). */
+export const passNeedsReason = (r: { decision: string; reason?: string }) => r.decision !== "pass" || !!r.reason?.trim();
+export const PASS_REASON_ERROR = { message: "A pass needs a reason", path: ["reason"] };
+
 export const CardSchema = z.object({
   attemptId: z.string(),
   anonId: z.string(),
@@ -111,6 +115,7 @@ export const CardSchema = z.object({
       note: z.string().optional(),
       at: z.string(),
     })
+    .refine(passNeedsReason, PASS_REASON_ERROR)
     .optional(),
   /** How the card was made, so it can be audited (G3). */
   audit: z.object({ extractor: z.string(), version: z.string(), createdAt: z.string() }),

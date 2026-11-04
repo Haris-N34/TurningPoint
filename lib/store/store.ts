@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CardSchema, type Card } from "@/lib/card/types";
+import { CardSchema, passNeedsReason, PASS_REASON_ERROR, type Card } from "@/lib/card/types";
 
 // Local-only data layer (demo scope: no database). Everything lives in one storage backend,
 // localStorage in the browser and an in-memory map in tests. Recordings live in IndexedDB (media.ts).
@@ -65,7 +65,7 @@ export const ReviewSchema = z.object({
   reason: z.string().optional(),
   note: z.string().optional(),
   at: z.string(),
-});
+}).refine(passNeedsReason, PASS_REASON_ERROR);
 export type Review = z.infer<typeof ReviewSchema>;
 
 /** A run in progress, saved after every step so it resumes on refresh (C2.4). */
@@ -167,7 +167,7 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
     // Reviews (E3.7): a pass needs a reason.
     listReviews: (): Review[] => read(kv, "reviews", z.array(ReviewSchema)) ?? [],
     review(r: Omit<Review, "at">): Review {
-      if (r.decision === "pass" && !r.reason) throw new Error("A pass needs a reason");
+      if (!passNeedsReason(r)) throw new Error("A pass needs a reason");
       const full = ReviewSchema.parse({ ...r, at: iso() });
       const rest = this.listReviews().filter((x) => !(x.attemptId === r.attemptId && x.challengeId === r.challengeId));
       write(kv, "reviews", [...rest, full]);

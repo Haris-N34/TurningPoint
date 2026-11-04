@@ -7,7 +7,12 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure" },
+  use: {
+    baseURL: `http://localhost:${PORT}`,
+    trace: "retain-on-failure",
+    permissions: ["camera", "microphone"],
+    launchOptions: { args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream", "--autoplay-policy=no-user-gesture-required"] },
+  },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
     { name: "phone", use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } } },

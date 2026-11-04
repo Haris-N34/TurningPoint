@@ -7,11 +7,27 @@ import { getScenario } from "@/content/scenarios";
 import type { Scenario } from "@/lib/engine/schema";
 import { advance, choose, progress, startRun, view, type CheckpointDue, type RunState } from "@/lib/engine/engine";
 import { planRun, type RunPlan } from "@/lib/engine/seed";
-import { store } from "@/lib/store/store";
+import { store, type Profile } from "@/lib/store/store";
+import type { CardCheckpoint } from "@/lib/card/types";
+import { checkpointQuestion } from "@/lib/ai/questions";
+import { Checkpoint, type CheckpointResult, type IntegrityNote } from "@/components/checkpoint/Checkpoint";
+import { RealLife, type RealStory } from "@/components/checkpoint/RealLife";
+import Link from "next/link";
 import { ResourceBar } from "./ResourceBar";
 import { chime } from "./sound";
 
-type Run = { attemptId: string; plan: RunPlan; state: RunState; startedAt: string; checkpointsDue: CheckpointDue[] };
+type Pending = { id: string; due: CheckpointDue; question: string; source: "generated" | "fallback" };
+type Run = {
+  attemptId: string;
+  plan: RunPlan;
+  state: RunState;
+  startedAt: string;
+  checkpointsDue: CheckpointDue[];
+  pending?: Pending;
+  answers: CardCheckpoint[];
+  integrity: IntegrityNote[];
+  realStory?: RealStory;
+};
 
 function newAttemptId() {
   const rand = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Math.random());
@@ -25,17 +41,29 @@ export function Game({ scenarioId }: { scenarioId: string }) {
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(false);
   const shownAt = useRef<number>(0);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   // Resume an unfinished run on this device (C2.4).
   useEffect(() => {
     const s = store();
     setMuted(s.getJSON("muted", z.boolean()) ?? false);
+    setProfile(s.getProfile());
     const saved = s.activeRun(scenarioId);
     if (saved && saved.scenarioId === scenario.id) {
-      const extra = saved.extra as { plan?: RunPlan; checkpointsDue?: CheckpointDue[] };
+      const extra = saved.extra as Partial<Pick<Run, "plan" | "checkpointsDue" | "pending" | "answers" | "integrity" | "realStory">>;
       const state = saved.state as RunState;
       if (extra.plan && state?.nodeId && state.scenarioVersion === scenario.version) {
-        setRun({ attemptId: saved.attemptId, plan: extra.plan, state, startedAt: saved.startedAt, checkpointsDue: extra.checkpointsDue ?? [] });
+        setRun({
+          attemptId: saved.attemptId,
+          plan: extra.plan,
+          state,
+          startedAt: saved.startedAt,
+          checkpointsDue: extra.checkpointsDue ?? [],
+          pending: extra.pending,
+          answers: extra.answers ?? [],
+          integrity: extra.integrity ?? [],
+          realStory: extra.realStory,
+        });
         setPaused(saved.status === "paused");
       }
     }
@@ -50,7 +78,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
         scenarioId: scenario.id,
         seed: r.plan.seed,
         state: r.state,
-        extra: { plan: r.plan, checkpointsDue: r.checkpointsDue },
+        extra: { plan: r.plan, checkpointsDue: r.checkpointsDue, pending: r.pending, answers: r.answers, integrity: r.integrity, realStory: r.realStory },
         status,
         startedAt: r.startedAt,
         practice: false,
@@ -70,7 +98,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
   const begin = () => {
     const attemptId = newAttemptId();
     const plan = planRun(scenario, attemptId);
-    update({ attemptId, plan, state: startRun(scenario, plan), startedAt: new Date().toISOString(), checkpointsDue: [] });
+    update({ attemptId, plan, state: startRun(scenario, plan), startedAt: new Date().toISOString(), checkpointsDue: [], answers: [], integrity: [] });
   };
 
   const v = run ? view(scenario, run.plan, run.state) : null;
@@ -84,15 +112,54 @@ export function Game({ scenarioId }: { scenarioId: string }) {
     if (isTurningPoint && !muted) chime("turning-point");
   }, [isTurningPoint, muted]);
 
+  // When a checkpoint or the pause screen closes, put focus back on the next action (A3, keyboard play).
+  const blocking = !!run?.pending || paused;
+  useEffect(() => {
+    if (blocking) return;
+    const t = setTimeout(() => {
+      if (document.activeElement && document.activeElement !== document.body) return;
+      const targets = document.querySelectorAll<HTMLElement>("[data-primary-action]");
+      targets[targets.length - 1]?.focus();
+    }, 50);
+    return () => clearTimeout(t);
+  }, [blocking]);
+
   const onChoose = (optionId: string) => {
     if (!run || paused) return;
     const r = choose(scenario, run.plan, run.state, optionId, performance.now() - shownAt.current);
-    update({ ...run, state: r.state, checkpointsDue: r.checkpoint ? [...run.checkpointsDue, r.checkpoint] : run.checkpointsDue });
+    let pending: Pending | undefined;
+    if (r.checkpoint) {
+      // Built the moment the choice is made, so it is ready when the checkpoint fires (latency budget).
+      const q = checkpointQuestion(scenario, r.checkpoint, run.plan.seed);
+      pending = { id: `cp${run.checkpointsDue.length + 1}`, due: r.checkpoint, question: q.question, source: q.source };
+      if (!muted) chime("checkpoint");
+    }
+    update({ ...run, state: r.state, pending, checkpointsDue: r.checkpoint ? [...run.checkpointsDue, r.checkpoint] : run.checkpointsDue });
   };
 
   const onContinue = () => {
     if (!run || paused) return;
     update({ ...run, state: advance(scenario, run.plan, run.state) });
+  };
+
+  const onCheckpointDone = (res: CheckpointResult) => {
+    if (!run) return;
+    update({ ...run, pending: undefined, answers: [...run.answers, res.checkpoint], integrity: [...run.integrity, ...res.integrity] });
+  };
+
+  const onRealLifeDone = (res: { results: CheckpointResult[]; story: RealStory }) => {
+    if (!run) return;
+    const next = {
+      ...run,
+      answers: [...run.answers, ...res.results.map((r) => r.checkpoint)],
+      integrity: [...run.integrity, ...res.results.flatMap((r) => r.integrity)],
+      realStory: res.story,
+    };
+    update({ ...next, state: advance(scenario, run.plan, run.state) });
+  };
+
+  const saveMode = (m: "video" | "voice" | "text") => {
+    setProfile(store().saveProfile({ defaultMode: m }));
   };
 
   const togglePause = () => {
@@ -167,14 +234,18 @@ export function Game({ scenarioId }: { scenarioId: string }) {
 
             <p className="text-lg leading-relaxed" data-testid="narration">{v?.text}</p>
 
-            {v?.kind === "choice" && <Choices options={v.node.options} onChoose={onChoose} disabled={paused} />}
+            {v?.kind === "choice" && <Choices options={v.node.options} onChoose={onChoose} disabled={paused || !!run.pending} focusToken={`${run.pending?.id ?? ""}${paused}`} />}
             {(v?.kind === "scene" || (v?.kind === "event" && !v.turningPoint)) && <ContinueButton onClick={onContinue} disabled={paused} />}
-            {v?.kind === "checkpoint" && (
-              <div className="rounded-2xl border p-4">
-                <p className="font-medium">Real-life checkpoint</p>
-                <p className="mt-1 text-sm opacity-80">Answering arrives in M2. Continue for now.</p>
-                <ContinueButton onClick={onContinue} disabled={paused} />
-              </div>
+            {v?.kind === "checkpoint" && profile && (
+              <RealLife
+                key={run.state.nodeId}
+                attemptId={run.attemptId}
+                nodeId={v.node.id}
+                prompt={v.text}
+                profile={profile}
+                onModeChange={saveMode}
+                onDone={onRealLifeDone}
+              />
             )}
             {v?.kind === "end" && <EndSummary scenario={scenario} run={run} />}
           </motion.section>
@@ -216,6 +287,23 @@ export function Game({ scenarioId }: { scenarioId: string }) {
           )}
         </AnimatePresence>
 
+        {run.pending && profile && !paused && (
+          <Checkpoint
+            key={run.pending.id}
+            id={run.pending.id}
+            nodeId={run.pending.due.nodeId}
+            kind="decision"
+            question={run.pending.question}
+            questionSource={run.pending.source}
+            attemptId={run.attemptId}
+            multiplier={profile.accommodations.timeMultiplier}
+            defaultMode={profile.defaultMode}
+            textOnly={profile.accommodations.textOnly}
+            onModeChange={saveMode}
+            onDone={onCheckpointDone}
+          />
+        )}
+
         {paused && (
           <div role="dialog" aria-modal="true" aria-label="Paused" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
             <div className="rounded-3xl bg-background p-6 text-center text-foreground">
@@ -234,18 +322,29 @@ export function Game({ scenarioId }: { scenarioId: string }) {
 
 function ContinueButton({ onClick, disabled, label = "Continue" }: { onClick: () => void; disabled?: boolean; label?: string }) {
   return (
-    <button onClick={onClick} disabled={disabled} autoFocus className="mt-4 self-start rounded-full bg-foreground px-6 py-3 font-medium text-background disabled:opacity-50">
+    <button onClick={onClick} disabled={disabled} autoFocus data-primary-action className="mt-4 self-start rounded-full bg-foreground px-6 py-3 font-medium text-background disabled:opacity-50">
       {label}
     </button>
   );
 }
 
 /** Options with keyboard play: arrow keys move, Enter or Space picks (C2.6). */
-function Choices({ options, onChoose, disabled }: { options: { id: string; label: string }[]; onChoose: (id: string) => void; disabled?: boolean }) {
+function Choices({
+  options,
+  onChoose,
+  disabled,
+  focusToken,
+}: {
+  options: { id: string; label: string }[];
+  onChoose: (id: string) => void;
+  disabled?: boolean;
+  focusToken?: string;
+}) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  // Focus the first option on a new scene and again when a checkpoint or pause closes (A3).
   useEffect(() => {
-    refs.current[0]?.focus();
-  }, [options]);
+    if (!disabled) refs.current[0]?.focus();
+  }, [options, focusToken, disabled]);
   const onKey = (e: React.KeyboardEvent, i: number) => {
     const n = options.length;
     if (e.key === "ArrowDown" || e.key === "ArrowRight") {
@@ -268,6 +367,7 @@ function Choices({ options, onChoose, disabled }: { options: { id: string; label
           onKeyDown={(e) => onKey(e, i)}
           disabled={disabled}
           data-testid={`option-${o.id}`}
+          data-primary-action={i === 0 ? "" : undefined}
           className="rounded-2xl border border-black/10 dark:border-white/15 px-4 py-3 text-left font-medium transition hover:bg-black/[.04] dark:hover:bg-white/[.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
         >
           {o.label}
@@ -282,8 +382,11 @@ function EndSummary({ scenario, run }: { scenario: Scenario; run: Run }) {
     <div className="rounded-2xl border p-4" data-testid="end">
       <p className="font-semibold">Run complete</p>
       <p className="mt-1 text-sm opacity-80">
-        {run.state.log.length} decisions logged. Your Capability Card is built from these in M3.
+        {run.state.log.length} decisions and {run.answers.length} answers saved on this device.
       </p>
+      <Link href={`/results/${run.attemptId}`} className="mt-3 inline-block rounded-full bg-foreground px-5 py-2.5 font-medium text-background" data-testid="see-results">
+        See your results
+      </Link>
       <ul className="mt-3 text-sm">
         {Object.entries(scenario.resources).map(([k, r]) => (
           <li key={k}>

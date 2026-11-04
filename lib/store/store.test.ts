@@ -53,6 +53,7 @@ describe("local store (M0.5, M0.6)", () => {
   it("requires a reason to pass (E3.7, F2)", () => {
     const s = makeStore(new MemoryKV(), clock());
     expect(() => s.review({ attemptId: "a", challengeId: "c", decision: "pass" })).toThrow(/reason/);
+    expect(() => s.review({ attemptId: "a", challengeId: "c", decision: "pass", reason: "  " })).toThrow(/reason/);
     s.review({ attemptId: "a", challengeId: "c", decision: "pass", reason: "Position filled" });
     s.review({ attemptId: "a", challengeId: "c", decision: "shortlist" });
     expect(s.listReviews()).toHaveLength(1);

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { answerCheckpoint, installFakeSpeech, nextStep, playToEnd } from "./helpers";
 
 type SavedRun = { status: string; state: { log: { nodeId: string; optionId: string; decidedMs: number; at: string }[]; status: string } };
 
@@ -8,27 +9,14 @@ async function savedRuns(page: Page): Promise<SavedRun[]> {
   );
 }
 
-/** Play to the end with the keyboard only: Enter on the focused control each step (C2.6). */
-async function playToEnd(page: Page) {
-  for (let i = 0; i < 40; i++) {
-    if (await page.getByTestId("end").isVisible()) return;
-    const focused = page.locator(":focus");
-    await expect(focused).toBeVisible();
-    // Move once with the arrow key so we exercise roving focus on choices.
-    if (await page.locator('[data-testid^="option-"]').first().isVisible()) await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("Enter");
-    await page.waitForTimeout(350);
-  }
-  throw new Error("did not reach the end");
-}
-
 test("plays the sample scenario start to end and logs every choice (M1)", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
+  await installFakeSpeech(page);
   await page.goto("/play/sample");
   await page.getByRole("button", { name: "Start" }).click();
   await expect(page.getByTestId("game")).toBeVisible();
-  await playToEnd(page);
+  await playToEnd(page, "text");
 
   const runs = await savedRuns(page);
   expect(runs).toHaveLength(1);
@@ -47,13 +35,18 @@ test("plays the sample scenario start to end and logs every choice (M1)", async 
 test("shows the turning-point takeover and resumes after a refresh (C3.1, C2.4)", async ({ page }) => {
   await page.goto("/play/sample");
   await page.getByRole("button", { name: "Start" }).click();
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByTestId("option-a").click();
-  await page.getByTestId("option-a").click();
+  for (let i = 0; i < 20; i++) {
+    const s = await nextStep(page);
+    if (s === "checkpoint") await answerCheckpoint(page, "text");
+    else if (await page.getByTestId("turning-point").isVisible()) break;
+    else if (s === "choice") await page.locator('[data-testid^="option-"]').first().click();
+    else await page.getByRole("button", { name: "Continue" }).click();
+  }
   await expect(page.getByTestId("turning-point")).toBeVisible();
 
   await page.reload();
   await expect(page.getByTestId("turning-point")).toBeVisible();
+  await expect(page.getByTestId("checkpoint")).toBeHidden();
   await page.getByRole("button", { name: "Face it" }).click();
   await expect(page.getByTestId("turning-point")).toBeHidden();
 
@@ -62,6 +55,16 @@ test("shows the turning-point takeover and resumes after a refresh (C3.1, C2.4)"
   await expect(page.getByRole("dialog", { name: "Paused" })).toBeVisible();
   await page.getByRole("dialog", { name: "Paused" }).getByRole("button", { name: "Resume" }).click();
   await expect(page.locator('[data-testid^="option-"]').first()).toBeVisible();
+});
+
+test("an open checkpoint survives a refresh (C2.4)", async ({ page }) => {
+  await page.goto("/play/sample");
+  await page.getByRole("button", { name: "Start" }).click();
+  const { playToCheckpoint } = await import("./helpers");
+  await playToCheckpoint(page);
+  const q = await page.getByTestId("checkpoint-question").getAttribute("aria-label");
+  await page.reload();
+  await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", q!);
 });
 
 test("fits a 375 px phone without horizontal scroll (C2.5)", async ({ page }) => {

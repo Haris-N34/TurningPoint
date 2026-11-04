@@ -24,6 +24,16 @@ describe("fixtures/attempt.json (M0.4)", () => {
   });
 });
 
+describe("review contract (E3.7)", () => {
+  it("rejects a pass with no reason or a blank reason", () => {
+    const base = { ...fixture, review: { decision: "pass", at: "2026-11-04T18:00:00Z" } };
+    expect(CardSchema.safeParse(base).success).toBe(false);
+    expect(CardSchema.safeParse({ ...base, review: { ...base.review, reason: "   " } }).success).toBe(false);
+    expect(CardSchema.safeParse({ ...base, review: { ...base.review, reason: "Position filled" } }).success).toBe(true);
+    expect(CardSchema.safeParse({ ...base, review: { decision: "hold", at: "2026-11-04T18:00:00Z" } }).success).toBe(true);
+  });
+});
+
 describe("verifyEvidence (G1)", () => {
   const card = CardSchema.parse(fixture);
 
@@ -33,8 +43,10 @@ describe("verifyEvidence (G1)", () => {
     if (e.source?.type === "clip") e.source.quote = "I am a natural leader.";
     const { evidence, dropped } = verifyEvidence(bad);
     expect(dropped).toHaveLength(1);
-    expect(evidence[0].level).toBe("some");
+    expect(evidence[0].level).toBe("needs_review");
     expect(evidence[0].source).toBeUndefined();
+    // The AI sentence described the invented quote, so it must not survive (E3.8).
+    expect(evidence[0].sentence).toBeUndefined();
   });
 
   it("drops a quote that is close but not exact", () => {
@@ -42,7 +54,28 @@ describe("verifyEvidence (G1)", () => {
     const e = bad.evidence[1];
     expect(e.level).toBe("strong");
     if (e.source?.type === "clip") e.source.quote = e.source.quote.replace("instead of", "rather than");
-    expect(verifyEvidence(bad).evidence[1].level).toBe("some");
+    expect(verifyEvidence(bad).evidence[1].level).toBe("needs_review");
+  });
+
+  it("never lets an unsourced AI sentence or level through (E3.8)", () => {
+    const bad = structuredClone(card);
+    bad.evidence = [
+      { skill: "collaboration", level: "strong", sentence: "Great team player." },
+      { skill: "prioritization", level: "some", sentence: "Prioritised well." },
+      { skill: "adaptability", level: "needs_review", sentence: "Unclear." },
+      { skill: "resilience", level: "not_observed", sentence: "Nothing here." },
+    ];
+    const { evidence, dropped } = verifyEvidence(bad);
+    expect(evidence.map((e) => e.level)).toEqual(["not_observed", "not_observed", "needs_review", "not_observed"]);
+    expect(evidence.every((e) => e.sentence === undefined)).toBe(true);
+    expect(dropped).toHaveLength(2);
+  });
+
+  it("keeps a verified choice source with its sentence", () => {
+    const ok = structuredClone(card);
+    const step = ok.decisionPath[1];
+    ok.evidence = [{ skill: "collaboration", level: "some", sentence: "Let the team decide.", source: { type: "choice", nodeId: step.nodeId, optionId: step.optionId, optionLabel: step.optionLabel } }];
+    expect(verifyEvidence(ok).evidence[0]).toEqual(ok.evidence[0]);
   });
 
   it("drops a choice source that is not in the log", () => {
