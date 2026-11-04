@@ -1,9 +1,10 @@
 import { parseScenario, type Scenario } from "@/lib/engine/schema";
 import sample from "./sample.json";
 import launchWeek from "./launch-week.json";
+import clientRescue from "./client-rescue.json";
 
 // Every scenario the app can play.
-const RAW: Record<string, unknown> = { sample, "launch-week": launchWeek };
+const RAW: Record<string, unknown> = { sample, "launch-week": launchWeek, "client-rescue": clientRescue };
 
 export const SCENARIO_IDS = Object.keys(RAW);
 
