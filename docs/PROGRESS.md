@@ -124,6 +124,12 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 
+## Paused (Nov 4, ~19:50 UTC)
+
+- #18 builder: `components/admin/Builder.tsx` written but not wired to a route or tested. Next: add `/admin/new`, replace the `/admin` placeholder with a challenge list, e2e for E1.1 to E1.7, then merge to `main`.
+- Then #31: practice mode (C8), demo shortcuts and seed reset (P.2), Lighthouse 85+ on the game page.
+- Haris's PRs wait for review while paused.
+
 ## Blockers
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
