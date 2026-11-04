@@ -1,0 +1,506 @@
+{
+  "id": "launch-week",
+  "version": 1,
+  "title": "Launch Week",
+  "summary": "Lead a student food market with a community non-profit. Build a plan, recover when it breaks, and explain what you protect.",
+  "industryFlavour": "non-profit",
+  "targetSkills": [
+    "adaptability",
+    "prioritization",
+    "collaboration",
+    "resilience"
+  ],
+  "start": "n1",
+  "estimatedMinutes": 15,
+  "resources": {
+    "budget": {
+      "label": "Budget",
+      "start": 5000,
+      "min": 0,
+      "unit": "$"
+    },
+    "morale": {
+      "label": "Team morale",
+      "start": 70,
+      "min": 0,
+      "max": 100
+    },
+    "time": {
+      "label": "Days left",
+      "start": 21,
+      "min": 0
+    }
+  },
+  "variation": {
+    "teamSize": [
+      6,
+      10
+    ]
+  },
+  "disruptions": [
+    {
+      "id": "sponsor-pulls-out",
+      "title": "The main sponsor pulls out",
+      "text": "Monday, 7 a.m. The sponsor freezes its community funding. The $3,000 instalment in your $5,000 opening grant is gone. The non-profit cannot cover it, and vendors need confirmation by noon. Your commitments still stand until you renegotiate them.",
+      "effects": {
+        "budget": -3000
+      },
+      "next": "n9"
+    },
+    {
+      "id": "venue-cancels",
+      "title": "The venue cancels",
+      "text": "Monday, 7 a.m. A burst pipe closes the community hall. A smaller accessible courtyard is available, but moving permits, refrigeration and signs will consume five days. Vendors need an answer by noon. You cannot promise the old layout.",
+      "effects": {
+        "time": -5,
+        "budget": -500
+      },
+      "next": "n9"
+    },
+    {
+      "id": "lead-volunteer-quits",
+      "title": "Your lead volunteer leaves",
+      "text": "Monday, 7 a.m. Your logistics lead must leave to care for a family member. Their supplier contacts are in a shared folder, but nobody else has rehearsed deliveries. Two volunteers say they cannot take on more hours. You have until noon to revise responsibilities.",
+      "effects": {
+        "morale": -35,
+        "time": -2
+      },
+      "next": "n9"
+    }
+  ],
+  "disruptionPool": [
+    "sponsor-pulls-out",
+    "venue-cancels",
+    "lead-volunteer-quits"
+  ],
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "scene",
+      "text": "Three weeks before opening, you lead {teamSize} students planning a pop-up food market with the fictional Neighbour Table non-profit. The goal is affordable food and a fair opportunity for small vendors, not maximum attendance. Your opening grant is $5,000. Leena, the community lead, asks for a plan that volunteers can actually deliver. Read each situation, weigh the trade-offs, and choose your next move. There is no perfect route.",
+      "next": "n2"
+    },
+    {
+      "id": "n2",
+      "type": "choice",
+      "text": "Your opening budget must cover vendor access, refrigeration, signs and promotion. The hall is donated. Small food vendors need fee support; established trucks bring their own equipment but charge more. Which opening commitment will you make?",
+      "skillSignals": [
+        "prioritization"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Reserve $600 for small-vendor access and simple promotion",
+          "effects": {
+            "budget": -600,
+            "morale": 5,
+            "time": -1
+          },
+          "next": "n3"
+        },
+        {
+          "id": "b",
+          "label": "Spend $1,000 on established trucks and wider promotion",
+          "effects": {
+            "budget": -1000,
+            "time": -1
+          },
+          "next": "n3"
+        },
+        {
+          "id": "c",
+          "label": "Keep $300 for basic signs and recruit vendors yourself",
+          "effects": {
+            "budget": -300,
+            "time": -2
+          },
+          "next": "n3"
+        }
+      ]
+    },
+    {
+      "id": "n3",
+      "type": "choice",
+      "text": "Two volunteers want social media. Nobody volunteers for delivery logistics. One student has only evenings free; another has never handled food storage. Leena needs named contacts tomorrow. How do you divide the work without assuming everyone has the same availability?",
+      "skillSignals": [
+        "collaboration",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Assign roles and publish a simple delivery checklist",
+          "effects": {
+            "morale": -5,
+            "time": -1
+          },
+          "next": "n4"
+        },
+        {
+          "id": "b",
+          "label": "Ask availability, then pair volunteers on logistics",
+          "effects": {
+            "morale": 8,
+            "time": -2
+          },
+          "next": "n4"
+        },
+        {
+          "id": "c",
+          "label": "Take logistics yourself and keep the team on outreach",
+          "effects": {
+            "morale": 4,
+            "time": -3
+          },
+          "next": "n4"
+        }
+      ],
+      "fallbackQuestion": "What did your approach to the logistics gap protect, and whose workload did it increase?"
+    },
+    {
+      "id": "n4",
+      "type": "scene",
+      "text": "The plan is on one shared page. Vendor access and safe food storage are essentials; decorations and a second promotional push can wait. Leena asks each workstream to name an owner and a backup. The budget and days-left meters show the consequences of your commitments. A reserve buys flexibility, but leaving every decision open also costs time. Your next update must tell partners what is confirmed and what is still uncertain.",
+      "next": "n5"
+    },
+    {
+      "id": "n5",
+      "type": "choice",
+      "text": "A required laboratory session clashes with the only delivery rehearsal. Half the students cannot attend. The supplier can offer a separate briefing for a fee, or you can rehearse with a smaller group. Opening is still two weeks away.",
+      "skillSignals": [
+        "problem-solving",
+        "collaboration"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Pay $200 for a second supplier briefing",
+          "effects": {
+            "budget": -200,
+            "time": -1
+          },
+          "next": "n6"
+        },
+        {
+          "id": "b",
+          "label": "Train two backups and share a delivery checklist",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n6"
+        },
+        {
+          "id": "c",
+          "label": "Move the whole rehearsal to the weekend",
+          "effects": {
+            "time": -2,
+            "morale": -5
+          },
+          "next": "n6"
+        }
+      ]
+    },
+    {
+      "id": "n6",
+      "type": "choice",
+      "text": "A popular vendor asks for a larger share of stall space and a reduced fee. They say their following will draw visitors. Two smaller vendors would lose their places. Your agreement promised fair access, but sign-ups are below plan. What will you offer?",
+      "skillSignals": [
+        "communication",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Keep equal stall space and explain the access promise",
+          "effects": {
+            "morale": 5,
+            "time": -1
+          },
+          "next": "n7"
+        },
+        {
+          "id": "b",
+          "label": "Offer a larger stall in exchange for subsidised meals",
+          "effects": {
+            "budget": -200,
+            "time": -1
+          },
+          "next": "n7"
+        },
+        {
+          "id": "c",
+          "label": "Split the stall across two shifts to keep every vendor",
+          "effects": {
+            "time": -2,
+            "morale": -3
+          },
+          "next": "n7"
+        }
+      ],
+      "fallbackQuestion": "Which trade-off in the vendor agreement mattered most, and how would you explain it to the smaller vendors?"
+    },
+    {
+      "id": "n7",
+      "type": "choice",
+      "text": "Week-one registrations are half your estimate. A community partner says the online form is difficult on a phone; students say people may simply arrive without booking. You can afford one more outreach effort before confirming supplies.",
+      "skillSignals": [
+        "problem-solving",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Phone community partners and offer assisted sign-up",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n8"
+        },
+        {
+          "id": "b",
+          "label": "Buy $300 of targeted local promotion",
+          "effects": {
+            "budget": -300,
+            "time": -1
+          },
+          "next": "n8"
+        },
+        {
+          "id": "c",
+          "label": "Reduce the first food order and accept walk-ins",
+          "effects": {
+            "budget": 100,
+            "morale": -3,
+            "time": -1
+          },
+          "next": "n8"
+        }
+      ]
+    },
+    {
+      "id": "n8",
+      "type": "event",
+      "turningPoint": true,
+      "text": "The plan breaks. Your next decision must account for the new constraint."
+    },
+    {
+      "id": "n9",
+      "type": "choice",
+      "text": "You have read the disruption. The noon update cannot promise the original plan unchanged. Leena asks for one workable opening and a clear statement of what you are dropping. Which scope change gives you room to recover?",
+      "skillSignals": [
+        "adaptability",
+        "resilience"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Run one compact market day and release optional bookings",
+          "effects": {
+            "budget": 400,
+            "time": 2,
+            "morale": -5
+          },
+          "next": "n10"
+        },
+        {
+          "id": "b",
+          "label": "Keep both dates but remove paid promotion and decoration",
+          "effects": {
+            "budget": 300,
+            "time": -1
+          },
+          "next": "n10"
+        },
+        {
+          "id": "c",
+          "label": "Delay opening two days to rebuild the plan with partners",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n10"
+        }
+      ],
+      "fallbackQuestion": "What did you stop doing after the disruption, and what risk remains in your revised plan?"
+    },
+    {
+      "id": "n10",
+      "type": "choice",
+      "text": "A neighbourhood cooperative can contribute $700, lend equipment and connect you with volunteers. In exchange, it wants a prominent stall and a decision today. You have not checked its food-handling capacity. Another partner can offer a smaller equipment loan with no cash.",
+      "skillSignals": [
+        "creativity",
+        "ambiguity"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Accept $700 conditional on a safety check and written roles",
+          "effects": {
+            "budget": 700,
+            "time": -2
+          },
+          "next": "n11"
+        },
+        {
+          "id": "b",
+          "label": "Take the equipment-only loan and keep the vendor layout",
+          "effects": {
+            "budget": 200,
+            "time": -1
+          },
+          "next": "n11"
+        },
+        {
+          "id": "c",
+          "label": "Ask existing vendors to share equipment before adding a partner",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n11"
+        }
+      ],
+      "fallbackQuestion": "What uncertainty did you accept in your partner decision, and what would make you change course?"
+    },
+    {
+      "id": "n11",
+      "type": "choice",
+      "text": "The group chat fills with questions. A volunteer says the earlier plan wasted their time. Others ask whether they should cancel their shifts. Leena wants a factual update before rumours reach vendors. How will you rebuild a shared picture?",
+      "skillSignals": [
+        "communication",
+        "collaboration"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Hold a short briefing, name the changes and invite concerns",
+          "effects": {
+            "time": -1,
+            "morale": 10
+          },
+          "next": "n12"
+        },
+        {
+          "id": "b",
+          "label": "Send revised roles with a private route for availability concerns",
+          "effects": {
+            "time": -1,
+            "morale": 5
+          },
+          "next": "n12"
+        },
+        {
+          "id": "c",
+          "label": "Speak to each workstream lead before sending the whole update",
+          "effects": {
+            "time": -2,
+            "morale": 8
+          },
+          "next": "n12"
+        }
+      ]
+    },
+    {
+      "id": "n12",
+      "type": "choice",
+      "text": "The final budget review leaves three competing needs: an accessible queue layout, a small vendor travel allowance, and an extra promotional push. Basic food safety is already protected. You cannot fully fund all three. Leena asks what you will protect and what you will tell the people losing support.",
+      "skillSignals": [
+        "prioritization",
+        "empathy"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Protect access and reduce promotion, explaining the smaller reach",
+          "effects": {
+            "budget": -200,
+            "morale": 5
+          },
+          "next": "n13"
+        },
+        {
+          "id": "b",
+          "label": "Protect vendor travel and use volunteers for queue support",
+          "effects": {
+            "budget": -250,
+            "time": -1
+          },
+          "next": "n13"
+        },
+        {
+          "id": "c",
+          "label": "Split the funds and tell partners which gaps need monitoring",
+          "effects": {
+            "budget": -300,
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n13"
+        }
+      ],
+      "fallbackQuestion": "Who benefits from the need you protected, and how would you handle the gap left for others?"
+    },
+    {
+      "id": "n13",
+      "type": "choice",
+      "text": "Market day happens with your revised plan. Volunteers report that people found affordable meals, but the queue was confusing and one vendor felt uninformed about the changes. At the debrief, Leena says: “You kept it going. Next time, tell partners earlier what they are losing.” You do not yet have reliable attendance or surplus figures. What do you do with that feedback?",
+      "skillSignals": [
+        "feedback",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask the vendor for a specific example and agree one change",
+          "effects": {
+            "time": -1,
+            "morale": 5
+          },
+          "next": "n14"
+        },
+        {
+          "id": "b",
+          "label": "Review the update timeline with Leena and assign a new owner",
+          "effects": {
+            "time": -1,
+            "morale": 3
+          },
+          "next": "n14"
+        },
+        {
+          "id": "c",
+          "label": "Explain the constraints, then ask what information was missing",
+          "effects": {
+            "time": -1,
+            "morale": 2
+          },
+          "next": "n14"
+        }
+      ]
+    },
+    {
+      "id": "n14",
+      "type": "checkpoint",
+      "kind": "real_life",
+      "text": "When have you faced something like this in real life? What broke, what did you decide, and what changed? A class project, community role, paid work or caring responsibility can all be relevant. Describe your own contribution and a specific trade-off.",
+      "next": "n15"
+    },
+    {
+      "id": "n15",
+      "type": "end",
+      "text": "Launch Week is complete. Your remaining resources show the consequences of the choices you made, not a hiring score. Your decision path and explanations are evidence for a person to review. There is no single winning route."
+    }
+  ]
+}

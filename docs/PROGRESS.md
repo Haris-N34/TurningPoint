@@ -32,7 +32,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] C3.3 [D] Disruption picked from pool by per-candidate seed
 - [x] S.1 [D] Schema rejects unreachable nodes, missing targets, no path to end, fewer than 3 eligible nodes
 - [x] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable
-- [ ] S.3 [H] Launch Week written in full (15 nodes, eligible 3, 6, 9, 10, 12, 3 disruptions)
+- [x] S.3 [H] Launch Week written in full (15 nodes, eligible 3, 6, 9, 10, 12, 3 disruptions); 87 unit + 44 serial e2e pass (#11, awaiting review). C2.5 timed first-user validation remains open.
 - [ ] S.4 [H] Client Rescue template written
 - [ ] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
 - Done when: a Playwright test plays Launch Week start to end on desktop and phone, every choice is in the database.
@@ -128,4 +128,4 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 
-- #11 (M1) waits for the M0 definition of done: review/integrate Haris foundation PRs and complete #25 deployment acceptance. #9 and #10 implementation is ready for review; no merge or deployment is authorized in this run.
+- M0 accepted by Div on Board #1 (2026-11-04): foundation PRs #32 to #34 merged into main. #25 deployment deferred until the product is done. #11 to #15 may proceed. Recruiter and employer screens #16 to #18 are delegated to Div.
