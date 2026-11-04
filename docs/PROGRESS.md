@@ -54,17 +54,17 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] A.9 [D] Map loads from Tiled JSON; walk with keys, click and tap; camera follows
 - [ ] A.10 [D] NPCs show urgency bubbles (icon + label, not colour only); talking opens a React dialogue driven by scenario nodes
 - [ ] A.11 [D] Clock advances by action costs and drift, pauses in dialogue, checkpoints, pause menu and on blur; shows day, time and progress ring
-- [ ] A.12 [D] Turn-based mode disables drift; outcomes do not depend on drift (unit test)
+- [x] A.12 [D] Turn-based mode disables drift; outcomes do not depend on drift (unit test)
 - [ ] A.13 [D] Issues spawn, count down, expire with consequences; Talk, Delegate, Defer with a reason, Ignore
 - [ ] A.14 [D] Evening recap shows the day's KPIs
 - [ ] A.15 [D] Turning-point sequence plays fully, changes the map, spawns new issues
-- [ ] A.16 [D] All A8 KPIs compute correctly from a recorded input log (unit tests with fixtures)
+- [x] A.16 [D] All A8 KPIs compute correctly from a recorded input log (unit tests with fixtures)
 - [ ] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
-- [ ] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
+- [x] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
 - [ ] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace
 - [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop
 - [ ] A.21 [D] Test hooks window.__tp (NEXT_PUBLIC_TEST_HOOKS=1); Playwright full run in map view (desktop, phone) and list view (keyboard only)
-- [ ] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills
+- [x] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills via the Value Mapper (B.5)
 - [ ] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete
 - Done when: every A item above passes and the quiz-test screenshots show a game, not a form.
 

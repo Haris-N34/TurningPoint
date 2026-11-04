@@ -1,0 +1,1704 @@
+{
+  "id": "launch-week",
+  "version": 2,
+  "title": "Launch Week",
+  "summary": "Run a 5-day pop-up community market with a local non-profit. Problems pop up all over the site and the clock is running. Midweek, the plan breaks.",
+  "role": "Student lead",
+  "industryFlavour": "non-profit",
+  "targetSkills": [
+    "prioritization",
+    "adaptability",
+    "resilience",
+    "collaboration"
+  ],
+  "estimatedMinutes": 14,
+  "map": {
+    "tiled": "/maps/launch-week.json",
+    "width": 40,
+    "height": 30,
+    "start": "hq"
+  },
+  "resources": {
+    "budget": {
+      "label": "Budget",
+      "start": 5000,
+      "unit": "$"
+    },
+    "morale": {
+      "label": "Team morale",
+      "start": 70
+    }
+  },
+  "stakeholders": [
+    {
+      "id": "vendors",
+      "label": "Vendors",
+      "start": 60
+    },
+    {
+      "id": "partner",
+      "label": "Non-profit partner",
+      "start": 65
+    },
+    {
+      "id": "community",
+      "label": "Community",
+      "start": 55
+    }
+  ],
+  "zones": [
+    {
+      "id": "gate",
+      "name": "Entrance Gate",
+      "x": 17,
+      "y": 1,
+      "w": 6,
+      "h": 3
+    },
+    {
+      "id": "volunteers",
+      "name": "Volunteer Station",
+      "x": 3,
+      "y": 4,
+      "w": 9,
+      "h": 6
+    },
+    {
+      "id": "vendors",
+      "name": "Vendor Row",
+      "x": 26,
+      "y": 4,
+      "w": 12,
+      "h": 6
+    },
+    {
+      "id": "hq",
+      "name": "HQ Tent",
+      "x": 16,
+      "y": 12,
+      "w": 8,
+      "h": 5
+    },
+    {
+      "id": "storage",
+      "name": "Storage Shed",
+      "x": 3,
+      "y": 19,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "id": "sponsor",
+      "name": "Sponsor Office",
+      "x": 28,
+      "y": 19,
+      "w": 9,
+      "h": 6
+    },
+    {
+      "id": "stage",
+      "name": "Main Stage",
+      "x": 14,
+      "y": 23,
+      "w": 12,
+      "h": 6
+    }
+  ],
+  "npcs": [
+    {
+      "id": "priya",
+      "name": "Priya",
+      "role": "Volunteer lead",
+      "zone": "volunteers",
+      "tile": {
+        "x": 7,
+        "y": 7
+      },
+      "portrait": "priya",
+      "look": {
+        "skin": "#8d5a3b",
+        "hair": "#1f1720",
+        "hairStyle": "bun",
+        "outfit": "#2f7f73",
+        "accent": "#e9d8b8",
+        "extra": "none"
+      },
+      "volunteer": {
+        "reliability": 0.8
+      }
+    },
+    {
+      "id": "theo",
+      "name": "Theo",
+      "role": "Logistics volunteer",
+      "zone": "storage",
+      "tile": {
+        "x": 7,
+        "y": 22
+      },
+      "portrait": "logistics-volunteer",
+      "look": {
+        "skin": "#f1c9a5",
+        "hair": "#c4462a",
+        "hairStyle": "spiky",
+        "outfit": "#2d3a5c",
+        "accent": "#f08a24",
+        "extra": "vest"
+      },
+      "volunteer": {
+        "reliability": 0.65
+      }
+    },
+    {
+      "id": "sam",
+      "name": "Sam",
+      "role": "Volunteer",
+      "zone": "volunteers",
+      "tile": {
+        "x": 5,
+        "y": 8
+      },
+      "portrait": "priya",
+      "look": {
+        "skin": "#c68a5e",
+        "hair": "#3b2a20",
+        "hairStyle": "short",
+        "outfit": "#6b4fa0",
+        "extra": "none"
+      },
+      "volunteer": {
+        "reliability": 0.45
+      },
+      "ambient": true
+    },
+    {
+      "id": "rosa",
+      "name": "Rosa",
+      "role": "Bakery stall",
+      "zone": "vendors",
+      "tile": {
+        "x": 28,
+        "y": 7
+      },
+      "portrait": "vendor-1",
+      "look": {
+        "skin": "#f0c8a8",
+        "hair": "#c9c4c0",
+        "hairStyle": "curly",
+        "outfit": "#7a2e3a",
+        "accent": "#e0a43a",
+        "extra": "apron"
+      }
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "role": "Dumpling truck",
+      "zone": "vendors",
+      "tile": {
+        "x": 32,
+        "y": 7
+      },
+      "portrait": "vendor-2",
+      "look": {
+        "skin": "#e8b98f",
+        "hair": "#1c1a1d",
+        "hairStyle": "short",
+        "outfit": "#3f6b3a",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "amara",
+      "name": "Amara",
+      "role": "Produce stall",
+      "zone": "vendors",
+      "tile": {
+        "x": 36,
+        "y": 7
+      },
+      "portrait": "vendor-3",
+      "look": {
+        "skin": "#6b4430",
+        "hair": "#2a1d18",
+        "hairStyle": "long",
+        "outfit": "#c47a2c",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "okafor",
+      "name": "Mr. Okafor",
+      "role": "Sponsor rep",
+      "zone": "sponsor",
+      "tile": {
+        "x": 32,
+        "y": 22
+      },
+      "portrait": "mr-okafor",
+      "look": {
+        "skin": "#5a3a28",
+        "hair": "#8a8a8a",
+        "hairStyle": "short",
+        "outfit": "#283a5c",
+        "accent": "#e39a2d",
+        "extra": "glasses"
+      }
+    },
+    {
+      "id": "dana",
+      "name": "Dana",
+      "role": "Non-profit lead",
+      "zone": "stage",
+      "tile": {
+        "x": 20,
+        "y": 25
+      },
+      "portrait": "dana",
+      "look": {
+        "skin": "#7a4a32",
+        "hair": "#3a2418",
+        "hairStyle": "curly",
+        "outfit": "#a6482a",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "laptop",
+      "name": "HQ laptop",
+      "role": "Your desk",
+      "zone": "hq",
+      "tile": {
+        "x": 20,
+        "y": 14
+      },
+      "portrait": "laptop",
+      "look": {
+        "skin": "#000000",
+        "hair": "#000000",
+        "hairStyle": "bald",
+        "outfit": "#000000",
+        "extra": "none"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n-roles",
+      "npc": "priya",
+      "lines": [
+        {
+          "who": "priya",
+          "text": "Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you split the roles?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Assign roles myself and post a checklist",
+          "effects": {
+            "morale": -8
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "neutral",
+            "line": "Clear, but a couple of them look flat."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Ask who's free when, then pair people on logistics",
+          "effects": {
+            "morale": 6
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "That feels fair. They'll show up for it."
+          },
+          "minutes": 15
+        },
+        {
+          "id": "c",
+          "label": "Take logistics myself so the team stays happy",
+          "effects": {
+            "morale": 10,
+            "budget": 0
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "worried",
+            "line": "You sure you have time for that?"
+          },
+          "explainOnPick": true,
+          "minutes": 30
+        }
+      ]
+    },
+    {
+      "id": "n-vendor-mix",
+      "npc": "rosa",
+      "lines": [
+        {
+          "who": "rosa",
+          "text": "We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What vendor mix and fee do you set?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Mostly local stalls at a low fee",
+          "effects": {
+            "budget": -300,
+            "trust.vendors": 10,
+            "trust.community": 5
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "The neighbours will love that."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Mix: two trucks pay more, the rest stay cheap",
+          "effects": {
+            "budget": 200,
+            "trust.vendors": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Balanced. I can work with it."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Big-name trucks only, highest fees",
+          "effects": {
+            "budget": 900,
+            "trust.vendors": -12,
+            "trust.community": -8
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry",
+            "line": "So we're out, then."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-permit",
+      "npc": "theo",
+      "lines": [
+        {
+          "who": "theo",
+          "text": "The food permit form isn't filed. The city office closes early tomorrow.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you handle the permit?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Drop everything and file it in person now",
+          "effects": {
+            "trust.partner": 6
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Legend. Filed."
+          },
+          "minutes": 60
+        },
+        {
+          "id": "b",
+          "label": "Theo files it; I check the form first",
+          "effects": {
+            "trust.partner": 3,
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "On it."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Pay a runner $150 to file it",
+          "effects": {
+            "budget": -150
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Done, but that's budget gone."
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-logo",
+      "npc": "okafor",
+      "lines": [
+        {
+          "who": "okafor",
+          "text": "Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What do you say?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Yes to everything, keep the sponsor happy",
+          "effects": {
+            "budget": -200,
+            "trust.community": -4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Wonderful."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Banner and stage only, and say why",
+          "effects": {
+            "trust.community": 3
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Reasonable. I'll take it back."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Push back: the market isn't an ad",
+          "effects": {
+            "trust.community": 5,
+            "budget": 0
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry",
+            "line": "That's not how partnerships work."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-schedule",
+      "npc": "priya",
+      "lines": [
+        {
+          "who": "priya",
+          "text": "Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you fix the schedule?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Rebuild the rota myself tonight",
+          "effects": {
+            "morale": -3
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "neutral"
+          },
+          "minutes": 45
+        },
+        {
+          "id": "b",
+          "label": "Ask them to swap and thank them publicly",
+          "effects": {
+            "morale": 6
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "They both said yes."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Leave it, sort it on the day",
+          "effects": {
+            "morale": -6
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried",
+            "line": "That makes me nervous."
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-vendor-cut",
+      "npc": "kenji",
+      "lines": [
+        {
+          "who": "kenji",
+          "text": "I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "What do you offer Kenji?",
+      "options": [
+        {
+          "id": "a",
+          "label": "No more money, but the best spot by the gate",
+          "effects": {
+            "trust.vendors": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Hm. Foot traffic is money. Deal."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Give him the 20%",
+          "effects": {
+            "budget": -400,
+            "trust.vendors": -3
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Now we're talking."
+          },
+          "explainOnPick": true
+        },
+        {
+          "id": "c",
+          "label": "Split the difference: 10% and a smaller stall",
+          "effects": {
+            "budget": -200,
+            "trust.vendors": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Fine."
+          }
+        },
+        {
+          "id": "d",
+          "label": "Let him walk and replace him",
+          "effects": {
+            "trust.vendors": -8,
+            "trust.community": -2
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry",
+            "line": "Your loss."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-signups",
+      "npc": "dana",
+      "lines": [
+        {
+          "who": "dana",
+          "text": "Only twelve families have signed up. Last year's market had sixty by now.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you get the word out?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Flyers through the school newsletters",
+          "effects": {
+            "budget": -120,
+            "trust.community": 8
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "The schools will share it."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Paid social ads",
+          "effects": {
+            "budget": -500,
+            "trust.community": 3
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Ask vendors to promote it to their customers",
+          "effects": {
+            "trust.vendors": 2,
+            "trust.community": 5
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "Smart. It costs nothing."
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-fridge",
+      "npc": "theo",
+      "lines": [
+        {
+          "who": "theo",
+          "text": "The fridge rental fell through. Without cold storage, half the food can't be sold.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you do about cold storage?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Rent a pricier fridge today",
+          "effects": {
+            "budget": -600
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Borrow the church's walk-in fridge",
+          "effects": {
+            "trust.partner": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "They said yes!"
+          },
+          "minutes": 30
+        },
+        {
+          "id": "c",
+          "label": "Cut the dairy and meat vendors",
+          "effects": {
+            "trust.vendors": -10,
+            "budget": 100
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "worried",
+            "line": "Two vendors are furious."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-recovery",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "The sponsor money is gone. The plan on the screen doesn't add up any more.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What is your recovery plan?",
+      "options": [
+        {
+          "id": "a",
+          "label": "One market day instead of two; protect vendor access and food safety",
+          "effects": {
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.8
+          }
+        },
+        {
+          "id": "b",
+          "label": "Keep both days, cut promotion, decorations and the stage",
+          "effects": {
+            "morale": -4,
+            "trust.community": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.6
+          }
+        },
+        {
+          "id": "c",
+          "label": "Delay two days and rebuild the plan with partners",
+          "effects": {
+            "morale": -6,
+            "trust.vendors": -6
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.7
+          }
+        },
+        {
+          "id": "d",
+          "label": "Keep everything and hope a sponsor turns up",
+          "effects": {
+            "morale": 2
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.3
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-shaken",
+      "npc": "priya",
+      "lines": [
+        {
+          "who": "priya",
+          "text": "The group chat went quiet after the news. Two people asked if it's even happening.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you reassure the team?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Call everyone in today, explain the new plan and what stays",
+          "effects": {
+            "morale": 12
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "That helped. People feel included."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Post a short update in the chat",
+          "effects": {
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Say nothing until the plan is final",
+          "effects": {
+            "morale": -10
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried",
+            "line": "People are guessing the worst."
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-vendors-worried",
+      "npc": "rosa",
+      "lines": [
+        {
+          "who": "rosa",
+          "text": "Is the market still on? I've ordered flour for two days.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you tell the vendors?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Tell them the truth today, with what changes and what doesn't",
+          "effects": {
+            "trust.vendors": 10
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Thank you for being straight with us."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Say everything is fine for now",
+          "effects": {
+            "trust.vendors": -6
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "worried",
+            "line": "You don't look fine."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Offer refunds on fees to anyone who wants out",
+          "effects": {
+            "budget": -300,
+            "trust.vendors": 6
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-new-partner",
+      "npc": "dana",
+      "lines": [
+        {
+          "who": "dana",
+          "text": "The credit union down the street might put in $800, if we pitch it this afternoon.",
+          "expression": "happy"
+        }
+      ],
+      "prompt": "Do you go after the new partner?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Pitch it myself this afternoon",
+          "effects": {
+            "budget": 800,
+            "trust.partner": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "They're in!"
+          },
+          "minutes": 60
+        },
+        {
+          "id": "b",
+          "label": "Send Dana with my one-page plan",
+          "effects": {
+            "budget": 500,
+            "trust.partner": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Skip it, we have enough to do",
+          "effects": {},
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-feedback",
+      "npc": "dana",
+      "lines": [
+        {
+          "who": "dana",
+          "text": "Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "How do you respond to Dana's feedback?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask what she'd change first, and change it",
+          "effects": {
+            "trust.partner": 10,
+            "trust.community": 6
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Thank you. Let's add a kids' corner."
+          },
+          "kpi": {
+            "feedback": "open"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Explain why the plan looks like this",
+          "effects": {
+            "trust.partner": -4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "I hear you. I still think it's off."
+          },
+          "kpi": {
+            "feedback": "defensive"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Say there's no time for changes now",
+          "effects": {
+            "trust.partner": -10
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "feedback": "dismissive"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-supplies",
+      "npc": "theo",
+      "lines": [
+        {
+          "who": "theo",
+          "text": "After the cuts we're short eight tables and two tents.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you cover the shortfall?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Borrow from the school and the library",
+          "effects": {
+            "trust.community": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy"
+          },
+          "minutes": 30
+        },
+        {
+          "id": "b",
+          "label": "Rent what's missing",
+          "effects": {
+            "budget": -350
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Vendors bring their own tables",
+          "effects": {
+            "trust.vendors": -5
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-weather",
+      "npc": "priya",
+      "lines": [
+        {
+          "who": "priya",
+          "text": "Rain is forecast for Saturday morning. Forty percent.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What's the call?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Book the gym as a backup, decide Friday night",
+          "effects": {
+            "budget": -150
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "Good, a plan B."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Go ahead outdoors and hope",
+          "effects": {},
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Move indoors now to be safe",
+          "effects": {
+            "trust.vendors": -4,
+            "budget": -250
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-dropout",
+      "npc": "amara",
+      "lines": [
+        {
+          "who": "amara",
+          "text": "I'm sorry. My supplier fell through and I can't come tomorrow.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you do about the gap?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Give her spot to a community group for free",
+          "effects": {
+            "trust.community": 6
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Spread the other stalls out",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Find a last-minute vendor at a discount",
+          "effects": {
+            "budget": -100,
+            "trust.vendors": 3
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          },
+          "minutes": 30
+        }
+      ]
+    },
+    {
+      "id": "n-permit-fine",
+      "npc": "theo",
+      "lines": [
+        {
+          "who": "theo",
+          "text": "The city called. Without the permit we get fined, or shut down Saturday.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "How do you fix it now?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Pay the late fee and file today",
+          "effects": {
+            "budget": -250
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Ask Dana's non-profit to vouch for us",
+          "effects": {
+            "trust.partner": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-kenji-leaves",
+      "npc": "kenji",
+      "lines": [
+        {
+          "who": "kenji",
+          "text": "I'm packing up. I'll do the food festival instead.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "Last chance. What do you say?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Match half of what he asked",
+          "effects": {
+            "budget": -200,
+            "trust.vendors": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Wish him well and fill the spot",
+          "effects": {
+            "trust.vendors": -4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "roles",
+      "title": "Nobody wants logistics",
+      "npc": "priya",
+      "zone": "volunteers",
+      "node": "n-roles",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "collaboration",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "morale": -8
+        }
+      },
+      "spawnAt": "Mon 09:00",
+      "deadline": "Mon 15:00",
+      "delegateEffects": {
+        "morale": 2
+      }
+    },
+    {
+      "id": "vendor-mix",
+      "title": "Vendor mix and fees",
+      "npc": "rosa",
+      "zone": "vendors",
+      "node": "n-vendor-mix",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "prioritization",
+        "communication"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -10
+        }
+      },
+      "spawnAt": "Mon 10:00",
+      "deadline": "Tue 10:00"
+    },
+    {
+      "id": "permit",
+      "title": "Food permit not filed",
+      "npc": "theo",
+      "zone": "storage",
+      "node": "n-permit",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "prioritization",
+        "problem-solving"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.partner": -8
+        },
+        "spawn": "permit-fine"
+      },
+      "spawnAt": "Mon 13:00",
+      "deadline": "Tue 10:00"
+    },
+    {
+      "id": "logo",
+      "title": "Sponsor wants logos everywhere",
+      "npc": "okafor",
+      "zone": "sponsor",
+      "node": "n-logo",
+      "severity": "low",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.community": -3
+        }
+      },
+      "spawnAt": "Mon 14:30",
+      "deadline": "Mon 17:30"
+    },
+    {
+      "id": "schedule",
+      "title": "Saturday rota clash",
+      "npc": "priya",
+      "zone": "volunteers",
+      "node": "n-schedule",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "collaboration"
+      ],
+      "checkpointEligible": true,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "morale": -6
+        }
+      },
+      "spawnAt": "Tue 09:30",
+      "deadline": "Tue 13:00",
+      "delegateEffects": {
+        "morale": 1
+      }
+    },
+    {
+      "id": "vendor-cut",
+      "title": "Kenji wants a bigger cut",
+      "npc": "kenji",
+      "zone": "vendors",
+      "node": "n-vendor-cut",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "communication",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -5
+        },
+        "spawn": "kenji-leaves"
+      },
+      "spawnAt": "Tue 11:00",
+      "deadline": "Tue 17:00"
+    },
+    {
+      "id": "signups",
+      "title": "Low sign-ups",
+      "npc": "dana",
+      "zone": "stage",
+      "node": "n-signups",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "creativity"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.community": -8
+        }
+      },
+      "spawnAt": "Tue 13:30",
+      "deadline": "Tue 17:30",
+      "delegateEffects": {
+        "trust.community": 3
+      }
+    },
+    {
+      "id": "fridge",
+      "title": "Fridge rental fell through",
+      "npc": "theo",
+      "zone": "storage",
+      "node": "n-fridge",
+      "severity": "high",
+      "talkCost": 45,
+      "skillSignals": [
+        "problem-solving",
+        "creativity"
+      ],
+      "checkpointEligible": true,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -8,
+          "budget": -200
+        }
+      },
+      "spawnAt": "Tue 15:00",
+      "deadline": "Wed 10:00"
+    },
+    {
+      "id": "recovery-plan",
+      "title": "Recovery plan",
+      "npc": "laptop",
+      "zone": "hq",
+      "node": "n-recovery",
+      "severity": "high",
+      "talkCost": 60,
+      "skillSignals": [
+        "adaptability",
+        "resilience",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -10
+        }
+      },
+      "lifetime": 480,
+      "tags": [
+        "recovery"
+      ]
+    },
+    {
+      "id": "team-shaken",
+      "title": "The team is shaken",
+      "npc": "priya",
+      "zone": "volunteers",
+      "node": "n-shaken",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "empathy",
+        "communication",
+        "resilience"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -12
+        }
+      },
+      "lifetime": 360
+    },
+    {
+      "id": "vendors-worried",
+      "title": "Vendors ask if it's still on",
+      "npc": "rosa",
+      "zone": "vendors",
+      "node": "n-vendors-worried",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -12
+        }
+      },
+      "lifetime": 420,
+      "delegateEffects": {
+        "trust.vendors": 2
+      }
+    },
+    {
+      "id": "new-partner",
+      "title": "A possible new sponsor",
+      "npc": "dana",
+      "zone": "stage",
+      "node": "n-new-partner",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "creativity",
+        "adaptability"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {}
+      },
+      "spawnAt": "Thu 09:30",
+      "deadline": "Thu 15:00"
+    },
+    {
+      "id": "feedback",
+      "title": "Dana's critical feedback",
+      "npc": "dana",
+      "zone": "stage",
+      "node": "n-feedback",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "feedback",
+        "empathy"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.partner": -10
+        }
+      },
+      "spawnAt": "Thu 11:00",
+      "deadline": "Thu 17:00",
+      "tags": [
+        "feedback"
+      ]
+    },
+    {
+      "id": "supplies",
+      "title": "Short of tables and tents",
+      "npc": "theo",
+      "zone": "storage",
+      "node": "n-supplies",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "creativity",
+        "problem-solving"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -6
+        }
+      },
+      "spawnAt": "Thu 13:00",
+      "deadline": "Fri 11:00",
+      "delegateEffects": {
+        "trust.community": 2
+      }
+    },
+    {
+      "id": "weather",
+      "title": "Rain forecast for Saturday",
+      "npc": "priya",
+      "zone": "volunteers",
+      "node": "n-weather",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "ambiguity",
+        "adaptability"
+      ],
+      "checkpointEligible": true,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.community": -5
+        }
+      },
+      "spawnAt": "Fri 09:30",
+      "deadline": "Fri 14:00"
+    },
+    {
+      "id": "dropout",
+      "title": "A vendor drops out",
+      "npc": "amara",
+      "zone": "vendors",
+      "node": "n-dropout",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "adaptability",
+        "problem-solving"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.community": -6
+        }
+      },
+      "spawnAt": "Fri 11:00",
+      "deadline": "Fri 16:00"
+    },
+    {
+      "id": "permit-fine",
+      "title": "City fine threatened",
+      "npc": "theo",
+      "zone": "storage",
+      "node": "n-permit-fine",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "problem-solving"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.partner": -12,
+          "budget": -300
+        }
+      },
+      "lifetime": 120
+    },
+    {
+      "id": "kenji-leaves",
+      "title": "Kenji is packing up",
+      "npc": "kenji",
+      "zone": "vendors",
+      "node": "n-kenji-leaves",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -6
+        }
+      },
+      "lifetime": 120
+    }
+  ],
+  "turningPoint": {
+    "at": "Wed 09:00",
+    "pool": [
+      "sponsor-pulls-out",
+      "venue-cancels",
+      "lead-volunteer-quits"
+    ],
+    "disruptions": [
+      {
+        "id": "sponsor-pulls-out",
+        "title": "The main sponsor pulls out",
+        "caller": "okafor",
+        "text": "I'm sorry. Our board has withdrawn the sponsorship, effective today. We can't fund the market.",
+        "budgetCut": 0.6,
+        "effects": {
+          "morale": -10
+        },
+        "darkZone": "sponsor",
+        "spawn": [
+          "recovery-plan",
+          "team-shaken",
+          "vendors-worried"
+        ]
+      },
+      {
+        "id": "venue-cancels",
+        "title": "The venue cancels",
+        "caller": "dana",
+        "text": "The city just pulled our site permit for Saturday. We need a new plan, fast.",
+        "budgetCut": 0.3,
+        "effects": {
+          "morale": -12,
+          "trust.vendors": -8
+        },
+        "spawn": [
+          "recovery-plan",
+          "team-shaken",
+          "vendors-worried"
+        ]
+      },
+      {
+        "id": "lead-volunteer-quits",
+        "title": "Your lead volunteer leaves",
+        "caller": "priya",
+        "text": "I got the paid internship. I start Thursday. I'm so sorry to leave you like this.",
+        "budgetCut": 0.2,
+        "effects": {
+          "morale": -25
+        },
+        "spawn": [
+          "recovery-plan",
+          "team-shaken",
+          "vendors-worried"
+        ]
+      }
+    ]
+  },
+  "deferReasons": [
+    "Something more urgent first",
+    "Waiting for information",
+    "Someone else is better placed",
+    "Low impact, can wait"
+  ],
+  "variation": {
+    "budget.start": [
+      4500,
+      5500
+    ]
+  }
+}

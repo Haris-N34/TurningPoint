@@ -30,6 +30,8 @@ const SKILL_WORDS: Record<SkillSlug, RegExp> = {
   empathy: /\b(felt|feel\w*|worr\w*|affect\w*|for them|their side|listen\w*|hear\w*|stress\w*|upset|car(e|ed|es|ing))\b/i,
   communication: /\b(told|tell\w*|explain\w*|wr(o|i)te\w*|messag\w*|email\w*|talk\w*|said|say\w*|announc\w*|updat\w*|let .* know)\b/i,
   feedback: /\b(feedback|critici\w*|crit|pointed out|said .* (mess|wrong)|learned|next time|changed .* because|took it on board)\b/i,
+  analytical: /\b(data|numbers?|chart|trend|evidence|analys\w*|compar\w*|measur\w*|pattern|percent|figures?)\b/i,
+  curiosity: /\b(asked around|found out|dug|look\w* into|curious|explor\w*|discover\w*|investigat\w*|wondered|why\b)\b/i,
 };
 
 // Rubric features (PRD, Evidence rubric). Dialect-neutral spellings included so wording style is not penalised (G4).
