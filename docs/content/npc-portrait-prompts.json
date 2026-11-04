@@ -1,0 +1,59 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-11-04",
+  "basePrompt": "Use case: stylized-concept. Asset type: a game portrait expression sprite sheet for Turning Point. Make one wide horizontal sheet with EXACTLY FOUR equal square cells in a single row, no gaps. Each cell contains the same character, centered bust from shoulders to top of head at identical scale and location. Expressions LEFT TO RIGHT: neutral (relaxed mouth), worried (raised inner brows, small frown), happy (smile), angry (lowered brows, firm frown). Subject: Priya, volunteer lead, young South Asian woman, warm brown skin, dark hair in a practical high bun, teal volunteer jacket. Style: original clean low-resolution pixel art suitable for a 96x96 portrait, hand-placed square pixel clusters, crisp hard edges, dark plum outline, three flat shade levels per material, warm muted palette, cozy top-down management-game aesthetic. Flat solid deep plum #241f30 background in every cell, no transparency. Head fully inside each cell with ample 12 percent margin. Face and outfit identical in all four cells except facial expression. Frontal three-quarter face looking slightly toward viewer's right. No text, labels, letters, grid lines, borders, props, logos, watermarks, gradients or smooth painting. Output aspect ratio 4:1.",
+  "roster": [
+    {
+      "id": "priya",
+      "subject": "Priya, volunteer lead, young South Asian woman, warm brown skin, dark hair in a practical high bun, teal volunteer jacket"
+    },
+    {
+      "id": "mr-okafor",
+      "subject": "Mr. Okafor, sponsor representative, middle-aged Black man, dark skin, short salt-and-pepper hair, round glasses, navy blazer and mustard shirt"
+    },
+    {
+      "id": "dana",
+      "subject": "Dana, non-profit lead, middle-aged woman with medium brown skin, short curly dark hair, terracotta overshirt"
+    },
+    {
+      "id": "vendor-1",
+      "subject": "Vendor one, market baker, older light-skinned woman, silver bob haircut, mustard apron over plum shirt"
+    },
+    {
+      "id": "vendor-2",
+      "subject": "Vendor two, market grower, young East Asian man, short dark hair, forest green work shirt"
+    },
+    {
+      "id": "vendor-3",
+      "subject": "Vendor three, market craft seller, brown-skinned adult with short wavy hair, purple overshirt"
+    },
+    {
+      "id": "logistics-volunteer",
+      "subject": "Logistics volunteer, young light-skinned man with red hair, freckles, orange safety vest over blue shirt"
+    },
+    {
+      "id": "developer",
+      "subject": "Developer, young Black woman, dark skin, short natural coiled hair, plum hoodie"
+    },
+    {
+      "id": "analyst",
+      "subject": "Data analyst, young East Asian woman, straight black bob, round glasses, teal sweater"
+    },
+    {
+      "id": "partner",
+      "subject": "Consulting partner, older brown-skinned man, greying beard, charcoal jacket, cream open collar"
+    },
+    {
+      "id": "store-manager",
+      "subject": "Store manager, middle-aged light-skinned woman, auburn ponytail, green work vest"
+    },
+    {
+      "id": "cfo",
+      "subject": "CFO, middle-aged East Asian man, swept-back greying hair, navy jacket, burgundy tie"
+    },
+    {
+      "id": "former-employee",
+      "subject": "Former employee, older brown-skinned woman, silver curly hair, ochre cardigan"
+    }
+  ]
+}

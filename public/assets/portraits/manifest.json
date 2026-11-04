@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "size": 96,
+  "expressions": [
+    "neutral",
+    "worried",
+    "happy",
+    "angry"
+  ],
+  "portraits": [
+    {
+      "id": "priya",
+      "name": "Priya",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/priya/neutral.png",
+          "alt": "Priya, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/priya/worried.png",
+          "alt": "Priya, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/priya/happy.png",
+          "alt": "Priya, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/priya/angry.png",
+          "alt": "Priya, angry expression."
+        }
+      }
+    },
+    {
+      "id": "mr-okafor",
+      "name": "Mr. Okafor",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/mr-okafor/neutral.png",
+          "alt": "Mr. Okafor, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/mr-okafor/worried.png",
+          "alt": "Mr. Okafor, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/mr-okafor/happy.png",
+          "alt": "Mr. Okafor, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/mr-okafor/angry.png",
+          "alt": "Mr. Okafor, angry expression."
+        }
+      }
+    },
+    {
+      "id": "dana",
+      "name": "Dana",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/dana/neutral.png",
+          "alt": "Dana, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/dana/worried.png",
+          "alt": "Dana, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/dana/happy.png",
+          "alt": "Dana, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/dana/angry.png",
+          "alt": "Dana, angry expression."
+        }
+      }
+    },
+    {
+      "id": "vendor-1",
+      "name": "Vendor one",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/vendor-1/neutral.png",
+          "alt": "Vendor one, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/vendor-1/worried.png",
+          "alt": "Vendor one, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/vendor-1/happy.png",
+          "alt": "Vendor one, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/vendor-1/angry.png",
+          "alt": "Vendor one, angry expression."
+        }
+      }
+    },
+    {
+      "id": "vendor-2",
+      "name": "Vendor two",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/vendor-2/neutral.png",
+          "alt": "Vendor two, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/vendor-2/worried.png",
+          "alt": "Vendor two, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/vendor-2/happy.png",
+          "alt": "Vendor two, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/vendor-2/angry.png",
+          "alt": "Vendor two, angry expression."
+        }
+      }
+    },
+    {
+      "id": "vendor-3",
+      "name": "Vendor three",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/vendor-3/neutral.png",
+          "alt": "Vendor three, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/vendor-3/worried.png",
+          "alt": "Vendor three, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/vendor-3/happy.png",
+          "alt": "Vendor three, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/vendor-3/angry.png",
+          "alt": "Vendor three, angry expression."
+        }
+      }
+    },
+    {
+      "id": "logistics-volunteer",
+      "name": "Logistics volunteer",
+      "scenario": "launch-week",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/logistics-volunteer/neutral.png",
+          "alt": "Logistics volunteer, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/logistics-volunteer/worried.png",
+          "alt": "Logistics volunteer, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/logistics-volunteer/happy.png",
+          "alt": "Logistics volunteer, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/logistics-volunteer/angry.png",
+          "alt": "Logistics volunteer, angry expression."
+        }
+      }
+    },
+    {
+      "id": "developer",
+      "name": "Developer",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/developer/neutral.png",
+          "alt": "Developer, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/developer/worried.png",
+          "alt": "Developer, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/developer/happy.png",
+          "alt": "Developer, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/developer/angry.png",
+          "alt": "Developer, angry expression."
+        }
+      }
+    },
+    {
+      "id": "analyst",
+      "name": "Data analyst",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/analyst/neutral.png",
+          "alt": "Data analyst, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/analyst/worried.png",
+          "alt": "Data analyst, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/analyst/happy.png",
+          "alt": "Data analyst, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/analyst/angry.png",
+          "alt": "Data analyst, angry expression."
+        }
+      }
+    },
+    {
+      "id": "partner",
+      "name": "Consulting partner",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/partner/neutral.png",
+          "alt": "Consulting partner, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/partner/worried.png",
+          "alt": "Consulting partner, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/partner/happy.png",
+          "alt": "Consulting partner, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/partner/angry.png",
+          "alt": "Consulting partner, angry expression."
+        }
+      }
+    },
+    {
+      "id": "store-manager",
+      "name": "Store manager",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/store-manager/neutral.png",
+          "alt": "Store manager, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/store-manager/worried.png",
+          "alt": "Store manager, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/store-manager/happy.png",
+          "alt": "Store manager, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/store-manager/angry.png",
+          "alt": "Store manager, angry expression."
+        }
+      }
+    },
+    {
+      "id": "cfo",
+      "name": "CFO",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/cfo/neutral.png",
+          "alt": "CFO, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/cfo/worried.png",
+          "alt": "CFO, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/cfo/happy.png",
+          "alt": "CFO, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/cfo/angry.png",
+          "alt": "CFO, angry expression."
+        }
+      }
+    },
+    {
+      "id": "former-employee",
+      "name": "Former employee",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/former-employee/neutral.png",
+          "alt": "Former employee, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/former-employee/worried.png",
+          "alt": "Former employee, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/former-employee/happy.png",
+          "alt": "Former employee, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/former-employee/angry.png",
+          "alt": "Former employee, angry expression."
+        }
+      }
+    }
+  ]
+}
