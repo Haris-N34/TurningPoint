@@ -1,0 +1,67 @@
+[
+  {
+    "id": "priya",
+    "source": "docs/art/portraits/priya.png",
+    "sha256": "37dfbb5520d430f78c882135239ad19ccc2ccf76275f6f84d28c8424d2091d3b"
+  },
+  {
+    "id": "mr-okafor",
+    "source": "docs/art/portraits/mr-okafor.png",
+    "sha256": "e014db6f2c883eceda323586936ac399b8e29dbce64dfa81a59218405692cf18"
+  },
+  {
+    "id": "dana",
+    "source": "docs/art/portraits/dana.png",
+    "sha256": "559eb7e72d174a6faf8837b0a5cd964ae311761f75c5f1850d66b7ce8da70703"
+  },
+  {
+    "id": "vendor-1",
+    "source": "docs/art/portraits/vendor-1.png",
+    "sha256": "45bedc3d0d3f4587dc7a1a00b0df6deebcebac5f2f6063a48ec1e47ba42688b8"
+  },
+  {
+    "id": "vendor-2",
+    "source": "docs/art/portraits/vendor-2.png",
+    "sha256": "19e7fac45bd017132d22896a4e6b303f3eb4345741ecb6e3d83333c1f393f5ee"
+  },
+  {
+    "id": "vendor-3",
+    "source": "docs/art/portraits/vendor-3.png",
+    "sha256": "0590f925eb4c38aad8a8af69342d096896c5619bd7d8fb65d9e8fce48701add5"
+  },
+  {
+    "id": "logistics-volunteer",
+    "source": "docs/art/portraits/logistics-volunteer.png",
+    "sha256": "00ada47c7b4c210fe6cbf9fd53c549ae4e07afa3c4fad9f30eefd39242eba5e3"
+  },
+  {
+    "id": "developer",
+    "source": "docs/art/portraits/developer.png",
+    "sha256": "5686646c1da7d17c0c3d67dcb6d10df0de280b56413b7791971f272205e871f1"
+  },
+  {
+    "id": "analyst",
+    "source": "docs/art/portraits/analyst.png",
+    "sha256": "ded5269fb32f5bb580a2467d9042243a796af6b6b74ce9aefa6a6ff444eaf0fd"
+  },
+  {
+    "id": "partner",
+    "source": "docs/art/portraits/partner.png",
+    "sha256": "da65564fd597a27cc1207747026e59f2ff4a611e4e35e5b39876e4c5130be894"
+  },
+  {
+    "id": "store-manager",
+    "source": "docs/art/portraits/store-manager.png",
+    "sha256": "8f9534f86368e7c0eb997850e66042dc5521607592fc81d9c61dd94474877f4f"
+  },
+  {
+    "id": "cfo",
+    "source": "docs/art/portraits/cfo.png",
+    "sha256": "a730d001f5e8968244a0becf2fbf06961e69931b0dbf7dad2e7f3ad8e88dfba7"
+  },
+  {
+    "id": "former-employee",
+    "source": "docs/art/portraits/former-employee.png",
+    "sha256": "b0f0f481e2ee72245dbca21a35512a47d4b078a5f49d7611d1fc12c6ed04f7ec"
+  }
+]
