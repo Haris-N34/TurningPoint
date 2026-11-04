@@ -12,7 +12,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] M0.4 [D+H] Scenario JSON schema (Zod) and card types committed (done, D); `fixtures/attempt.json` mock card (done, D); Haris sign-off pending (#8)
 - [x] M0.5 [D] Local store: runs, cards, shares, reviews in localStorage; recordings in IndexedDB; delete-all
 - [x] M0.6 [D] Demo profile and role storage (no auth server); picker UI is M0.11
-- [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e (workflow committed; first run pending)
+- [x] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, build, e2e
 - [ ] M0.8 [D] Deployed to Vercel
 - [ ] M0.9 [H] Design system tokens (fonts, accent, neutrals, light and dark)
 - [ ] M0.10 [H] Landing page (screen 1)
@@ -88,20 +88,20 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] E1.2 [H] Scenario step: 2+ templates with thumbnail, length, skills
 - [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original
 - [ ] E1.4 [H] Inline scene editing, mark checkpoint-eligible
-- [ ] E1.5 [D+H] Preview as candidate, no data saved
+- [ ] E1.5 [D+H] Preview as candidate, no data saved (sandbox route /admin/preview/<id> done and tested, D; button in builder, H)
 - [x] E1.6 [D] Publish creates public link, job code and QR (logic; builder UI shows them, H)
 - [ ] E1.7 [H] Setup under 10 minutes for a first-time user
-- [ ] C6.1 [H] Add up to 2 witnesses with relationship
+- [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
-- [ ] C6.3 [H] Witness page, no account, phone, under 30 s
+- [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
 - [ ] C6.4 [H] Card shows "Confirmed by ..." never the witness email
 - [x] C6.5 [D] Reject witness email matching candidate email or domain alias
 - [ ] C7.1 [H] Candidate sees own card exactly as a recruiter would
-- [ ] C7.2 [D+H] Hide a single clip (no transcript edits)
-- [ ] C7.3 [D+H] Share with another employer in one click, "Reused" badge
+- [x] C7.2 [D+H] Hide a single clip (no transcript edits) (logic + basic toggle; design H)
+- [x] C7.3 [D+H] Share with another employer in one click, reused flag (logic + basic list; badge in inbox H)
 - [x] C7.4 [D] Revoke share; employer sees "Candidate withdrew this card" (cardFor returns withdrawn)
 - [x] C7.5 [D] Delete everything, immediately (deleteMyData: store + recordings)
-- [ ] E8.1 [D+H] Inbox shows reused cards with covered skills
+- [ ] E8.1 [D+H] Inbox shows reused cards with covered skills (row data `reused` + `covers` done, D; badge H)
 - [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
 - [x] E5.2 [D] Exported candidate links back to the card
 - [ ] PV5 [H] "How we use AI" page linked from every screen

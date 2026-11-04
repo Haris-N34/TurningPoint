@@ -5,6 +5,7 @@ import { ClipPlayer, type ClipHandle } from "@/components/card/ClipPlayer";
 import type { Card } from "@/lib/card/types";
 import { SKILLS } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
+import { CandidateActions } from "./CandidateActions";
 
 const LEVEL_LABEL = { strong: "Strong", some: "Some", not_observed: "Not observed", needs_review: "Needs human review" } as const;
 const skillName = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
@@ -94,6 +95,8 @@ export function Results({ attemptId }: { attemptId: string }) {
           ))}
         </ol>
       </section>
+
+      <CandidateActions card={card} onChange={setCard} />
 
       {card.integrity.length > 0 && (
         <section className="rounded-2xl bg-black/[.03] p-4 text-sm text-black/60 dark:bg-white/[.04] dark:text-white/60" aria-labelledby="int-h">

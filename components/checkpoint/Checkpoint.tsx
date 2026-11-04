@@ -24,6 +24,8 @@ type Props = {
   title?: string;
   onDone: (r: CheckpointResult) => void;
   onModeChange?: (m: Mode) => void;
+  /** False in the admin preview sandbox: recordings are discarded (E1.5). */
+  persistMedia?: boolean;
 };
 
 type Phase = "think" | "answer" | "review" | "saving";
@@ -191,7 +193,7 @@ export function Checkpoint(p: Props) {
     if (!result) return;
     setPhase("saving");
     let key: string | undefined;
-    if (result.blob) key = await putWithRetry(`${p.attemptId}/${p.id}`, result.blob);
+    if (result.blob && p.persistMedia !== false) key = await putWithRetry(`${p.attemptId}/${p.id}`, result.blob);
     r.release();
     const integrity: IntegrityNote[] = [];
     const lost = Math.round(focusLostMs.current / 1000);

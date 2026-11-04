@@ -44,7 +44,8 @@ export async function answerCheckpoint(page: Page, mode: Mode, typed = "I cut th
   await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /\S/);
   await cp.locator(`label:has(input[value="${mode}"])`).click();
   await cp.getByRole("button", { name: /start answering/i }).click();
-  await expect(cp).toHaveAttribute("data-phase", "answer");
+  // Camera and mic can take a few seconds to start when many browsers run in parallel.
+  await expect(cp).toHaveAttribute("data-phase", "answer", { timeout: 20_000 });
   if (mode === "text") {
     await cp.getByTestId("answer-text").fill(typed);
   } else {

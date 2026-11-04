@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Game } from "@/components/game/Game";
+import { TemplatePlay } from "@/components/play/TemplatePlay";
 import { getScenario, SCENARIO_IDS } from "@/content/scenarios";
 
 export function generateStaticParams() {
@@ -9,5 +9,5 @@ export function generateStaticParams() {
 export default async function PlayPage({ params }: { params: Promise<{ scenarioId: string }> }) {
   const { scenarioId } = await params;
   if (!getScenario(scenarioId)) notFound();
-  return <Game scenarioId={scenarioId} />;
+  return <TemplatePlay scenarioId={scenarioId} />;
 }

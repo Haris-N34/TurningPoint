@@ -19,6 +19,7 @@ export function RealLife(p: {
   nodeId: string;
   prompt: string;
   profile: Profile;
+  persistMedia?: boolean;
   onModeChange: (m: Mode) => void;
   onDone: (r: { results: CheckpointResult[]; story: RealStory }) => void;
 }) {
@@ -33,6 +34,7 @@ export function RealLife(p: {
     defaultMode: p.profile.defaultMode,
     textOnly: p.profile.accommodations.textOnly,
     onModeChange: p.onModeChange,
+    persistMedia: p.persistMedia,
   };
 
   if (step === "intro") {

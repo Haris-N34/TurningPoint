@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { getScenario } from "@/content/scenarios";
 import type { Scenario } from "@/lib/engine/schema";
+import type { SkillSlug } from "@/lib/engine/skills";
 import { advance, choose, progress, startRun, view, type CheckpointDue, type RunState } from "@/lib/engine/engine";
 import { planRun, type RunPlan } from "@/lib/engine/seed";
 import { store, type Profile } from "@/lib/store/store";
@@ -35,8 +35,14 @@ function newAttemptId() {
   return "att_" + rand.replace(/-/g, "").slice(0, 10);
 }
 
-export function Game({ scenarioId }: { scenarioId: string }) {
-  const scenario = useMemo(() => getScenario(scenarioId)!, [scenarioId]);
+export type GameChallenge = { id: string; title: string; company: string; targetSkills?: SkillSlug[] };
+
+/**
+ * Plays one scenario for one challenge. `sandbox` is the admin's "Preview as candidate" (E1.5):
+ * the full game runs but nothing is saved.
+ */
+export function Game({ scenario, challenge, sandbox = false }: { scenario: Scenario; challenge: GameChallenge; sandbox?: boolean }) {
+  const scenarioId = challenge.id;
   const [run, setRun] = useState<Run | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -49,7 +55,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
     const s = store();
     setMuted(s.getJSON("muted", z.boolean()) ?? false);
     setProfile(s.getProfile());
-    const saved = s.activeRun(scenarioId);
+    const saved = sandbox ? undefined : s.activeRun(scenarioId);
     if (saved && saved.scenarioId === scenario.id) {
       const extra = saved.extra as Partial<Pick<Run, "plan" | "checkpointsDue" | "pending" | "answers" | "integrity" | "realStory">>;
       const state = saved.state as RunState;
@@ -69,10 +75,11 @@ export function Game({ scenarioId }: { scenarioId: string }) {
       }
     }
     setLoaded(true);
-  }, [scenario, scenarioId]);
+  }, [scenario, scenarioId, sandbox]);
 
   const save = useCallback(
     (r: Run, status: "playing" | "paused" | "finished") => {
+      if (sandbox) return;
       store().saveRun({
         attemptId: r.attemptId,
         challengeId: scenarioId,
@@ -85,7 +92,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
         practice: false,
       });
     },
-    [scenario.id, scenarioId],
+    [scenario.id, scenarioId, sandbox],
   );
 
   const update = useCallback(
@@ -119,7 +126,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
 
   // A finished run becomes a Capability Card, shared with the challenge it was played for.
   useEffect(() => {
-    if (!run || run.state.status !== "ended" || !profile) return;
+    if (!run || run.state.status !== "ended" || !profile || sandbox) return;
     const s = store();
     if (s.getCard(run.attemptId)) return;
     const card = buildCard({
@@ -130,13 +137,13 @@ export function Game({ scenarioId }: { scenarioId: string }) {
       answers: run.answers,
       integrity: run.integrity,
       realStory: run.realStory,
-      challenge: { id: scenarioId, title: scenario.title, company: "Demo employer" },
+      challenge,
       candidate: { displayName: profile.displayName, university: profile.university || undefined, verified: profile.verified },
       timeMultiplier: profile.accommodations.timeMultiplier,
     });
     s.saveCard(card);
     s.share(run.attemptId, scenarioId, false);
-  }, [run, profile, scenario, scenarioId]);
+  }, [run, profile, scenario, scenarioId, challenge, sandbox]);
 
   // When a checkpoint or the pause screen closes, put focus back on the next action (A3, keyboard play).
   const blocking = !!run?.pending || paused;
@@ -207,8 +214,9 @@ export function Game({ scenarioId }: { scenarioId: string }) {
   if (!run) {
     return (
       <main className="mx-auto max-w-xl px-4 py-10 sm:py-16">
-        <p className="text-sm uppercase tracking-wide opacity-70">Challenge</p>
-        <h1 className="mt-1 text-3xl font-semibold">{scenario.title}</h1>
+        <p className="text-sm uppercase tracking-wide opacity-70">{challenge.company}</p>
+        <h1 className="mt-1 text-3xl font-semibold">{challenge.title}</h1>
+        {challenge.title !== scenario.title && <p className="mt-1 opacity-80">Scenario: {scenario.title}</p>}
         {scenario.summary && <p className="mt-3 opacity-80">{scenario.summary}</p>}
         <section className="mt-8 rounded-2xl border p-4 text-sm" aria-labelledby="consent-title" data-testid="consent">
           <h2 id="consent-title" className="font-semibold">Before you start</h2>
@@ -278,6 +286,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
               <RealLife
                 key={run.state.nodeId}
                 attemptId={run.attemptId}
+                persistMedia={!sandbox}
                 nodeId={v.node.id}
                 prompt={v.text}
                 profile={profile}
@@ -285,7 +294,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
                 onDone={onRealLifeDone}
               />
             )}
-            {v?.kind === "end" && <EndSummary scenario={scenario} run={run} />}
+            {v?.kind === "end" && <EndSummary scenario={scenario} run={run} sandbox={sandbox} />}
           </motion.section>
         </AnimatePresence>
 
@@ -334,6 +343,7 @@ export function Game({ scenarioId }: { scenarioId: string }) {
             question={run.pending.question}
             questionSource={run.pending.source}
             attemptId={run.attemptId}
+            persistMedia={!sandbox}
             multiplier={profile.accommodations.timeMultiplier}
             defaultMode={profile.defaultMode}
             textOnly={profile.accommodations.textOnly}
@@ -415,16 +425,20 @@ function Choices({
   );
 }
 
-function EndSummary({ scenario, run }: { scenario: Scenario; run: Run }) {
+function EndSummary({ scenario, run, sandbox }: { scenario: Scenario; run: Run; sandbox?: boolean }) {
   return (
     <div className="rounded-2xl border p-4" data-testid="end">
       <p className="font-semibold">Run complete</p>
       <p className="mt-1 text-sm opacity-80">
-        {run.state.log.length} decisions and {run.answers.length} answers saved on this device.
+        {sandbox
+          ? `Preview finished: ${run.state.log.length} decisions and ${run.answers.length} answers. Nothing was saved.`
+          : `${run.state.log.length} decisions and ${run.answers.length} answers saved on this device.`}
       </p>
-      <Link href={`/results/${run.attemptId}`} className="mt-3 inline-block rounded-full bg-foreground px-5 py-2.5 font-medium text-background" data-testid="see-results">
-        See your results
-      </Link>
+      {!sandbox && (
+        <Link href={`/results/${run.attemptId}`} className="mt-3 inline-block rounded-full bg-foreground px-5 py-2.5 font-medium text-background" data-testid="see-results">
+          See your results
+        </Link>
+      )}
       <ul className="mt-3 text-sm">
         {Object.entries(scenario.resources).map(([k, r]) => (
           <li key={k}>
