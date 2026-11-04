@@ -273,7 +273,7 @@ export function Game({ scenario, challenge, sandbox = false }: { scenario: Scena
           >
             {v && v.node.art ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/art/${v.node.art.key}.webp`} alt={v.node.art.alt} className="aspect-[16/9] w-full rounded-2xl object-cover" />
+              <img src={`/art/${v.node.art.key}${profile?.accommodations.lowBandwidth ? ".small" : ""}.webp`} alt={v.node.art.alt} className="aspect-[16/9] w-full rounded-2xl object-cover" />
             ) : (
               <div aria-hidden className="aspect-[16/9] w-full rounded-2xl bg-gradient-to-br from-amber-100 via-orange-100 to-rose-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-rose-900/30" />
             )}

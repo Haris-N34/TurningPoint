@@ -36,7 +36,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable
 - [x] S.3 [H] Launch Week written in full (15 nodes, eligible 3, 6, 9, 10, 12, 3 disruptions) (#11, merged). C2.5 timed first-user validation remains open.
 - [x] S.4 [H] Client Rescue template written (#12, merged)
-- [ ] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
+- [x] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
 - Done when: a Playwright test plays Launch Week start to end on desktop and phone, every choice is in the database.
 
 ## M1.5. Game map and clock (v2 Part A)
@@ -70,10 +70,10 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## M2. Checkpoints
 
-- [ ] C1.1 [H] Three intro screens (checkpoints, timing, formats, no face or tone scored)
+- [x] C1.1 [H] Three intro screens (checkpoints, timing, formats, no face or tone scored)
 - [x] C1.2 [D] Default answer mode, changeable at every checkpoint
-- [ ] C1.3 [D+H] Device check: camera preview, mic meter, text fallback on denied permission (fallback inside checkpoints done, D; device check screen pending, H)
-- [ ] C1.4 [D+H] Accommodations form (1.5x, 2x, text-only, screen reader) changes timers (timers and text-only wired and tested, D; form UI pending, H)
+- [x] C1.3 [D+H] Device check: camera preview, mic meter, text fallback on denied permission
+- [x] C1.4 [D+H] Accommodations form (1.5x, 2x, text-only, screen reader) changes timers
 - [x] C1.5 [D] Mocked university SSO sets `verified=true`
 - [x] C4.1 [D] Checkpoints fire on 2 or 3 seeded `checkpointEligible` nodes
 - [x] C4.2 [D] Question quotes the candidate's last choice (built locally at choice time, node fallback)
@@ -86,7 +86,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] C5.1 [D] Real-life checkpoint: 30 s think, up to 120 s answer, any mode
 - [x] C5.2 [D] Follow-up about a specific detail, 60 s answer
 - [x] C5.3 [D] Candidate writes the one-sentence story title
-- [ ] AI.1 [H] Fallback question for every checkpoint-eligible node; rubric examples
+- [x] AI.1 [H] Fallback question for every checkpoint-eligible node; rubric examples
 - [x] PV2 [D] Consent screen before recording; improvement opt-in off by default
 - Done when: a test run records 3 checkpoints in each mode (fake media stream), transcripts appear within 30 s.
 
