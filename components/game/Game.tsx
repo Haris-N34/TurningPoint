@@ -13,6 +13,7 @@ import { checkpointQuestion } from "@/lib/ai/questions";
 import { Checkpoint, type CheckpointResult, type IntegrityNote } from "@/components/checkpoint/Checkpoint";
 import { RealLife, type RealStory } from "@/components/checkpoint/RealLife";
 import Link from "next/link";
+import { buildCard } from "@/lib/card/build";
 import { ResourceBar } from "./ResourceBar";
 import { chime } from "./sound";
 
@@ -115,6 +116,27 @@ export function Game({ scenarioId }: { scenarioId: string }) {
   useEffect(() => {
     if (isTurningPoint && !muted) chime("turning-point");
   }, [isTurningPoint, muted]);
+
+  // A finished run becomes a Capability Card, shared with the challenge it was played for.
+  useEffect(() => {
+    if (!run || run.state.status !== "ended" || !profile) return;
+    const s = store();
+    if (s.getCard(run.attemptId)) return;
+    const card = buildCard({
+      attemptId: run.attemptId,
+      scenario,
+      plan: run.plan,
+      state: run.state,
+      answers: run.answers,
+      integrity: run.integrity,
+      realStory: run.realStory,
+      challenge: { id: scenarioId, title: scenario.title, company: "Demo employer" },
+      candidate: { displayName: profile.displayName, university: profile.university || undefined, verified: profile.verified },
+      timeMultiplier: profile.accommodations.timeMultiplier,
+    });
+    s.saveCard(card);
+    s.share(run.attemptId, scenarioId, false);
+  }, [run, profile, scenario, scenarioId]);
 
   // When a checkpoint or the pause screen closes, put focus back on the next action (A3, keyboard play).
   const blocking = !!run?.pending || paused;

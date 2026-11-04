@@ -15,8 +15,8 @@ for (const mode of ["video", "voice", "text"] as Mode[]) {
     await page.getByTestId("see-results").click();
     await expect(page.getByTestId("results")).toBeVisible();
     const answers: Answer[] = await page.evaluate(() => {
-      const k = Object.keys(localStorage).find((x) => x.startsWith("tp:run:"))!;
-      return JSON.parse(localStorage.getItem(k)!).extra.answers;
+      const k = Object.keys(localStorage).find((x) => x.startsWith("tp:card:"))!;
+      return JSON.parse(localStorage.getItem(k)!).checkpoints;
     });
     expect(answers.filter((a) => a.kind === "decision").length).toBeGreaterThanOrEqual(2);
     expect(answers.map((a) => a.kind)).toEqual(expect.arrayContaining(["real_life", "follow_up"]));
@@ -29,6 +29,19 @@ for (const mode of ["video", "voice", "text"] as Mode[]) {
     }
     if (mode !== "text") expect(answers[0].transcript.text).toBe(FAKE_SPEECH);
     expect(Date.now() - started).toBeLessThan(30_000); // C4.7
+
+    // M3: the card has evidence, every AI sentence links to a moment, and the link jumps the clip there.
+    const evidence = page.getByTestId("evidence").locator("li");
+    await expect(evidence).toHaveCount(4);
+    await expect(page.getByTestId("results")).not.toContainText(/(score|rating)\s*[:=]?\s*\d|\d+\s*\/\s*(10|100)\b/i);
+    const jumps = page.locator('[data-testid^="jump-"]');
+    expect(await jumps.count()).toBeGreaterThan(0);
+    expect(await page.getByText("AI summary").count()).toBe(await jumps.count());
+    if (mode !== "text") {
+      await jumps.first().click();
+      const t = await page.locator('[data-testid="clip-media"]').first().evaluate((m: HTMLMediaElement) => m.currentTime);
+      expect(t).toBeGreaterThanOrEqual(0);
+    }
   });
 }
 

@@ -62,22 +62,22 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 ## M3. Capability Card
 
 - [x] G1 [D] Exact substring quote check; unmatched quotes dropped, skill drops a level
-- [ ] G2 [D] Models never get name, email, university or video frames
-- [ ] G3 [D] Prompt and model version stored with every result
-- [ ] AI.2 [D] Evidence extraction per rubric (Strong, Some, Not observed); "Needs human review" fallback
-- [ ] AI.3 [D] Data APIs for inbox and card
+- [x] G2 [D] Extractor never gets name, email, university or video frames
+- [x] G3 [D] Extractor name and version stored with every card
+- [x] AI.2 [D] Evidence extraction per rubric (local rules) (Strong, Some, Not observed); "Needs human review" fallback
+- [x] AI.3 [D] Data APIs for inbox and card (lib/card/recruiter.ts, inbox.ts)
 - [ ] E2.1 [H] Inbox table (anon ID, date, status, top 3 skills, witness, reused)
 - [ ] E2.2 [H] Filters and sorts
 - [ ] E2.3 [H] Shortcuts J/K, Enter, S
 - [ ] E3.1 [H] Card header (verified, "adjusted timing" only)
 - [ ] E3.2 [H] Skill evidence strip; never an overall score
 - [ ] E3.3 [H] Decision path timeline with turning point and checkpoint dots
-- [ ] E3.4 [D+H] Clips; click a sentence to jump to the exact second
+- [ ] E3.4 [D+H] Clips; click a sentence to jump to the exact second (ClipPlayer done, D; card layout pending, H)
 - [ ] E3.5 [H] Real turning point section
 - [ ] E3.6 [H] Integrity notes, "For context, not scored"
-- [ ] E3.7 [D+H] Shortlist, Hold, Pass (pass needs a reason)
+- [ ] E3.7 [D+H] Shortlist, Hold, Pass (pass needs a reason) (logic done, D; buttons pending, H)
 - [ ] E3.8 [H] Every AI sentence labelled "AI summary" with a source link
-- [ ] E6.1 [D+H] Anonymous first review ON by default
+- [ ] E6.1 [D+H] Anonymous first review ON by default (logic done, D; UI pending, H)
 - [ ] E6.2 [H] Transcript-first video setting
 - [ ] PV3 [D] Recordings served by 1-hour signed URLs only
 - Done when: finishing a run produces a card where every AI sentence links to a real timestamp, and a recruiter can shortlist from the inbox.
