@@ -116,7 +116,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] E7.4 [H] Seed data: 200 fake candidates
 - [ ] C8.1 [D] Practice mode, nothing shared, deleted after 24 h
 - [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
-- [ ] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ
+- [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
 - [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)
 - [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
 - [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script

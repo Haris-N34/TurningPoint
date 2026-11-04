@@ -21,14 +21,14 @@ export type ExtractInput = {
 // Words that suggest a sentence is about a skill. Kept plain on purpose so the rules can be read and defended.
 const SKILL_WORDS: Record<SkillSlug, RegExp> = {
   "problem-solving": /\b(problem|fix|fixed|solve|solution|figured|worked out|broke it down|root cause|plan b|workaround)\b/i,
-  adaptability: /\b(changed|change|switched|adjust\w*|adapt\w*|new plan|pivot\w*|instead|re-?plan\w*|shifted)\b/i,
+  adaptability: /\b(chang\w*|switch\w*|adjust\w*|adapt\w*|new plan|pivot\w*|instead|rather than|re-?plan\w*|shift\w*)\b/i,
   resilience: /\b(kept going|still|recover\w*|bounced back|finished|despite|didn'?t give up|tried again|setback|learned)\b/i,
   ambiguity: /\b(didn'?t know|unclear|uncertain|not sure|guess\w*|risk\w*|bet|without knowing|best call|judg(e)?ment call)\b/i,
   prioritization: /\b(instead of|rather than|first|priorit\w*|protect\w*|cut|matter\w*|most important|trade-?off|focus\w*|dropped)\b/i,
   creativity: /\b(donat\w*|borrow\w*|cheaper|free|idea|found a way|reused|creative|swap\w*|partner\w*|asked .* for)\b/i,
   collaboration: /\b(team|together|vote\w*|volunteers?|everyone|we|asked (them|the team|people)|shared|split|leads?)\b/i,
-  empathy: /\b(felt|feel\w*|worried|affect\w*|for them|their side|listened|heard|stressed|upset|cared?)\b/i,
-  communication: /\b(told|explain\w*|wrote|messag\w*|email\w*|talked|said|announc\w*|updated|let .* know)\b/i,
+  empathy: /\b(felt|feel\w*|worr\w*|affect\w*|for them|their side|listen\w*|hear\w*|stress\w*|upset|car(e|ed|es|ing))\b/i,
+  communication: /\b(told|tell\w*|explain\w*|wr(o|i)te\w*|messag\w*|email\w*|talk\w*|said|say\w*|announc\w*|updat\w*|let .* know)\b/i,
   feedback: /\b(feedback|critici\w*|crit|pointed out|said .* (mess|wrong)|learned|next time|changed .* because|took it on board)\b/i,
 };
 
