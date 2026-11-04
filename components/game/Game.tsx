@@ -95,7 +95,11 @@ export function Game({ scenarioId }: { scenarioId: string }) {
     [save],
   );
 
+  const [optIn, setOptIn] = useState(false);
+
   const begin = () => {
+    // Starting is consent to record answers on this device. The improvement opt-in is separate and off by default (PV2).
+    setProfile(store().saveProfile({ consentedToRecording: true, improvementOptIn: optIn }));
     const attemptId = newAttemptId();
     const plan = planRun(scenario, attemptId);
     update({ attemptId, plan, state: startRun(scenario, plan), startedAt: new Date().toISOString(), checkpointsDue: [], answers: [], integrity: [] });
@@ -184,8 +188,20 @@ export function Game({ scenarioId }: { scenarioId: string }) {
         <p className="text-sm uppercase tracking-wide opacity-70">Challenge</p>
         <h1 className="mt-1 text-3xl font-semibold">{scenario.title}</h1>
         {scenario.summary && <p className="mt-3 opacity-80">{scenario.summary}</p>}
-        <button onClick={begin} className="mt-8 rounded-full bg-foreground text-background px-6 py-3 font-medium" autoFocus>
-          Start
+        <section className="mt-8 rounded-2xl border p-4 text-sm" aria-labelledby="consent-title" data-testid="consent">
+          <h2 id="consent-title" className="font-semibold">Before you start</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 opacity-90">
+            <li>2 or 3 checkpoints will ask you to explain a choice. You can answer by video, voice or text.</li>
+            <li>Answers are recorded and kept on this device. You choose which employers see them, and you can delete everything.</li>
+            <li>Only your words are used. Your face, voice tone, accent and grammar are never scored.</li>
+          </ul>
+          <label className="mt-3 flex items-start gap-2">
+            <input type="checkbox" checked={optIn} onChange={(e) => setOptIn(e.target.checked)} className="mt-1" data-testid="improve-opt-in" />
+            <span>Also use my answers to improve Turning Point (optional)</span>
+          </label>
+        </section>
+        <button onClick={begin} className="mt-6 rounded-full bg-foreground text-background px-6 py-3 font-medium" autoFocus>
+          I agree, start
         </button>
       </main>
     );

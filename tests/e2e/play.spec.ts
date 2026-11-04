@@ -14,7 +14,7 @@ test("plays the sample scenario start to end and logs every choice (M1)", async 
   page.on("pageerror", (e) => errors.push(e.message));
   await installFakeSpeech(page);
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   await expect(page.getByTestId("game")).toBeVisible();
   await playToEnd(page, "text");
 
@@ -34,7 +34,7 @@ test("plays the sample scenario start to end and logs every choice (M1)", async 
 
 test("shows the turning-point takeover and resumes after a refresh (C3.1, C2.4)", async ({ page }) => {
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   for (let i = 0; i < 20; i++) {
     const s = await nextStep(page);
     if (s === "checkpoint") await answerCheckpoint(page, "text");
@@ -59,7 +59,7 @@ test("shows the turning-point takeover and resumes after a refresh (C3.1, C2.4)"
 
 test("an open checkpoint survives a refresh (C2.4)", async ({ page }) => {
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   const { playToCheckpoint } = await import("./helpers");
   await playToCheckpoint(page);
   const q = await page.getByTestId("checkpoint-question").getAttribute("aria-label");
@@ -70,7 +70,7 @@ test("an open checkpoint survives a refresh (C2.4)", async ({ page }) => {
 test("fits a 375 px phone without horizontal scroll (C2.5)", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);

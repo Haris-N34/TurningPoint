@@ -7,7 +7,7 @@ for (const mode of ["video", "voice", "text"] as Mode[]) {
   test(`records every checkpoint in ${mode} mode and shows transcripts on results (M2)`, async ({ page }) => {
     await installFakeSpeech(page);
     await page.goto("/play/sample");
-    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "I agree, start" }).click();
     const answered = await playToEnd(page, mode);
     expect(answered).toBeGreaterThanOrEqual(4); // 2 or 3 decisions + real life + follow-up
 
@@ -34,7 +34,7 @@ for (const mode of ["video", "voice", "text"] as Mode[]) {
 
 test("checkpoint question quotes the choice just made (C4.2)", async ({ page }) => {
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   const label = await playToCheckpoint(page);
   await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", new RegExp(`"${label}"`));
 });
@@ -42,7 +42,7 @@ test("checkpoint question quotes the choice just made (C4.2)", async ({ page }) 
 test("text mode blocks paste, allows one retake, and logs focus loss as context (C4.4, C4.5, C4.8)", async ({ page }) => {
   await setProfile(page, { accommodations: { textOnly: true, timeMultiplier: 1 } });
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   await playToCheckpoint(page);
   const cp = page.getByTestId("checkpoint");
   await expect(cp.locator('input[value="video"]')).toBeDisabled();
@@ -82,7 +82,7 @@ test("text mode blocks paste, allows one retake, and logs focus loss as context 
 test("accommodation multiplier stretches the timers (C1.4)", async ({ page }) => {
   await setProfile(page, { accommodations: { timeMultiplier: 2, textOnly: true } });
   await page.goto("/play/sample");
-  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "I agree, start" }).click();
   await playToCheckpoint(page);
   await expect(page.getByTestId("checkpoint").getByText("Take 30 seconds to think. You then have 120 seconds.")).toBeVisible();
   await answerCheckpoint(page, "text");

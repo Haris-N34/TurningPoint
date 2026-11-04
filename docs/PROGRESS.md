@@ -43,7 +43,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] C1.2 [D] Default answer mode, changeable at every checkpoint
 - [ ] C1.3 [D+H] Device check: camera preview, mic meter, text fallback on denied permission (fallback inside checkpoints done, D; device check screen pending, H)
 - [ ] C1.4 [D+H] Accommodations form (1.5x, 2x, text-only, screen reader) changes timers (timers and text-only wired and tested, D; form UI pending, H)
-- [ ] C1.5 [D] Mocked university SSO sets `verified=true`
+- [x] C1.5 [D] Mocked university SSO sets `verified=true`
 - [x] C4.1 [D] Checkpoints fire on 2 or 3 seeded `checkpointEligible` nodes
 - [x] C4.2 [D] Question quotes the candidate's last choice (built locally at choice time, node fallback)
 - [x] C4.3 [D] 15 s think then 60 s answer, times accommodation multiplier
@@ -56,7 +56,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] C5.2 [D] Follow-up about a specific detail, 60 s answer
 - [x] C5.3 [D] Candidate writes the one-sentence story title
 - [ ] AI.1 [H] Fallback question for every checkpoint-eligible node; rubric examples
-- [ ] PV2 [D] Consent screen before recording; improvement opt-in off by default
+- [x] PV2 [D] Consent screen before recording; improvement opt-in off by default
 - Done when: a test run records 3 checkpoints in each mode (fake media stream), transcripts appear within 30 s.
 
 ## M3. Capability Card
