@@ -129,3 +129,5 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 
 - M0 accepted by Div on Board #1 (2026-11-04): foundation PRs #32 to #34 merged into main. #25 deployment deferred until the product is done. #11 to #15 may proceed. Recruiter and employer screens #16 to #18 are delegated to Div.
+
+- #13 art package ready for review: 15 generated illustrations and 15 small WebP variants in `public/art`, alt-text manifest, prompt records, contact sheet and rendered 1440/375 px screenshots. Launch Week's 15 nodes now reference the matching art and alt text. Full images are 59 to 88 KB; small images are 12 to 17 KB. Client Rescue's node mapping awaits PR #36 integration; selecting small images awaits Div's Game.tsx ownership approval or implementation. Lint, typecheck and 89 unit tests pass. Full e2e: 53 passed, 1 skipped, 2 failed in the existing recruiter transcript-first toggle check. S.5/C2.6/A4 remain unchecked pending integration and full-suite acceptance.
