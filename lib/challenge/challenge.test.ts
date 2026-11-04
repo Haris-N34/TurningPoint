@@ -92,3 +92,12 @@ describe("challenges (E1.1, E1.6, C7.3)", () => {
     expect(reusableFor(s, card, [b.id])).toEqual([]);
   });
 });
+
+describe("slugify", () => {
+  it("keeps short slugs and cuts long ones at a word boundary", async () => {
+    const { slugify } = await import("./challenge");
+    expect(slugify("Bow River Credit Union")).toBe("bow-river-credit-union");
+    expect(slugify("Prairie Grid Energy Field Operations Analyst")).toBe("prairie-grid-energy-field-operations");
+    expect(slugify("Supercalifragilisticexpialidociousexpialidocious")).toHaveLength(40);
+  });
+});

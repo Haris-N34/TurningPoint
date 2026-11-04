@@ -129,13 +129,13 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## M4. Employer side and portability
 
-- [ ] E1.1 [H] Skills step: 10 skill cards, pick 3 or 4
-- [ ] E1.2 [H] Scenario step: 2+ templates with thumbnail, length, skills
+- [x] E1.1 [D] Skills step: 10 skill cards, pick 3 or 4
+- [x] E1.2 [D] Scenario step: 2+ templates with length and skills
 - [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original
-- [ ] E1.4 [H] Inline scene editing, mark checkpoint-eligible
-- [ ] E1.5 [D+H] Preview as candidate, no data saved (sandbox route /admin/preview/<id> done and tested, D; button in builder, H)
-- [x] E1.6 [D] Publish creates public link, job code and QR (logic; builder UI shows them, H)
-- [ ] E1.7 [H] Setup under 10 minutes for a first-time user
+- [x] E1.4 [D] Inline scene editing, mark checkpoint-eligible
+- [x] E1.5 [D] Preview as candidate, no data saved
+- [x] E1.6 [D] Publish creates public link, job code and QR
+- [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
 - [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
 - [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)

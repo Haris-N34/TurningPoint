@@ -33,12 +33,15 @@ export const getChallenge = (s: Store, id: string) => list(s).find((c) => c.id =
 export const getChallengeBySlug = (s: Store, slug: string) => list(s).find((c) => c.publicSlug === slug && c.status === "published");
 export const challengeScenario = (c: Challenge): Scenario => parseScenario(c.scenario);
 
-export function slugify(s: string) {
-  return s
+export function slugify(text: string) {
+  const s = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 40);
+    .replace(/^-|-$/g, "");
+  if (s.length <= 40) return s;
+  // Cut at a word boundary so links read cleanly.
+  const cut = s.slice(0, 41);
+  return cut.slice(0, cut.lastIndexOf("-") > 0 ? cut.lastIndexOf("-") : 40);
 }
 
 const CODE = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
