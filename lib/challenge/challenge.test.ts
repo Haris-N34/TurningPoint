@@ -25,6 +25,15 @@ describe("tailorScenario (E1.3)", () => {
     expect(energy.nodes.map((n) => n.id)).toEqual(base.nodes.map((n) => n.id));
   });
 
+  it("tailors Launch Week for every industry", () => {
+    const lw = getScenario("launch-week")!;
+    for (const ind of INDUSTRIES) {
+      const r = tailorScenario(lw, ind, "Prairie Grid");
+      expect(r.error).toBeUndefined();
+      if (ind !== "Non-profit") expect(JSON.stringify(r.scenario)).not.toMatch(/food market/i);
+    }
+  });
+
   it("keeps the original when the result would be invalid", () => {
     const broken = { ...base, nodes: base.nodes.map((n) => (n.type === "choice" ? { ...n, options: n.options.map((o) => ({ ...o, next: "missing" })) } : n)) };
     const r = tailorScenario(broken as typeof base, "Energy");

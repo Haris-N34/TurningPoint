@@ -13,7 +13,7 @@ export const DEMO_EMPLOYERS = [
   { id: "ch_demo_bank", company: { name: "Bow River Credit Union (fictional)", colour: "#1d4ed8" }, title: "Member Experience Associate", industry: "Banking" as const, targetSkills: ["resilience", "communication", "empathy"] as const },
 ];
 
-export function seedDemo(s: Store, templateId = "sample"): Challenge[] {
+export function seedDemo(s: Store, templateId = "launch-week"): Challenge[] {
   const base = getScenario(templateId)!;
   const out: Challenge[] = [];
   for (const e of DEMO_EMPLOYERS) {
