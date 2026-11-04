@@ -15,8 +15,8 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e (workflow committed; first run pending)
 - [ ] M0.8 [D] Deployed to Vercel
 - [x] M0.9 [H] Design system tokens, shadcn primitives and light/dark preview; 49 unit + 30 serial e2e pass (#9, implementation complete, awaiting review)
-- [ ] M0.10 [H] Landing page (screen 1)
-- [ ] M0.11 [H] Role picker (screen 2)
+- [x] M0.10 [H] Landing page with promise, three-step explainer and working CTAs (#10, implementation complete, awaiting review)
+- [x] M0.11 [H] Header role picker, local persistence and four role entry routes; 49 unit + 38 serial e2e pass (#10, awaiting review)
 - Done when: fresh clone runs with `pnpm i && pnpm dev`, CI is green, deployed URL shows landing page and role picker.
 
 ## M1. Playable game
@@ -127,3 +127,5 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 ## Blockers
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
+
+- #11 (M1) waits for the M0 definition of done: review/integrate Haris foundation PRs and complete #25 deployment acceptance. #9 and #10 implementation is ready for review; no merge or deployment is authorized in this run.
