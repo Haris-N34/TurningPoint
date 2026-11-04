@@ -181,9 +181,16 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
     getJSON: <T>(key: string, schema: z.ZodType<T>) => read(kv, `x:${key}`, schema),
     setJSON: (key: string, value: unknown) => write(kv, `x:${key}`, value),
 
-    /** Delete everything this browser holds for the candidate (C7.5). Media is cleared separately. */
+    /**
+     * Delete everything held for the candidate (C7.5): profile, runs, cards, shares, reviews of their
+     * cards, witnesses and ATS exports. Employer challenges and UI settings stay. Media is cleared
+     * separately (media.clear), see deleteMyData.
+     */
     deleteAll() {
-      for (const k of keys(kv, "")) kv.removeItem(PREFIX + k);
+      const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports"];
+      for (const k of keys(kv, "")) {
+        if (candidateKeys.includes(k) || k.startsWith("run:") || k.startsWith("card:")) kv.removeItem(PREFIX + k);
+      }
     },
   };
 }

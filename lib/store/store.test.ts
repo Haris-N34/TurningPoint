@@ -67,7 +67,12 @@ describe("local store (M0.5, M0.6)", () => {
     s.saveProfile({ displayName: "Maya" });
     s.saveCard(CardSchema.parse(fixture));
     s.share("att_demo_maya", "ch2", false);
+    s.setJSON("challenges", [{ id: "ch2" }]);
+    s.setJSON("witnesses", [{ id: "w1" }]);
     s.deleteAll();
+    expect(kv.getItem("tp:x:challenges")).not.toBeNull(); // employer data stays
+    expect(kv.getItem("tp:x:witnesses")).toBeNull();
+    expect(s.listShares()).toEqual([]);
     expect(s.listCards()).toEqual([]);
     expect(s.getProfile().displayName).toBe("");
     expect(kv.getItem("other-app")).toBe("keep");

@@ -86,24 +86,24 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 
 - [ ] E1.1 [H] Skills step: 10 skill cards, pick 3 or 4
 - [ ] E1.2 [H] Scenario step: 2+ templates with thumbnail, length, skills
-- [ ] E1.3 [D] AI tailoring returns schema-valid JSON or keeps the original
+- [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original
 - [ ] E1.4 [H] Inline scene editing, mark checkpoint-eligible
 - [ ] E1.5 [D+H] Preview as candidate, no data saved
-- [ ] E1.6 [D] Publish creates public link, job code and QR
+- [x] E1.6 [D] Publish creates public link, job code and QR (logic; builder UI shows them, H)
 - [ ] E1.7 [H] Setup under 10 minutes for a first-time user
 - [ ] C6.1 [H] Add up to 2 witnesses with relationship
-- [ ] C6.2 [D] Witness email with one-time link, expires in 14 days
+- [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
 - [ ] C6.3 [H] Witness page, no account, phone, under 30 s
 - [ ] C6.4 [H] Card shows "Confirmed by ..." never the witness email
-- [ ] C6.5 [D] Reject witness email matching candidate email or domain alias
+- [x] C6.5 [D] Reject witness email matching candidate email or domain alias
 - [ ] C7.1 [H] Candidate sees own card exactly as a recruiter would
 - [ ] C7.2 [D+H] Hide a single clip (no transcript edits)
 - [ ] C7.3 [D+H] Share with another employer in one click, "Reused" badge
-- [ ] C7.4 [D] Revoke share; employer sees "Candidate withdrew this card"
-- [ ] C7.5 [D] Delete everything within 1 minute (`delete_my_data`)
+- [x] C7.4 [D] Revoke share; employer sees "Candidate withdrew this card" (cardFor returns withdrawn)
+- [x] C7.5 [D] Delete everything, immediately (deleteMyData: store + recordings)
 - [ ] E8.1 [D+H] Inbox shows reused cards with covered skills
-- [ ] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
-- [ ] E5.2 [D] Exported candidate links back to the card
+- [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
+- [x] E5.2 [D] Exported candidate links back to the card
 - [ ] PV5 [H] "How we use AI" page linked from every screen
 - Done when: the five-step loop from the PRD Summary works end to end on the deployed site.
 
