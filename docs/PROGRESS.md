@@ -21,14 +21,14 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 
 ## M1. Playable game
 
-- [ ] C2.1 [D] Game loads scenario JSON and renders scene, choice, event, checkpoint, end
-- [ ] C2.2 [D] Choices change resources and branch; resource bar animates
-- [ ] C2.3 [D] Every choice logged with timestamp, node id, option id, decided_ms
-- [ ] C2.4 [D] Pause; progress saved server-side; resumes on refresh or another device
-- [ ] C2.5 [D+H] Full run 12 to 18 minutes; works at 375 px
-- [ ] C2.6 [D+H] Keyboard-only play (arrows, Enter); all art has alt text
-- [ ] C3.1 [D] Turning point fires between 40% and 60%, full-screen transition, mutable sound
-- [ ] C3.2 [D] Resets a resource sharply and unlocks new choices
+- [x] C2.1 [D] Game loads scenario JSON and renders scene, choice, event, checkpoint, end
+- [x] C2.2 [D] Choices change resources and branch; resource bar animates
+- [x] C2.3 [D] Every choice logged with timestamp, node id, option id, decided_ms
+- [x] C2.4 [D] Pause; progress saved locally; resumes on refresh (another device needs a server, out of demo scope)
+- [ ] C2.5 [D+H] Full run 12 to 18 minutes (needs Launch Week); works at 375 px (done, e2e)
+- [ ] C2.6 [D+H] Keyboard-only play (done, e2e); all art has alt text (enforced by content test, needs art)
+- [x] C3.1 [D] Turning point fires between 40% and 60%, full-screen transition, mutable sound
+- [x] C3.2 [D] Resets a resource sharply and unlocks new choices
 - [x] C3.3 [D] Disruption picked from pool by per-candidate seed
 - [x] S.1 [D] Schema rejects unreachable nodes, missing targets, no path to end, fewer than 3 eligible nodes
 - [x] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable

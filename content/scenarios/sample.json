@@ -1,0 +1,239 @@
+{
+  "id": "sample",
+  "version": 1,
+  "title": "Sample: Pop-up Market",
+  "summary": "A short sample run for development and tests. Launch Week replaces it in the demo.",
+  "industryFlavour": "non-profit",
+  "targetSkills": [
+    "adaptability",
+    "prioritization",
+    "collaboration",
+    "resilience"
+  ],
+  "start": "s1",
+  "estimatedMinutes": 4,
+  "resources": {
+    "budget": {
+      "label": "Budget",
+      "start": 5000,
+      "min": 0,
+      "unit": "$"
+    },
+    "morale": {
+      "label": "Team morale",
+      "start": 70,
+      "min": 0,
+      "max": 100
+    },
+    "time": {
+      "label": "Days left",
+      "start": 21,
+      "min": 0
+    }
+  },
+  "variation": {
+    "budget.start": [
+      4000,
+      6000
+    ],
+    "teamSize": [
+      6,
+      10
+    ]
+  },
+  "disruptions": [
+    {
+      "id": "sponsor-pulls-out",
+      "title": "Your main sponsor pulls out",
+      "text": "The sponsor emails at 7 a.m.: they are out. Most of your budget goes with them.",
+      "effects": {
+        "budget": -3000
+      },
+      "next": "c4"
+    },
+    {
+      "id": "venue-cancels",
+      "title": "The venue cancels",
+      "text": "The community hall double-booked. You lose a week finding a new space.",
+      "effects": {
+        "time": -7
+      },
+      "next": "c4"
+    },
+    {
+      "id": "lead-volunteer-quits",
+      "title": "Your lead volunteer quits",
+      "text": "Your most reliable volunteer leaves for a paid job. The group chat goes quiet.",
+      "effects": {
+        "morale": -35
+      },
+      "next": "c4"
+    }
+  ],
+  "disruptionPool": [
+    "sponsor-pulls-out",
+    "venue-cancels",
+    "lead-volunteer-quits"
+  ],
+  "nodes": [
+    {
+      "id": "s1",
+      "type": "scene",
+      "text": "You lead a team of {teamSize} students running a 3-week pop-up food market with a local non-profit.",
+      "next": "c1"
+    },
+    {
+      "id": "c1",
+      "type": "choice",
+      "text": "Two volunteers want to run social media. Nobody wants logistics.",
+      "checkpointEligible": true,
+      "skillSignals": [
+        "collaboration",
+        "prioritization"
+      ],
+      "fallbackQuestion": "Why did you handle the logistics gap the way you did?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Assign roles yourself",
+          "effects": {
+            "morale": -10,
+            "time": -1
+          },
+          "next": "c2"
+        },
+        {
+          "id": "b",
+          "label": "Let the team vote",
+          "effects": {
+            "morale": 5,
+            "time": -2
+          },
+          "next": "c2"
+        },
+        {
+          "id": "c",
+          "label": "Take logistics on yourself",
+          "effects": {
+            "morale": 10,
+            "time": -3
+          },
+          "next": "c2"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "type": "choice",
+      "text": "Pick a vendor mix for opening weekend.",
+      "checkpointEligible": true,
+      "skillSignals": [
+        "prioritization"
+      ],
+      "fallbackQuestion": "What did your vendor choice trade away?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Mostly local food vendors",
+          "effects": {
+            "budget": -800,
+            "morale": 5
+          },
+          "next": "e1"
+        },
+        {
+          "id": "b",
+          "label": "A few big-name trucks",
+          "effects": {
+            "budget": -2000
+          },
+          "next": "e1"
+        }
+      ]
+    },
+    {
+      "id": "e1",
+      "type": "event",
+      "turningPoint": true,
+      "text": "Something breaks."
+    },
+    {
+      "id": "c4",
+      "type": "choice",
+      "text": "The plan no longer works. What do you protect first?",
+      "checkpointEligible": true,
+      "skillSignals": [
+        "adaptability",
+        "resilience"
+      ],
+      "fallbackQuestion": "Why protect that over everything else?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Cut the second weekend",
+          "effects": {
+            "time": 3
+          },
+          "next": "c5"
+        },
+        {
+          "id": "b",
+          "label": "Find a new partner",
+          "effects": {
+            "time": -3,
+            "budget": 1000
+          },
+          "next": "c5"
+        },
+        {
+          "id": "c",
+          "label": "Rally the team and keep the full plan",
+          "effects": {
+            "morale": 15,
+            "time": -2
+          },
+          "next": "c5"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "type": "choice",
+      "text": "After market day the non-profit lead says the queue was a mess.",
+      "checkpointEligible": true,
+      "skillSignals": [
+        "feedback",
+        "empathy"
+      ],
+      "fallbackQuestion": "How did you take that feedback?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask what they would change first",
+          "effects": {
+            "morale": 5
+          },
+          "next": "rl"
+        },
+        {
+          "id": "b",
+          "label": "Explain why it happened",
+          "effects": {},
+          "next": "rl"
+        }
+      ]
+    },
+    {
+      "id": "rl",
+      "type": "checkpoint",
+      "kind": "real_life",
+      "text": "When have you faced something like this in real life?",
+      "next": "end"
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "text": "Market day is done. Here is where you ended up."
+    }
+  ]
+}
