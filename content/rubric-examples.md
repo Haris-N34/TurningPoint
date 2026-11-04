@@ -91,3 +91,19 @@ Launch Week has five eligible questions at n3, n6, n9, n10 and n12. Client Rescu
 The local demo generates questions synchronously from the choice log; it has no network request to time out. Its missing-context path uses the node fallback immediately. A future remote implementation must use the same fallback after four seconds or on failure. This content change does not implement a network timer.
 
 Manual review protocol: for each eligible node, try every option with several seeds, check the generated question quotes the selected label verbatim, stays within 30 words and remains neutral. Remove choice context and confirm the node fallback appears. For real-life follow-ups, ensure any quoted detail occurs in the answer. Escalate invented evidence or identity-based judgments on Board #1.
+
+## analytical
+
+**Strong:** “I compared the stockout data across the three stores because one chart looked like noise. The trend only held in the small stores, so instead of recommending it everywhere I told the CFO it would affect two sites first.”
+
+**Some:** “I looked at the data because the numbers seemed off.”
+
+**Not observed:** “The meeting was on Thursday.” No reading of data or evidence is described.
+
+## curiosity
+
+**Strong:** “I asked around at the café because the report didn't explain the old system failing. I found out the staff had a workaround, so instead of replacing everything we kept it, and the store team felt heard.”
+
+**Some:** “I looked into the old report because I wanted to know why it failed.”
+
+**Not observed:** “I finished the slides on time.” No searching for information beyond what was given is described.

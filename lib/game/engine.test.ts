@@ -198,7 +198,7 @@ describe("checkpoints (A9)", () => {
 
   it("asks the order question once when 3 issues are open, and logs what was done next", () => {
     let st = newGame(s, SEED, { turnBased: true });
-    while (ids(st).length < 3) st = step(s, st, { type: "drift", minutes: 0 }), (st = step(s, st, { type: "move", zone: st.zone === "hq" ? "stage" : "hq" }));
+    while (ids(st).length < 3) st = step(s, st, { type: "move", zone: st.zone === "hq" ? "stage" : "hq" });
     expect(st.checkpointsDue.filter((c) => c.kind === "order")).toHaveLength(1);
     const plan = ids(st).slice(0, 3).reverse();
     st = step(s, st, { type: "orderAnswer", ranking: plan });
