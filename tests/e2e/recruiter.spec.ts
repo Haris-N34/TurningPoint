@@ -117,7 +117,10 @@ test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
 test("transcript-first hides video until revealed (E6.2)", async ({ page }) => {
   await seed(page);
   await page.goto("/recruiter");
+  // Wait for the client inbox to render (hydrated) before toggling.
+  await expect(page.getByTestId(`row-${MAYA}`)).toBeVisible();
   await page.getByTestId("transcript-first-toggle").check();
+  await expect(page.getByTestId("transcript-first-toggle")).toBeChecked();
   await page.goto(CARD);
   await page.getByTestId("tab-cp2").click();
   await expect(page.getByRole("button", { name: "Reveal video" })).toBeVisible();

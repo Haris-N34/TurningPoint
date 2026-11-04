@@ -92,8 +92,9 @@ export function Inbox() {
   const skills = (challenge?.targetSkills ?? []) as SkillSlug[];
   const setSettings = (s: Partial<Pick<Challenge, "anonymousReview" | "transcriptFirst">>) => {
     if (!challenge) return;
-    updateSettings(store(), challenge.id, s);
-    setVersion((v) => v + 1);
+    const updated = updateSettings(store(), challenge.id, s);
+    // Update local state in the same tick so the controlled checkbox never shows the old value.
+    setChallenges((list) => list?.map((c) => (c.id === updated.id ? updated : c)) ?? null);
   };
 
   const exportAts = async () => {
