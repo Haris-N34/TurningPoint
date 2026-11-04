@@ -505,3 +505,236 @@ The live demo takes 4 minutes. Pre-record a backup video of the same flow in cas
 - Does the partner code? That decides which version of the team split to use.
 - Do the competition rules allow a live AI demo, or should the core flow also work fully offline from cached outputs?
 - Which real Calgary employer, if any, can we name as a pilot partner on the slides?
+
+---
+
+# Upgrade v2 (Nov 4, Div): game map, AI Engine, integration layer
+
+This section adds three upgrades on top of everything above. Where it conflicts with earlier sections, this section wins.
+
+**How it fits the demo scope (CLAUDE.md, Demo scope decisions).** The demo stays local-first with no required API keys:
+- Data: the Part F tables are implemented as typed collections in the local store (browser) and an in-process demo store on the server for the integration layer (webhooks, mock ATS, public API). A Supabase migration for the full product is out of scope for the demo.
+- AI: every service runs behind one provider interface. `AI_MODE=off` (default) uses deterministic local implementations and template fallbacks. `AI_MODE=cached` replays stored outputs. `AI_MODE=live` uses Claude only if `ANTHROPIC_API_KEY` is set in the environment. Keys never live in code.
+- Email: simulated (links shown and logged), not sent.
+
+## Where this comes from (the team's whiteboard)
+
+- Existing inputs: resume and cover letter go into the employer's ATS. The game goes into our scoring system. The two are linked by "similar values" (employer competencies mapped to our skills) and both feed a final recruiter view.
+- Company inputs: the company enters the skills it wants (e.g. leadership). These drive a job-related scenario.
+- The game tests job skills with in-game metrics and KPIs. Video pop-ups let students prove real experiences. Answers become transcripts, an AI scan turns them into scores, and the AI engine keeps improving.
+- Open question: "How can we limit candidates being booted out?" (answered by Second Look, C3).
+- AI requirements: avoid bias, avoid hallucinations, accurate algorithm.
+- Key success factors: students can distinguish themselves; recruiters can handle volume; capabilities are represented truthfully. Secondary: internal fulfilment for students.
+- Role example: Tech Consulting wants communicating tech to business, analytical thinking, making new discoveries.
+- Choice-triggered video: picking certain options (A to D) triggers a video explanation.
+- Resume vs evidence: resume analysis gives signals of basic capability; the game gives evidence. Side by side. "My resume has this, but let me show you how I can back that up."
+
+## Non-negotiables (additions)
+
+Never score face, emotion, voice tone, accent, grammar, fluency, typing speed, movement speed or reflexes. No auto-reject. Models never receive name, email, university, photos or video frames. Every quote is an exact transcript substring, checked in code. Every part of the game is playable without a camera, without a mouse, and without real-time pressure (accessibility mode). Candidates own their data. No API keys in code.
+
+## Part A. The game: top-down map plus live clock
+
+### A0. It must look and feel like a real game (P0)
+
+Judges must see it and say "this is an actual game." Reference feel: a cozy top-down 2D game (Stardew Valley, classic Pokémon overworlds) with the time pressure of a management game. Pixel art at a consistent scale (16x16 tiles at 3x or 4x, `pixelArt: true`, `roundPixels: true`).
+
+Must-have elements:
+- Title screen: animated map background, logo, "Press Enter / Tap to start", music toggle, settings. Not a web landing page.
+- Avatar creator: body, skin tone, hair, outfit from inclusive options, plus a display name (never shown to recruiters). 30 seconds, skippable.
+- Animated characters: 4-direction walk cycles, idle animations, NPCs walking short routes.
+- A living world: ambient crowd NPCs, animated tiles, birds or particles, shadows, day-to-evening lighting via a tinted overlay.
+- Game dialogue: bottom box with speaker portrait (neutral, worried, happy, angry), typewriter text with skip and a voice blip, choices A to D as game buttons navigable by arrow keys, NPC emote bubbles and expression changes in reaction.
+- Juice: floating numbers, tweened and flashing bars, small screen shake on bad events, particle bursts on resolve, sound effects (footsteps, clicks, notifications, success, failure), a music loop that changes after the turning point.
+- HUD: pixel panels, minimap with issue markers, quest-log issue tracker with countdowns, clock with a day ring, notification toasts.
+- Turning point as a cutscene: letterbox bars, phone-call animation, camera pan, music change, Sponsor Office lights out.
+- End-of-week results screen: animated KPI counters, "week in review" timeline, "Continue" into the real-life checkpoint.
+- Pause menu: Resume, Settings (volume, text speed, reduced motion, turn-based mode, list view), How to play.
+- Loading screen with tips.
+
+Assets: CC0 packs from Kenney.nl as the base. Portraits: 6 to 8 NPC sets with 4 expressions in one pixel style (partner), in `public/assets/portraits/`. Every asset's source and licence in `public/assets/LICENSES.md`. Missing assets use a clearly temporary placeholder logged in `docs/ASSETS_TODO.md`; never a grey box in the demo build.
+
+The "quiz test" (gate for M1.5): no gameplay screen shows choices without a character, a scene and an animation; every decision happens through an in-world interaction; Playwright captures the title, map, dialogue, cutscene, checkpoint and results into `docs/screens/` and `docs/CHANGELOG.md` records which items are met; 60 fps desktop, 30+ fps mid-range phone, no asset pop-in after loading.
+
+### A1. Concept
+
+Launch Week: the candidate is the student lead running a 5-day pop-up community market with a local non-profit. The map is the market site. Problems appear as people with "!" bubbles. A clock runs. The candidate walks to people, talks, decides, and can't fix everything in time. Midweek the main sponsor pulls out. Movement becomes a prioritization signal (who first, what deferred, what expired), measured in game time and outcomes, never real-time reflexes.
+
+### A2. Tech
+
+Phaser 3 map in a client-only component (`next/dynamic`, `ssr: false`) at `components/game/MapCanvas.tsx`. React renders all text UI (HUD, dialogue, issues, checkpoints) over the canvas. Zustand store (`lib/game/store.ts`) plus a typed event bus (mitt). The pure TypeScript engine (`lib/engine`, `lib/game`) is the single source of truth; Phaser only renders and sends input. Map authored in Tiled JSON at `public/maps/launch-week.json` with CC0 tiles and sprites. EasyStar.js pathfinding for click and tap. CC0 UI sounds; mute persisted with a try/catch fallback.
+
+### A3. The map
+
+40x30 tiles, camera follows the player, zoom fit for phones. Zones with signs:
+
+| Zone | Who | What happens |
+| --- | --- | --- |
+| HQ Tent | Desk, laptop | Inbox, budget overview, end-of-day plan |
+| Volunteer Station | Priya (volunteer lead), 2 volunteers | Staffing, schedule conflicts, morale |
+| Vendor Row | 3 vendors | Fees, stall placement, a vendor threatening to leave |
+| Sponsor Office | Mr. Okafor (sponsor rep) | Sponsorship terms; goes dark at the turning point |
+| Storage Shed | Logistics volunteer | Missing supplies, permits, deliveries |
+| Main Stage | Dana (non-profit lead) | Programming, community partner, critical feedback |
+| Entrance Gate | Visitors (Day 5) | Market-day outcome |
+
+NPCs with an open issue show a bouncing "!" coloured by urgency, plus an icon and label (never colour only).
+
+### A4. Controls
+
+Desktop: WASD or arrows to walk, E or Enter to talk, click to walk, Tab cycles NPCs with open issues. Phone: tap to walk, tap an NPC to talk. Fast travel from the issue list. Every route costs the same game time regardless of movement skill.
+
+### A5. The clock
+
+Monday to Friday 09:00 to 18:00, market day Saturday. HUD clock "Wed 14:20" with a day ring; lighting tints morning to evening. Time advances by action costs (walking 10 game minutes per 10 tiles of path, talking 30 to 90 minutes per issue, decisions per their effects) and ambient drift (2 game minutes per real second on the map, outside dialogue and checkpoints). Constants in `lib/game/config.ts`. The clock pauses in dialogue, checkpoints, pause menu and when the tab loses focus. Turn-based mode: no drift, only actions cost time; offered on the intro screen and on automatically with extra-time accommodations; shown in the HUD; no outcome may depend on drift. End of day: a 10-second evening recap with the day's KPIs and a one-line reflection prompt. Target run 12 to 16 minutes, tuned by a Playwright timing test.
+
+### A6. Issues
+
+Scenario JSON gains `map`, `npcs` and `issues`:
+
+```json
+{ "issues": [ { "id": "vendor-fee-dispute", "npc": "vendor-2", "zone": "vendor-row",
+  "spawnAt": "Mon 11:00", "deadline": "Tue 12:00", "severity": "medium", "talkCost": 45,
+  "choiceNode": "n6", "onExpire": { "effects": { "reputation": -10 }, "spawn": "vendor-2-leaves" },
+  "skillSignals": ["prioritization", "communication"], "checkpointEligible": true } ] }
+```
+
+14 to 18 issues per week, at most 3 or 4 open at once. Actions: Talk (choice dialogue), Delegate (pick a volunteer; costs morale; success depends on their state), Defer (one-tap reason from a short list), Ignore (expires). Expiry applies `onExpire` effects and may spawn an escalated issue. HUD tracker shows deadline countdown in game time, severity and a "Go" button. HUD resources: Budget, Team morale, Community trust, Days left, animated on change.
+
+### A7. The turning point
+
+Wednesday 09:00 or the seeded variant. Screen dims, phone rings, full-screen call card from Mr. Okafor, budget drains 60%, Sponsor Office goes dark, three new issues spawn, camera pans across them. A "Recovery plan" choice unlocks at HQ.
+
+### A8. In-game KPIs
+
+Deterministic, explainable in one sentence on the card, inputs to scoring (Part D):
+
+| KPI | Definition | Skill |
+| --- | --- | --- |
+| Critical issues handled before deadline | % of high-severity issues resolved in time | Prioritization |
+| Deliberate deferrals | Deferred with a reason vs left to expire | Prioritization, decision-making under ambiguity |
+| Recovery speed | Game hours from the turning point to a committed recovery plan | Resilience, adaptability |
+| Budget protected for core goal | Share of remaining budget kept for the core purpose after the cut | Creativity with limited resources |
+| Team morale trajectory | End morale vs the low point after the turning point | Collaboration, empathy |
+| Delegation quality | Successful vs failed delegations, relative to the volunteer's state | Collaboration |
+| Stakeholder balance | No stakeholder trust below 30 at the end | Empathy, communication |
+| Feedback response | Choice after Dana's Day 4 critical feedback | Responding to feedback |
+
+Never compute or display anything based on real-time speed, path efficiency, clicks or keystrokes.
+
+### A9. Checkpoints inside the map
+
+Same rules as C4 and C5. Triggers are decision-based: after a Talk, Delegate or Defer on a `checkpointEligible` issue, chosen by seed. The takeover freezes and blurs the map and quotes the action ("You deferred the permit problem to fix the vendor dispute first. Why that order?"). Choice-triggered video: options flagged `explainOnPick: true` (bold or unconventional options, and at least one in each turning-point dialogue) open a checkpoint immediately, quoting the option; cap of 4 video checkpoints per run; seeded ones still guarantee at least 2. The order question fires once: "You've got three open problems. Which first, and why?"; the next moves are logged against the answer.
+
+### A10. Accessibility mode: list view
+
+A toggle replaces the map with an accessible list of zones and issues; same actions, clock and outcomes. List view and map view produce identical engine state for identical inputs (unit test replaying one input log in both). Reduced motion turns off pans, shake and drains. Every NPC and issue has a text label; live regions announce new issues and clock milestones.
+
+### A11. Testing the game
+
+With `NEXT_PUBLIC_TEST_HOOKS=1`, `window.__tp` exposes `moveTo(zone)`, `talk(npc)`, `act(issueId, action)`, `setClock(time)`, `getState()`. Playwright plays a full run in map view on desktop and phone, and in list view keyboard-only.
+
+### A12. Role-specific scenario: Tech Consulting, "The Client Pivot"
+
+Junior analyst at a small tech consultancy, 5 days to recommend an inventory system to a regional grocery chain. Zones: your desk (data dashboards), team pod (developer, data analyst), partner's office (boss pushing clarity), client site via bus stop (non-technical store manager, CFO), whiteboard room, café (former employee with insider information). Target skills: Communicating tech to business, Analytical thinking, Curiosity and discovery, Adaptability. Mechanics: a mini data view with 3 charts where you pick the finding that matters (a wrong read costs credibility); optional hidden discoveries (café chat, store employee, dusty report) that unlock a better option later, never signposted, tracked as a KPI; explaining the same recommendation to the CFO and store manager, with reactions based on fit. Turning point Day 3: the CFO halves the budget and asks for a phased plan by Friday. KPIs: discoveries found, correct data insight, stakeholder understanding (CFO and manager trust), recovery speed.
+
+Skill framework grows from 10 to 12: add Analytical thinking and Curiosity and discovery. Employers can type custom skill names; the Value Mapper maps them to framework skills and the admin confirms.
+
+## Part B. The AI layer (AI Engine)
+
+### B1. Structure
+
+All AI code in `lib/ai/`: `providers/` (interface, Claude via the Vercel AI SDK, mock), `prompts/` (versioned registry: id, version, Zod schema, fixtures), `services/` (one per service), `guards/` (quote verification, PII stripping, protected-attribute filter), `evals/`, and telemetry of every call (model, prompt version, latency, cost, validation) into `ai_calls`. Kill switch `AI_MODE=live|cached|off`.
+
+### B2. Services
+
+| Service | What | When | Guardrails |
+| --- | --- | --- | --- |
+| Scenario Tailor | Rewrites names, setting, NPC lines, issue text for the industry | Publish | Schema validation; structure (issues, costs, effects) locked; wording only |
+| Dialogue Variants | 3 wording variants per NPC line | Publish, cached | Meaning fixed; picked by seed, never live |
+| Checkpoint Interviewer | Checkpoint question from last actions and state; real-life follow-up | Pre-generated on the triggering action | Quotes the action; 30 words; template fallback after 4 s |
+| Transcriber | Speech to text with word timestamps | After each answer | Retry, then "Transcript pending" |
+| Evidence Scanner | Per-skill level plus quotes and timestamps | Run end | Quote substring check; no PII; blind inputs; temperature 0 |
+| Consistency Checker | Said vs did: explanation vs choice, order plan vs next moves, real story vs follow-up | Run end | Context for the recruiter, never a penalty |
+| Value Mapper | Maps employer competency names and job text to the framework | Setup and ATS import | Mapping with confidence; admin confirms |
+| Recruiter Copilot | Answers questions about one candidate's evidence | On demand | Cites evidence rows and transcripts only; refuses protected traits and "should I hire"; every answer cites |
+| Candidate Coach | Feedback on specificity and clarity | On demand | Never a hiring score |
+| Fairness Monitor | Adverse impact by opt-in group and answer mode; drift by model version | On demand and nightly | Aggregates only; minimum group size 10 |
+
+### B3. The three AI requirements as code
+
+- Avoid bias: blind inputs (`guards/pii.ts`), protected-attribute output filter, counterfactual CI test (6 names × 3 dialects, identical levels), Fairness Monitor.
+- Avoid hallucinations: grounded inputs only, exact substring quotes (unverified dropped, skill drops a level), every Copilot answer cites, hallucination eval (20 "Not observed" fixtures, 19+ correct).
+- Accurate algorithm: gold set of 40+ hand-scored answers in `lib/ai/evals/gold/`; Evidence Scanner matches human level on 80%+ with no item off by two levels; Cohen's kappa in `docs/EVALS.md`; prompt or model changes re-run evals and cannot merge if accuracy drops.
+
+## Part C. Integration layer
+
+### C1. Purpose
+
+Plug in next to the employer's ATS: pull candidates and requisitions in, push evidence back, and rescue strong candidates the resume screen would have rejected.
+
+### C2. Components (`lib/integrations/`)
+
+- ATS adapter interface: `listJobs`, `getJob`, `listApplicants`, `postResult`, `postNote`, `getStatus`, `subscribeWebhooks`. Two adapters against our own mock servers: mock-greenhouse (Harvest-shaped) and mock-workday, marked as mocks in the UI.
+- Inbound webhooks: `application.created` auto-invites the applicant to the linked challenge (simulated email with a unique link); `application.status_changed` to rejected triggers Second Look.
+- Outbound: on attempt finish, post a scorecard-style result (per-skill levels, card link, Final score with breakdown, short summary), retry with exponential backoff, log every call.
+- Webhook security: HMAC-SHA256 with a per-company secret, 5-minute timestamp window, idempotency keys in `webhook_events`.
+- Public REST API `/api/v1/...` with per-company hashed API keys, rate limiting, OpenAPI generated from Zod and served at `/developers`.
+- Resume intake from the ATS or a candidate upload, with consent, into the Resume Analyzer.
+- Portable credential: Open Badges 3.0 / W3C VC (JSON-LD, Ed25519-signed); public `/verify` checks the signature.
+- Integration console `/admin/integrations`: connect the mock ATS, map requisitions to challenges, live webhook log with payloads, re-send failed deliveries, rotate keys.
+
+### C3. Second Look
+
+If the ATS rejects an applicant at the resume stage (or never reviews them) and their evidence shows Strong in 2+ of the employer's target skills, they enter a Second Look queue with the reason ("Rejected at resume screen; Strong evidence in Resilience and Prioritization"). The recruiter must open the card and choose Restore or Confirm pass with a reason. Analytics shows "Candidates rescued by Second Look this season." Turning Point never removes anyone from consideration.
+
+### C4. Resume Analyzer
+
+Before any AI call, strip identity and prestige: name, contact, photo, address, graduation years; school and company names become "University" or "Company A". Extract structured achievements (role, action, result, skills claimed, has a number). Resume items are "Claimed"; game items are "Observed". Claim-to-evidence links: "Backed by game evidence" (link to clip or KPI) or "Not yet shown", never "false". Card shows two columns: "Resume: basic capabilities" and "Game: evidence", with lines for backed claims. A private real-life suggestion ("You might talk about your community garden project") is shown only to the candidate.
+
+## Part D. Scoring
+
+- Game score per skill (0 to 100) with level and confidence: KPI part (50%) plus Evidence Scanner part (Strong 90, Some 60, Not observed contributes nothing; 50%). No transcript evidence means KPI-only with Low confidence.
+- Resume score per skill (0 to 100): backed claims count fully, unbacked claims at half.
+- Final score (0 to 100): employer-weighted average over target skills of game × game weight + resume × resume weight. Game 75% / resume 25% by default; resume weight adjustable 0% to 40%, never higher. No resume means game only, no penalty.
+- Guardrails: the Final score sorts but never filters; no threshold, hide-below or auto-reject setting exists anywhere; every Final score shows its breakdown on hover; Second Look still applies; formula and weights in `lib/scoring/config.ts`, versioned, shown on a public "How scores work" page. The card leads with evidence; the Final score sits in a box at the top right.
+
+## Part E. Architecture
+
+See `docs/ARCHITECTURE.md` (Mermaid): Experience, Game, AI, Integration and Data layers.
+
+## Part F. Data model additions
+
+`map_sessions`, `issue_events`, `kpis`, `skill_scores`, `consistency_notes`, `ai_calls`, `integrations`, `webhook_events`, `api_keys`, `second_look`, `credentials`, `resume_imports`, `resume_claims`, `claim_links`, `final_scores`, `custom_skills` (fields as listed in the v2 prompt). In the demo build these are typed local collections; "delete everything" covers every one.
+
+## Part G. Impact dashboard (`/admin/impact`)
+
+Seeded with 200 candidates and 3 employers, live data when present:
+
+| Success factor | Metric |
+| --- | --- |
+| Students distinguish themselves | % with at least one Strong skill; spread of skill profiles |
+| Recruiters handle volume | Median recruiter minutes per candidate, % reviewed, Second Look rescues |
+| Truthful representation | AI vs human agreement on the gold set, % stories witness-confirmed, said-vs-did consistency, % resume claims backed |
+| Internal fulfilment | Post-game survey "I learned something about how I work" (1 to 5), Coach usage |
+| Fairness | Shortlist rate by answer mode and opt-in group with the four-fifths warning |
+
+## Part H. Build order
+
+Finish M0 to M1, then M1.5 (Part A: engine and clock in pure TypeScript with tests, then Phaser, then HUD, then list view), M2 (checkpoints from map actions), M3 (card with KPIs, Final score, Resume vs Evidence, said vs did), M3.5 (Part B), M4 (Part C plus employer side and portability), M5 (polish, Part G, accessibility, demo seed, cached AI mode). Keep it demo-able after every milestone.
+
+## Part I. Demo additions
+
+1. Open on the title screen; the camera sweeps the map and music comes in.
+2. Admin, 45 s: type "Communicate tech and business, Analytical thinking, Make new discoveries"; the Value Mapper maps them; publish "The Client Pivot".
+3. Walk the map to the vendor with a red "!" while two other issues count down. Pick B; the video checkpoint fires instantly.
+4. Defer with a reason, then the checkpoint about that exact choice.
+5. Turning point: phone call, budget drain, map goes dark.
+6. Integration console: a mock ATS rejection arrives and the candidate appears in Second Look with Strong evidence. Restore them.
+7. Card: Resume vs Evidence ("Led a team of 50 volunteers" Claimed, linked to Collaboration Observed). Hover the Final score to show the breakdown and the 25% resume cap.
+8. Ask the Copilot "Where did they show prioritization?" and click the citation to jump to the clip.
+9. Close on the impact dashboard: Second Look rescues, recruiter minutes per candidate, fairness check.
+
+## Part J. Working rules
+
+This section wins over earlier PRD sections. Commit PROGRESS.md after every ticked criterion. Stuck after 3 attempts: write it in PROGRESS.md and move on. After each milestone: screenshots of new screens in `docs/screens/` and a 5-line summary in `docs/CHANGELOG.md`. A criterion is done only when its test exists and passes in CI.

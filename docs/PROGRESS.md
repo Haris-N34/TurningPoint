@@ -2,6 +2,8 @@
 
 Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only when a test covers it and the full check (`pnpm lint && pnpm typecheck && pnpm test && pnpm e2e`) is green. Owner in brackets: [D] Div, [H] Haris, [D+H] both.
 
+**v2 (Nov 4, evening):** added M1.5 (game map), M3.5 (AI Engine) and M4 additions (integrations, scoring), see PRD "Upgrade v2".
+
 **Scope change (Nov 4):** local-only demo. No database, no auth server, no API keys except Vercel. See CLAUDE.md, Demo scope decisions. Criteria that assumed a server are reworded to their local equivalent.
 
 ## M0. Foundations
@@ -36,6 +38,35 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] S.4 [H] Client Rescue template written (#12, merged)
 - [ ] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
 - Done when: a Playwright test plays Launch Week start to end on desktop and phone, every choice is in the database.
+
+## M1.5. Game map and clock (v2 Part A)
+
+Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring help).
+
+- [ ] A.1 [D] "Quiz test": no gameplay screen shows choices without a character, a scene and an animation
+- [ ] A.2 [D] Every decision happens through an in-world interaction (walk to someone, item, HQ laptop)
+- [ ] A.3 [D] Playwright screenshots of title, map, dialogue, cutscene, checkpoint and results in docs/screens; CHANGELOG records which A0 items are met
+- [ ] A.4 [D] Title screen, avatar creator, pause menu, loading screen and end-of-week results screen match A0
+- [ ] A.5 [D+H] Dialogue: portraits with expressions, typewriter text with skip and blip, A to D buttons with arrow keys, NPC emote reactions, sound
+- [ ] A.6 [D] Juice: floating numbers, tweened bars, shake, particles and sound on every resource change
+- [ ] A.7 [D] Choice-triggered video fires on explainOnPick options and quotes the option picked; cap 4 per run; seeded still guarantee 2
+- [ ] A.8 [D] "The Client Pivot" fully playable: own map, NPCs, data mini-view, hidden discoveries, KPIs
+- [ ] A.9 [D] Map loads from Tiled JSON; walk with keys, click and tap; camera follows
+- [ ] A.10 [D] NPCs show urgency bubbles (icon + label, not colour only); talking opens a React dialogue driven by scenario nodes
+- [ ] A.11 [D] Clock advances by action costs and drift, pauses in dialogue, checkpoints, pause menu and on blur; shows day, time and progress ring
+- [ ] A.12 [D] Turn-based mode disables drift; outcomes do not depend on drift (unit test)
+- [ ] A.13 [D] Issues spawn, count down, expire with consequences; Talk, Delegate, Defer with a reason, Ignore
+- [ ] A.14 [D] Evening recap shows the day's KPIs
+- [ ] A.15 [D] Turning-point sequence plays fully, changes the map, spawns new issues
+- [ ] A.16 [D] All A8 KPIs compute correctly from a recorded input log (unit tests with fixtures)
+- [ ] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
+- [ ] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
+- [ ] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace
+- [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop
+- [ ] A.21 [D] Test hooks window.__tp (NEXT_PUBLIC_TEST_HOOKS=1); Playwright full run in map view (desktop, phone) and list view (keyboard only)
+- [ ] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills
+- [ ] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete
+- Done when: every A item above passes and the quiz-test screenshots show a game, not a form.
 
 ## M2. Checkpoints
 
@@ -82,6 +113,20 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] PV3 [D] Recordings served by 1-hour signed URLs only
 - Done when: finishing a run produces a card where every AI sentence links to a real timestamp, and a recruiter can shortlist from the inbox.
 
+## M3.5. AI Engine (v2 Part B)
+
+- [ ] B.1 [D] All model calls go through lib/ai with a provider interface; the mock provider passes the full e2e suite offline
+- [ ] B.2 [D] Every B2 service exists with a Zod schema, fixtures and a fallback
+- [ ] B.3 [D] Scenario Tailor and Dialogue Variants run at publish time and are cached; no live generation of game content
+- [ ] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context
+- [ ] B.5 [D] Value Mapper shows mappings with confidence; admin can accept, change or reject each
+- [ ] B.6 [D] Recruiter Copilot answers only with citations; refuses protected-trait and hire/no-hire questions (tests)
+- [ ] B.7 [D] Counterfactual bias test, hallucination eval and gold-set accuracy eval run in CI and block merge on failure
+- [ ] B.8 [D] ai_calls telemetry on an admin "AI health" page: calls, latency p50/p95, cost, validation failures
+- [ ] B.9 [D] AI_MODE=cached lets the whole demo run without network access to the model provider
+- [ ] B.10 [D+H] Gold set of 40+ hand-scored answers (both team members); kappa in docs/EVALS.md
+- Done when: all B items pass in CI.
+
 ## M4. Employer side and portability
 
 - [ ] E1.1 [H] Skills step: 10 skill cards, pick 3 or 4
@@ -107,6 +152,24 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] PV5 [H] "How we use AI" page linked from every screen
 - Done when: the five-step loop from the PRD Summary works end to end on the deployed site.
 
+### M4 additions: integration layer (v2 Part C) and scoring (Part D)
+
+- [ ] C.1 [D] ATS adapter interface with mock-greenhouse and mock-workday adapters and contract tests
+- [ ] C.2 [D] Inbound webhook creates an invite; signature, timestamp and idempotency enforced (bad signature, replay, duplicate tests)
+- [ ] C.3 [D] Outbound result appears in the mock ATS with a link back; failures retry with backoff and show in the console
+- [ ] C.4 [D] Public API with API keys, rate limits and generated OpenAPI docs at /developers
+- [ ] C.5 [D] Resume Analyzer strips identity and prestige fields before any model call (fixtures with names, schools, years, addresses)
+- [ ] C.6 [D] Resume items labelled Claimed, game items Observed; links "Backed by game evidence" or "Not yet shown", never "false"
+- [ ] C.7 [D] Two-column Resume vs Evidence view on the Capability Card
+- [ ] C.8 [D] Counterfactual: same resume with different names and schools gives identical resume signals
+- [ ] C.9 [D] Open Badges 3.0 export plus /verify; a tampered file fails verification (test)
+- [ ] C.10 [D] Integration console shows the live webhook log and can re-send a failed delivery
+- [ ] C.11 [D] Second Look works end to end from a mock ATS rejection; rescued count on analytics
+- [ ] D.1 [D] Unit tests: formula, low confidence, no-resume candidates, 40% resume cap, employer weights
+- [ ] D.2 [D] No setting or query hides or rejects candidates by score (test asserts no threshold exists)
+- [ ] D.3 [D] "How scores work" page renders the live config and version
+- [ ] D.4 [D] Final score box top right with breakdown on hover; card leads with evidence
+
 ## M5. Polish and proof
 
 - [ ] E4.1 [H] Compare view (2 or 3 cards)
@@ -121,14 +184,10 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
 - [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video
+- [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
+- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug
 - [ ] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
-
-## Paused (Nov 4, ~19:50 UTC)
-
-- #18 builder: `components/admin/Builder.tsx` written but not wired to a route or tested. Next: add `/admin/new`, replace the `/admin` placeholder with a challenge list, e2e for E1.1 to E1.7, then merge to `main`.
-- Then #31: practice mode (C8), demo shortcuts and seed reset (P.2), Lighthouse 85+ on the game page.
-- Haris's PRs wait for review while paused.
 
 ## Blockers
 

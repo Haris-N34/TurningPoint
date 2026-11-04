@@ -1,6 +1,6 @@
 # Turning Point: project context for Claude Code
 
-Read this file first. Full build spec: `docs/PRD.md`. Progress per acceptance criterion: `docs/PROGRESS.md`. Task board: the "Board" GitHub issue plus one issue per task (labels `div` / `haris`, `M0` to `M5`).
+Read `CONTEXT.md` and this file first. Full build spec: `docs/PRD.md` (including "Upgrade v2"). Architecture: `docs/ARCHITECTURE.md`. Progress per acceptance criterion: `docs/PROGRESS.md`. Task board: the "Board" GitHub issue plus one issue per task (labels `div` / `haris`, `M0` to `M5`).
 
 ## What we are building
 
