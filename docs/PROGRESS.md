@@ -9,7 +9,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] M0.1 [D] Repo has PRD, CLAUDE.md, PROGRESS.md
 - [x] M0.2 [D] Next.js 15 + TS + Tailwind scaffold; `pnpm i && pnpm dev` works on a fresh clone
 - [x] M0.3 [D] Vitest, Playwright, axe-core, ESLint and `typecheck` scripts wired
-- [ ] M0.4 [D+H] Scenario JSON schema (Zod) and card types committed (done, D); `fixtures/attempt.json` mock card (done, D); Haris sign-off pending (#8)
+- [x] M0.4 [D+H] Scenario JSON schema and card types committed; fixture verified; Haris signed off integration `2fcbe91` (#8, see `docs/reviews/8-contract-review.md`)
 - [x] M0.5 [D] Local store: runs, cards, shares, reviews in localStorage; recordings in IndexedDB; delete-all
 - [x] M0.6 [D] Demo profile and role storage (no auth server); picker UI is M0.11
 - [ ] M0.7 [D] CI (GitHub Actions) green on lint, typecheck, unit, e2e (workflow committed; first run pending)
