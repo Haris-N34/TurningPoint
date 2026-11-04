@@ -135,3 +135,5 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 
 - M0 accepted by Div on Board #1 (2026-11-04): foundation PRs #32 to #34 merged into main. #25 deployment deferred until the product is done. #11 to #15 may proceed. Recruiter and employer screens #16 to #18 are delegated to Div.
+
+- #14 onboarding UI implementation is ready for review: three introduction screens, persisted accommodations and a device check using the existing recorder hook. All eight new desktop/375 px e2e checks pass, including doubled timers, camera cleanup, denied-permission fallback and axe. Lint, typecheck and 88 unit tests pass. Full e2e: 61 passed, 1 skipped, 2 failed in the existing recruiter transcript-first toggle test; both fail again in a serial rerun. C1.1/C1.3/C1.4 remain unchecked until the full suite is green. The same failures appear in PR #36 CI run 41900161594.
