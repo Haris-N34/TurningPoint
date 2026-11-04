@@ -1,0 +1,77 @@
+[
+  {
+    "key": "market-plan",
+    "scene": "Students and a community coordinator planning a small food market around a table with blank paper and crates",
+    "alt": "Students and a community coordinator plan a food market around a table."
+  },
+  {
+    "key": "vendor-stalls",
+    "scene": "Small produce stalls arranged inside a community hall, crates of vegetables and a simple accessible aisle",
+    "alt": "Produce stalls and crates line a wide aisle inside a community hall."
+  },
+  {
+    "key": "team-roles",
+    "scene": "A small student team dividing delivery and outreach roles around blank task cards, one person holds a crate",
+    "alt": "Students divide tasks around a market planning table."
+  },
+  {
+    "key": "budget-table",
+    "scene": "Overhead view of a modest event planning table with calculator, coins, blank notebook and produce crate",
+    "alt": "A calculator, coins and a blank notebook sit beside a produce crate."
+  },
+  {
+    "key": "schedule-clash",
+    "scene": "Students comparing blank calendars and a delivery trolley outside a community hall",
+    "alt": "Students compare calendars outside a community hall."
+  },
+  {
+    "key": "vendor-talk",
+    "scene": "Market organiser listening to two small food vendors across a stall with a simple divided space",
+    "alt": "An organiser and vendors discuss stall space across a market counter."
+  },
+  {
+    "key": "outreach",
+    "scene": "Student volunteer talking with a community resident at a market information desk, blank leaflet and phone",
+    "alt": "A volunteer helps a resident at an information desk."
+  },
+  {
+    "key": "plan-breaks",
+    "scene": "An empty community market hall with stacked folded tables, a student looking at a phone and a colleague offering a hand",
+    "alt": "Two students pause beside folded market tables after an unexpected update."
+  },
+  {
+    "key": "recovery-plan",
+    "scene": "Small team rearranging a tabletop model of market stalls with fewer wooden blocks and a clear path",
+    "alt": "A team rearranges a smaller market layout with a clear central path."
+  },
+  {
+    "key": "new-partner",
+    "scene": "Community cooperative member lending a trolley and crates to a student market organiser outside a small hall",
+    "alt": "A community partner lends a trolley and crates to an organiser."
+  },
+  {
+    "key": "team-briefing",
+    "scene": "Small diverse volunteer team in a circle at a food market briefing, one organiser holding a blank plan",
+    "alt": "Volunteers gather around an organiser holding the revised plan."
+  },
+  {
+    "key": "market-day",
+    "scene": "Friendly modest community food market with produce vendors and a wide queue area, volunteers guiding visitors",
+    "alt": "Volunteers guide visitors through a community food market."
+  },
+  {
+    "key": "debrief",
+    "scene": "Student organiser and community coordinator listening to a vendor at a quiet table after the market, folded stalls behind",
+    "alt": "An organiser, coordinator and vendor discuss the day beside folded stalls."
+  },
+  {
+    "key": "client-review",
+    "scene": "Student consulting team meeting a community client around a table, blank charts and workshop tools in background",
+    "alt": "Students and a community client review charts around a table."
+  },
+  {
+    "key": "client-reset",
+    "scene": "Student consultants rearranging blank project notes while community staff point to a revised plan",
+    "alt": "Consultants and community staff reorganise notes for a revised project."
+  }
+]

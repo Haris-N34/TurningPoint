@@ -78,7 +78,11 @@
       "id": "n1",
       "type": "scene",
       "text": "Three weeks before opening, you lead {teamSize} students planning a pop-up food market with the fictional Neighbour Table non-profit. The goal is affordable food and a fair opportunity for small vendors, not maximum attendance. Your opening grant is $5,000. Leena, the community lead, asks for a plan that volunteers can actually deliver. Read each situation, weigh the trade-offs, and choose your next move. There is no perfect route.",
-      "next": "n2"
+      "next": "n2",
+      "art": {
+        "key": "market-plan",
+        "alt": "Students and a community coordinator plan a food market around a table."
+      }
     },
     {
       "id": "n2",
@@ -117,7 +121,11 @@
           },
           "next": "n3"
         }
-      ]
+      ],
+      "art": {
+        "key": "vendor-stalls",
+        "alt": "Produce stalls and crates line a wide aisle inside a community hall."
+      }
     },
     {
       "id": "n3",
@@ -157,13 +165,21 @@
           "next": "n4"
         }
       ],
-      "fallbackQuestion": "What did your approach to the logistics gap protect, and whose workload did it increase?"
+      "fallbackQuestion": "What did your approach to the logistics gap protect, and whose workload did it increase?",
+      "art": {
+        "key": "team-roles",
+        "alt": "Students divide tasks around a market planning table."
+      }
     },
     {
       "id": "n4",
       "type": "scene",
       "text": "The plan is on one shared page. Vendor access and safe food storage are essentials; decorations and a second promotional push can wait. Leena asks each workstream to name an owner and a backup. The budget and days-left meters show the consequences of your commitments. A reserve buys flexibility, but leaving every decision open also costs time. Your next update must tell partners what is confirmed and what is still uncertain.",
-      "next": "n5"
+      "next": "n5",
+      "art": {
+        "key": "budget-table",
+        "alt": "A calculator, coins and a blank notebook sit beside a produce crate."
+      }
     },
     {
       "id": "n5",
@@ -202,7 +218,11 @@
           },
           "next": "n6"
         }
-      ]
+      ],
+      "art": {
+        "key": "schedule-clash",
+        "alt": "Students compare calendars outside a community hall."
+      }
     },
     {
       "id": "n6",
@@ -242,7 +262,11 @@
           "next": "n7"
         }
       ],
-      "fallbackQuestion": "Which trade-off in the vendor agreement mattered most, and how would you explain it to the smaller vendors?"
+      "fallbackQuestion": "Which trade-off in the vendor agreement mattered most, and how would you explain it to the smaller vendors?",
+      "art": {
+        "key": "vendor-talk",
+        "alt": "An organiser and vendors discuss stall space across a market counter."
+      }
     },
     {
       "id": "n7",
@@ -282,13 +306,21 @@
           },
           "next": "n8"
         }
-      ]
+      ],
+      "art": {
+        "key": "outreach",
+        "alt": "A volunteer helps a resident at an information desk."
+      }
     },
     {
       "id": "n8",
       "type": "event",
       "turningPoint": true,
-      "text": "The plan breaks. Your next decision must account for the new constraint."
+      "text": "The plan breaks. Your next decision must account for the new constraint.",
+      "art": {
+        "key": "plan-breaks",
+        "alt": "Two students pause beside folded market tables after an unexpected update."
+      }
     },
     {
       "id": "n9",
@@ -329,7 +361,11 @@
           "next": "n10"
         }
       ],
-      "fallbackQuestion": "What did you stop doing after the disruption, and what risk remains in your revised plan?"
+      "fallbackQuestion": "What did you stop doing after the disruption, and what risk remains in your revised plan?",
+      "art": {
+        "key": "recovery-plan",
+        "alt": "A team rearranges a smaller market layout with a clear central path."
+      }
     },
     {
       "id": "n10",
@@ -369,7 +405,11 @@
           "next": "n11"
         }
       ],
-      "fallbackQuestion": "What uncertainty did you accept in your partner decision, and what would make you change course?"
+      "fallbackQuestion": "What uncertainty did you accept in your partner decision, and what would make you change course?",
+      "art": {
+        "key": "new-partner",
+        "alt": "A community partner lends a trolley and crates to an organiser."
+      }
     },
     {
       "id": "n11",
@@ -408,7 +448,11 @@
           },
           "next": "n12"
         }
-      ]
+      ],
+      "art": {
+        "key": "team-briefing",
+        "alt": "Volunteers gather around an organiser holding the revised plan."
+      }
     },
     {
       "id": "n12",
@@ -449,7 +493,11 @@
           "next": "n13"
         }
       ],
-      "fallbackQuestion": "Who benefits from the need you protected, and how would you handle the gap left for others?"
+      "fallbackQuestion": "Who benefits from the need you protected, and how would you handle the gap left for others?",
+      "art": {
+        "key": "market-day",
+        "alt": "Volunteers guide visitors through a community food market."
+      }
     },
     {
       "id": "n13",
@@ -488,19 +536,31 @@
           },
           "next": "n14"
         }
-      ]
+      ],
+      "art": {
+        "key": "debrief",
+        "alt": "An organiser, coordinator and vendor discuss the day beside folded stalls."
+      }
     },
     {
       "id": "n14",
       "type": "checkpoint",
       "kind": "real_life",
       "text": "When have you faced something like this in real life? What broke, what did you decide, and what changed? A class project, community role, paid work or caring responsibility can all be relevant. Describe your own contribution and a specific trade-off.",
-      "next": "n15"
+      "next": "n15",
+      "art": {
+        "key": "debrief",
+        "alt": "An organiser, coordinator and vendor discuss the day beside folded stalls."
+      }
     },
     {
       "id": "n15",
       "type": "end",
-      "text": "Launch Week is complete. Your remaining resources show the consequences of the choices you made, not a hiring score. Your decision path and explanations are evidence for a person to review. There is no single winning route."
+      "text": "Launch Week is complete. Your remaining resources show the consequences of the choices you made, not a hiring score. Your decision path and explanations are evidence for a person to review. There is no single winning route.",
+      "art": {
+        "key": "debrief",
+        "alt": "An organiser, coordinator and vendor discuss the day beside folded stalls."
+      }
     }
   ]
 }
