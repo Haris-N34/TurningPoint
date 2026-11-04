@@ -1,0 +1,503 @@
+{
+  "id": "client-rescue",
+  "version": 1,
+  "title": "Client Rescue",
+  "summary": "A student consulting team must rescue a community client project after its scope changes. Balance evidence, capacity and trust.",
+  "industryFlavour": "consulting",
+  "targetSkills": [
+    "ambiguity",
+    "adaptability",
+    "communication",
+    "feedback"
+  ],
+  "start": "n1",
+  "estimatedMinutes": 15,
+  "resources": {
+    "budget": {
+      "label": "Project budget",
+      "start": 5000,
+      "min": 0,
+      "unit": "$"
+    },
+    "morale": {
+      "label": "Team morale",
+      "start": 70,
+      "min": 0,
+      "max": 100
+    },
+    "time": {
+      "label": "Days left",
+      "start": 21,
+      "min": 0
+    }
+  },
+  "variation": {
+    "teamSize": [
+      4,
+      6
+    ]
+  },
+  "disruptions": [
+    {
+      "id": "scope-expands",
+      "title": "The brief doubles overnight",
+      "text": "The client board now wants a service rollout plan as well as the booking review. The deadline and grant stay the same. The director says the original review is still needed, but asks you to promise both deliverables before seeing the new requirements.",
+      "effects": {
+        "time": -5,
+        "morale": -15
+      },
+      "next": "n9"
+    },
+    {
+      "id": "data-access-lost",
+      "title": "The dataset is withdrawn",
+      "text": "The client discovers that the booking export contains personal information without the required consent. Access is withdrawn. You must stop using it, including copies. An anonymised export may take a week. The client still expects a useful recommendation.",
+      "effects": {
+        "time": -7,
+        "budget": -400
+      },
+      "next": "n9"
+    },
+    {
+      "id": "client-lead-changes",
+      "title": "A new lead challenges the brief",
+      "text": "Your client contact leaves unexpectedly. The incoming lead says the board needs a capacity plan rather than your agreed booking review. The earlier sign-off remains in the project folder, but the new lead controls access to staff and will judge the final report.",
+      "effects": {
+        "morale": -30,
+        "time": -3
+      },
+      "next": "n9"
+    }
+  ],
+  "disruptionPool": [
+    "scope-expands",
+    "data-access-lost",
+    "client-lead-changes"
+  ],
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "scene",
+      "text": "You lead {teamSize} student consultants helping a fictional community repair cooperative, Common Ground. In three weeks, it needs recommendations for reducing missed workshop bookings. You have a $5,000 project allowance, limited staff access and no authority to change live services. Success means a recommendation the cooperative can test, with limits stated clearly. Your team must gather evidence, agree scope and explain its decisions when the brief changes.",
+      "next": "n2"
+    },
+    {
+      "id": "n2",
+      "type": "choice",
+      "text": "The director wants fewer missed bookings; the front desk wants less administration. You cannot investigate every service in three weeks. Your opening meeting must produce a useful question without promising an answer before you have evidence.",
+      "skillSignals": [
+        "prioritization",
+        "ambiguity"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Focus on the booking journey for one workshop type",
+          "effects": {
+            "time": -1,
+            "budget": -300
+          },
+          "next": "n3"
+        },
+        {
+          "id": "b",
+          "label": "Compare two services using a small shared dataset",
+          "effects": {
+            "time": -2,
+            "budget": -600
+          },
+          "next": "n3"
+        },
+        {
+          "id": "c",
+          "label": "Map staff workload before choosing a booking metric",
+          "effects": {
+            "time": -2,
+            "budget": -400
+          },
+          "next": "n3"
+        }
+      ]
+    },
+    {
+      "id": "n3",
+      "type": "choice",
+      "text": "Two teammates prefer analysis. Nobody has volunteered for interviews, and one student can only meet clients after work. The front desk has offered a single afternoon. You need both a credible analysis and staff context. How do you share responsibility?",
+      "skillSignals": [
+        "collaboration",
+        "communication"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Pair an analyst with an interviewer and share preparation",
+          "effects": {
+            "time": -2,
+            "morale": 8
+          },
+          "next": "n4"
+        },
+        {
+          "id": "b",
+          "label": "Take the interviews yourself and assign the analysis",
+          "effects": {
+            "time": -3,
+            "morale": 3
+          },
+          "next": "n4"
+        },
+        {
+          "id": "c",
+          "label": "Ask the client for an evening session before assigning roles",
+          "effects": {
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n4"
+        }
+      ],
+      "fallbackQuestion": "How did your role allocation balance availability, learning and the risk of missing staff context?"
+    },
+    {
+      "id": "n4",
+      "type": "scene",
+      "text": "You record the agreed question, deadline, exclusions and client contact on one page. Staff participation is voluntary, and any working data must be authorised and de-identified. Your team labels assumptions separately from observations. The director signs off on a booking review, not a full service redesign. This agreement will help you discuss changes later, but it cannot remove the need to listen when the client has new priorities.",
+      "next": "n5"
+    },
+    {
+      "id": "n5",
+      "type": "choice",
+      "text": "The first data extract is incomplete. Several booking cancellations have no reason recorded, and staff say the reporting screen recently changed. A clean chart would hide those gaps. You have enough time for one additional check before the progress meeting.",
+      "skillSignals": [
+        "problem-solving",
+        "ambiguity"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Audit a small authorised sample with front-desk staff",
+          "effects": {
+            "time": -2,
+            "budget": -200
+          },
+          "next": "n6"
+        },
+        {
+          "id": "b",
+          "label": "Request an anonymised export with missing fields flagged",
+          "effects": {
+            "time": -2
+          },
+          "next": "n6"
+        },
+        {
+          "id": "c",
+          "label": "Present a provisional pattern with its uncertainty visible",
+          "effects": {
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n6"
+        }
+      ]
+    },
+    {
+      "id": "n6",
+      "type": "choice",
+      "text": "A senior staff member says reminder messages will solve the problem. Another says people miss sessions because transport is unreliable. The data cannot distinguish those explanations. The director wants a clear recommendation in tomorrow's update. What do you present?",
+      "skillSignals": [
+        "ambiguity",
+        "communication"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Compare both explanations and propose a small test",
+          "effects": {
+            "time": -2,
+            "budget": -200
+          },
+          "next": "n7"
+        },
+        {
+          "id": "b",
+          "label": "Prioritise reminders with an explicit untested assumption",
+          "effects": {
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n7"
+        },
+        {
+          "id": "c",
+          "label": "Ask for two targeted staff interviews before recommending",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n7"
+        }
+      ],
+      "fallbackQuestion": "What could your evidence support at that point, and what did you make explicit to the director?"
+    },
+    {
+      "id": "n7",
+      "type": "choice",
+      "text": "An optional client workshop could improve your understanding, but it conflicts with the team's analysis session. Your draft has useful findings but no agreed test of success. The client says its staff cannot attend both sessions. What do you schedule?",
+      "skillSignals": [
+        "prioritization",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Combine a shorter analysis review with a client workshop",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n8"
+        },
+        {
+          "id": "b",
+          "label": "Send questions asynchronously and protect analysis time",
+          "effects": {
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n8"
+        },
+        {
+          "id": "c",
+          "label": "Attend the workshop and narrow the draft to one recommendation",
+          "effects": {
+            "time": -2,
+            "budget": 100
+          },
+          "next": "n8"
+        }
+      ]
+    },
+    {
+      "id": "n8",
+      "type": "event",
+      "turningPoint": true,
+      "text": "The client project changes before your midpoint review."
+    },
+    {
+      "id": "n9",
+      "type": "choice",
+      "text": "After reading the change, you cannot responsibly promise the old plan and every new request. The client needs a response today. Your team wants to know which work still counts. How do you renegotiate the deliverable?",
+      "skillSignals": [
+        "adaptability",
+        "resilience"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Agree one essential output and document what moves out",
+          "effects": {
+            "time": 2,
+            "morale": 3
+          },
+          "next": "n10"
+        },
+        {
+          "id": "b",
+          "label": "Offer a smaller first delivery and a later optional phase",
+          "effects": {
+            "time": 1,
+            "budget": -200
+          },
+          "next": "n10"
+        },
+        {
+          "id": "c",
+          "label": "Keep the original report and add a short limitations note",
+          "effects": {
+            "time": -2,
+            "morale": -5
+          },
+          "next": "n10"
+        }
+      ],
+      "fallbackQuestion": "Which commitment did you revise, and how did you preserve something useful for the client?"
+    },
+    {
+      "id": "n10",
+      "type": "choice",
+      "text": "A specialist offers two hours of free advice but has not seen your evidence. The client would also accept a limited staff workshop. You can pursue only one before the revised deadline. Neither source can guarantee the right answer. Which input will you seek?",
+      "skillSignals": [
+        "creativity",
+        "ambiguity"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask the specialist to challenge the riskiest assumption",
+          "effects": {
+            "time": -1,
+            "morale": 3
+          },
+          "next": "n11"
+        },
+        {
+          "id": "b",
+          "label": "Run a short staff workshop focused on feasibility",
+          "effects": {
+            "time": -2,
+            "budget": -100
+          },
+          "next": "n11"
+        },
+        {
+          "id": "c",
+          "label": "Use existing authorised evidence and state the remaining gap",
+          "effects": {
+            "time": -1,
+            "morale": -3
+          },
+          "next": "n11"
+        }
+      ],
+      "fallbackQuestion": "What information could change your recommendation, and why was your chosen source worth the time?"
+    },
+    {
+      "id": "n11",
+      "type": "choice",
+      "text": "One teammate says the revised brief makes their analysis worthless. Another has started polishing slides before the scope is confirmed. The client asks who owns the next update. How do you restore a clear plan without pretending the setback did not cost work?",
+      "skillSignals": [
+        "collaboration",
+        "communication"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Review reusable work and assign owners for the new scope",
+          "effects": {
+            "time": -1,
+            "morale": 10
+          },
+          "next": "n12"
+        },
+        {
+          "id": "b",
+          "label": "Speak to each teammate before publishing a revised task list",
+          "effects": {
+            "time": -2,
+            "morale": 8
+          },
+          "next": "n12"
+        },
+        {
+          "id": "c",
+          "label": "Write a short scope update and invite corrections by tonight",
+          "effects": {
+            "time": -1,
+            "morale": 3
+          },
+          "next": "n12"
+        }
+      ]
+    },
+    {
+      "id": "n12",
+      "type": "choice",
+      "text": "Your draft recommendation is feasible, but the evidence covers only a small part of the service. The client wants a confident headline for the board. A wider claim would be easier to present, yet could guide spending beyond what you studied. What goes on the first slide?",
+      "skillSignals": [
+        "communication",
+        "ambiguity"
+      ],
+      "checkpointEligible": true,
+      "options": [
+        {
+          "id": "a",
+          "label": "Recommend a bounded pilot and show the evidence limits",
+          "effects": {
+            "time": -1,
+            "morale": 3
+          },
+          "next": "n13"
+        },
+        {
+          "id": "b",
+          "label": "Present two options with assumptions and a decision owner",
+          "effects": {
+            "time": -2,
+            "morale": 5
+          },
+          "next": "n13"
+        },
+        {
+          "id": "c",
+          "label": "Lead with the strongest observed pattern and defer wider claims",
+          "effects": {
+            "time": -1,
+            "morale": -2
+          },
+          "next": "n13"
+        }
+      ],
+      "fallbackQuestion": "How did you make the recommendation useful without claiming more certainty than the evidence allowed?"
+    },
+    {
+      "id": "n13",
+      "type": "choice",
+      "text": "At the final review, the director says the narrower recommendation can be tested, but front-desk staff felt consulted too late. No pilot results exist yet, so you cannot claim the proposal reduced missed bookings. Your team put substantial work into the report. How do you respond to that feedback?",
+      "skillSignals": [
+        "feedback",
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask staff what earlier involvement would have changed",
+          "effects": {
+            "time": -1,
+            "morale": 5
+          },
+          "next": "n14"
+        },
+        {
+          "id": "b",
+          "label": "Agree a staff review point before the pilot starts",
+          "effects": {
+            "time": -1,
+            "morale": 3
+          },
+          "next": "n14"
+        },
+        {
+          "id": "c",
+          "label": "Explain the deadline, then revise the consultation plan",
+          "effects": {
+            "time": -1,
+            "morale": 2
+          },
+          "next": "n14"
+        }
+      ]
+    },
+    {
+      "id": "n14",
+      "type": "checkpoint",
+      "kind": "real_life",
+      "text": "When have you faced a changing brief or incomplete information in real life? What changed, what did you decide, and what happened next? Use a specific example from study, work, volunteering or everyday responsibilities. Explain your own contribution.",
+      "next": "n15"
+    },
+    {
+      "id": "n15",
+      "type": "end",
+      "text": "Client Rescue is complete. You have a decision path and explanations for a human to review. The resource balance is context, not a hiring score. A recommendation can be useful while its effects still need testing."
+    }
+  ]
+}

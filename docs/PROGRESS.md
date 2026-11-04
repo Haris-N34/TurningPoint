@@ -33,7 +33,7 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] S.1 [D] Schema rejects unreachable nodes, missing targets, no path to end, fewer than 3 eligible nodes
 - [x] S.2 [D] Seed picks disruption, 2 or 3 checkpoints, number variation; replayable
 - [ ] S.3 [H] Launch Week written in full (15 nodes, eligible 3, 6, 9, 10, 12, 3 disruptions)
-- [ ] S.4 [H] Client Rescue template written
+- [x] S.4 [H] Client Rescue template written; 86 unit + 44 e2e pass (#12, awaiting review).
 - [ ] S.5 [H] 12 to 15 scene illustrations, one flat style, alt text
 - Done when: a Playwright test plays Launch Week start to end on desktop and phone, every choice is in the database.
 
