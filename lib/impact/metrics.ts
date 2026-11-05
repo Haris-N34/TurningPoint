@@ -2,6 +2,7 @@ import { z } from "zod";
 import { SKILLS } from "@/lib/engine/skills";
 import type { Store } from "@/lib/store/store";
 import type { Card } from "@/lib/card/types";
+import { getChallenge } from "@/lib/challenge/challenge";
 
 export const DEMO_PREFIX = "att_impact_demo_";
 export const Participation = z.object({ mode: z.enum(["video", "voice", "text"]), adjustedTiming: z.boolean(), optInGroup: z.string().optional() });
@@ -59,4 +60,17 @@ export function impactReport(s: Store, challengeId?: string, source: Source = "a
     skills: SKILLS.map((skill) => ({ ...skill, strong: cards.filter((c) => c.evidence.some((e) => e.skill === skill.slug && e.level === "strong")).length, some: cards.filter((c) => c.evidence.some((e) => e.skill === skill.slug && e.level === "some")).length, total: cards.filter((c) => c.targetSkills.includes(skill.slug)).length })),
     groups: groups("mode"), timing: groups("timing"), demographics: groups("demographic"),
   };
+}
+
+/** E7.1: started, finished and shortlisted per challenge. A shared card counts in each challenge it was shared with. */
+export function funnelByChallenge(s: Store, source: Source = "all") {
+  const include = (id: string) => source === "all" || id.startsWith(DEMO_PREFIX) === (source === "demo");
+  const names = new Map<string, { company: string; title: string }>();
+  for (const c of s.listCards().filter((c) => include(c.attemptId))) names.set(c.challenge.id, { company: c.challenge.company, title: c.challenge.title });
+  const ids = new Set([...names.keys(), ...s.listRuns().filter((r) => !r.practice && include(r.attemptId)).map((r) => r.challengeId), ...s.listShares().filter((x) => !x.revokedAt && include(x.attemptId)).map((x) => x.challengeId)]);
+  return [...ids].sort().map((challengeId) => {
+    const r = impactReport(s, challengeId, source);
+    const ch = getChallenge(s, challengeId);
+    return { challengeId, company: ch?.company.name ?? names.get(challengeId)?.company ?? challengeId, title: ch?.title ?? names.get(challengeId)?.title ?? "", started: r.started, finished: r.finished, shortlisted: r.shortlisted };
+  }).filter((f) => f.started > 0);
 }
