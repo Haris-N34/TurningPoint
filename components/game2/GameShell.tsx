@@ -555,6 +555,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
         </div>
       )}
       {/* Big screens (1080p and up): the HUD grows with the map so it never looks lost. */}
+      {/* Pixelify Sans draws the "fi" ligature as a wrong glyph ("first" read "Arst"): no ligatures anywhere in the game. */}
+      <style>{`[data-testid="game-shell"], [data-testid="game-shell"] * { font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0, "dlig" 0; }`}</style>
       <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } [data-testid="game-shell"] .tp-dialogue { zoom: 1.25; } [data-testid="game-shell"] [data-testid="checkpoint"] > div { zoom: 1.2; } }`}</style>
       {sandbox && <p className="absolute left-1/2 top-0 z-[70] -translate-x-1/2 bg-amber-200 px-3 text-sm font-semibold">Preview as candidate · nothing is saved</p>}
     </div>

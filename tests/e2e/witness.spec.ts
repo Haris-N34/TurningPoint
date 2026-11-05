@@ -17,8 +17,10 @@ test("C6.1 candidate adds up to two witnesses, each listed with relationship and
   await expect(page.getByTestId("seeded")).toBeVisible();
   await page.goto(`/results/${MAYA}`);
   const list = page.getByTestId("witness-list");
-  const before = await list.getByRole("listitem").count();
-  await expect(page.getByTestId("witness-slots")).toHaveText(`${before} of 2 witnesses added`);
+  // Wait for the saved witnesses to load (the demo seeds one for Maya), then count them.
+  await expect(page.getByTestId("witness-slots")).toHaveText(/^\d of 2 witnesses added$/);
+  const before = Number((await page.getByTestId("witness-slots").textContent())!.trim()[0]);
+  await expect(list.getByRole("listitem")).toHaveCount(before);
   for (const [i, [email, rel]] of ([["jordan@example.org", "Supervisor"], ["sam@example.net", "Community partner"]] as const).entries()) {
     if (before + i >= 2) break;
     await addWitness(page, email, rel);
