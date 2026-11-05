@@ -65,7 +65,8 @@ describe("claim extraction and linking (C.6)", () => {
   });
 
   it("links claims to game evidence or says Not yet shown, never false", () => {
-    const a = analyzeResume(MAYA, card, { source: "upload" });
+    // Without KPIs, so a claim with no clip or choice behind it shows as Not yet shown.
+    const a = analyzeResume(MAYA, { ...card, kpis: [] }, { source: "upload" });
     const lead = a.claims[0];
     expect(lead.backed).toBe(true);
     expect(lead.link?.type).toBe("clip");
