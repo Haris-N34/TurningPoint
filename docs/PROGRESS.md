@@ -110,7 +110,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E3.8 [D] Every AI sentence labelled "AI summary" with a source link
 - [x] E6.1 [D] Anonymous first review ON by default
 - [x] E6.2 [D] Transcript-first video setting
-- [ ] PV3 [D] Recordings served by 1-hour signed URLs only
+- [x] PV3 [D] Recordings served by 1-hour signed URLs only (local: `tp-media:` links with an HMAC-SHA256 token and 1 h expiry, checked before IndexedDB is read; per-session random secret; lib/store/signed.test.ts)
 - Done when: finishing a run produces a card where every AI sentence links to a real timestamp, and a recruiter can shortlist from the inbox.
 
 ## M3.5. AI Engine (v2 Part B)

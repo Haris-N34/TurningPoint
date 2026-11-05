@@ -24,13 +24,19 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
     let url: string | undefined;
     let alive = true;
     if (checkpoint.media) {
-      // Demo seed clips are static files; candidate recordings live in IndexedDB.
+      // Demo seed clips are static files; candidate recordings live in IndexedDB and play only
+      // through a 1-hour signed link (PV3).
       if (checkpoint.media.startsWith("demo/")) setSrc(`/${checkpoint.media}`);
       else
-        media.url(checkpoint.media).then((u) => {
-          url = u;
-          if (alive) setSrc(u);
-        });
+        media
+          .signedUrl(checkpoint.media)
+          .then(media.playbackUrl)
+          .then((u) => {
+            url = u;
+            if (alive) setSrc(u);
+            else if (u) URL.revokeObjectURL(u);
+          })
+          .catch(() => {});
     }
     return () => {
       alive = false;
