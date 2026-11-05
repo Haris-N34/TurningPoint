@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { openIssues, type GameState } from "@/lib/game/engine";
+import { daysLeft as daysLeftOf, openIssues, type GameState } from "@/lib/game/engine";
 import type { Issue, MapScenario } from "@/lib/game/schema";
 import { useGame } from "@/lib/game/store";
 import { dayProgress, formatDuration, formatTime } from "@/lib/game/time";
@@ -63,7 +63,7 @@ export function Resources({ scenario, state }: { scenario: MapScenario; state: G
 
 export function Clock({ state, turnBased }: { state: GameState; turnBased: boolean }) {
   const p = dayProgress(state.t);
-  const daysLeft = Math.max(0, 5 - Math.floor(state.t / 1440));
+  const daysLeft = daysLeftOf(state);
   return (
     <Panel className="px-2 py-1.5 text-center sm:px-3" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}, ${daysLeft} days left`}>
       <p className={cn(pixelTitle.className, "whitespace-nowrap text-[12px] leading-none sm:text-[13px]")} data-testid="clock-time">{formatTime(state.t)}</p>

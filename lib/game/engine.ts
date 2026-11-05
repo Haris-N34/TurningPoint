@@ -45,6 +45,8 @@ export type GameLength = "quick" | "full";
 export type GameState = {
   scenarioId: string;
   length: GameLength;
+  /** Working days in this run (3 in Quick mode, 5 for the full week). */
+  days: number;
   seed: string;
   t: number;
   turnBased: boolean;
@@ -177,6 +179,7 @@ export function newGame(base: MapScenario, seed: string, opts: { turnBased?: boo
   const state: GameState = {
     scenarioId: s.id,
     length,
+    days: daysOf(s),
     seed,
     t: dayStartOf(0),
     turnBased: !!opts.turnBased,
@@ -507,3 +510,6 @@ export function replay(s: MapScenario, seed: string, actions: Action[], opts: { 
 }
 
 export const isPaused = (state: GameState) => !!state.dialogue || state.checkpointsDue.length > 0 || state.ended;
+
+/** Working days left including today, for the HUD (3 on Quick-mode Monday, 5 on a full-week Monday). */
+export const daysLeft = (state: GameState) => Math.max(0, (state.days ?? GAME.workDays) - dayOf(state.t));

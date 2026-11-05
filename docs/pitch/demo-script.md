@@ -28,9 +28,9 @@ This replaces `docs/demo/V2_SCRIPT.md` once Haris accepts it.
 4. Resume: open `/results/att_demo_maya`, paste the demo resume (end of this file) into the resume box, tick consent, **Compare with my evidence**. It should say it added 3 claims.
 5. Second Look: open `/admin/integrations`, click **Start a fresh demo tenant**. Leave this tab open.
 6. Pre-open tabs in this order:
-   - Tab 1: `/game/launch-week` (title screen)
+   - Tab 1: `/game/launch-week?week=full` (title screen; or tick **Full week** in Settings)
    - Tab 2: `/admin/new`
-   - Tab 3: `/game/launch-week` paused just before Wednesday (see "Prepared turning-point tab")
+   - Tab 3: `/game/launch-week?week=full` paused just before Wednesday (see "Prepared turning-point tab"). The long script plays the full week; Quick mode, the default, breaks on Tuesday.
    - Tab 4: `/admin/integrations` (fresh tenant from step 5)
    - Tab 5: `/recruiter?challenge=ch_demo_energy`
    - Tab 6: `/admin/impact`
