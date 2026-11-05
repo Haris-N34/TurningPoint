@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { Button } from "@/components/ui/button";
 import { store } from "@/lib/store/store";
 import { funnelByChallenge, impactReport, type Source } from "@/lib/impact/metrics";
@@ -95,7 +95,7 @@ export function ImpactDashboard() {
   const ai = telemetryImpact(calls);
   if (!report) return <main className="mx-auto max-w-6xl p-8" aria-busy="true">Loading local impact report…</main>;
   return <main className="mx-auto max-w-6xl px-4 pb-12 pt-3 sm:px-10" data-testid="impact-dashboard">
-    <Button asChild variant="ghost" size="sm" className="-ml-3.5"><Link href="/admin">← Employer home</Link></Button>
+    <BackLink href="/admin">Employer home</BackLink>
     <header className="mt-2 grid gap-4 border-b border-border/70 pb-6 md:grid-cols-[1fr_auto]">
       <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Impact observatory</p><h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl">Evidence of impact.</h1><p className="mt-2 max-w-xl text-sm text-muted-foreground">See who gets a chance to show their capability, where review happens, and what needs a closer look.</p></div>
       <div className="self-end"><Button variant="outline" size="sm" onClick={() => { try { seedImpactDemo(store()); setSource("demo"); setEmployer(""); refresh(); setMessage("Fictional cohort loaded: 200 candidates, 3 employers. Existing local data was preserved."); setError(""); } catch { setError("The demo cohort could not be saved. Check browser storage and try again."); } }}>Load 200 fictional candidates</Button></div>

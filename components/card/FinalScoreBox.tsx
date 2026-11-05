@@ -9,6 +9,8 @@ import type { FinalScore } from "@/lib/scoring/score";
 // Hover or keyboard focus shows the breakdown. The score sorts only and never filters anyone.
 
 const name = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
+/** "Resilience (failing forward)" reads as "Resilience" in the compact inline breakdown. */
+const shortName = (slug: string) => name(slug).replace(/\s*\(.*\)$/, "");
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
 export function FinalScoreBox({ score }: { score: FinalScore }) {
@@ -18,15 +20,26 @@ export function FinalScoreBox({ score }: { score: FinalScore }) {
       <button
         type="button"
         aria-describedby={id}
-        className="flex h-11 items-center gap-3 rounded-lg border bg-card pl-3 pr-3.5 text-left shadow-xs transition-colors hover:border-input/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex w-full flex-col gap-1.5 rounded-lg border bg-card px-3 py-2 text-left shadow-xs transition-colors hover:border-input/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
       >
-        <span className="font-display text-2xl leading-none tabular-nums" data-testid="final-score-value">
-          {score.value}
-          <span className="text-sm text-muted-foreground">/100</span>
+        <span className="flex items-center gap-3">
+          <span className="font-display text-2xl leading-none tabular-nums" data-testid="final-score-value">
+            {score.value}
+            <span className="text-sm text-muted-foreground">/100</span>
+          </span>
+          <span className="flex flex-col whitespace-nowrap leading-tight">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Final score</span>
+            <span className="text-xs font-medium text-foreground">Sorts only, never filters</span>
+          </span>
         </span>
-        <span className="flex flex-col whitespace-nowrap leading-tight">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Final score</span>
-          <span className="text-xs font-medium text-foreground">Sorts only <span className="font-normal text-muted-foreground">· breakdown ⓘ</span></span>
+        {/* Always-visible breakdown (a projector has no hover). The full table is on focus or hover. */}
+        <span className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] leading-tight text-muted-foreground" data-testid="final-score-inline">
+          {score.breakdown.map((b) => (
+            <span key={b.skill} className="flex items-center justify-between gap-2 whitespace-nowrap">
+              <span>{shortName(b.skill)}</span>
+              <span className="tabular-nums text-foreground">{b.combined} <span className="text-muted-foreground">· {pct(b.weight)}</span></span>
+            </span>
+          ))}
         </span>
       </button>
       <div

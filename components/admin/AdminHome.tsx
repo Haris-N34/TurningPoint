@@ -15,7 +15,7 @@ export function AdminHome() {
   useEffect(refresh, []);
   if (!list) return <PageSkeleton />;
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-12 pt-8 sm:px-10" data-testid="admin-home">
+    <main className="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-10" data-testid="admin-home">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Employer admin</p>
