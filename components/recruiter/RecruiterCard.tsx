@@ -71,8 +71,8 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   const covers = challenge ? challenge.targetSkills.filter((s) => view.card.targetSkills.includes(s)) : [];
 
   const actions = (
-    <div className="relative" data-testid="review-actions">
-      <div className="flex gap-2">
+    <div className="relative w-full sm:w-auto" data-testid="review-actions">
+      <div className="flex gap-2 [&>button]:flex-1 sm:[&>button]:flex-none">
         <Button onClick={() => act("shortlist")} aria-pressed={decision === "shortlist"} className="aria-pressed:ring-2 aria-pressed:ring-primary/30">Shortlist</Button>
         <Button variant="outline" onClick={() => act("hold")} aria-pressed={decision === "hold"} className="aria-pressed:border-foreground">Hold</Button>
         <Button variant="outline" onClick={() => setPassing((p) => !p)} aria-pressed={decision === "pass"} aria-expanded={passing} className="aria-pressed:border-foreground">Pass</Button>

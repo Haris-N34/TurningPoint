@@ -21,6 +21,13 @@ const routes = [
   ["how-scores-work", "/how-scores-work"],
   ["practice", "/practice"],
   ["verify", "/verify"],
+  ["impact", "/admin/impact"],
+  ["builder", "/admin/new"],
+  ["ai-health", "/admin/ai-health"],
+  ["gold", "/admin/gold"],
+  ["intro", "/candidate/intro"],
+  ["developers", "/developers"],
+  ["compare-3", "/recruiter/compare?challenge=ch_demo_energy&ids=att_demo_maya,att_demo_peer_01,att_demo_peer_02"],
 ];
 const sizes = (process.env.SIZES ?? "1280x720,375x812").split(",").map(s => s.split("x").map(Number));
 const dark = process.env.DARK === "1";

@@ -61,10 +61,10 @@ export function Results({ attemptId }: { attemptId: string }) {
         hiddenClipIds={card.checkpoints.filter((c) => c.hidden).map((c) => c.id)}
         showFinalScore={false}
       />
+      <CandidateActions card={card} onChange={setCard} />
       <ResumeIntake card={card} onChange={setCard} />
       <BadgeExport card={card} />
       <LearningSurvey attemptId={card.attemptId} />
-      <CandidateActions card={card} onChange={setCard} />
     </main>
   );
 }

@@ -25,7 +25,7 @@ export default function CandidateHome() {
               Play the game <span aria-hidden>→</span>
             </Link>
           </Button>
-          <p className="text-sm text-muted-foreground">Launch Week · about 10 minutes</p>
+          <p className="text-sm text-muted-foreground">Launch Week · about 15 minutes</p>
         </div>
         <ul className="mt-8 flex flex-col gap-2 text-sm text-muted-foreground">
           <li className="flex items-center gap-2"><span aria-hidden className="size-1.5 rounded-full bg-primary" />Video, voice or text, your choice</li>
