@@ -218,8 +218,8 @@ test("evening recap shows the day's numbers (A.14)", async ({ page }) => {
 });
 
 test("list view: a full week with the keyboard, then results and real-life (A.10, A.21)", async ({ page }) => {
-  test.setTimeout(180_000);
-  await startGame(page, { list: true, turnBased: true });
+  test.setTimeout(300_000);
+  await startGame(page, { list: true, turnBased: true, full: true });
   await expect(page.getByTestId("list-view")).toBeVisible();
   for (let i = 0; i < 160; i++) {
     if (await page.getByTestId("to-results").isVisible()) break;
