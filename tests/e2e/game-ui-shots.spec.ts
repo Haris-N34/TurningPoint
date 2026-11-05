@@ -56,6 +56,8 @@ for (const size of SIZES) {
     await page.waitForTimeout(500);
     await shot("08-choices");
     await page.getByTestId("choice-b").click();
+    await page.waitForTimeout(450);
+    await shot("08b-after-pick");
     await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
     await page.waitForTimeout(3000);
     await shot("09-checkpoint");

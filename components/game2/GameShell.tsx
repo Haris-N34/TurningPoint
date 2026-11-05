@@ -292,7 +292,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       bus.emit("emote", { npc: issue.npc, emote: opt.reaction.emote });
       setReaction({ npc: node.npc, expression: opt.reaction.expression, line: opt.reaction.line });
       setLastReaction(`${node.npc}:${opt.reaction.expression}`);
-      setTimeout(() => setReaction(null), settings.reducedMotion ? 600 : 1500);
+      // A spoken reaction stays long enough to read; a silent one is a short beat for the floaters.
+      setTimeout(() => setReaction(null), settings.reducedMotion ? 600 : opt.reaction.line ? 1500 : 700);
     }
     if (opt.effects.budget && opt.effects.budget < -400) bus.emit("shake", { intensity: 0.004 });
   };
@@ -422,7 +423,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
-          {reaction && <ReactionBox scenario={scenario} {...reaction} />}
+          {reaction?.line && <ReactionBox scenario={scenario} {...reaction} />}
           {cutscene && (
             <Cutscene
               scenario={scenario}

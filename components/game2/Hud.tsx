@@ -38,7 +38,7 @@ function Bar({ label, value, max, colour, testid, display }: { label: string; va
             animate={{ opacity: 1, y: -18 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.9 }}
-            className={cn("absolute right-0 top-0 rounded-[3px] px-1 text-xs font-bold", f.tone === "good" ? "bg-[#4f9d69] text-white" : f.tone === "bad" ? "bg-[#c43d22] text-white" : "bg-white")}
+            className={cn("absolute left-full top-0 ml-3 whitespace-nowrap rounded-[3px] border-2 border-[#2e222f] px-1.5 text-[13px] font-bold", f.tone === "good" ? "bg-[#4f9d69] text-white" : f.tone === "bad" ? "bg-[#c43d22] text-white" : "bg-white")}
             data-testid="floater"
           >
             {f.text}
