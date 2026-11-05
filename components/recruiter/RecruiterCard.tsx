@@ -9,6 +9,7 @@ import { cardFor, decide, type RecruiterCardView } from "@/lib/card/recruiter";
 import { PASS_REASONS } from "@/lib/card/types";
 import { getChallenge, type Challenge } from "@/lib/challenge/challenge";
 import { store } from "@/lib/store/store";
+import { SecondLookPanel } from "./SecondLook";
 
 // Recruiter's card screen (E3) with Shortlist, Hold, Pass (E3.7). A human makes every call.
 export function RecruiterCard({ attemptId }: { attemptId: string }) {
@@ -95,6 +96,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   return (
     <main className="mx-auto max-w-7xl px-6 py-3 sm:px-10">
       {back}
+      <SecondLookPanel attemptId={attemptId} challengeId={challengeId} />
       <div>
         <CapabilityCard
           card={view.card}

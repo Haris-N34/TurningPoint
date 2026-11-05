@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import type { Card } from "@/lib/card/types";
+import { integrationsApi, inviteFor } from "@/lib/integrations/client";
 import { analyzeResume, realLifeSuggestion } from "@/lib/integrations/resume";
 import { store } from "@/lib/store/store";
 
@@ -16,7 +17,18 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<string | undefined>();
+  const [source, setSource] = useState<"upload" | "ats">("upload");
+  const [ats, setAts] = useState<{ text: string; label: string } | null>(null);
   useEffect(() => setSuggestion(store().getJSON(privateKey(card.attemptId), z.string()) ?? undefined), [card.attemptId]);
+  // Resume intake from the ATS (C.5): if the candidate applied through an ATS, offer that resume. Still needs consent.
+  const challengeId = card.challenge.id;
+  useEffect(() => {
+    const token = inviteFor(challengeId);
+    if (!token) return;
+    integrationsApi<{ resumeText: string | null; providerLabel: string }>(`invites/${encodeURIComponent(token)}`)
+      .then((r) => r.resumeText && setAts({ text: r.resumeText, label: r.providerLabel }))
+      .catch(() => undefined);
+  }, [challengeId]);
 
   const analyze = () => {
     setErr(null);
@@ -25,7 +37,7 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
     const s = store();
     const p = s.getProfile();
     const a = analyzeResume(text, card, {
-      source: "upload",
+      source,
       knownNames: [p.displayName, card.candidate.displayName].filter(Boolean),
       knownSchools: [p.university, card.candidate.university ?? ""].filter(Boolean),
     });
@@ -66,6 +78,19 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
         </div>
       ) : (
         <div className="mt-3 space-y-2">
+          {ats && (
+            <button
+              type="button"
+              className="block text-sm underline"
+              data-testid="resume-from-ats"
+              onClick={() => {
+                setText(ats.text);
+                setSource("ats");
+              }}
+            >
+              Use the resume from your application ({ats.label})
+            </button>
+          )}
           <label htmlFor="ri-text" className="text-sm font-medium">
             Resume text
           </label>
@@ -73,7 +98,10 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
             id="ri-text"
             rows={6}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              if (!e.target.value) setSource("upload");
+            }}
             className="w-full rounded-xl border px-3 py-2 text-sm"
             placeholder={"Your name\nExperience\nRole at Organization\n- What you did, and what happened"}
             data-testid="resume-text"

@@ -13,6 +13,7 @@ import { seedDemo } from "@/lib/demo/seed";
 import type { SkillSlug } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
 import { cn } from "@/lib/utils";
+import { SecondLookQueue } from "./SecondLook";
 
 const STATUS_LABEL: Record<Status, string> = { new: "New", shortlist: "Shortlisted", hold: "On hold", pass: "Passed", withdrawn: "Withdrawn" };
 
@@ -143,6 +144,8 @@ export function Inbox() {
         </div>
       </div>
 
+      <SecondLookQueue challengeId={challenge?.id} nameFor={(id) => rows.find((r) => r.attemptId === id)?.displayName} />
+
       <fieldset className="mt-6 flex flex-wrap items-end gap-3 text-sm" aria-label="Filters">
         <label className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">Skill</span>
@@ -187,6 +190,18 @@ export function Inbox() {
             <option value="">Any</option>
             <option value="true">Confirmed</option>
             <option value="false">Not confirmed</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-muted-foreground">Sort</span>
+          <select
+            className="min-h-11 rounded-md border border-input bg-background px-2"
+            value={sort.by === "final" ? "final" : "default"}
+            onChange={(e) => setSort(e.target.value === "final" ? { by: "final" } : filter.skill ? { by: "skill", skill: filter.skill } : { by: "date" })}
+            data-testid="sort"
+          >
+            <option value="default">{filter.skill ? "Skill evidence" : "Most recent"}</option>
+            <option value="final">Final score</option>
           </select>
         </label>
         <p className="ml-auto text-xs text-muted-foreground">Keys: J/K move · Enter open · S shortlist</p>
@@ -267,7 +282,7 @@ export function Inbox() {
         </table>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Levels show evidence found in candidates&apos; own words. Not observed is not a negative judgment. Sorted by {sort.by === "skill" ? `${skillName(sort.skill)} evidence` : "most recent"}. There is no overall score.
+        Levels show evidence found in candidates&apos; own words. Not observed is not a negative judgment. Sorted by {sort.by === "skill" ? `${skillName(sort.skill)} evidence` : sort.by === "final" ? "Final score" : "most recent"}. The Final score only sorts; it never hides or rejects anyone. <Link href="/how-scores-work" className="underline">How scores work</Link>
       </p>
 
       {toast && (

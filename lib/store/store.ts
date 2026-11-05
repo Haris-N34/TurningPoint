@@ -189,7 +189,7 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
     deleteAll() {
       const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports"];
       for (const k of keys(kv, "")) {
-        if (candidateKeys.includes(k) || k.startsWith("run:") || k.startsWith("card:") || k.startsWith("x:resume_private:")) kv.removeItem(PREFIX + k);
+        if (candidateKeys.includes(k) || k.startsWith("run:") || k.startsWith("card:") || /^x:(resume_private|invite|reported):/.test(k)) kv.removeItem(PREFIX + k);
       }
     },
   };

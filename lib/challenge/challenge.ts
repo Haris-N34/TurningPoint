@@ -55,6 +55,9 @@ function code(seed: string, n: number) {
   return out;
 }
 
+/** The public link slug a challenge gets on publish. Deterministic, so the server can rebuild it. */
+export const publicSlugFor = (id: string, companyName: string, title: string) => `${slugify(`${companyName} ${title}`)}-${code(id, 4).toLowerCase()}`;
+
 export function saveDraft(
   s: Store,
   d: Pick<Challenge, "company" | "title" | "templateId" | "industry" | "targetSkills"> & { scenario: Scenario; id?: string },
@@ -74,7 +77,7 @@ export function publish(s: Store, id: string, now = new Date()): Challenge {
   const c = getChallenge(s, id);
   if (!c) throw new Error("No such challenge");
   parseScenario(c.scenario);
-  const publicSlug = c.publicSlug ?? `${slugify(`${c.company.name} ${c.title}`)}-${code(id, 4).toLowerCase()}`;
+  const publicSlug = c.publicSlug ?? publicSlugFor(id, c.company.name, c.title);
   const jobCode = c.jobCode ?? `TP-${code(id + "job", 5)}`;
   const out = { ...c, status: "published" as const, publicSlug, jobCode, publishedAt: c.publishedAt ?? now.toISOString() };
   save(s, [...list(s).filter((x) => x.id !== id), out]);
