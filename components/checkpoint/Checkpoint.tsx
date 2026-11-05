@@ -271,7 +271,7 @@ export function Checkpoint(p: Props) {
                 ))}
               </div>
             </fieldset>
-            {deviceMsg && <p className="text-sm text-orange-700 dark:text-orange-300" role="status">{deviceMsg}</p>}
+            {deviceMsg && <p className="text-sm text-accent-foreground" role="status">{deviceMsg}</p>}
             <button onClick={() => void beginAnswer()} className="rounded-full bg-foreground px-5 py-2.5 font-medium text-background" autoFocus>
               I&apos;m ready, start answering
             </button>
@@ -305,7 +305,7 @@ export function Checkpoint(p: Props) {
                   rows={5}
                   className="mt-1 w-full rounded-2xl border p-3"
                 />
-                {pasteBlocked && <p className="text-sm text-orange-700 dark:text-orange-300" role="status">Paste is off for checkpoints. Type your answer.</p>}
+                {pasteBlocked && <p className="text-sm text-accent-foreground" role="status">Paste is off for checkpoints. Type your answer.</p>}
               </div>
             )}
             {mode !== "text" && <p className="text-sm opacity-80" aria-live="polite">Recording…</p>}

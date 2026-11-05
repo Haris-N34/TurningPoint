@@ -36,6 +36,9 @@ async function noHorizontalScroll(page: Page) {
 
 async function check(page: Page, label: string) {
   await page.waitForLoadState("networkidle").catch(() => {});
+  // Scan settled UI: a fade-in caught half way reads as low contrast.
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity), null, { timeout: 5_000 }).catch(() => {});
+  await page.waitForTimeout(300);
   expect.soft(await axe(page), `${label} axe`).toEqual([]);
   await expect.soft(page.getByRole("link", { name: "How we use AI" }).first(), `${label} AI link`).toBeAttached();
   expect.soft(await noHorizontalScroll(page), `${label} horizontal scroll`).toBe(true);
