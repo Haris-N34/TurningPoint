@@ -191,7 +191,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## Blockers
 
-- #44 portrait implementation is ready for review: all 13 NPC roles named in the issue have four 96px expressions (52 PNGs, 658,644 bytes total). Source sheets, exact prompts, provenance/licence status, manifest, contact sheet and asset-contract test are included. A.23 remains unchecked until CI and review; A.5 needs Div's dialogue integration. Map wording review awaits Div's v2 schema and 14 to 18 authored issues (#42/#43). #46 awaits the shared answer list; #47 awaits the Part G data contract and preceding v2 milestones.
+- #44 portrait implementation is ready for review: all 13 NPC roles named in the issue have four 96px expressions (52 PNGs, 658,644 bytes total). Source sheets, exact prompts, provenance/licence status, manifest, contact sheet and asset-contract test are included. A.23 remains unchecked until CI and review; A.5 needs Div's dialogue integration. Map wording review awaits Div's v2 schema and 14 to 18 authored issues (#42/#43). #46 now has 48 independent Codex label proposals in `lib/ai/evals/gold/labels.haris.json` and boundary notes in `docs/reviews/46-gold-labels.md`, awaiting human review and independent Div ratings. B.10 remains open; #47 awaits the Part G data contract and preceding v2 milestones.
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 
