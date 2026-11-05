@@ -120,7 +120,7 @@ export function IssueTracker({
   // Issues that appeared in the last game hour get a "New" tag so fresh trouble is easy to spot.
   const fresh = new Set(state.events.filter((e) => e.kind === "spawned" && state.t - e.t < 60).map((e) => e.issue));
   return (
-    <Panel className="w-full p-1.5 sm:w-[300px]" data-testid="issue-tracker">
+    <Panel className="w-full p-1.5 sm:w-[300px] lg:w-[330px]" data-testid="issue-tracker">
       <div className="flex items-center gap-1.5">
         <button className="flex min-h-8 flex-1 items-center gap-2 rounded-[3px] px-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c43d22]" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <span className={cn(pixelTitle.className, "text-[10px] uppercase")}>Issues</span>
