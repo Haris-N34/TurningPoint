@@ -121,7 +121,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context (lib/ai/consistency.test.ts, tests/e2e/ai.spec.ts)
 - [x] B.5 [D] Value Mapper shows mappings with confidence; admin can accept, change or reject each (components/admin/ValueMapper.tsx, lib/ai/valueMapper.test.ts, tests/e2e/ai.spec.ts)
 - [x] B.6 [D] Recruiter Copilot answers only with citations; refuses protected-trait and hire/no-hire questions (tests: lib/ai/copilot.test.ts, tests/e2e/ai.spec.ts)
-- [ ] B.7 [D] Counterfactual bias test, hallucination eval and gold-set accuracy eval run in CI and block merge on failure
+- [x] B.7 [D] Counterfactual bias test, hallucination eval and gold-set accuracy eval run in CI and block merge on failure (lib/ai/bias.test.ts, lib/ai/evals; `pnpm evals` step in CI; gold accuracy skips with a message until B.10 labels exist; merge blocking also needs branch protection on main)
 - [x] B.8 [D] ai_calls telemetry on an admin "AI health" page: calls, latency p50/p95, cost, validation failures (/admin/ai-health, lib/ai/telemetry.ts)
 - [ ] B.9 [D] AI_MODE=cached lets the whole demo run without network access to the model provider
 - [ ] B.10 [D+H] Gold set of 40+ hand-scored answers (both team members); kappa in docs/EVALS.md

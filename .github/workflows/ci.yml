@@ -18,6 +18,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      # AI evals (B.7): bias, hallucination and gold-set accuracy. Also part of pnpm test; listed so a failure is easy to spot.
+      - run: pnpm evals
       - run: pnpm build
         env:
           NEXT_PUBLIC_TEST_HOOKS: "1"

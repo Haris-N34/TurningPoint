@@ -1,0 +1,16 @@
+{
+  "items": [
+    { "id": "g01", "skill": "prioritization", "nodeSkills": ["prioritization"], "transcript": "When the sponsor pulled out I cut the second weekend instead of cutting vendor spots, because the vendors had already paid for stock and the team agreed.", "labels": { "div": null, "haris": null } },
+    { "id": "g02", "skill": "prioritization", "nodeSkills": ["prioritization"], "transcript": "I went to the vendor first because their deadline was the earliest.", "labels": { "div": null, "haris": null } },
+    { "id": "g03", "skill": "prioritization", "nodeSkills": [], "transcript": "I picked the second option. It looked fine.", "labels": { "div": null, "haris": null } },
+    { "id": "g04", "skill": "collaboration", "nodeSkills": ["collaboration"], "transcript": "I let the team vote rather than assigning roles myself, because people who choose their job stick with it. It cost us a day, but nobody checked out.", "labels": { "div": null, "haris": null } },
+    { "id": "g05", "skill": "collaboration", "nodeSkills": [], "transcript": "I did the whole budget myself so it would be done faster.", "labels": { "div": null, "haris": null } },
+    { "id": "g06", "skill": "communication", "nodeSkills": ["communication"], "transcript": "I told everyone the same day so nobody heard it secondhand, and I explained what we were keeping instead of what we lost.", "labels": { "div": null, "haris": null } },
+    { "id": "g07", "skill": "adaptability", "nodeSkills": ["adaptability"], "transcript": "Once the budget dropped I switched to the smaller venue instead of keeping the hall, since the hall would have eaten everything and the volunteers would have had nothing to work with.", "labels": { "div": null, "haris": null } },
+    { "id": "g08", "skill": "adaptability", "nodeSkills": [], "transcript": "I kept the plan exactly as it was. I liked the plan.", "labels": { "div": null, "haris": null } },
+    { "id": "g09", "skill": "analytical", "nodeSkills": ["analytical"], "transcript": "The chart showed sales were flat in the north but growing in the west, so I moved the budget west rather than spreading it evenly, because that is where the trend actually was.", "labels": { "div": null, "haris": null } },
+    { "id": "g10", "skill": "curiosity", "nodeSkills": ["curiosity"], "transcript": "I asked around the office before deciding, because nobody had told me why the client was unhappy. I found out their old vendor had missed two deadlines.", "labels": { "div": null, "haris": null } },
+    { "id": "g11", "skill": "empathy", "nodeSkills": ["empathy"], "transcript": "I called the volunteer who was upset before the meeting, because I did not want her to hear about the cut in front of everyone. It slowed us down but she stayed.", "labels": { "div": null, "haris": null } },
+    { "id": "g12", "skill": "resilience", "nodeSkills": ["resilience"], "transcript": "After the first launch failed I tried again the next week since we had learned what broke.", "labels": { "div": null, "haris": null } }
+  ]
+}
