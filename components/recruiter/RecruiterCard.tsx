@@ -73,7 +73,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
         <Button variant="outline" onClick={() => act("hold")} aria-pressed={decision === "hold"} className="aria-pressed:border-foreground">Hold</Button>
         <Button variant="outline" onClick={() => setPassing((p) => !p)} aria-pressed={decision === "pass"} aria-expanded={passing} className="aria-pressed:border-foreground">Pass</Button>
       </div>
-      {decision && <p className="mt-1.5 text-xs text-muted-foreground" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
+      {decision && <p className="mt-1.5 text-xs text-muted-foreground lg:absolute lg:right-0 lg:top-full lg:whitespace-nowrap" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
       {passing && (
         <form
           className="tp-pop mt-2 w-full space-y-2 rounded-xl border bg-card p-3 shadow-card lg:absolute lg:right-0 lg:z-20 lg:w-72"

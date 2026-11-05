@@ -66,9 +66,16 @@ export function DemoPanel() {
           <ul className="mt-1 -mx-2">
             {DEMO_JUMPS.map((j) => (
               <li key={j.href}>
-                <Link href={j.href} onClick={() => setOpen(false)} className="flex min-h-9 items-center justify-between rounded-md px-2 transition-colors hover:bg-muted">
-                  {j.label}<span aria-hidden className="text-muted-foreground">→</span>
-                </Link>
+                {j.href.startsWith("/game/") ? (
+                  // Full navigation so the game remounts, even from inside the same game route (on-stage recovery).
+                  <a href={j.href} className="flex min-h-9 items-center justify-between rounded-md px-2 transition-colors hover:bg-muted">
+                    {j.label}<span aria-hidden className="text-muted-foreground">→</span>
+                  </a>
+                ) : (
+                  <Link href={j.href} onClick={() => setOpen(false)} className="flex min-h-9 items-center justify-between rounded-md px-2 transition-colors hover:bg-muted">
+                    {j.label}<span aria-hidden className="text-muted-foreground">→</span>
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

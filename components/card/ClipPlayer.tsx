@@ -80,7 +80,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-56 w-full rounded-xl bg-black object-contain" data-testid="clip-media" />
+            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-44 w-full rounded-xl bg-foreground/90 object-contain" data-testid="clip-media" />
           ) : (
             <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}
@@ -94,12 +94,12 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       <p className="max-h-32 overflow-y-auto text-sm leading-relaxed" tabIndex={0} aria-label="Transcript" data-testid="transcript-words">
         {checkpoint.transcript.words.length
           ? checkpoint.transcript.words.map((w, i) => [
-              i > 0 ? " " : null,
+              i > 0 ? (marked.has(i) && marked.has(i - 1) ? <span key={`s${i}`} className="bg-accent">{" "}</span> : " ") : null,
               <button
                 key={i}
                 type="button"
                 onClick={() => seek(w.start)}
-                className={`inline rounded-sm hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "bg-accent text-accent-foreground" : ""}`}
+                className={`inline rounded-sm hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "rounded-none bg-accent text-accent-foreground" : ""}`}
                 aria-label={`${w.w}, jump to ${Math.floor(w.start)} seconds`}
               >
                 {w.w}
