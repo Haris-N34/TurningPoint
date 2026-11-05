@@ -99,7 +99,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
                 key={i}
                 type="button"
                 onClick={() => seek(w.start)}
-                className={`rounded px-px hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "bg-accent text-accent-foreground" : ""}`}
+                className={`inline rounded-sm hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "bg-accent text-accent-foreground" : ""}`}
                 aria-label={`${w.w}, jump to ${Math.floor(w.start)} seconds`}
               >
                 {w.w}
