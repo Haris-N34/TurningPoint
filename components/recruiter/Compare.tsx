@@ -23,10 +23,20 @@ export function Compare() {
   const [result, setResult] = useState<Comparison | null>(null);
 
   useEffect(() => {
-    const s = store();
-    const c = getChallenge(s, challengeId);
-    const skills = (c?.targetSkills ?? []) as SkillSlug[];
-    setResult(c ? compareFor(s, challengeId, idsKey.split(",").filter(Boolean), skills, c.anonymousReview) : { ok: false, reason: "This challenge was not found." });
+    const refresh = () => {
+      const s = store();
+      const c = getChallenge(s, challengeId);
+      const skills = (c?.targetSkills ?? []) as SkillSlug[];
+      setResult(c ? compareFor(s, challengeId, idsKey.split(",").filter(Boolean), skills, c.anonymousReview) : { ok: false, reason: "This challenge was not found." });
+    };
+    refresh();
+    // A candidate can withdraw while the recruiter is looking (from #53): re-check on storage changes and focus.
+    window.addEventListener("storage", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("focus", refresh);
+    };
   }, [challengeId, idsKey]);
 
   const back = (
