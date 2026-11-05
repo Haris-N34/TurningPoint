@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getMapScenario, MAP_IDS } from "@/content/maps";
 import { rng } from "@/lib/engine/seed";
 import { GAME } from "./config";
-import { availableOptions, forLength, hiddenAvailable, newGame, nodeById, openIssues, replay, step, type Action, type GameLength, type GameState } from "./engine";
+import { availableOptions, forLength, GameError, hiddenAvailable, newGame, nodeById, openIssues, replay, step, type Action, type GameLength, type GameState } from "./engine";
 import { computeKpis } from "./kpis";
 import type { MapScenario } from "./schema";
 import { dayOf } from "./time";
@@ -71,7 +71,10 @@ function play(s: MapScenario, seed: string, policy: Policy, turnBased: boolean, 
     const before = st;
     st = step(s, st, a);
     log.push(a);
-    for (const c of st.checkpointsDue) if (!before.checkpointsDue.some((x) => x.id === c.id)) raised.push(c.id);
+    const fresh = st.checkpointsDue.filter((c) => !before.checkpointsDue.some((x) => x.id === c.id));
+    for (const c of fresh) raised.push(c.id);
+    // A conversation and a checkpoint never show at once: a checkpoint only comes due from closing a conversation.
+    if (st.dialogue) expect(st.checkpointsDue, `${policy} step ${k} ${a.type}: checkpoint due while talking`).toEqual([]);
     // A new recap shows the state at that day's end (the HUD after the step only differs if the turning point hit next morning).
     if (st.recaps.length > before.recaps.length) {
       const rc = st.recaps.at(-1)!;
@@ -159,5 +162,24 @@ describe("dialogue fits the A to D grid", () => {
   it.each(MAP_IDS)("every option label on %s is at most 70 characters", (mapId) => {
     const long = getMapScenario(mapId)!.nodes.flatMap((n) => n.options.filter((o) => o.label.length > 70).map((o) => `${n.id}/${o.id}`));
     expect(long).toEqual([]);
+  });
+});
+
+describe("checkpoints and conversations never overlap", () => {
+  it.each(MAP_IDS.flatMap((m) => (["quick", "full"] as const).map((l) => [m, l] as const)))("%s (%s): talk, move, wait, delegate and defer are refused while a checkpoint is due", (mapId, length) => {
+    const s = getMapScenario(mapId)!;
+    for (const seed of SEEDS) {
+      let st = newGame(s, seed, { length });
+      for (let k = 0; k < 400 && !st.ended && !st.checkpointsDue.length; k++) st = step(s, st, nextAction(s, st, "last", rng(`x${k}`)));
+      if (!st.checkpointsDue.length) continue;
+      const open = openIssues(s, st)[0];
+      if (open) expect(() => step(s, st, { type: "talk", issue: open.id }), seed).toThrow(GameError);
+      expect(() => step(s, st, { type: "wait" }), seed).toThrow(GameError);
+      expect(() => step(s, st, { type: "move", zone: s.zones[0].id }), seed).toThrow(GameError);
+      if (open) expect(() => step(s, st, { type: "defer", issue: open.id, reason: s.deferReasons[0] }), seed).toThrow(GameError);
+      // Answering it is always allowed.
+      const due = st.checkpointsDue[0];
+      expect(() => step(s, st, due.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: due.id })).not.toThrow();
+    }
   });
 });
