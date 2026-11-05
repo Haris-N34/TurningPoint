@@ -1,4 +1,5 @@
 import type { SkillSlug } from "@/lib/engine/skills";
+import { scoreCard } from "@/lib/scoring/score";
 import type { Card, Evidence } from "./types";
 
 // Recruiter inbox data (E2, E6, E8). Haris's inbox UI renders these rows; all rules live here.
@@ -22,6 +23,8 @@ export type InboxRow = {
   /** Which of this employer's skills a reused card covers (E8.1). */
   covers: SkillSlug[];
   withdrawn: boolean;
+  /** Final score (Part D). Sorts only; never used to hide or reject anyone (D.2). */
+  finalScore?: number;
 };
 
 export const LEVEL_RANK: Record<Level, number> = { strong: 3, some: 2, needs_review: 1, not_observed: 0 };
@@ -58,6 +61,7 @@ export function toRow(card: Card, employerSkills: SkillSlug[], share: ShareInfo 
     reused: !!share?.reused,
     covers,
     withdrawn,
+    finalScore: scoreCard(card).value,
   };
 }
 
@@ -68,7 +72,7 @@ export type InboxFilter = {
   witness?: boolean;
 };
 
-export type InboxSort = { by: "date" } | { by: "skill"; skill: SkillSlug };
+export type InboxSort = { by: "date" } | { by: "skill"; skill: SkillSlug } | { by: "final" };
 
 /** Filter and sort rows (E2.2). Withdrawn cards stay listed but sink to the bottom. */
 export function queryInbox(rows: InboxRow[], f: InboxFilter = {}, sort: InboxSort = { by: "date" }): InboxRow[] {
@@ -78,6 +82,7 @@ export function queryInbox(rows: InboxRow[], f: InboxFilter = {}, sort: InboxSor
     if (f.skill && f.minLevel && LEVEL_RANK[r.levels[f.skill] ?? "not_observed"] < LEVEL_RANK[f.minLevel]) return false;
     return true;
   });
-  const key = (r: InboxRow) => (sort.by === "skill" ? LEVEL_RANK[r.levels[sort.skill] ?? "not_observed"] : Date.parse(r.date));
+  const key = (r: InboxRow) =>
+    sort.by === "skill" ? LEVEL_RANK[r.levels[sort.skill] ?? "not_observed"] : sort.by === "final" ? (r.finalScore ?? -1) : Date.parse(r.date);
   return out.sort((a, b) => Number(a.withdrawn) - Number(b.withdrawn) || key(b) - key(a) || b.date.localeCompare(a.date));
 }
