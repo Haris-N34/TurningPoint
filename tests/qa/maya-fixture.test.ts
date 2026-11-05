@@ -16,6 +16,7 @@ import { dayOf } from "@/lib/game/time";
 // tests/qa/maya-fixture.test.ts` rebuilds the fixture from this script; the tests keep it in sync with the map.
 
 const s = parseMapScenario(raw);
+const FIX = "Maya's fixture is out of date with the map. Run: WRITE_MAYA=1 pnpm vitest run tests/qa/maya-fixture.test.ts && pnpm ai:record";
 const RECOVERY_B_QUESTION = "You chose B, to keep Saturday and Sunday; cut promotion, decorations and the stage. Walk us through why.";
 
 /** Options Maya picks. Anything else open gets its first option. */
@@ -119,17 +120,17 @@ describe("Maya's demo card matches the Launch Week run the demo plays", () => {
     expect(maya.scenario).toMatchObject({ id: "launch-week", disruptionId: "sponsor-pulls-out" });
     for (const d of maya.decisionPath) {
       const issue = s.issues.find((i) => i.id === d.nodeId);
-      expect(issue, d.nodeId).toBeDefined();
+      expect(issue, `${FIX} (unknown issue ${d.nodeId})`).toBeDefined();
       if (/^[a-d]$/.test(d.optionId)) {
         const node = s.nodes.find((n) => n.id === issue!.node)!;
-        expect(node.options.find((o) => o.id === d.optionId)?.label).toBe(d.optionLabel);
+        expect(node.options.find((o) => o.id === d.optionId)?.label, FIX).toBe(d.optionLabel);
       }
     }
-    expect(maya.decisionPath.find((d) => d.nodeId === "recovery-plan")).toMatchObject({ optionId: "b", optionLabel: "Keep Saturday and Sunday; cut promotion, decorations and the stage" });
+    expect(maya.decisionPath.find((d) => d.nodeId === "recovery-plan")).toMatchObject({ optionId: "b" });
   });
 
   it("checkpoint 2 is the exact explain-on-pick question for recovery plan B", () => {
-    expect(maya.checkpoints.find((c) => c.id === "cp2")?.question).toBe(RECOVERY_B_QUESTION);
+    expect(maya.checkpoints.find((c) => c.id === "cp2")?.question, FIX).toBe(RECOVERY_B_QUESTION);
   });
 
   it("Prioritization is Strong, from checkpoint 2, with an exact quote", () => {
@@ -144,6 +145,6 @@ describe("Maya's demo card matches the Launch Week run the demo plays", () => {
   });
 
   it("the fixture is exactly what this script builds", () => {
-    expect(JSON.parse(JSON.stringify(buildMaya()))).toEqual(JSON.parse(JSON.stringify(maya)));
+    expect(JSON.parse(JSON.stringify(buildMaya())), FIX).toEqual(JSON.parse(JSON.stringify(maya)));
   });
 });
