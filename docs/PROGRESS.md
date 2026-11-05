@@ -65,7 +65,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop (Lighthouse mobile 86 twice on the production build, title screen is a still image and the engine starts at the avatar step. fps: needs a real GPU; this machine renders WebGL on the CPU (56 fps at 720x450, 21 at 1440x900). Check on a laptop with /game/launch-week?fps=1)
 - [x] A.21 [D] Test hooks window.__tp (NEXT_PUBLIC_TEST_HOOKS=1); Playwright full run in map view (desktop, phone) and list view (keyboard only)
 - [x] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills via the Value Mapper (B.5)
-- [ ] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete
+- [x] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete (13 sets, content/portraits.test.ts; Kenney packs and fonts added to LICENSES.md. Nice to have: a portrait for Kai in The Client Pivot)
 - Done when: every A item above passes and the quiz-test screenshots show a game, not a form.
 
 ## M2. Checkpoints
