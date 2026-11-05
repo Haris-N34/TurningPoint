@@ -7,7 +7,7 @@ import type { SkillSlug } from "@/lib/engine/skills";
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.7.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.7.1" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -38,7 +38,7 @@ const SKILL_WORDS: Record<SkillSlug, RegExp> = {
 
 // Rubric features (PRD, Evidence rubric). Dialect-neutral spellings included so wording style is not penalised (G4).
 const REASON = /\b(because|cause|cuz|cos|since|so that|so|that'?s why|the reason|in order to)\b/i;
-const TRADE_OFF = /\b(instead of|rather than|trade-?off|cost (us|me)|gave up|give up|lose|losing|but|over)\b/i;
+const TRADE_OFF = /\b(instead of|rather than|trade-?off|cost (us|me)|gave up|give up|lose|losing|but|over|even though|although|at the cost of)\b/i;
 const AWARE = /\b(team|volunteers?|people|they|them|everyone|vendors?|affect\w*|would change|next time|i'?d (do|change))\b/i;
 
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean);
@@ -107,7 +107,12 @@ function trimQuote(sentence: string): string {
   const m = sentence.match(TRADE_OFF) ?? sentence.match(REASON);
   const at = m?.index !== undefined ? words(sentence.slice(0, m.index)).length : 0;
   const start = Math.max(0, Math.min(at - 8, w.length - MAX_QUOTE_WORDS));
-  return w.slice(start, start + MAX_QUOTE_WORDS).join(" ");
+  const win = w.slice(start, start + MAX_QUOTE_WORDS);
+  // End on a clause boundary when one is close, so a quote never stops mid-thought ("...so I picked").
+  if (start + MAX_QUOTE_WORDS < w.length) {
+    for (let k = win.length - 1; k >= 10; k--) if (/[,;:]$/.test(win[k])) return win.slice(0, k + 1).join(" ").replace(/[,;:]$/, "");
+  }
+  return win.join(" ");
 }
 
 type Candidate = { checkpointId: string; quote: string; level: "strong" | "some"; score: number };
