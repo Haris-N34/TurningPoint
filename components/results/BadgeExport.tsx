@@ -1,9 +1,10 @@
 "use client";
 
+import { badgeRequestBody } from "@/lib/integrations/badgeRequest";
+
 import Link from "next/link";
 import { useState } from "react";
 import type { Card } from "@/lib/card/types";
-import { badgeRequestBody } from "@/lib/integrations/badgeRequest";
 
 // Portable credential export (C.9): an Open Badges 3.0 file the candidate can keep and show anywhere.
 export function BadgeExport({ card }: { card: Card }) {

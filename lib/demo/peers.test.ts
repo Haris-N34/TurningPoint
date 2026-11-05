@@ -13,7 +13,8 @@ describe("demo inbox peers", () => {
     expect(peers).toHaveLength(PEER_COUNT);
     for (const id of peers) {
       const card = s.getCard(id)!;
-      expect(card.candidate.displayName).toMatch(/^Synthetic candidate \d{3}$/);
+      expect(card.candidate.displayName).toMatch(/^[A-Z][a-z]+ [A-Z][a-z]+$/);
+      expect(isPeer(card.attemptId)).toBe(true);
       expect(card.candidate.university).toBeUndefined();
       // Every quote is an exact substring of its transcript (G1).
       expect(verifyEvidence(card).evidence).toHaveLength(card.evidence.length);

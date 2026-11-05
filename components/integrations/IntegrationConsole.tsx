@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { listChallenges, type Challenge } from "@/lib/challenge/challenge";
 import { seedDemo } from "@/lib/demo/seed";
-import { integrationsApi, setCompanyId } from "@/lib/integrations/client";
+import { CONSOLE_LOCKED, integrationsApi, setCompanyId, setConsoleSecret } from "@/lib/integrations/client";
 import type { Connection, Delivery, Provider, SecondLookEntry, SimEmail, WebhookEvent } from "@/lib/integrations/store";
 import { store } from "@/lib/store/store";
 
@@ -79,7 +79,30 @@ export function IntegrationConsole() {
     }
   };
 
-  if (!s) return <div className="p-8" aria-busy="true">{error ?? "Loading…"}</div>;
+  // A locked deploy (TP_CONSOLE_SECRET) answers 401: ask for the secret once per tab, then retry.
+  const unlock = error === CONSOLE_LOCKED && (
+    <form
+      className="flex flex-wrap items-end gap-2 rounded-xl border bg-card p-4 shadow-card"
+      data-testid="console-secret"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const v = new FormData(e.currentTarget).get("secret");
+        if (typeof v === "string" && v.trim()) {
+          setConsoleSecret(v.trim());
+          load();
+        }
+      }}
+    >
+      <div className="min-w-0 flex-1">
+        <label htmlFor="console-secret-input" className="block text-sm font-medium">Console secret required</label>
+        <p className="text-xs text-muted-foreground">This deploy locks the integration console. The secret stays in this tab only.</p>
+        <input id="console-secret-input" name="secret" type="password" autoComplete="off" className="mt-2 min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm" />
+      </div>
+      <Button type="submit">Unlock</Button>
+    </form>
+  );
+
+  if (!s) return <div className="mx-auto max-w-xl p-8" aria-busy={!unlock}>{unlock || error || "Loading…"}</div>;
 
   return (
     <main className="mx-auto max-w-7xl space-y-6 px-6 py-8 sm:px-10" data-testid="integration-console">
@@ -109,7 +132,8 @@ export function IntegrationConsole() {
           </Button>
         </div>
       </header>
-      {error && (
+      {unlock}
+      {error && error !== CONSOLE_LOCKED && (
         <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </p>
