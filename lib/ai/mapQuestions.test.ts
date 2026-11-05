@@ -11,7 +11,7 @@ describe("map checkpoint questions (A9, C4.2)", () => {
   it("quotes a deferral and its reason", () => {
     const st = base();
     const q = mapCheckpointQuestion(s, st, { id: "cp1", kind: "action", t: 0, issue: "roles", action: "defer", reason: "Something more urgent first" });
-    expect(q.question).toMatch(/^You deferred nobody wants logistics \("Something more urgent first"\), with .+ still open\. Why that order\?$/);
+    expect(q.question).toMatch(/^You deferred "Nobody wants logistics" \("Something more urgent first"\), with ".+" still open\. Why that order\?$/);
   });
   it("quotes the explain-on-pick option with its letter", () => {
     const q = mapCheckpointQuestion(s, base(), { id: "cp1", kind: "explain", t: 0, issue: "roles", action: "choose", optionId: "c", optionLabel: "Take logistics myself so the team stays happy" });
@@ -27,3 +27,30 @@ describe("map checkpoint questions (A9, C4.2)", () => {
     expect(q.question.split(/\s+/).length).toBeLessThanOrEqual(MAX_QUESTION_WORDS);
   });
 });
+
+import pivotRaw from "@/content/maps/client-pivot.json";
+
+// Every issue's question reads as a sentence: titles are quoted as written, never lower-cased into the
+// sentence ("For nobody wants logistics, you chose ..." was the bug).
+describe("map checkpoint questions read naturally for every issue (QA night)", () => {
+  for (const [name, map] of [["launch-week", s], ["client-pivot", parseMapScenario(pivotRaw)]] as const) {
+    it(`${name}: choose, defer and delegate`, () => {
+      const st = step(map, newGame(map, "q", { turnBased: true }), { type: "wait" });
+      for (const issue of map.issues) {
+        const node = map.nodes.find((n) => n.id === issue.node)!;
+        const qs = [
+          ...node.options.map((o) => mapCheckpointQuestion(map, st, { id: "x", kind: "action", t: 0, issue: issue.id, action: "choose", optionId: o.id, optionLabel: o.label }).question),
+          mapCheckpointQuestion(map, st, { id: "x", kind: "action", t: 0, issue: issue.id, action: "defer", reason: "Something more urgent first" }).question,
+          mapCheckpointQuestion(map, st, { id: "x", kind: "action", t: 0, issue: issue.id, action: "delegate", to: "Priya" }).question,
+        ];
+        for (const q of qs) {
+          expect(q, q).not.toMatch(/^For [a-z]/);
+          expect(q, q).toContain(`"${issue.title}"`);
+          expect(q, q).toMatch(/[?]$/);
+          expect(q.split(/\s+/).length, q).toBeLessThanOrEqual(MAX_QUESTION_WORDS);
+        }
+      }
+    });
+  }
+});
+

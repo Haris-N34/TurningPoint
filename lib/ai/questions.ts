@@ -99,27 +99,32 @@ export function mapCheckpointQuestion(s: MapScenario, st: MapState, due: MapDue)
   const issue = due.issue ? s.issues.find((i) => i.id === due.issue) : undefined;
   const others = s.issues.filter((i) => st.issues[i.id].status === "open" && !i.hidden && i.id !== due.issue);
   const fit = (q: string, fallback: string): GeneratedQuestion => (words(q) <= MAX_QUESTION_WORDS ? { question: q, source: "generated" } : { question: fallback, source: "fallback" });
+  // Issue titles are headlines ("Nobody wants logistics"), so they are quoted as titles, never lower-cased into
+  // the sentence ("For nobody wants logistics, ..." read wrong). The explain-on-pick wording is unchanged.
+  const q = (t: string) => `"${t}"`;
   if (due.kind === "order") {
-    const names = others.slice(0, 3).map((i) => lc(i.title));
+    const names = others.slice(0, 3).map((i) => q(i.title));
     const list = names.length >= 2 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0] ?? "several problems";
     return fit(`You've got ${others.length} open problems: ${list}. Which are you going to first, and why?`, "You've got several open problems. Which are you going to first, and why?");
   }
   if (!issue) return { question: "Why did you make that last call?", source: "fallback" };
-  const title = lc(issue.title);
+  const title = q(issue.title);
   if (due.kind === "explain" && due.optionLabel) {
     return fit(`You chose ${due.optionId?.toUpperCase()}, to ${lc(strip(due.optionLabel))}. Walk us through why.`, `You chose ${due.optionId?.toUpperCase()}. Walk us through why.`);
   }
   switch (due.action) {
     case "defer": {
-      const other = others[0] ? `, with ${lc(others[0].title)} still open` : "";
+      const other = others[0] ? `, with ${q(others[0].title)} still open` : "";
       return fit(`You deferred ${title} ("${due.reason}")${other}. Why that order?`, `You deferred ${title}. Why that order?`);
     }
     case "delegate":
       return fit(`You handed ${title} to ${due.to} instead of handling it yourself. Why them, and why then?`, `You handed ${title} to ${due.to}. Why?`);
-    default:
+    default: {
+      const pick = `${due.optionId ? `${due.optionId.toUpperCase()}: ` : ""}"${strip(due.optionLabel ?? "")}"`;
       return fit(
-        `For ${title}, you chose "${strip(due.optionLabel ?? "")}"${others.length ? ` while ${others.length} other problem${others.length === 1 ? " was" : "s were"} waiting` : ""}. Why?`,
-        `For ${title}, you chose "${strip(due.optionLabel ?? "")}". Why?`,
+        `On ${title}, you chose ${pick}${others.length ? ` while ${others.length} other problem${others.length === 1 ? " was" : "s were"} waiting` : ""}. Why that?`,
+        `On ${title}, you chose ${pick}. Why that?`,
       );
+    }
   }
 }
