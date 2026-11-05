@@ -419,7 +419,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
               </Panel>
             </div>
           )}
-          {!cutscene && !node && !reaction && settings.view === "map" && (
+          {!cutscene && !node && !reaction && !showCheckpoint && settings.view === "map" && (
             <div className="tp-scale absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>

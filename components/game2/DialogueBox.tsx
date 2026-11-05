@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { availableOptions, type GameState } from "@/lib/game/engine";
 import type { DialogueNode, MapScenario } from "@/lib/game/schema";
 import { sfx } from "@/lib/game/sound";
+import { useGame } from "@/lib/game/store";
 import { cn } from "@/lib/utils";
 import { pixelTitle } from "./fonts";
 import { Portrait } from "./Portrait";
@@ -75,9 +76,14 @@ export function DialogueBox({
       btns.current[0]?.focus();
     }
   }, [isPrompt, tw.done]);
+  // The picked option flashes for a beat before the box closes (no delay with reduced motion).
+  const [picked, setPicked] = useState<string | null>(null);
+  const reduce = useGame((g) => g.settings.reducedMotion);
   const pick = (id: "a" | "b" | "c" | "d") => {
-    if (performance.now() - shownAt.current < 350) return;
-    onChoose(id);
+    if (picked || performance.now() - shownAt.current < 350) return;
+    if (reduce) return onChoose(id);
+    setPicked(id);
+    setTimeout(() => onChoose(id), 180);
   };
 
   useEffect(() => {
@@ -164,7 +170,10 @@ export function DialogueBox({
                   onClick={() => pick(o.id)}
                   onFocus={() => setFocus(i)}
                   data-testid={`choice-${o.id}`}
+                  data-picked={picked === o.id ? "1" : undefined}
                   className={cn(
+                    picked === o.id && "!bg-[#c43d22] !text-white",
+                    picked && picked !== o.id && "opacity-50",
                     "group flex min-h-10 items-center gap-2.5 rounded-[4px] border-2 border-[#2e222f] bg-white px-2 py-1 text-left text-[15px] leading-snug shadow-[inset_0_-3px_0_#e8d9b5] hover:bg-[#fff1c4] focus-visible:bg-[#ffe08a] focus-visible:outline-none sm:text-[16px]",
                   )}
                 >

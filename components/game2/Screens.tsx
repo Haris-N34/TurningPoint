@@ -178,8 +178,8 @@ export function AvatarCreator({ onDone }: { onDone: () => void }) {
         <div className="mt-3 grid gap-4 sm:grid-cols-[auto_1fr]">
           <div className="flex flex-col items-center justify-center gap-3 rounded-[4px] border-[3px] border-[#2e222f] bg-[#7cbe6e] bg-[linear-gradient(45deg,#74b566_25%,transparent_25%,transparent_75%,#74b566_75%),linear-gradient(45deg,#74b566_25%,transparent_25%,transparent_75%,#74b566_75%)] bg-[length:16px_16px] bg-[position:0_0,8px_8px] p-3">
             <div className="relative flex flex-col items-center">
-              <SpritePreview look={look} scale={7} />
-              <span className="-mt-3 h-3 w-16 rounded-[50%] bg-black/25" aria-hidden />
+              <span className="absolute bottom-[10px] left-1/2 h-3.5 w-16 -translate-x-1/2 rounded-[50%] bg-black/25" aria-hidden />
+              <div className="relative"><SpritePreview look={look} scale={7} /></div>
             </div>
             <div className="flex gap-1 rounded-[4px] bg-[#2e222f]/15 p-1">
               <SpritePreview look={look} scale={3} dirRow={1} />

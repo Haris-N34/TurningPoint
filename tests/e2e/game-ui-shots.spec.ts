@@ -59,6 +59,14 @@ for (const size of SIZES) {
     await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
     await page.waitForTimeout(3000);
     await shot("09-checkpoint");
+    const cp = page.getByTestId("checkpoint");
+    await cp.locator('label:has(input[value="text"])').click();
+    await cp.getByRole("button", { name: /start answering/i }).click();
+    await cp.getByTestId("answer-text").pressSequentially("Saturday and Sunday keep the vendors whole. Promotion and the stage are nice to have.", { delay: 5 });
+    await shot("09b-checkpoint-answer");
+    await cp.getByRole("button", { name: "Done" }).click();
+    await page.waitForTimeout(300);
+    await shot("09c-checkpoint-review");
   });
 }
 
