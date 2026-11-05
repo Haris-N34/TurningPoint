@@ -37,6 +37,8 @@ test("AI explanation is linked globally and missing results have a recovery path
   await page.getByRole("link", { name: "How we use AI", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("How we use AI.");
   await expect(page.getByText(/No automatic rejection/)).toBeVisible();
+  // Client-side navigation sets the title a moment after the content; let it land before axe checks it.
+  await expect(page).toHaveTitle("How we use AI | Turning Point");
   const axe = await new AxeBuilder({page}).analyze();
   expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
 });
