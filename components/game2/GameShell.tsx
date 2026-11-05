@@ -420,6 +420,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
                 defaultMode={profile.defaultMode}
                 textOnly={profile.accommodations.textOnly}
                 persistMedia={!sandbox}
+                variant="game"
+                interviewer={((n) => (n ? { name: n.name, role: `${n.role} · asking for the hiring panel`, portrait: n.portrait } : undefined))(scenario.npcs.find((n) => n.id === scenario.issues.find((i) => i.id === due.issue)?.npc))}
                 onDone={(r) => onCheckpointDone(due, r)}
               />
             )
