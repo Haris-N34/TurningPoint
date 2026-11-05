@@ -392,7 +392,30 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:238cbd338a69ae35": {
+ "recruiter-copilot@1.0.0:7cb85b1eb8598b00": {
+  "output": {
+   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:22: “Losing a day would have cost the vendors more than it cost us.”",
+   "citations": [
+    {
+     "kind": "transcript",
+     "label": "Checkpoint 2 · 0:00",
+     "checkpointId": "cp2",
+     "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
+     "t": 0
+    },
+    {
+     "kind": "transcript",
+     "label": "Checkpoint 2 · 0:22",
+     "checkpointId": "cp2",
+     "quote": "Losing a day would have cost the vendors more than it cost us.",
+     "t": 22.31
+    }
+   ],
+   "refused": null
+  },
+  "model": "local-rules"
+ },
+ "recruiter-copilot@1.0.0:e0984adbf31b9c98": {
   "output": {
    "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage, and protected both market days.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
    "citations": [
@@ -415,29 +438,6 @@
      "label": "KPI: Deliberate deferrals",
      "skill": "prioritization",
      "kpiId": "deliberate-deferrals"
-    }
-   ],
-   "refused": null
-  },
-  "model": "local-rules"
- },
- "recruiter-copilot@1.0.0:cabf42d64754c483": {
-  "output": {
-   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:22: “Losing a day would have cost the vendors more than it cost us.”",
-   "citations": [
-    {
-     "kind": "transcript",
-     "label": "Checkpoint 2 · 0:00",
-     "checkpointId": "cp2",
-     "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
-     "t": 0
-    },
-    {
-     "kind": "transcript",
-     "label": "Checkpoint 2 · 0:22",
-     "checkpointId": "cp2",
-     "quote": "Losing a day would have cost the vendors more than it cost us.",
-     "t": 22.31
     }
    ],
    "refused": null
