@@ -202,6 +202,18 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     };
   }, [screen, setPaused, state?.dialogue, state?.checkpointsDue.length]);
 
+  // The browser's storage is full (store emits tp:storage-full): say so once, calmly, in the game.
+  useEffect(() => {
+    let told = false;
+    const onFull = () => {
+      if (told) return;
+      told = true;
+      toast("This browser's storage is full, so progress may not save. Free some space to keep it.");
+    };
+    window.addEventListener("tp:storage-full", onFull);
+    return () => window.removeEventListener("tp:storage-full", onFull);
+  }, [toast]);
+
   // Toasts wait while the cutscene plays, then show as one line (only the cutscene is on screen during it).
   // Quick mode's day end: a 2-second banner that never pauses play.
   const [dayBanner, setDayBanner] = useState<{ id: number; text: string; sub: string } | null>(null);
@@ -240,11 +252,15 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     if (dt) floater(`${dt > 0 ? "+" : ""}${dt} trust`, dt > 0 ? "good" : "bad", "res-trust");
     const fresh = state.events.slice(p.events.length);
     const hold = fresh.some((e) => e.kind === "turning_point") && !shownTp.current;
+    // Quick mode's day-end banner already counts what ran out at the end of the day; no toast per issue.
+    const bannerDay = scenario.recapModal === false && state.recaps.length > p.recaps.length;
     for (const e of fresh) {
       const issue = scenario.issues.find((i) => i.id === e.issue);
       if (e.kind === "spawned" && issue && !issue.hidden) {
         note(`New issue at ${scenario.zones.find((z) => z.id === issue.zone)?.name}: ${issue.title}`, hold, issue.id);
         sfx.notify();
+      } else if (e.kind === "expired" && issue && !issue.hidden && bannerDay) {
+        sfx.fail();
       } else if (e.kind === "expired" && issue && !issue.hidden) {
         note(`Ran out of time: ${issue.title}`, hold);
         sfx.fail();
@@ -458,7 +474,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           {!cutscene && <Toasts />}
           <AnimatePresence>
             {dayBanner && !cutscene && (
-              <motion.div key={dayBanner.id} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pointer-events-none absolute inset-x-0 top-[28%] z-30 flex justify-center px-3" role="status" data-testid="day-banner">
+              <motion.div key={dayBanner.id} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pointer-events-none absolute inset-x-0 top-[38%] z-30 flex justify-center px-3" role="status" data-testid="day-banner">
                 <Panel tone="ink" className="px-5 py-2 text-center">
                   <p className={cn(pixelTitle.className, "text-[14px] uppercase text-[#ffd166] sm:text-[16px]")}>{dayBanner.text}</p>
                   <p className="mt-1 text-[14px]">{dayBanner.sub}</p>

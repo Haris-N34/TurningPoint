@@ -120,3 +120,17 @@ test("first-time coach hint points at the first Go and goes away after the first
   await expect(page.getByTestId("issue-tracker")).toBeVisible();
   await expect(page.getByTestId("coach")).toHaveCount(0);
 });
+
+test("a full browser storage shows one calm in-game notice", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "one run is enough");
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("tp:storage-full"));
+    window.dispatchEvent(new Event("tp:storage-full"));
+  });
+  await expect(page.getByTestId("toast").filter({ hasText: "storage is full" })).toHaveCount(1);
+});
