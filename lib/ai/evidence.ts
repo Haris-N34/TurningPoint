@@ -8,7 +8,7 @@ import type { SkillSlug } from "@/lib/engine/skills";
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.5.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.6.0" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -153,7 +153,7 @@ const LEAD: Record<SkillSlug, Record<Candidate["level"], string>> = {
 
 // Verb-like words make poor topics ("losing, hurt"); the topic should name things.
 const VERBISH = /(?:ing|ed)$/i;
-const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said".split(" "));
+const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said share shared shares".split(" "));
 
 /** Up to three concrete words from the quote (things, not filler or verbs), in the order and case spoken. */
 function topicOf(quote: string): string[] {
@@ -192,7 +192,9 @@ export function extractEvidence(input: ExtractInput): Evidence[] {
       const j = judge(skill, cp.transcript.text, signalled, contextFor(cp));
       if (!j) continue;
       const base = (j.level === "strong" ? 10 : 5) + (signalled ? 2 : 0) + (cp.kind === "real_life" ? 1 : 0);
-      j.quotes.forEach((quote, k) => candidates.push({ skill, checkpointId: cp.id, quote, level: j.level, score: base - k * 0.01 }));
+      // A quote in the skill's own words beats one picked only because the decision was meant to surface the skill
+      // (a prioritization sentence must not back Resilience when a real setback sentence exists).
+      j.quotes.forEach((quote, k) => candidates.push({ skill, checkpointId: cp.id, quote, level: j.level, score: base + (SKILL_WORDS[skill].test(quote) ? 3 : 0) - k * 0.01 }));
     }
   // One quote backs at most one skill per card: the best-fitting skill takes it, the other uses its next-best
   // quote or, with none left, reads Not observed. Ties keep the employer's skill order.

@@ -65,13 +65,13 @@
     {
       "skill": "resilience",
       "level": "some",
-      "sentence": "Keeps going, with a reason: Saturday, Sunday, vendors.",
+      "sentence": "Keeps going, with a reason: half, money, news.",
       "source": {
         "type": "clip",
-        "checkpointId": "cp2",
-        "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
-        "startS": 0,
-        "endS": 9.58
+        "checkpointId": "fu",
+        "quote": "We kept going on half the money, and I learned to share bad news the same day.",
+        "startS": 13.6,
+        "endS": 23.5
       }
     }
   ],
@@ -1067,207 +1067,197 @@
       "mode": "text",
       "durationS": 41,
       "transcript": {
-        "text": "I wrote to every volunteer myself before the group chat found out. I said what we were cutting and what we were keeping, and I asked who still had time. Most people stayed, a few left, and that was fine.",
+        "text": "I wrote to every volunteer myself before the group chat found out, so nobody heard it secondhand. A few people left. We kept going on half the money, and I learned to share bad news the same day.",
         "words": [
           {
             "w": "I",
-            "start": 0.4,
-            "end": 0.58
+            "start": 1,
+            "end": 1.3
           },
           {
             "w": "wrote",
-            "start": 0.7,
-            "end": 1.08
+            "start": 1.6,
+            "end": 1.9
           },
           {
             "w": "to",
-            "start": 1.2,
-            "end": 1.38
+            "start": 2.2,
+            "end": 2.5
           },
           {
             "w": "every",
-            "start": 1.5,
-            "end": 1.89
+            "start": 2.8,
+            "end": 3.1
           },
           {
             "w": "volunteer",
-            "start": 2.01,
-            "end": 2.7
+            "start": 3.4,
+            "end": 3.7
           },
           {
             "w": "myself",
-            "start": 2.82,
-            "end": 3.28
+            "start": 4,
+            "end": 4.3
           },
           {
             "w": "before",
-            "start": 3.4,
-            "end": 3.86
+            "start": 4.6,
+            "end": 4.9
           },
           {
             "w": "the",
-            "start": 3.98,
-            "end": 4.22
+            "start": 5.2,
+            "end": 5.5
           },
           {
             "w": "group",
-            "start": 4.34,
-            "end": 4.72
+            "start": 5.8,
+            "end": 6.1
           },
           {
             "w": "chat",
-            "start": 4.84,
-            "end": 5.15
+            "start": 6.4,
+            "end": 6.7
           },
           {
             "w": "found",
-            "start": 5.27,
-            "end": 5.65
+            "start": 7,
+            "end": 7.3
           },
           {
-            "w": "out.",
-            "start": 5.77,
-            "end": 6.08
+            "w": "out,",
+            "start": 7.6,
+            "end": 7.9
           },
           {
-            "w": "I",
-            "start": 6.2,
-            "end": 6.38
+            "w": "so",
+            "start": 8.2,
+            "end": 8.5
           },
           {
-            "w": "said",
-            "start": 6.5,
-            "end": 6.81
+            "w": "nobody",
+            "start": 8.8,
+            "end": 9.1
           },
           {
-            "w": "what",
-            "start": 6.93,
-            "end": 7.24
-          },
-          {
-            "w": "we",
-            "start": 7.36,
-            "end": 7.54
-          },
-          {
-            "w": "were",
-            "start": 7.66,
-            "end": 7.96
-          },
-          {
-            "w": "cutting",
-            "start": 8.08,
-            "end": 8.62
-          },
-          {
-            "w": "and",
-            "start": 8.74,
-            "end": 8.97
-          },
-          {
-            "w": "what",
-            "start": 9.09,
-            "end": 9.4
-          },
-          {
-            "w": "we",
-            "start": 9.52,
+            "w": "heard",
+            "start": 9.4,
             "end": 9.7
           },
           {
-            "w": "were",
-            "start": 9.82,
-            "end": 10.13
+            "w": "it",
+            "start": 10,
+            "end": 10.3
           },
           {
-            "w": "keeping,",
-            "start": 10.25,
-            "end": 10.86
+            "w": "secondhand.",
+            "start": 10.6,
+            "end": 10.9
           },
           {
-            "w": "and",
-            "start": 10.98,
-            "end": 11.21
-          },
-          {
-            "w": "I",
-            "start": 11.33,
-            "end": 11.51
-          },
-          {
-            "w": "asked",
-            "start": 11.63,
-            "end": 12.02
-          },
-          {
-            "w": "who",
-            "start": 12.14,
-            "end": 12.37
-          },
-          {
-            "w": "still",
-            "start": 12.49,
-            "end": 12.87
-          },
-          {
-            "w": "had",
-            "start": 12.99,
-            "end": 13.22
-          },
-          {
-            "w": "time.",
-            "start": 13.34,
-            "end": 13.73
-          },
-          {
-            "w": "Most",
-            "start": 13.85,
-            "end": 14.16
-          },
-          {
-            "w": "people",
-            "start": 14.28,
-            "end": 14.74
-          },
-          {
-            "w": "stayed,",
-            "start": 14.86,
-            "end": 15.4
-          },
-          {
-            "w": "a",
-            "start": 15.52,
-            "end": 15.7
+            "w": "A",
+            "start": 11.2,
+            "end": 11.5
           },
           {
             "w": "few",
-            "start": 15.82,
-            "end": 16.05
+            "start": 11.8,
+            "end": 12.1
           },
           {
-            "w": "left,",
-            "start": 16.17,
-            "end": 16.55
+            "w": "people",
+            "start": 12.4,
+            "end": 12.7
           },
           {
-            "w": "and",
-            "start": 16.67,
+            "w": "left.",
+            "start": 13,
+            "end": 13.3
+          },
+          {
+            "w": "We",
+            "start": 13.6,
+            "end": 13.9
+          },
+          {
+            "w": "kept",
+            "start": 14.2,
+            "end": 14.5
+          },
+          {
+            "w": "going",
+            "start": 14.8,
+            "end": 15.1
+          },
+          {
+            "w": "on",
+            "start": 15.4,
+            "end": 15.7
+          },
+          {
+            "w": "half",
+            "start": 16,
+            "end": 16.3
+          },
+          {
+            "w": "the",
+            "start": 16.6,
             "end": 16.9
           },
           {
-            "w": "that",
-            "start": 17.02,
-            "end": 17.33
+            "w": "money,",
+            "start": 17.2,
+            "end": 17.5
           },
           {
-            "w": "was",
-            "start": 17.45,
-            "end": 17.68
-          },
-          {
-            "w": "fine.",
+            "w": "and",
             "start": 17.8,
-            "end": 18.19
+            "end": 18.1
+          },
+          {
+            "w": "I",
+            "start": 18.4,
+            "end": 18.7
+          },
+          {
+            "w": "learned",
+            "start": 19,
+            "end": 19.3
+          },
+          {
+            "w": "to",
+            "start": 19.6,
+            "end": 19.9
+          },
+          {
+            "w": "share",
+            "start": 20.2,
+            "end": 20.5
+          },
+          {
+            "w": "bad",
+            "start": 20.8,
+            "end": 21.1
+          },
+          {
+            "w": "news",
+            "start": 21.4,
+            "end": 21.7
+          },
+          {
+            "w": "the",
+            "start": 22,
+            "end": 22.3
+          },
+          {
+            "w": "same",
+            "start": 22.6,
+            "end": 22.9
+          },
+          {
+            "w": "day.",
+            "start": 23.2,
+            "end": 23.5
           }
         ],
         "status": "ready"
@@ -1299,11 +1289,6 @@
       "checkpointId": "cp2",
       "kind": "retake_used",
       "detail": "Retake used on checkpoint 2"
-    },
-    {
-      "checkpointId": "cp1",
-      "kind": "focus_lost",
-      "detail": "Window lost focus for 3 seconds during the answer"
     }
   ],
   "kpis": [
@@ -1421,14 +1406,14 @@
     },
     {
       "kind": "story",
-      "said": "I wrote to every volunteer myself before the group chat found out.",
+      "said": "I wrote to every volunteer myself before the group chat found out, so nobody heard it secondhand.",
       "did": "Real story: “The summer our garden lost its funding”",
       "consistent": true
     }
   ],
   "audit": {
     "extractor": "local-rules",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "createdAt": "2026-11-04T17:42:00.000Z"
   }
 }
