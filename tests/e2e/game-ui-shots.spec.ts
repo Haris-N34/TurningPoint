@@ -61,3 +61,29 @@ for (const size of SIZES) {
     await shot("09-checkpoint");
   });
 }
+
+// No camera or microphone permission: the checkpoint must open calmly in text mode.
+test("game UI shot: checkpoint without media permission", async ({ browser }, info) => {
+  test.skip(process.env.SCREENS !== "1", "set SCREENS=1 to take review shots");
+  test.skip(info.project.name !== "desktop", "one size is enough");
+  test.setTimeout(120_000);
+  const dir = process.env.SHOTS_DIR ?? "docs/screens/night/game-ui/latest";
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, permissions: [] });
+  const page = await ctx.newPage();
+  await page.goto("/game/launch-week?jump=turning-point");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await page.getByTestId("cutscene-next").click({ timeout: 20_000 });
+  await page.getByTestId("cutscene-done").click();
+  await page.getByTestId("go-recovery-plan").click();
+  await untilVisible(page, "choice-b");
+  await page.waitForTimeout(500);
+  await page.getByTestId("choice-b").click();
+  await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId("checkpoint").locator('input[value="text"]')).toBeChecked();
+  await expect(page.getByTestId("checkpoint")).not.toContainText(/couldn't/i);
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: `${dir}/10-checkpoint-no-media-1280x720.png`, style: "nextjs-portal { display: none !important; }" });
+  await ctx.close();
+});

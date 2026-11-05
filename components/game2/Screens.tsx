@@ -173,12 +173,15 @@ export function AvatarCreator({ onDone }: { onDone: () => void }) {
   return (
     <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#2e222f]/70 p-3" data-testid="avatar-creator">
       <Panel className="w-[min(560px,96vw)] p-4">
-        <h2 className={cn(pixelTitle.className, "text-[14px]")}>Make your character</h2>
-        <p className="mt-1 text-sm text-[#6a5a4a]">Just for you. Employers never see your character or this name.</p>
+        <h2 className={cn(pixelTitle.className, "text-[14px] sm:text-[16px]")}>Make your character</h2>
+        <p className="mt-1.5 text-[14px] text-[#6a5a4a]">Just for you. Employers never see your character or this name.</p>
         <div className="mt-3 grid gap-4 sm:grid-cols-[auto_1fr]">
-          <div className="flex flex-col items-center gap-2 rounded-[4px] bg-[#7cbe6e] p-3">
-            <SpritePreview look={look} scale={7} />
-            <div className="flex gap-1">
+          <div className="flex flex-col items-center justify-center gap-3 rounded-[4px] border-[3px] border-[#2e222f] bg-[#7cbe6e] bg-[linear-gradient(45deg,#74b566_25%,transparent_25%,transparent_75%,#74b566_75%),linear-gradient(45deg,#74b566_25%,transparent_25%,transparent_75%,#74b566_75%)] bg-[length:16px_16px] bg-[position:0_0,8px_8px] p-3">
+            <div className="relative flex flex-col items-center">
+              <SpritePreview look={look} scale={7} />
+              <span className="-mt-3 h-3 w-16 rounded-[50%] bg-black/25" aria-hidden />
+            </div>
+            <div className="flex gap-1 rounded-[4px] bg-[#2e222f]/15 p-1">
               <SpritePreview look={look} scale={3} dirRow={1} />
               <SpritePreview look={look} scale={3} dirRow={3} />
               <SpritePreview look={look} scale={3} dirRow={2} />
@@ -244,11 +247,11 @@ export function LoadingScreen({ ready, onDone }: { ready: boolean; onDone: () =>
   }, [ready, minDone, onDone]);
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#2e222f] p-6 text-center text-[#fff8e7]" data-testid="loading-screen" aria-busy="true">
-      <p className={cn(pixelTitle.className, "text-[14px]")}>Loading the market…</p>
-      <div className="mt-4 h-3 w-56 overflow-hidden rounded-[2px] border-2 border-[#fff8e7]">
+      <p className={cn(pixelTitle.className, "text-[14px] sm:text-[16px]")}>Loading…</p>
+      <div className="mt-5 h-4 w-64 overflow-hidden rounded-[2px] border-[3px] border-[#fff8e7] p-0.5">
         <motion.div className="h-full bg-[#ffd166]" initial={{ width: "5%" }} animate={{ width: ready ? "100%" : "80%" }} transition={{ duration: 1.2 }} />
       </div>
-      <p className="mt-6 max-w-md text-sm">Tip: {tip}</p>
+      <p className="mt-6 max-w-md text-[15px] text-[#fff8e7]/85"><span className="font-semibold text-[#ffd166]">Tip:</span> {tip}</p>
     </div>
   );
 }
@@ -338,7 +341,7 @@ export function Recap({ state, day, onDone }: { state: GameState; day: number; o
   return (
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/70 p-4" role="dialog" aria-label="Evening recap" data-testid="recap">
       <Panel className="w-[min(420px,92vw)] p-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#9c2c18]">Evening recap</p>
+        <Eyebrow>Evening recap</Eyebrow>
         <h2 className={cn(pixelTitle.className, "mt-1 text-[13px]")}>{names[day]} is done</h2>
         <dl className="mt-3 grid grid-cols-2 gap-1 text-sm">
           <dt>Handled</dt><dd className="text-right font-bold">{r.resolved + r.delegated}</dd>
@@ -403,7 +406,7 @@ export function ResultsScreen({ scenario, state, kpis, onContinue }: { scenario:
   return (
     <div className="absolute inset-0 z-40 overflow-y-auto bg-[#2e222f]/85 p-3 sm:p-6" data-testid="results-screen">
       <Panel className="mx-auto w-[min(860px,96vw)] p-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#9c2c18]">Market day · week complete</p>
+        <Eyebrow>Week complete</Eyebrow>
         <h2 className={cn(pixelTitle.className, "mt-1 text-[16px]")}>Week in review</h2>
         <div className="mt-3 grid gap-2 sm:grid-cols-4">
           {kpis.map((k) => (

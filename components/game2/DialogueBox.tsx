@@ -123,16 +123,17 @@ export function DialogueBox({
   return (
     <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(820px,94vw)] sm:-translate-x-1/2" role="dialog" aria-label={`Talking with ${node.npc === "laptop" || !facing ? "yourself" : facing.name}`} data-testid="dialogue">
       <SpeakerPlate name={tag} />
-      <Panel className="flex gap-3 p-3 pt-4 sm:gap-4 sm:p-4 sm:pt-5">
-        <Portrait id={portraitId} expression={expression} className="size-16 shrink-0 self-start rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-24" />
-        <div className="min-w-0 flex-1">
-          <p className="min-h-[2.75rem] cursor-pointer text-[17px] leading-snug sm:text-[18px]" aria-live="polite" onClick={() => (tw.done ? !isPrompt && setLine((l) => l + 1) : tw.skip())} data-testid="dialogue-text">
+      {/* Phones: portrait beside the line, choices full width below. Desktop: everything right of the portrait. */}
+      <Panel className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 p-3 pt-4 sm:gap-x-4 sm:p-4 sm:pt-5">
+        <Portrait id={portraitId} expression={expression} className="row-span-1 size-16 shrink-0 self-start rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:row-span-4 sm:size-24" />
+        <div className="contents">
+          <p className="min-h-[2.75rem] cursor-pointer self-center sm:self-start text-[17px] leading-snug sm:text-[18px]" aria-live="polite" onClick={() => (tw.done ? !isPrompt && setLine((l) => l + 1) : tw.skip())} data-testid="dialogue-text">
             <span className="sr-only">{cur.text}</span>
             <span aria-hidden>{tw.shown}</span>
             {tw.done && !isPrompt && <span className="ml-1 inline-block text-[#c43d22] motion-safe:animate-bounce" aria-hidden>▼</span>}
           </p>
           {node.charts && isPrompt && tw.done && (
-            <div className="mt-2 grid gap-2 sm:grid-cols-3" aria-label="Data view">
+            <div className="col-span-2 sm:col-span-1 sm:col-start-2 mt-2 grid gap-2 sm:grid-cols-3" aria-label="Data view">
               {node.charts.map((c) => {
                 const max = Math.max(...c.points.map((p) => p[1]));
                 return (
@@ -153,7 +154,7 @@ export function DialogueBox({
             </div>
           )}
           {isPrompt && tw.done && (
-            <div className="mt-2 flex flex-col gap-1.5" role="group" aria-label="Your choice">
+            <div className="col-span-2 sm:col-span-1 sm:col-start-2 mt-2 flex flex-col gap-1.5" role="group" aria-label="Your choice">
               {opts.map((o, i) => (
                 <button
                   key={o.id}
@@ -174,7 +175,7 @@ export function DialogueBox({
               ))}
             </div>
           )}
-          <div className="mt-2 flex items-center justify-between gap-2 text-[12px] text-[#6a5a4a]">
+          <div className="col-span-2 sm:col-span-1 sm:col-start-2 mt-2 flex items-center justify-between gap-2 text-[12px] text-[#6a5a4a]">
             <span className="hidden sm:inline">
               {isPrompt ? (<><Kbd>↑↓</Kbd> pick · <Kbd>Enter</Kbd> choose · or press <Kbd>A</Kbd>-<Kbd>D</Kbd></>) : (<><Kbd>Enter</Kbd> or click to continue</>)}
             </span>

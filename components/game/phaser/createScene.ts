@@ -46,6 +46,8 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     focusRing?: PhaserNS.GameObjects.Ellipse;
     lastStepTile = "";
     minimap?: PhaserNS.Cameras.Scene2D.Camera;
+    /** True while the camera tours the new problems after the cutscene; signs step aside. */
+    panning = false;
     labels: { text: PhaserNS.GameObjects.Text; zone: MapScenario["zones"][number] }[] = [];
 
     constructor() {
@@ -280,6 +282,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const cam = this.cameras.main;
       if (o.reducedMotion()) return;
       cam.stopFollow();
+      this.panning = true;
       const pts = e.npcs.map((id) => this.npcs.get(id)?.sprite).filter(Boolean) as PhaserNS.GameObjects.Sprite[];
       let delay = 0;
       for (const p of pts) {
@@ -288,7 +291,10 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       }
       this.time.delayedCall(delay, () => {
         cam.pan(this.player.x, this.player.y, 600, Phaser.Math.Easing.Sine.InOut);
-        this.time.delayedCall(650, () => cam.startFollow(this.player, true, 0.12, 0.12));
+        this.time.delayedCall(650, () => {
+          this.panning = false;
+          cam.startFollow(this.player, true, 0.12, 0.12);
+        });
       });
     };
 
@@ -487,20 +493,31 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       }
     }
 
-    /** Keep zone signs fully on screen (below the HUD) while their zone is in view; dim the far ones. */
+    /** Keep zone signs fully on screen and clear of the HUD panels while their zone is in view; dim the far ones. */
     placeLabels() {
       const cam = this.cameras.main;
       const v = cam.worldView;
-      const top = 76 / cam.zoom; // the HUD strip
-      for (const { text, zone: z } of this.labels) {
-        const zx = z.x * TILE, zy = z.y * TILE, zw = z.w * TILE, zh = z.h * TILE;
+      const z = cam.zoom;
+      const sw = this.scale.width;
+      const desktop = sw >= 640;
+      // Screen-space reserves: the top HUD strip, and on desktop the issue list in the top right.
+      const big = sw >= 1700 && this.scale.height >= 950; // the HUD is drawn 1.25x there (tp-scale in GameShell)
+      const k = big ? 1.25 : 1;
+      const top = (132 * k) / z;
+      const listW = desktop ? (320 * k) / z : 0, listBottom = (360 * k) / z;
+      // Signs keep one on-screen size whatever the camera zoom (about 18 px tall).
+      const scale = (desktop ? 17 : 14) / (8 * z);
+      for (const { text, zone: zn } of this.labels) {
+        const zx = zn.x * TILE, zy = zn.y * TILE, zw = zn.w * TILE, zh = zn.h * TILE;
         const inView = zx < v.right && zx + zw > v.x && zy < v.bottom && zy + zh > v.y;
-        text.setVisible(inView);
-        if (!inView) continue;
+        text.setVisible(inView && !this.panning);
+        if (!inView || this.panning) continue;
+        text.setScale(scale);
         const hw = text.displayWidth / 2 + 2;
-        const x = Phaser.Math.Clamp(zx + zw / 2, v.x + hw, v.right - hw);
         const y = Phaser.Math.Clamp(zy - 2, v.y + top + text.displayHeight, v.bottom - 2);
-        text.setPosition(Math.round(x), Math.round(y));
+        const right = y - v.y < listBottom ? v.right - listW : v.right;
+        const x = Phaser.Math.Clamp(zx + zw / 2, v.x + hw, Math.max(v.x + hw, right - hw));
+        text.setPosition(x, y);
         const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, zx + zw / 2, zy + zh / 2) / TILE;
         text.setAlpha(Phaser.Math.Clamp(1.4 - d / 18, 0.45, 1));
       }

@@ -27,7 +27,7 @@ import { pixelBody, pixelTitle } from "./fonts";
 import { Clock, IssueTracker, Resources, Toasts } from "./Hud";
 import { ListView } from "./ListView";
 import { AvatarCreator, Cutscene, LoadingScreen, PauseMenu, Recap, ResultsScreen, TitleScreen, TitleBackdrop } from "./Screens";
-import { Panel, PixelButton } from "./ui";
+import { Eyebrow, Panel, PixelButton } from "./ui";
 
 const MapCanvas = dynamic(() => import("@/components/game/MapCanvas"), { ssr: false });
 
@@ -397,7 +397,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
         <>
           {/* HUD: hidden while the cutscene plays so only the cutscene is on screen. */}
           {!cutscene && (
-            <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2" data-testid="hud">
+            <div className="tp-scale pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2" data-testid="hud">
               <div className="pointer-events-auto"><Resources scenario={scenario} state={state} /></div>
               <div className="pointer-events-auto absolute left-1/2 top-0 -translate-x-1/2 max-sm:static max-sm:translate-x-0"><Clock state={state} turnBased={state.turnBased} /></div>
               <div className="pointer-events-auto flex gap-1 max-sm:flex-col">
@@ -412,7 +412,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           )}
           {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. Out of the way while talking. */}
           {!cutscene && !node && !reaction && (
-            <div className="absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
+            <div className="tp-scale absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
           )}
@@ -475,6 +475,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           </Panel>
         </div>
       )}
+      {/* Big screens (1080p and up): the HUD grows with the map so it never looks lost. */}
+      <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } }`}</style>
       {sandbox && <p className="absolute left-1/2 top-0 z-[70] -translate-x-1/2 bg-amber-200 px-3 text-sm font-semibold">Preview as candidate · nothing is saved</p>}
     </div>
   );
@@ -485,17 +487,17 @@ function OrderPick({ scenario, state, onDone }: { scenario: ReturnType<typeof ge
   const open = openIssues(scenario, state);
   const [rank, setRank] = useState<string[]>([]);
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm" role="dialog" aria-label="The order question" data-testid="order-pick">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-3" role="dialog" aria-label="The order question" data-testid="order-pick">
       <Panel className="w-[min(520px,94vw)] p-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#9c2c18]">Checkpoint</p>
-        <h2 className={cn(pixelTitle.className, "mt-1 text-[12px] leading-relaxed")}>You&apos;ve got {open.length} open problems. Which are you going to first?</h2>
+        <Eyebrow>Checkpoint</Eyebrow>
+        <h2 className={cn(pixelTitle.className, "mt-1.5 text-[13px] leading-relaxed")}>You&apos;ve got {open.length} open problems. Which are you going to first?</h2>
         <p className="mt-1 text-sm">Tap them in the order you&apos;ll handle them. Then say why.</p>
         <ul className="mt-3 space-y-1.5">
           {open.map((i) => {
             const n = rank.indexOf(i.id);
             return (
               <li key={i.id}>
-                <button className={cn("flex w-full items-center gap-2 rounded-[4px] border-2 border-[#2e222f] p-2 text-left", n >= 0 ? "bg-[#ffe08a]" : "bg-white")} onClick={() => setRank((r) => (n >= 0 ? r.filter((x) => x !== i.id) : [...r, i.id]))} data-testid={`rank-${i.id}`}>
+                <button className={cn("flex min-h-11 w-full items-center gap-2 rounded-[4px] border-2 border-[#2e222f] p-2 text-left text-[15px] shadow-[inset_0_-3px_0_#e8d9b5] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166]", n >= 0 ? "bg-[#ffe08a]" : "bg-white hover:bg-[#fff1c4]")} onClick={() => setRank((r) => (n >= 0 ? r.filter((x) => x !== i.id) : [...r, i.id]))} data-testid={`rank-${i.id}`}>
                   <span className="flex size-6 items-center justify-center rounded-[3px] bg-[#2e222f] text-sm font-bold text-white">{n >= 0 ? n + 1 : ""}</span>
                   {i.title}
                 </button>
