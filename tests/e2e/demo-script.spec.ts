@@ -210,6 +210,26 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
   });
 
+  test("step 5 (Quick mode, the default): the turning point hits Tuesday morning and opens the recovery plan", async ({ page }) => {
+    await page.goto("/game/launch-week");
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.getByRole("button", { name: "Settings" }).click();
+    await page.getByTestId("set-turn-based").check();
+    await expect(page.getByTestId("set-full-week")).not.toBeChecked();
+    await page.getByTestId("start").click();
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+    for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
+      await clearOverlay(page);
+      await tp(page, (x) => x.setClock("Tue 09:00"));
+    }
+    await expect(page.getByTestId("cutscene")).toBeVisible();
+    await page.getByTestId("cutscene-next").click();
+    await page.getByTestId("cutscene-done").click();
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
+    expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
+  });
+
   test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async ({ page }) => {
     await seed(page);
     await page.goto("/");
