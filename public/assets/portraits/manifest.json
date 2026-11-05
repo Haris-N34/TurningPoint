@@ -306,6 +306,29 @@
           "alt": "Former employee, angry expression."
         }
       }
+    },
+    {
+      "id": "store-employee",
+      "name": "Kai",
+      "scenario": "client-pivot",
+      "expressions": {
+        "neutral": {
+          "src": "/assets/portraits/store-employee/neutral.png",
+          "alt": "Kai, neutral expression."
+        },
+        "worried": {
+          "src": "/assets/portraits/store-employee/worried.png",
+          "alt": "Kai, worried expression."
+        },
+        "happy": {
+          "src": "/assets/portraits/store-employee/happy.png",
+          "alt": "Kai, happy expression."
+        },
+        "angry": {
+          "src": "/assets/portraits/store-employee/angry.png",
+          "alt": "Kai, angry expression."
+        }
+      }
     }
   ]
 }

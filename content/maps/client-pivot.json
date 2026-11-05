@@ -836,14 +836,14 @@
       "options": [
         {
           "id": "a",
-          "label": "Lead with cost per store and payback: the small stores pay it back in 9 months",
+          "label": "Show phase-1 cost per small store and how fewer stockouts could repay it",
           "effects": {
             "trust.cfo": 12
           },
           "reaction": {
             "emote": "heart",
             "expression": "happy",
-            "line": "That's a number I can take to the board."
+            "line": "Show me the costs and assumptions behind that."
           },
           "kpi": {
             "fit": "good"
@@ -1048,7 +1048,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "The client's ops lead says your waste number doesn't hold up. Waste has been flat for three years.",
+          "text": "The client's ops lead says your waste number doesn't hold up. Waste moved from 4% to 5%, while small stores have 19 stockouts a week.",
           "expression": "angry"
         }
       ],

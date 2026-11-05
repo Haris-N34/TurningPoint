@@ -63,5 +63,10 @@
     "id": "former-employee",
     "source": "docs/art/portraits/former-employee.png",
     "sha256": "b0f0f481e2ee72245dbca21a35512a47d4b078a5f49d7611d1fc12c6ed04f7ec"
+  },
+  {
+    "id": "store-employee",
+    "source": "docs/art/portraits/store-employee.png",
+    "sha256": "fbb5f8c5bb3e05b1c1b53c2961e24ec6ecc15491f79612feb0b6fccfa7b44825"
   }
 ]

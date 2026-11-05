@@ -128,7 +128,7 @@ nodes = [
     ]),
     node("n-pitch-cfo", "cfo", [("cfo", "Convince me phase 1 is worth the money.", "neutral")],
          "How do you make the case to the CFO?", [
-        opt("a", "Lead with cost per store and payback: the small stores pay it back in 9 months", {"trust.cfo": 12}, ("heart", "happy", "That's a number I can take to the board."), kpi={"fit": "good"}),
+        opt("a", "Show phase-1 cost per small store and how fewer stockouts could repay it", {"trust.cfo": 12}, ("heart", "happy", "Show me the costs and assumptions behind that."), kpi={"fit": "good"}),
         opt("b", "Walk him through the architecture diagram", {"trust.cfo": -8}, ("sweat", "worried", "I'm not the IT department."), kpi={"fit": "poor"}),
         opt("c", "Show why the 2019 rollout failed and how phase 1 avoids it", {"trust.cfo": 16}, ("heart", "happy", "You did your homework."), requires=["cafe-chat"], kpi={"fit": "good"}, explain=True),
     ]),
@@ -150,7 +150,7 @@ nodes = [
         opt("b", "Build the demo on made-up numbers", {"trust.cfo": -6}, ("sweat", "worried"), explain=True),
         opt("c", "Drop the demo from the pitch", {"morale": -4}, ("note", "neutral")),
     ]),
-    node("n-credibility", "partner", [("partner", "The client's ops lead says your waste number doesn't hold up. Waste has been flat for three years.", "angry")],
+    node("n-credibility", "partner", [("partner", "The client's ops lead says your waste number doesn't hold up. Waste moved from 4% to 5%, while small stores have 19 stockouts a week.", "angry")],
          "How do you respond?", [
         opt("a", "Own the misread and re-run the analysis", {"trust.firm": 4}, ("note", "neutral", "Good. Fix it fast.")),
         opt("b", "Defend the waste angle", {"trust.firm": -8, "trust.cfo": -6}, ("anger", "angry")),

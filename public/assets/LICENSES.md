@@ -35,6 +35,8 @@ Every row includes `neutral.png`, `worried.png`, `happy.png`, `angry.png`:
 | `cfo` | Client Pivot CFO | Original image_gen output | AI-generated project asset |
 | `former-employee` | Client Pivot former employee | Original image_gen output | AI-generated project asset |
 
+| `store-employee` | Kai, Client Pivot store employee | Original image_gen output (2026-11-04) | AI-generated project asset |
+
 ## Tiles, map sprites, audio and UI packs
 
 All Kenney packs are CC0 1.0 (public domain, no attribution required). Credit given anyway. Each pack's own licence file sits next to it.
