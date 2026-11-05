@@ -32,6 +32,8 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 
 ## Risks to note
 
+- `/api/credentials` signs whatever skill levels the browser sends: one unauthenticated POST returns a badge `/verify` calls valid with Strong in every skill. The local-first server never sees the card, so it cannot check. Decision sent to parent: re-score transcripts server-side and bind a hash, or never claim the badge proves the evidence.
+
 - Issuer key is random per server process unless `TP_ISSUER_ED25519_KEY` is set. On Vercel, a badge issued by one function instance fails `/verify` on another, and every badge fails after a redeploy. Set the env var before the demo.
 
 - `POST /api/integrations/keys` mints a live API key with no auth, and that key reads `/api/v1/attempts` (evidence summaries). Fine for the no-auth demo, but on a public Vercel URL anyone can do it. Gate the console API behind the admin role or a deploy-time secret before sharing the link.
