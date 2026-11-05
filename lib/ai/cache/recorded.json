@@ -344,8 +344,8 @@
  },
  "follow-up-question@1.0.0:75992275f3efb265": {
   "output": {
-   "question": "What was the hardest part to tell your team?",
-   "source": "fallback"
+   "question": "Tell us a bit more: what went wrong, and what did you do about it?",
+   "source": "generated"
   },
   "model": "local-rules"
  },

@@ -69,8 +69,28 @@ export function pickDetail(transcript: string): string | undefined {
   return w.slice(start, start + 12).join(" ");
 }
 
+/** Kind nudge when the real-life answer has no setback or no action of their own yet. */
+export const THIN_FOLLOW_UP = "Tell us a bit more: what went wrong, and what did you do about it?";
+
+// Story signals. Deterministic and only about the words: something went wrong, and the candidate did something.
+const SETBACK_WORDS =
+  /(wrong|problem|issue|mistake|crisis|conflict|late|behind|short(?:age)?|over budget|deadline|complain\w*|sick|broken|couldn'?t|didn'?t work|fail\w*|lost|los(?:e|ing))\b/i;
+const OWN_ACTION = /\b(?:i|we)\s+(?:\w+\s+)?(?:\w+ed|decided|chose|made|took|led|ran|set up|wrote|met|found|split|kept|told|cut|built|brought|gave|spoke|got|went|stepped in|reached out|sat down)\b/i;
+const MIN_STORY_WORDS = 12;
+
+/**
+ * A real-life answer is thin when it is very short, names no setback, or names nothing the
+ * candidate (or their team) did. Thin answers get THIN_FOLLOW_UP instead of a quoted detail (C5.2).
+ */
+export function isThinStory(transcript: string): boolean {
+  const t = transcript.trim();
+  if (words(t) < MIN_STORY_WORDS) return true;
+  return !(SETBACK_WORDS.test(t) || BREAK_WORDS.test(t)) || !OWN_ACTION.test(t);
+}
+
 /** Follow-up question about a specific detail they mentioned (C5.2). */
 export function followUpQuestion(transcript: string): GeneratedQuestion {
+  if (isThinStory(transcript)) return { question: THIN_FOLLOW_UP, source: "generated" };
   const detail = pickDetail(transcript);
   if (!detail) return { question: FOLLOW_UP_FALLBACK, source: "fallback" };
   const d = lower(detail.replace(/^(and|but|so|then)\s+/i, ""));
