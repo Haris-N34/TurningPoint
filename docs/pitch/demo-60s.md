@@ -5,9 +5,10 @@ The live demo slot is one minute. Two tabs, prepared before you walk on. The ful
 ## Before you go on
 
 1. Run the app, press Ctrl+Shift+D, click **Reset everything**, then **Load demo seed**.
-2. **Tab 1:** open `/game/launch-week?jump=turning-point` and leave it on the title screen. The jump uses a fixed seed, so the sponsor always pulls out.
-3. **Tab 2:** open `/recruiter/card/att_demo_maya?challenge=ch_demo_energy`.
-4. Sound on, zoom 100%, Tab 1 in front.
+2. Open the game once on the stage laptop and click **Allow** for camera and microphone (the checkpoint is a video interview).
+3. **Tab 1:** open `/game/launch-week?jump=turning-point` and leave it on the title screen. The jump uses a fixed seed, so the sponsor always pulls out.
+4. **Tab 2:** open `/recruiter/card/att_demo_maya?challenge=ch_demo_energy`.
+5. Sound on, zoom 100%, Tab 1 in front.
 
 ## The minute
 
