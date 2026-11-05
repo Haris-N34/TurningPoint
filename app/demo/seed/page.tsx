@@ -8,10 +8,12 @@ import { store } from "@/lib/store/store";
 
 // Loads demo employers and Maya's card into this browser. Demo-only helper.
 export default function SeedPage() {
-  const [list, setList] = useState<Challenge[]>([]);
+  // null until seedDemo has stored everything; tests wait on data-testid="seeded", so it appears only then.
+  const [list, setList] = useState<Challenge[] | null>(null);
   useEffect(() => setList(seedDemo(store())), []);
+  if (!list) return <main className="mx-auto max-w-xl px-4 py-10 text-sm text-muted-foreground" aria-busy="true">Loading demo data…</main>;
   return (
-    <main className="mx-auto max-w-xl space-y-5 px-4 py-10" data-testid="seeded">
+    <main className="mx-auto max-w-xl space-y-5 px-4 py-10" data-testid="seeded" data-done="1">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Demo</p>
         <h1 className="mt-2 font-display text-3xl tracking-tight">Demo data loaded</h1>

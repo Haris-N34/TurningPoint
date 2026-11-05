@@ -60,9 +60,12 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
           <br />
           POINT
         </motion.h1>
-        <p className="mt-5 max-w-[min(520px,90vw)] text-[17px] text-[#fff8e7] sm:text-[19px] [@media(max-height:520px)]:mt-2 [@media(max-height:520px)]:text-[16px]">
-          You&apos;re the {scenario.role.toLowerCase()}. Midweek, the plan breaks.
+        {/* An employer brief already sets the scene (and the role), so the generic line only shows without one. */}
+        {!brief && (
+          <p className="mt-5 max-w-[min(520px,90vw)] text-[17px] text-[#fff8e7] sm:text-[19px] [@media(max-height:520px)]:mt-2 [@media(max-height:520px)]:text-[16px]">
+          You&apos;re the {scenario.role.toLowerCase()}. {settings.length === "quick" ? "On Tuesday" : "Midweek"}, the plan breaks.
         </p>
+        )}
         {brief && (
           // An employer's challenge: who it is for and the tailored setting.
           <Panel tone="ink" className="mt-3 max-w-[min(560px,92vw)] px-3 py-2 text-left text-[14px]" data-testid="title-brief">

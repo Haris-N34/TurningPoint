@@ -8,11 +8,13 @@ import { parseMapScenario } from "@/lib/game/schema";
 const s = parseMapScenario(raw);
 
 describe("QA: no conversation starts while a checkpoint is due", () => {
-  // FIXME(agent B, lib/game/engine.ts "talk"): fails today. Remove .skip once talk is refused while a checkpoint is due.
-  it.skip("talk is refused (or the dialogue stays closed) while checkpointsDue is non-empty", () => {
+  it("talk is refused (or the dialogue stays closed) while checkpointsDue is non-empty", () => {
     let st: GameState = newGame(s, "qa-talk", { turnBased: true });
     let found = false;
+    const answer = (z: GameState) => z.checkpointsDue.reduce((y, c) => step(s, y, c.kind === "order" ? { type: "orderAnswer", ranking: openIssues(s, y).map((i) => i.id) } : { type: "checkpointDone", id: c.id }), z);
     for (let guard = 0; guard < 200 && !st.ended && !found; guard++) {
+      // Anything raised by the last step (e.g. the order question on a new morning) is answered first.
+      st = answer(st);
       const open = openIssues(s, st);
       if (!open.length) { st = step(s, st, { type: "endDay" }); continue; }
       let x = step(s, st, { type: "talk", issue: open[0].id });
@@ -29,7 +31,7 @@ describe("QA: no conversation starts while a checkpoint is due", () => {
           expect(y?.dialogue ?? null).toBeNull();
         }
       }
-      st = x.checkpointsDue.reduce((z, c) => step(s, z, c.kind === "order" ? { type: "orderAnswer", ranking: openIssues(s, z).map((i) => i.id) } : { type: "checkpointDone", id: c.id }), x);
+      st = answer(x);
     }
     expect(found).toBe(true);
   });

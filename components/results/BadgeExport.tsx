@@ -1,9 +1,10 @@
 "use client";
 
+import { badgeRequestBody } from "@/lib/integrations/badgeRequest";
+
 import Link from "next/link";
 import { useState } from "react";
 import type { Card } from "@/lib/card/types";
-import { verifyEvidence } from "@/lib/card/verify";
 
 // Portable credential export (C.9): an Open Badges 3.0 file the candidate can keep and show anywhere.
 export function BadgeExport({ card }: { card: Card }) {
@@ -16,20 +17,11 @@ export function BadgeExport({ card }: { card: Card }) {
     setBusy(true);
     setErr(null);
     try {
-      const skills = verifyEvidence(card)
-        .evidence.filter((e) => e.level === "strong" || e.level === "some")
-        .map((e) => ({ skill: e.skill, level: e.level as "strong" | "some" }));
+      // The server re-scores the answers itself and signs only its own levels (QA: no client-supplied levels).
       const res = await fetch("/api/credentials", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          attemptId: card.attemptId,
-          challengeTitle: card.challenge.title,
-          company: card.challenge.company,
-          finishedAt: card.finishedAt,
-          skills,
-          ...(withName && card.candidate.displayName ? { name: card.candidate.displayName } : {}),
-        }),
+        body: JSON.stringify(badgeRequestBody(card, withName)),
       });
       if (!res.ok) throw new Error("Could not create the credential");
       const text = JSON.stringify(await res.json(), null, 2);

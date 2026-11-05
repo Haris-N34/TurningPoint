@@ -12,7 +12,7 @@ import { ANSWER_VARIANTS } from "./answers";
 
 // E7.4: 200 synthetic candidates across 3 fictional employers. Feeds the recruiter inbox,
 // the fairness analytics and /admin/impact. Deterministic: the same seed gives the same cohort.
-// Names are clearly synthetic ("Synthetic candidate 001"), never real people.
+// Names are fictional (see syntheticName), never real people, and every synthetic card is flagged as such in the UI.
 
 export const IMPACT_EMPLOYERS = [
   { id: "ch_impact_energy", company: "Prairie Grid Energy (fictional)", colour: "#0f766e", title: "Field Operations Analyst (synthetic demo)" },
@@ -36,7 +36,11 @@ export function prng(seed: number) {
   };
 }
 
-export const syntheticName = (i: number) => `Synthetic candidate ${String(i + 1).padStart(3, "0")}`;
+/** Fictional first and last names from many backgrounds. Deterministic per index; 20 x 23 gives 460 unique pairs. */
+export const SYNTHETIC_FIRST = ["Aiyana", "Mateo", "Priyanka", "Kofi", "Mei", "Elias", "Noor", "Tomasz", "Amara", "Kenji", "Lucia", "Darius", "Siobhan", "Tariq", "Ingrid", "Rafael", "Zanele", "Hana", "Olu", "Camille"] as const;
+export const SYNTHETIC_LAST = ["Okafor", "Lindqvist", "Ramos", "Nakamura", "Haddad", "Novak", "Mensah", "Castillo", "Brennan", "Sato", "Abara", "Delacroix", "Kaur", "Petrov", "Achebe", "Moreau", "Huang", "Ferreira", "Yilmaz", "Osei", "Varga", "Duarte", "Kowalczyk"] as const;
+/** A fictional name for synthetic candidate i. Never a real person; the UI always tags these rows "Synthetic". */
+export const syntheticName = (i: number) => `${SYNTHETIC_FIRST[i % SYNTHETIC_FIRST.length]} ${SYNTHETIC_LAST[i % SYNTHETIC_LAST.length]}`;
 export const impactAttemptId = (i: number) => `${DEMO_PREFIX}${String(i + 1).padStart(3, "0")}`;
 
 type Mode = "video" | "voice" | "text";

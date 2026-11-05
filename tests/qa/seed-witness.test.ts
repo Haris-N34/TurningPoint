@@ -7,8 +7,7 @@ import { witnessesFor } from "@/lib/witness/witness";
 // added. No witnesses yet." Her card carries a confirmed witness, but the seed never stores the witness record
 // the witness list reads, so she could also add two more (three in total, over the limit of 2).
 describe("QA: seeded witnesses match the card", () => {
-  // FIXME(agent B, lib/demo/seed.ts): remove .skip once the seed stores Maya's confirmed witness record.
-  it.skip("every witness on Maya's card is in her witness list", () => {
+  it("every witness on Maya's card is in her witness list", () => {
     const s = makeStore(new MemoryKV());
     seedDemo(s);
     const card = s.getCard("att_demo_maya")!;

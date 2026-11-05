@@ -5,7 +5,7 @@ import { BackLink } from "@/components/ui/back-link";
 import { useSearchParams } from "next/navigation";
 import { AddonRequest } from "@/components/addon/AddonRequest";
 import type { SkillSlug } from "@/lib/engine/skills";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
 import { Button } from "@/components/ui/button";
 import { Copilot, CopilotButton } from "./Copilot";
@@ -23,6 +23,27 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   const [challenge, setChallenge] = useState<Challenge>();
   const [decision, setDecision] = useState<string>();
   const [passing, setPassing] = useState(false);
+  const passBtn = useRef<HTMLButtonElement | null>(null);
+  const passForm = useRef<HTMLFormElement | null>(null);
+  // The Pass reason form closes on Escape or a click outside it, and focus goes back to Pass.
+  useEffect(() => {
+    if (!passing) return;
+    const close = () => {
+      setPassing(false);
+      passBtn.current?.focus();
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (!passForm.current?.contains(t) && !passBtn.current?.contains(t)) setPassing(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [passing]);
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -71,12 +92,14 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
       <div className="flex gap-2 [&>button]:flex-1 sm:[&>button]:flex-none">
         <Button onClick={() => act("shortlist")} aria-pressed={decision === "shortlist"} className="aria-pressed:ring-2 aria-pressed:ring-primary/30">Shortlist</Button>
         <Button variant="outline" onClick={() => act("hold")} aria-pressed={decision === "hold"} className="aria-pressed:border-foreground">Hold</Button>
-        <Button variant="outline" onClick={() => setPassing((p) => !p)} aria-pressed={decision === "pass"} aria-expanded={passing} className="aria-pressed:border-foreground">Pass</Button>
+        <Button ref={passBtn} variant="outline" onClick={() => setPassing((p) => !p)} aria-pressed={decision === "pass"} aria-expanded={passing} aria-controls="pass-form" className="aria-pressed:border-foreground">Pass</Button>
       </div>
-      {decision && <p className="mt-1.5 text-xs text-muted-foreground lg:absolute lg:right-0 lg:top-full lg:whitespace-nowrap" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
+      {decision && !passing && <p className="mt-1.5 text-xs text-muted-foreground lg:absolute lg:right-0 lg:top-full lg:whitespace-nowrap" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
       {passing && (
         <form
-          className="tp-pop mt-2 w-full space-y-2 rounded-xl border bg-card p-3 shadow-card lg:absolute lg:right-0 lg:z-20 lg:w-72"
+          id="pass-form"
+          ref={passForm}
+          className="tp-pop mt-2 w-full space-y-2 rounded-xl border bg-card p-3 shadow-card sm:w-80"
           onSubmit={(e) => {
             e.preventDefault();
             act("pass");
