@@ -233,8 +233,8 @@ export function Inbox() {
         </div>
 
         <div className="relative overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm" aria-label="Candidates">
-            <thead className="border-b border-border/70 bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+          <table className="w-full text-left text-sm max-sm:block sm:min-w-[760px]" aria-label="Candidates">
+            <thead className="border-b border-border/70 bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground max-sm:sr-only">
               <tr>
                 <th className="w-10 py-2.5 pl-4 pr-2 font-medium"><span className="sr-only">Compare</span></th>
                 <th className="px-3 py-2.5 font-medium">Candidate</th>
@@ -245,13 +245,13 @@ export function Inbox() {
                 <th className="py-2.5 pl-3 pr-4"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="max-sm:block">
               {rows.map((r, i) => (
                 <tr
                   key={r.attemptId}
                   aria-selected={i === sel}
                   onClick={() => setSel(i)}
-                  className={cn("group border-b border-border/60 transition-colors last:border-0 hover:bg-muted/40", i === sel && "bg-accent/40 hover:bg-accent/40", r.withdrawn && "text-muted-foreground")}
+                  className={cn("group border-b border-border/60 transition-colors last:border-0 hover:bg-muted/40 max-sm:flex max-sm:flex-wrap max-sm:items-center max-sm:gap-x-3 max-sm:gap-y-1 max-sm:px-4 max-sm:py-3 max-sm:[&>td]:p-0", i === sel && "bg-accent/40 hover:bg-accent/40", r.withdrawn && "text-muted-foreground")}
                   data-testid={`row-${r.attemptId}`}
                 >
                   <td className="py-2.5 pl-4 pr-2">
@@ -284,7 +284,7 @@ export function Inbox() {
                       </span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-3 py-2.5 max-sm:order-last max-sm:basis-full">
                     <div className="flex flex-wrap gap-x-3 gap-y-1.5">
                       {r.withdrawn ? (
                         <span>Candidate withdrew this card</span>
@@ -299,15 +299,15 @@ export function Inbox() {
                       )}
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">{r.witnessConfirmed ? <span className="text-foreground"><span aria-hidden>✓ </span>Confirmed</span> : "None yet"}</td>
-                  <td className="px-3 py-2.5">
+                  <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground max-sm:order-3 max-sm:text-xs">{r.witnessConfirmed ? <span className="text-foreground"><span aria-hidden>✓ </span>Confirmed</span> : "None yet"}</td>
+                  <td className="px-3 py-2.5 max-sm:order-3">
                     <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium", r.status === "new" ? "text-muted-foreground" : "text-foreground")}>
                       <span aria-hidden className={cn("size-1.5 rounded-full", r.status === "shortlist" ? "bg-primary" : r.status === "new" ? "bg-input" : "bg-foreground/50")} />
                       {STATUS_LABEL[r.status]}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-muted-foreground">{new Date(r.date).toLocaleDateString("en-CA")}</td>
-                  <td className="py-2.5 pl-3 pr-4 text-right">
+                  <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-muted-foreground max-sm:order-3 max-sm:text-xs">{new Date(r.date).toLocaleDateString("en-CA")}</td>
+                  <td className="py-2.5 pl-3 pr-4 text-right max-sm:order-2 max-sm:ml-auto">
                     {!r.withdrawn && r.status !== "shortlist" && (
                       <Button size="sm" variant="ghost" className="border border-transparent group-hover:border-border group-hover:bg-card" onClick={() => shortlist(r)}>
                         Shortlist
