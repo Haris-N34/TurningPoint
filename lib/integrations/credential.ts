@@ -143,10 +143,13 @@ export function verifyBadge(input: unknown): VerifyResult {
     const key = createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x: rawFromDidKey(did).toString("base64url") }, format: "jwk" });
     const ok = verify(null, proofHash(doc, proofConfig), key, Buffer.from(unbase58btc(proofValue.slice(1))));
     if (!ok) return { valid: false, reason: "Signature does not match: the credential was changed after it was issued" };
+    // A consistent signature only proves the signer holds that key. Anyone can make a key and sign their own
+    // levels, so the key must be Turning Point's. Set TP_ISSUER_ED25519_KEY in production so it survives restarts.
+    if (did !== issuer().did) return { valid: false, reason: "Signed by a key that is not Turning Point's issuer key" };
     const subject = doc.credentialSubject as { result?: { resultDescription: string; value: string }[] };
     return {
       valid: true,
-      issuerKnown: did === issuer().did,
+      issuerKnown: true,
       issuer: did,
       name: String(doc.name ?? ""),
       skills: (subject.result ?? []).map((x) => ({ skill: skillName(x.resultDescription.replace("urn:tp:skill:", "")), level: x.value })),

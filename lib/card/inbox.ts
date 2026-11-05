@@ -44,6 +44,9 @@ export function toRow(card: Card, employerSkills: SkillSlug[], share: ShareInfo 
   const levels: Partial<Record<SkillSlug, Level>> = {};
   for (const e of card.evidence) levels[e.skill as SkillSlug] = e.level;
   const withdrawn = !!share?.revokedAt;
+  // C7.4: a withdrawn card shows nothing. Only the anonymous id, the date and the status stay.
+  if (withdrawn)
+    return { attemptId: card.attemptId, displayName: card.anonId, anonymous: true, date: card.finishedAt, status: "withdrawn", topSkills: [], levels: {}, witnessConfirmed: false, reused: !!share?.reused, covers: [], withdrawn };
   const topSkills = card.evidence
     .filter((e) => e.level === "strong" || e.level === "some")
     .sort((a, b) => LEVEL_RANK[b.level] - LEVEL_RANK[a.level])
