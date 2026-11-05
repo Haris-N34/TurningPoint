@@ -47,7 +47,7 @@ export function DemoPanel() {
   };
 
   return (
-    <div role="dialog" aria-label="Demo shortcuts" data-testid="demo-panel" className="fixed bottom-4 left-4 z-[200] w-72 rounded-xl border bg-card p-4 text-sm shadow-card">
+    <div role="dialog" aria-label="Demo shortcuts" data-testid="demo-panel" className="fixed right-4 top-24 z-[200] w-72 max-w-[calc(100vw-2rem)] rounded-xl border bg-card p-4 text-sm shadow-card">
       <div className="flex items-center justify-between">
         <p className="font-semibold">Demo shortcuts</p>
         <button type="button" aria-label="Close demo shortcuts" onClick={() => setOpen(false)} className="min-h-8 px-2 text-muted-foreground">✕</button>
