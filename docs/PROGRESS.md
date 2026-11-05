@@ -186,7 +186,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
 - [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug
-- [ ] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario
+- [x] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario (recruiter one-click request on a reused card, 5-minute text mini-scenario for only the missing skills, evidence levels only; lib/addon/addon.test.ts, tests/e2e/addon.spec.ts)
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 
 ## Blockers

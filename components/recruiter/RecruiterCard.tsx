@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { AddonRequest } from "@/components/addon/AddonRequest";
+import type { SkillSlug } from "@/lib/engine/skills";
 import { useEffect, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
 import { Button } from "@/components/ui/button";
@@ -108,6 +110,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
           seekTo={seekTo}
         />
       </div>
+      {share?.reused && challenge && <AddonRequest attemptId={attemptId} challengeId={challengeId} employerSkills={challenge.targetSkills as SkillSlug[]} cardSkills={view.card.targetSkills} />}
       <Copilot card={view.card} onCite={(c) => setSeekTo((p) => ({ ...c, n: (p?.n ?? 0) + 1 }))} />
     </main>
   );

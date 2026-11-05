@@ -201,11 +201,11 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
 
     /**
      * Delete everything held for the candidate (C7.5): profile, runs, cards, shares, reviews of their
-     * cards, witnesses and ATS exports. Employer challenges and UI settings stay. Media is cleared
+     * cards, witnesses, add-ons (E8.2) and ATS exports. Employer challenges and UI settings stay. Media is cleared
      * separately (media.clear), see deleteMyData.
      */
     deleteAll() {
-      const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports"];
+      const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports", "x:addons"];
       for (const k of keys(kv, "")) {
         if (candidateKeys.includes(k) || k.startsWith("run:") || k.startsWith("card:")) kv.removeItem(PREFIX + k);
       }
