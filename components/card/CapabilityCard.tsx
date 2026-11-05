@@ -83,10 +83,20 @@ export function CapabilityCard({
   const confirmed = card.realStory ? confirmationLine(card.realStory.witnesses) : undefined;
   const witnessSentence = card.realStory?.witnesses.find((w) => w.status === "confirmed" && w.sentence)?.sentence;
 
-  const jump = (checkpointId: string, t: number) => {
+  const answersRef = useRef<HTMLElement | null>(null);
+  const [lastJump, setLastJump] = useState<{ skill?: string; quote?: string; checkpointId: string; t: number; n: number }>();
+  const jump = (checkpointId: string, t: number, from?: { skill: string; quote: string }) => {
     setActive(checkpointId);
-    // Let the tab render before seeking.
-    setTimeout(() => players.current[checkpointId]?.seek(t), 0);
+    setLastJump((p) => ({ ...from, checkpointId, t, n: (p?.n ?? 0) + 1 }));
+    // Let the tab render before seeking, then bring the answer into view if it is off screen.
+    setTimeout(() => {
+      players.current[checkpointId]?.seek(t);
+      const el = answersRef.current;
+      if (el) {
+        const r = el.getBoundingClientRect();
+        if (r.top < 0 || r.top > window.innerHeight - 160) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
   };
 
   useEffect(() => {
@@ -99,17 +109,13 @@ export function CapabilityCard({
 
   return (
     <article className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]" data-testid="capability-card" aria-label="Capability Card">
-      <header className="flex flex-wrap items-start justify-between gap-3 lg:col-span-2">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Capability Card</p>
-          <h1 className="mt-1 font-display text-2xl leading-tight sm:text-3xl" data-testid="card-name">
-            {identity.displayName}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {card.challenge.company} · {card.challenge.title} · {new Date(card.finishedAt).toLocaleDateString("en-CA")}
-            {identity.university && !identity.anonymous ? ` · ${identity.university}` : ""}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
+      <header className="flex flex-col gap-4 border-b border-border/70 pb-3 lg:col-span-2 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Capability Card</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <h1 className="font-display text-3xl leading-tight tracking-tight" data-testid="card-name">
+              {identity.displayName}
+            </h1>
             {card.candidate.verified && <Badge variant="secondary">Verified student</Badge>}
             {card.adjustedTiming && <Badge variant="outline">Adjusted timing</Badge>}
             {identity.anonymous && <Badge variant="outline">Anonymous review</Badge>}
@@ -119,46 +125,61 @@ export function CapabilityCard({
               </Badge>
             )}
           </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {card.challenge.company} · {card.challenge.title} · {new Date(card.finishedAt).toLocaleDateString("en-CA")}
+            {identity.university && !identity.anonymous ? ` · ${identity.university}` : ""}
+          </p>
         </div>
-        <div className="flex flex-col items-end gap-3">
-          {showFinalScore && <FinalScoreBox score={final} />}
-          {actions}
-        </div>
+        {(showFinalScore || actions) && (
+          <div className="flex flex-wrap items-start justify-end gap-3 lg:flex-nowrap">
+            {showFinalScore && <FinalScoreBox score={final} />}
+            {actions}
+          </div>
+        )}
       </header>
 
       <div className="space-y-4">
-        <section aria-labelledby="ev-h" className="rounded-xl border bg-card p-4 shadow-card">
-          <div className="flex items-baseline justify-between">
-            <h2 id="ev-h" className="font-semibold">Skill evidence</h2>
-            <span className="text-xs text-muted-foreground">Evidence first</span>
+        <section aria-labelledby="ev-h" className="rounded-xl border bg-card shadow-card">
+          <div className="flex items-baseline justify-between border-b border-border/70 px-4 py-2.5">
+            <h2 id="ev-h" className="text-sm font-semibold">Skill evidence</h2>
+            <span className="text-xs text-muted-foreground">Click a quote to hear it</span>
           </div>
-          <ul className="mt-3 space-y-3" data-testid="evidence">
+          <ul className="divide-y divide-border/70" data-testid="evidence">
             {evidence.map((e) => (
-              <li key={e.skill} data-testid={`evidence-${e.skill}`} data-level={e.level}>
+              <li key={e.skill} className="px-4 py-2" data-testid={`evidence-${e.skill}`} data-level={e.level}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">{skillName(e.skill)}</span>
                   <LevelBadge level={e.level} />
                 </div>
                 {e.sentence && e.source && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    <span className="mr-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-foreground">AI summary</span>
-                    {e.sentence}{" "}
+                  <div className="mt-0.5 space-y-0.5">
                     {e.source.type === "clip" ? (
                       <button
                         type="button"
-                        className="text-left text-foreground underline underline-offset-2"
+                        className={cn(
+                          "group -mx-2 flex w-[calc(100%+1rem)] items-start gap-2 rounded-lg border border-transparent px-2 py-0.5 text-left text-sm transition-colors hover:border-primary/30 hover:bg-accent/50",
+                          lastJump?.skill === e.skill && "border-primary/40 bg-accent/60",
+                        )}
                         data-testid={`jump-${e.skill}`}
                         onClick={() => {
-                          const s = e.source as { checkpointId: string; startS: number };
-                          jump(s.checkpointId, s.startS);
+                          const s = e.source as { checkpointId: string; startS: number; quote: string };
+                          jump(s.checkpointId, s.startS, { skill: e.skill, quote: s.quote });
                         }}
                       >
-                        “{e.source.quote}” · {mmss(e.source.startS)}
+                        <span aria-hidden className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[9px] text-primary-foreground transition-transform group-hover:scale-110">▶</span>
+                        <span className="min-w-0 flex-1 text-foreground">
+                          <span className="sr-only">Play </span>“{e.source.quote}”
+                          <span className="ml-1.5 font-mono text-xs text-muted-foreground">{mmss(e.source.startS)}</span>
+                        </span>
                       </button>
                     ) : (
-                      <span className="text-foreground">Choice: “{e.source.optionLabel}”</span>
+                      <p className="text-sm text-foreground">Choice: “{e.source.optionLabel}”</p>
                     )}
-                  </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      <span className="mr-1.5 rounded bg-muted px-1 py-px text-[10px] font-medium uppercase tracking-wide text-foreground/80">AI summary</span>
+                      {e.sentence}
+                    </p>
+                  </div>
                 )}
               </li>
             ))}
@@ -171,7 +192,7 @@ export function CapabilityCard({
             <p className="mt-1 font-display text-lg leading-snug">“{card.realStory.title}”</p>
             {realLife?.transcript.text && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{realLife.transcript.text}</p>}
             {followUp && (
-              <p className="mt-1 line-clamp-2 text-sm">
+              <p className="mt-1 line-clamp-1 text-sm">
                 <span className="font-medium">{followUp.question}</span>{" "}
                 <span className="text-muted-foreground">{followUp.transcript.text}</span>
               </p>
@@ -186,8 +207,52 @@ export function CapabilityCard({
       </div>
 
       <div className="min-w-0 space-y-4">
+        {clipTabs.length > 0 && (
+          <section ref={answersRef} aria-labelledby="clips-h" className={cn("scroll-mt-4 rounded-xl border bg-card p-4 shadow-card transition-shadow", lastJump && "ring-2 ring-primary/25")} data-testid="answers">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 id="clips-h" className="text-sm font-semibold">Answers</h2>
+              {lastJump?.skill && (
+                <p key={lastJump.n} className="tp-pop rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground" role="status" data-testid="jump-banner">
+                  ▶ {skillName(lastJump.skill)} quote at {mmss(lastJump.t)}
+                </p>
+              )}
+            </div>
+            <div role="tablist" aria-label="Checkpoint answers" className="mt-3 flex flex-wrap gap-1.5">
+              {clipTabs.map((c, i) => (
+                <button
+                  key={c.id}
+                  role="tab"
+                  type="button"
+                  aria-selected={active === c.id}
+                  aria-controls={`panel-${c.id}`}
+                  onClick={() => setActive(c.id)}
+                  className={cn("min-h-9 rounded-full border px-3 text-xs font-medium transition-colors", active === c.id ? "border-foreground bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}
+                  data-testid={`tab-${c.id}`}
+                >
+                  {c.kind === "decision" ? `${KIND_LABEL.decision} ${i + 1}` : KIND_LABEL[c.kind]} · {c.mode}
+                </button>
+              ))}
+            </div>
+            {clipTabs.map((c) => (
+              <div key={c.id} id={`panel-${c.id}`} role="tabpanel" hidden={active !== c.id} className="mt-3 space-y-2">
+                <p className="text-sm font-medium">{c.question}</p>
+                {hiddenClipIds.includes(c.id) && <p className="text-xs text-muted-foreground">The candidate hid this recording. The transcript is shown.</p>}
+                <ClipPlayer
+                  checkpoint={c}
+                  highlight={lastJump?.checkpointId === c.id && lastJump.quote ? { t: lastJump.t, quote: lastJump.quote, n: lastJump.n } : undefined}
+                  transcriptFirst={transcriptFirst}
+                  ref={(h) => {
+                    players.current[c.id] = h;
+                  }}
+                />
+                {c.retakeUsed && <p className="text-xs text-muted-foreground">Retake used</p>}
+              </div>
+            ))}
+          </section>
+        )}
+
         <section aria-labelledby="dp-h" className="rounded-xl border bg-card p-4 shadow-card">
-          <h2 id="dp-h" className="font-semibold">Decision path</h2>
+          <h2 id="dp-h" className="text-sm font-semibold">Decision path</h2>
           <ol className="relative mt-4 flex items-start overflow-x-auto pb-2" data-testid="decision-path">
             {card.decisionPath.map((d, i) => {
               const cp = d.checkpointId;
@@ -222,42 +287,6 @@ export function CapabilityCard({
             })}
           </ol>
         </section>
-
-        {clipTabs.length > 0 && (
-          <section aria-labelledby="clips-h" className="rounded-xl border bg-card p-4 shadow-card">
-            <h2 id="clips-h" className="font-semibold">Answers</h2>
-            <div role="tablist" aria-label="Checkpoint answers" className="mt-3 flex flex-wrap gap-2">
-              {clipTabs.map((c, i) => (
-                <button
-                  key={c.id}
-                  role="tab"
-                  type="button"
-                  aria-selected={active === c.id}
-                  aria-controls={`panel-${c.id}`}
-                  onClick={() => setActive(c.id)}
-                  className={cn("min-h-9 rounded-full border px-3 text-xs font-medium", active === c.id && "bg-foreground text-background")}
-                  data-testid={`tab-${c.id}`}
-                >
-                  {c.kind === "decision" ? `${KIND_LABEL.decision} ${i + 1}` : KIND_LABEL[c.kind]} · {c.mode}
-                </button>
-              ))}
-            </div>
-            {clipTabs.map((c) => (
-              <div key={c.id} id={`panel-${c.id}`} role="tabpanel" hidden={active !== c.id} className="mt-3 space-y-2">
-                <p className="text-sm font-medium">{c.question}</p>
-                {hiddenClipIds.includes(c.id) && <p className="text-xs text-muted-foreground">The candidate hid this recording. The transcript is shown.</p>}
-                <ClipPlayer
-                  checkpoint={c}
-                  transcriptFirst={transcriptFirst}
-                  ref={(h) => {
-                    players.current[c.id] = h;
-                  }}
-                />
-                {c.retakeUsed && <p className="text-xs text-muted-foreground">Retake used</p>}
-              </div>
-            ))}
-          </section>
-        )}
 
         {!!card.consistency?.length && (
           // Collapsed by default so the card still fits one laptop screen.

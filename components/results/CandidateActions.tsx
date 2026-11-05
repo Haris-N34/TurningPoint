@@ -42,8 +42,8 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
     <div className="grid gap-6 lg:grid-cols-2">
       <p role="status" className="text-sm text-primary lg:col-span-2">{notice}</p>
       {card.realStory && (
-        <section aria-labelledby="w-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7" data-testid="witness-form">
-          <h2 id="w-h" className="font-display text-2xl">Add a witness (optional)</h2>
+        <section aria-labelledby="w-h" className="rounded-xl border bg-card p-5 shadow-card sm:p-6" data-testid="witness-form">
+          <h2 id="w-h" className="text-base font-semibold">Add a witness (optional)</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Someone who saw your real turning point. Employers see the relationship and their sentence, never their email.</p>
           {confirmationLine(card.realStory.witnesses) && <p className="mt-2 text-sm font-medium">{confirmationLine(card.realStory.witnesses)}</p>}
           <div className="mt-5 flex items-center justify-between gap-3">
@@ -95,7 +95,7 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
                   <option key={r} value={r}>{RELATIONSHIP_LABELS[r]}</option>
                 ))}
               </select>
-              <button className="min-h-11 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">Add</button>
+              <button className="min-h-11 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 justify-self-start">Add</button>
             </form>
           )}
           {err && <p role="alert" className="mt-2 text-sm text-destructive">{err}</p>}
@@ -108,8 +108,8 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
         </section>
       )}
 
-      <section aria-labelledby="share-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7" data-testid="share">
-        <h2 id="share-h" className="font-display text-2xl">Share with another employer</h2>
+      <section aria-labelledby="share-h" className="rounded-xl border bg-card p-5 shadow-card sm:p-6" data-testid="share">
+        <h2 id="share-h" className="text-base font-semibold">Share with another employer</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Same card, no replay. They see it was reused and which of their skills it covers.</p>
         <ul className="mt-3 space-y-2">
           {options.map(({ challenge, overlap }) => (
@@ -167,8 +167,8 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
         )}
       </section>
 
-      <section aria-labelledby="hide-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7">
-        <h2 id="hide-h" className="font-display text-2xl">Hide a clip</h2>
+      <section aria-labelledby="hide-h" className="rounded-xl border bg-card p-5 shadow-card sm:p-6">
+        <h2 id="hide-h" className="text-base font-semibold">Hide a clip</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Employers won&apos;t see the recording. The transcript stays, and can&apos;t be edited.</p>
         {!card.checkpoints.some((c) => c.media) && <p className="mt-4 text-sm text-muted-foreground">This card has no saved recordings to hide. Text answers remain part of your evidence.</p>}
         <ul className="mt-2 space-y-1">
@@ -185,8 +185,8 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
         </ul>
       </section>
 
-      <section aria-labelledby="del-h" className="rounded-2xl border border-destructive/40 bg-card p-5 sm:p-7">
-        <h2 id="del-h" className="font-display text-2xl">Delete everything</h2>
+      <section aria-labelledby="del-h" className="rounded-xl border border-destructive/30 bg-card p-5 sm:p-6">
+        <h2 id="del-h" className="text-base font-semibold">Delete everything</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Removes your profile, runs, cards, recordings, shares and witnesses from this device, right now.</p>
         <button
           className="mt-4 min-h-11 rounded-md bg-destructive px-4 py-2 font-medium text-destructive-foreground"

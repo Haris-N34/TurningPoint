@@ -60,7 +60,7 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
   };
 
   return (
-    <section aria-labelledby="ri-h" className="rounded-2xl border p-4" data-testid="resume-intake">
+    <section aria-labelledby="ri-h" className="rounded-xl border bg-card p-5 shadow-card" data-testid="resume-intake">
       <h2 id="ri-h" className="font-semibold">Add your resume (optional)</h2>
       <p className="text-sm opacity-80">
         We remove your name, contact details, photo, address, graduation years, and school and company names before anything is analyzed. Employers see
@@ -129,7 +129,7 @@ export function ResumeIntake({ card, onChange }: { card: Card; onChange: (c: Car
               {err}
             </p>
           )}
-          <button type="button" onClick={analyze} className="min-h-11 rounded-xl bg-foreground px-4 text-sm font-medium text-background" data-testid="resume-analyze">
+          <button type="button" onClick={analyze} className="min-h-11 rounded-lg border border-border bg-card px-5 text-sm font-medium shadow-xs transition-colors hover:bg-muted" data-testid="resume-analyze">
             Compare with my evidence
           </button>
         </div>

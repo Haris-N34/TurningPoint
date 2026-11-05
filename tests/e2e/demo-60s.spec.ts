@@ -12,6 +12,7 @@ test("one-minute demo: turning point, the checkpoint quotes the pick, the recrui
   // Tab 1: the game, prepared with the turning-point jump (fixed seed: the sponsor pulls out).
   await page.goto("/game/launch-week?jump=turning-point");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  const t0 = Date.now();
   await page.keyboard.press("Enter");
   await page.getByTestId("avatar-done").click();
   await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
@@ -29,6 +30,12 @@ test("one-minute demo: turning point, the checkpoint quotes the pick, the recrui
   await page.getByTestId("choice-b").click();
   await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose B, to keep Saturday and Sunday/);
+  // A presenter gets from Enter to the checkpoint in under 25 seconds (the test clicks faster than a person).
+  expect(Date.now() - t0).toBeLessThan(25_000);
+  // The scripted jump played a decent Monday and Tuesday: no evening recap popped, nothing ran out of time.
+  await expect(page.getByTestId("recap")).toHaveCount(0);
+  const st = await page.evaluate(() => (window as unknown as { __tp: { getState: () => { events: { kind: string; t: number }[]; morale: number } } }).__tp.getState());
+  expect(st.events.filter((e) => e.kind === "expired")).toEqual([]);
 
   // Tab 2: the recruiter card.
   const card = await context.newPage();

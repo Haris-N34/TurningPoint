@@ -48,7 +48,7 @@ export function BadgeExport({ card }: { card: Card }) {
   };
 
   return (
-    <section aria-labelledby="badge-h" className="rounded-2xl border p-4" data-testid="badge-export">
+    <section aria-labelledby="badge-h" className="rounded-xl border bg-card p-5 shadow-card" data-testid="badge-export">
       <h2 id="badge-h" className="font-semibold">Take your evidence with you</h2>
       <p className="text-sm opacity-80">
         Download a signed Open Badges 3.0 credential with your Strong and Some skills. Anyone can check it at{" "}
@@ -61,7 +61,7 @@ export function BadgeExport({ card }: { card: Card }) {
         <input type="checkbox" checked={withName} onChange={(e) => setWithName(e.target.checked)} />
         Put my name on it
       </label>
-      <button type="button" onClick={download} disabled={busy} className="mt-3 min-h-11 rounded-xl bg-foreground px-4 text-sm font-medium text-background" data-testid="badge-download">
+      <button type="button" onClick={download} disabled={busy} className="mt-3 min-h-11 rounded-lg border border-border bg-card px-5 text-sm font-medium shadow-xs transition-colors hover:bg-muted" data-testid="badge-download">
         {busy ? "Signing…" : "Download credential"}
       </button>
       {done && (
