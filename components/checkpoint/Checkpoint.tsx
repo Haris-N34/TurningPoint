@@ -47,6 +47,7 @@ const SKINS = {
     field: "mt-1 w-full rounded-2xl border p-3",
     panel: "rounded-2xl bg-black/[.04] dark:bg-white/[.06] p-4",
     calm: "text-sm opacity-80",
+    actions: "flex flex-wrap gap-2",
   },
   pixel: {
     overlay: "bg-[#2e222f]/75",
@@ -63,6 +64,8 @@ const SKINS = {
     field: "mt-1 w-full rounded-[4px] border-[3px] border-[#2e222f] bg-white p-3 text-[17px] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffd166]",
     panel: "rounded-[4px] border-2 border-[#2e222f] bg-white p-3",
     calm: "text-[14px] text-[#5a4a4a]",
+    // Game modals keep the primary action bottom right (first child sits rightmost).
+    actions: "flex flex-row-reverse flex-wrap gap-2",
   },
 } as const;
 
@@ -319,9 +322,11 @@ export function Checkpoint(p: Props) {
               </div>
             </fieldset>
             {deviceMsg && <p className={k.calm} role="status">{deviceMsg}</p>}
-            <button onClick={() => void beginAnswer()} className={k.primary} autoFocus>
-              I&apos;m ready, start answering
-            </button>
+            <div className={k.actions}>
+              <button onClick={() => void beginAnswer()} className={k.primary} autoFocus>
+                I&apos;m ready, start answering
+              </button>
+            </div>
           </div>
         )}
 
@@ -356,9 +361,11 @@ export function Checkpoint(p: Props) {
               </div>
             )}
             {mode !== "text" && <p className="text-sm opacity-80" aria-live="polite">Recording…</p>}
-            <button onClick={finishAnswer} className={k.primary} disabled={mode === "text" && !text.trim()}>
-              Done
-            </button>
+            <div className={k.actions}>
+              <button onClick={finishAnswer} className={k.primary} disabled={mode === "text" && !text.trim()}>
+                Done
+              </button>
+            </div>
           </div>
         )}
 
@@ -370,7 +377,7 @@ export function Checkpoint(p: Props) {
                 {result.transcript.text || "No words were picked up. Your recording is still saved, and a recruiter can play it."}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className={k.actions}>
               <button onClick={submit} className={k.primary} autoFocus>
                 Submit
               </button>
