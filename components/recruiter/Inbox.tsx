@@ -83,11 +83,11 @@ export function Inbox() {
 
   if (!challenges.length) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16">
+      <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <h1 className="font-display text-4xl">Your inbox is empty</h1>
         <p className="mt-3 text-muted-foreground">No published challenges yet. Create one as Admin, or load the demo employers.</p>
+        <div className="mt-6 flex flex-wrap gap-3">
         <Button
-          className="mt-6"
           onClick={() => {
             seedDemo(store());
             setVersion((v) => v + 1);
@@ -96,7 +96,7 @@ export function Inbox() {
           Load demo data
         </Button>
         <Button
-          className="ml-3 mt-6"
+          className="max-w-full whitespace-normal text-center"
           variant="outline"
           onClick={() => {
             seedImpactDemo(store());
@@ -105,6 +105,7 @@ export function Inbox() {
         >
           Load 200 fictional candidates (3 employers)
         </Button>
+        </div>
       </main>
     );
   }
