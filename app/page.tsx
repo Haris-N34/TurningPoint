@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { HeroPreview } from "@/components/site/HeroPreview";
 
 const steps = [
   { n: "01", title: "Step into a story.", text: "Lead a team. Make the calls. Work with limited time, money and information." },
@@ -23,24 +23,7 @@ export default function Home() {
           </div>
           <p className="mt-6 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground"><span>Free for candidates</span><span aria-hidden className="hidden sm:inline">·</span><span>Video, voice or text</span><span aria-hidden className="hidden sm:inline">·</span><span>A human makes every call</span></p>
         </div>
-        <div className="relative self-center rounded-2xl border border-border/60 bg-story p-6 sm:p-9" aria-label="Illustrated example of a turning point">
-          <div className="flex items-center justify-between border-b border-border pb-4 text-xs font-medium uppercase tracking-widest"><span>Launch Week</span><span className="text-muted-foreground">A sample story</span></div>
-          <div className="relative my-6 border-l-2 border-dashed border-input pl-6">
-            <span aria-hidden className="absolute -left-[7px] top-1 size-3 rounded-full border-2 border-input bg-story" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">The plan</p>
-            <p className="mt-2 text-lg">Three weeks. One market. A team counting on you.</p>
-          </div>
-          <div className="-mx-2 rotate-[-2deg] rounded-lg bg-primary p-6 text-primary-foreground shadow-card sm:-mx-5">
-            <p className="text-xs font-medium uppercase tracking-widest">↳ The turning point</p>
-            <p className="mt-3 font-display text-3xl leading-tight">Your sponsor just pulled out.</p>
-            <p className="mt-3 text-sm">Less budget. Same promise to your community.</p>
-          </div>
-          <div className="mt-7 border-l-2 border-foreground pl-6">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Your next move</p>
-            <p className="mt-2 text-lg font-medium">What do you protect? What do you change?</p>
-            <div className="mt-4 flex flex-wrap gap-2"><Badge variant="outline">Adaptability</Badge><Badge variant="outline">Prioritization</Badge></div>
-          </div>
-        </div>
+        <HeroPreview />
       </section>
       <section className="border-y border-border bg-card">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-10 sm:py-20">

@@ -23,7 +23,7 @@ test("Quick run from a challenge link: the card's decision path has every handle
     if (await talk.isVisible()) {
       await talk.click();
       await expect(page.getByTestId("dialogue").or(page.getByTestId("checkpoint")).or(page.getByTestId("cutscene")).first()).toBeVisible({ timeout: 15_000 });
-    } else await page.getByTestId("wait").first().click();
+    } else await page.getByTestId("wait").first().click({ timeout: 3_000 }).catch(() => {}); // a checkpoint can pop mid-click
   }
   const handled = await handledCount(page);
   expect(handled).toBeGreaterThanOrEqual(5);

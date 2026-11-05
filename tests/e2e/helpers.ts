@@ -127,3 +127,13 @@ export async function playToEnd(page: Page, mode: Mode = "text") {
   }
   throw new Error("did not reach the end");
 }
+
+/** Ctrl+Shift+D opens the demo panel. Under load the key can land before the page hydrates, so press until it shows. */
+export async function openDemoPanel(page: Page) {
+  const panel = page.getByTestId("demo-panel");
+  await expect(async () => {
+    if (!(await panel.isVisible())) await page.keyboard.press("Control+Shift+D");
+    await expect(panel).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  return panel;
+}
