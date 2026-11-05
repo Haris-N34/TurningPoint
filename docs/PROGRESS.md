@@ -197,3 +197,5 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - M0 accepted by Div on Board #1 (2026-11-04): foundation PRs #32 to #34 merged into main. #25 deployment deferred until the product is done. #11 to #15 may proceed. Recruiter and employer screens #16 to #18 are delegated to Div.
 
+
+- #20 comparison implementation is ready for review: two or three shared cards, guarded anonymous profiles and source-linked transcripts by checkpoint type. Includes a phone table-overflow fix. Fairness and 200 synthetic candidates are in PR #51 under #47, awaiting integration. E4.1/E7 acceptance remains unchecked pending CI and review.
