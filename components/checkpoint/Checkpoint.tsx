@@ -260,7 +260,7 @@ export function Checkpoint(p: Props) {
     const integrity: IntegrityNote[] = [];
     const lost = Math.round(focusLostMs.current / 1000);
     if (lost > 0) integrity.push({ checkpointId: p.id, kind: "focus_lost", detail: `Window lost focus for ${lost} second${lost === 1 ? "" : "s"} during the answer` });
-    if (retakes > 0) integrity.push({ checkpointId: p.id, kind: "retake_used", detail: "Retake used" });
+    if (retakes > 0) integrity.push({ checkpointId: p.id, kind: "retake_used", detail: "Answered on the second take" });
     // Fixing misheard words is allowed before submit (C7.2 forbids edits after). Recruiters see that it happened and the original.
     const recognized = mode === "text" ? undefined : result.transcript.text;
     const changed = recognized === undefined || transcript.text === recognized ? 0 : wordsChanged(recognized, transcript.text);
@@ -297,6 +297,12 @@ export function Checkpoint(p: Props) {
     e.preventDefault();
     if (e.type === "paste") setPasteBlocked(true);
   };
+
+  const retakeBtn = retakes < MAX_RETAKES && (
+    <button onClick={retake} className={s.plain}>
+      Retake ({MAX_RETAKES - retakes} left)
+    </button>
+  );
 
   const label = p.title ?? (p.kind === "real_life" ? "Real-life checkpoint" : p.kind === "follow_up" ? "One follow-up" : "Checkpoint");
   const recording = phase === "answer" && mode !== "text";
@@ -446,9 +452,11 @@ export function Checkpoint(p: Props) {
                 {deviceMsg}
               </p>
             )}
-            <button onClick={() => void beginAnswer()} className={s.primary} autoFocus>
-              I&apos;m ready, start answering
-            </button>
+            <div className={cn(game && "flex justify-end")}>
+              <button onClick={() => void beginAnswer()} className={s.primary} autoFocus>
+                I&apos;m ready, start answering
+              </button>
+            </div>
           </div>
         )}
 
@@ -483,9 +491,11 @@ export function Checkpoint(p: Props) {
                 {deviceMsg}
               </p>
             )}
-            <button onClick={finishAnswer} className={s.primary} disabled={mode === "text" && !text.trim()} autoFocus={mode !== "text"}>
-              Done
-            </button>
+            <div className={cn(game && "flex justify-end")}>
+              <button onClick={finishAnswer} className={s.primary} disabled={mode === "text" && !text.trim()} autoFocus={mode !== "text"}>
+                Done
+              </button>
+            </div>
           </div>
         )}
 
@@ -526,15 +536,13 @@ export function Checkpoint(p: Props) {
                 )}
               </div>
             )}
-            <div className="flex flex-wrap gap-2">
+            {/* In the game the primary action sits bottom right like every game modal, with Retake to its left. */}
+            <div className={cn("flex flex-wrap gap-2", game && "justify-end")}>
+              {game && retakeBtn}
               <button onClick={submit} className={s.primary} autoFocus>
                 Submit
               </button>
-              {retakes < MAX_RETAKES && (
-                <button onClick={retake} className={s.plain}>
-                  Retake ({MAX_RETAKES - retakes} left)
-                </button>
-              )}
+              {!game && retakeBtn}
             </div>
           </div>
         )}

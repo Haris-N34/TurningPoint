@@ -72,8 +72,9 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   await scriptedSpeech(page, [
     [
       { at: 200, type: "interim", text: "I cut the" },
-      { at: 900, type: "final", text: "I cut the second weekend" },
-      { at: 1300, type: "end" }, // browser ends recognition by itself (silence)
+      // Interim words stay up for a few seconds so a slow test machine still sees them.
+      { at: 4000, type: "final", text: "I cut the second weekend" },
+      { at: 4400, type: "end" }, // browser ends recognition by itself (silence)
     ],
     [
       { at: 300, type: "interim", text: "because vendors" },
@@ -84,8 +85,8 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   await expect(cp.getByTestId("mic-meter")).toBeVisible();
   await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "listening");
   await expect(cp.getByTestId("interim")).toHaveText("I cut the");
-  await expect(cp.getByTestId("live-captions")).toContainText("I cut the second weekend");
-  await expect(cp.getByTestId("live-captions")).toContainText("because vendors were the draw", { timeout: 5000 });
+  await expect(cp.getByTestId("live-captions")).toContainText("I cut the second weekend", { timeout: 8000 });
+  await expect(cp.getByTestId("live-captions")).toContainText("because vendors were the draw", { timeout: 10_000 });
   expect(await page.evaluate(() => (window as unknown as { __recStarts: number }).__recStarts)).toBeGreaterThanOrEqual(2);
 
   await cp.getByRole("button", { name: "Done" }).click();
@@ -296,6 +297,19 @@ test("demo path: camera already allowed, the first checkpoint opens on camera wi
   // The think timer is already running: no extra click, no waiting on a prompt.
   await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
   await expect(cp.getByRole("button", { name: /start answering/i })).toBeVisible();
+  // Game modals keep the primary action bottom right.
+  const card = (await cp.locator("> div").first().boundingBox())!;
+  const btn = (await cp.getByRole("button", { name: /start answering/i }).boundingBox())!;
+  expect(card.x + card.width - (btn.x + btn.width)).toBeLessThan(40);
+});
+
+test("recruiter card words a retake neutrally", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "one size is enough");
+  await page.goto("/demo/seed");
+  await expect(page.getByTestId("seeded")).toBeVisible();
+  await page.goto("/recruiter/card/att_demo_maya?challenge=ch_demo_energy");
+  await expect(page.getByTestId("integrity")).toContainText("Answered on the second take");
+  await expect(page.getByTestId("capability-card")).not.toContainText("Retake used");
 });
 
 test("demo path: camera and mic refused, the first checkpoint opens calmly in text", async ({ page }, info) => {
