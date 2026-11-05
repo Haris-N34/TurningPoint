@@ -34,7 +34,9 @@ test("compare view: pick 2 or 3 cards, evidence and answers side by side in the 
   const cp2 = await compare.getByTestId("compare-row-decision-1").locator("p.leading-relaxed").allInnerTexts();
   expect(new Set(cp2).size).toBeGreaterThan(1);
 
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  // Compare with the device viewport, not innerWidth: mobile browsers widen the layout viewport to fit wide content.
+  const width = page.viewportSize()!.width;
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
 });

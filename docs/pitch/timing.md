@@ -32,7 +32,7 @@ The video follows `demo-script.md` exactly, so the talker keeps the same lines. 
 
 | # | Video time | Route | Shot |
 | --- | --- | --- | --- |
-| 1 | 0:00 | `/game/launch-week` | Title screen, map animating, 10 s |
+| 1 | 0:00 | `/game/launch-week` | Title screen (still map, slow pan), 10 s |
 | 2 | 0:15 | `/admin/new` | Type company and role, Next, type the three skills, Map to framework, accept all three, Next, Next, Publish. Hold on link, job code and QR |
 | 3 | 0:50 | `/game/launch-week` | Settings, Turn-based, Start, avatar Done, map with the issue tracker |
 | 4 | 1:05 | same | Go to Priya, dialogue with portrait, pick C, checkpoint quotes the choice. Hold 3 s on the question |

@@ -94,7 +94,12 @@ export function Compare() {
                 return (
                   <div key={c.attemptId} className="border-b border-l p-3">
                     <LevelBadge level={cell.level} />
-                    {cell.quote && <blockquote className="mt-2 border-l-2 border-primary/40 pl-2 text-xs text-muted-foreground">&ldquo;{cell.quote}&rdquo;</blockquote>}
+                    {cell.quote && (
+                      <a href={cell.checkpointId ? `#cmp-${c.attemptId}-${cell.checkpointId}` : undefined} className="mt-2 block border-l-2 border-primary/40 pl-2 text-xs text-muted-foreground underline-offset-2 hover:underline" data-testid="compare-source">
+                        &ldquo;{cell.quote}&rdquo;
+                        {cell.startS !== undefined && ` · ${Math.floor(cell.startS / 60)}:${String(Math.floor(cell.startS % 60)).padStart(2, "0")}`}
+                      </a>
+                    )}
                   </div>
                 );
               })}
@@ -109,12 +114,12 @@ export function Compare() {
               <div key={`${row.kind}-${row.slot}`} className="contents" data-testid={`compare-row-${row.kind}-${row.slot}`}>
                 <div className="sticky left-0 z-10 border-b bg-card p-3 font-medium">{ROW_LABEL[row.kind]}{many ? ` ${n}` : ""}</div>
                 {row.answers.map((a, j) => (
-                  <div key={columns[j].attemptId} className="border-b border-l p-3">
+                  <div key={columns[j].attemptId} id={a ? `cmp-${columns[j].attemptId}-${a.checkpointId}` : undefined} className="scroll-mt-6 border-b border-l p-3">
                     {a ? (
                       <>
                         <p className="text-xs text-muted-foreground">{a.question}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{MODE_LABEL[a.mode]} answer · transcript</p>
-                        <p className="mt-2 leading-relaxed">{a.text}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{MODE_LABEL[a.mode]} answer · transcript{a.hidden ? " · recording hidden by candidate" : ""}</p>
+                        <p className="mt-2 leading-relaxed">{a.ready ? a.text || "No transcript text recorded." : "Transcript pending or unavailable."}</p>
                       </>
                     ) : (
                       <p className="text-xs text-muted-foreground">No answer of this type</p>

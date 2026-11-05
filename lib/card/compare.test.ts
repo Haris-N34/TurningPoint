@@ -67,6 +67,19 @@ describe("E4.1 compare view", () => {
     }
   });
 
+  it("links each quote to its source answer and timestamp, and marks pending transcripts (from #53)", () => {
+    const { s, base } = setup();
+    s.saveCard({ ...s.getCard("b")!, checkpoints: base.checkpoints.map((c, i) => (i === 0 ? { ...c, transcript: { ...c.transcript, status: "pending" as const } } : c)) });
+    const r = compareFor(s, CH, ["a", "b"], [...SKILLS]);
+    if (!r.ok) throw new Error(r.reason);
+    for (const x of r.columns[0].skills.filter((k) => k.quote)) {
+      expect(base.checkpoints.some((c) => c.id === x.checkpointId)).toBe(true);
+      expect(typeof x.startS).toBe("number");
+    }
+    expect(r.rows[0].answers[0]!.ready).toBe(true);
+    expect(r.rows[0].answers[1]!.ready).toBe(false);
+  });
+
   it("respects anonymous review and blocks withdrawn cards", () => {
     const { s } = setup();
     const r = compareFor(s, CH, ["a", "b"], [...SKILLS]);

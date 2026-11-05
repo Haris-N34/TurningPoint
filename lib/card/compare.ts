@@ -17,10 +17,10 @@ export type CompareColumn = {
   adjustedTiming: boolean;
   witnessConfirmed: boolean;
   /** One entry per employer skill, in the employer's order. Only verified quotes survive. */
-  skills: { skill: SkillSlug; level: Evidence["level"]; quote?: string }[];
+  skills: { skill: SkillSlug; level: Evidence["level"]; quote?: string; checkpointId?: string; startS?: number }[];
 };
 
-export type CompareAnswer = { checkpointId: string; question: string; mode: CardCheckpoint["mode"]; text: string } | undefined;
+export type CompareAnswer = { checkpointId: string; question: string; mode: CardCheckpoint["mode"]; text: string; ready: boolean; hidden: boolean } | undefined;
 
 /** One row per checkpoint slot (first decision, second decision, real life, follow-up). */
 export type CompareRow = { kind: CardCheckpoint["kind"]; slot: number; answers: CompareAnswer[] };
@@ -51,7 +51,8 @@ export function compareFor(s: Store, challengeId: string, attemptIds: string[], 
       witnessConfirmed: !!card.realStory?.witnesses.some((w) => w.status === "confirmed"),
       skills: employerSkills.map((skill) => {
         const e = evidence.find((x) => x.skill === skill);
-        return { skill, level: e?.level ?? "not_observed", quote: e?.source?.type === "clip" ? e.source.quote : undefined };
+        const clip = e?.source?.type === "clip" ? e.source : undefined;
+        return { skill, level: e?.level ?? "not_observed", quote: clip?.quote, checkpointId: clip?.checkpointId, startS: clip?.startS };
       }),
     };
   });
@@ -65,7 +66,7 @@ export function compareFor(s: Store, challengeId: string, attemptIds: string[], 
         slot,
         answers: perCard.map((list) => {
           const c = list[slot];
-          return c ? { checkpointId: c.id, question: c.question, mode: c.mode, text: c.transcript.text } : undefined;
+          return c ? { checkpointId: c.id, question: c.question, mode: c.mode, text: c.transcript.text, ready: c.transcript.status === "ready", hidden: !!c.hidden } : undefined;
         }),
       });
     }
