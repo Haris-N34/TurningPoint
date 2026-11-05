@@ -2,7 +2,7 @@
   "id": "launch-week",
   "version": 2,
   "title": "Launch Week",
-  "summary": "Run a 5-day pop-up community market with a local non-profit. Problems pop up all over the site and the clock is running. Midweek, the plan breaks.",
+  "summary": "Spend five weekdays preparing a weekend community market with a local non-profit. Problems appear across the site and the clock is running. Midweek, the plan breaks.",
   "role": "Student lead",
   "industryFlavour": "non-profit",
   "targetSkills": [
@@ -289,7 +289,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks.",
+          "text": "Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
           "expression": "worried"
         }
       ],
@@ -316,7 +316,7 @@
           "reaction": {
             "emote": "heart",
             "expression": "happy",
-            "line": "That feels fair. They'll show up for it."
+            "line": "I can pair an experienced volunteer with someone new. That gives us cover."
           },
           "minutes": 15
         },
@@ -504,7 +504,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
+          "text": "Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
           "expression": "worried"
         }
       ],
@@ -524,7 +524,7 @@
         },
         {
           "id": "b",
-          "label": "Ask them to swap and thank them publicly",
+          "label": "Ask who can swap into clean-up, then confirm the revised shifts",
           "effects": {
             "morale": 6
           },
@@ -554,7 +554,7 @@
       "lines": [
         {
           "who": "kenji",
-          "text": "I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
+          "text": "I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
           "expression": "angry"
         }
       ],
@@ -574,7 +574,7 @@
         },
         {
           "id": "b",
-          "label": "Give him the 20%",
+          "label": "Pay the extra $400 to keep Kenji",
           "effects": {
             "budget": -400,
             "trust.vendors": -3
@@ -588,7 +588,7 @@
         },
         {
           "id": "c",
-          "label": "Split the difference: 10% and a smaller stall",
+          "label": "Offer $200 more and a smaller stall",
           "effects": {
             "budget": -200,
             "trust.vendors": 2
@@ -662,7 +662,7 @@
           "reaction": {
             "emote": "note",
             "expression": "happy",
-            "line": "Smart. It costs nothing."
+            "line": "I'll ask what they can share. We need to get them the details today."
           }
         }
       ]
@@ -725,7 +725,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "The sponsor money is gone. The plan on the screen doesn't add up any more.",
+          "text": "The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left.",
           "expression": "worried"
         }
       ],
@@ -733,7 +733,7 @@
       "options": [
         {
           "id": "a",
-          "label": "One market day instead of two; protect vendor access and food safety",
+          "label": "Run Saturday only; protect vendor access and food safety",
           "effects": {
             "morale": 4
           },
@@ -747,7 +747,7 @@
         },
         {
           "id": "b",
-          "label": "Keep both days, cut promotion, decorations and the stage",
+          "label": "Keep Saturday and Sunday; cut promotion, decorations and the stage",
           "effects": {
             "morale": -4,
             "trust.community": -4
@@ -763,7 +763,7 @@
         },
         {
           "id": "c",
-          "label": "Delay two days and rebuild the plan with partners",
+          "label": "Move the market back two days and rebuild with partners",
           "effects": {
             "morale": -6,
             "trust.vendors": -6
@@ -779,7 +779,7 @@
         },
         {
           "id": "d",
-          "label": "Keep everything and hope a sponsor turns up",
+          "label": "Keep the full programme while seeking replacement funding",
           "effects": {
             "morale": 2
           },
@@ -848,7 +848,7 @@
       "lines": [
         {
           "who": "rosa",
-          "text": "Is the market still on? I've ordered flour for two days.",
+          "text": "Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier.",
           "expression": "worried"
         }
       ],
@@ -875,7 +875,7 @@
           "reaction": {
             "emote": "question",
             "expression": "worried",
-            "line": "You don't look fine."
+            "line": "I still need dates and stall details before I can plan."
           }
         },
         {
@@ -898,7 +898,7 @@
       "lines": [
         {
           "who": "dana",
-          "text": "The credit union down the street might put in $800, if we pitch it this afternoon.",
+          "text": "The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
           "expression": "happy"
         }
       ],
@@ -947,7 +947,7 @@
       "lines": [
         {
           "who": "dana",
-          "text": "Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it.",
+          "text": "Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?",
           "expression": "angry"
         }
       ],
@@ -955,7 +955,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Ask what she'd change first, and change it",
+          "label": "Ask which change matters most, then add a free children's activity",
           "effects": {
             "trust.partner": 10,
             "trust.community": 6
@@ -971,7 +971,7 @@
         },
         {
           "id": "b",
-          "label": "Explain why the plan looks like this",
+          "label": "Defend the existing plan and keep the programme unchanged",
           "effects": {
             "trust.partner": -4
           },
@@ -1055,7 +1055,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Rain is forecast for Saturday morning. Forty percent.",
+          "text": "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
           "expression": "worried"
         }
       ],
@@ -1075,7 +1075,7 @@
         },
         {
           "id": "b",
-          "label": "Go ahead outdoors and hope",
+          "label": "Keep the outdoor layout and accept the rain risk",
           "effects": {},
           "reaction": {
             "emote": "sweat",
@@ -1168,7 +1168,7 @@
         },
         {
           "id": "b",
-          "label": "Ask Dana's non-profit to vouch for us",
+          "label": "Ask Dana to arrange an urgent filing through the non-profit",
           "effects": {
             "trust.partner": -4
           },
@@ -1193,7 +1193,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Match half of what he asked",
+          "label": "Offer the extra $200 as a final compromise",
           "effects": {
             "budget": -200,
             "trust.vendors": 2
@@ -1660,7 +1660,7 @@
         "id": "venue-cancels",
         "title": "The venue cancels",
         "caller": "dana",
-        "text": "The city just pulled our site permit for Saturday. We need a new plan, fast.",
+        "text": "The site owner has cancelled our booking. The replacement venue costs more, so we have less money for the programme. We need to rework the weekend.",
         "budgetCut": 0.3,
         "effects": {
           "morale": -12,
@@ -1676,7 +1676,7 @@
         "id": "lead-volunteer-quits",
         "title": "Your lead volunteer leaves",
         "caller": "priya",
-        "text": "I got the paid internship. I start Thursday. I'm so sorry to leave you like this.",
+        "text": "I got the paid internship and start Thursday. I need to hand over my shifts. Paid cover will take part of the budget, but I can brief someone today.",
         "budgetCut": 0.2,
         "effects": {
           "morale": -25
