@@ -30,7 +30,7 @@ export function AddonRequest({ attemptId, challengeId, employerSkills, cardSkill
           <p className="text-xs text-muted-foreground">Add-on answers, in the candidate&apos;s own words. Evidence levels only, no score.</p>
           {addon.evidence.map((e) => (
             <div key={e.skill}>
-              <p className="flex items-center gap-2 font-medium">{skillName(e.skill)} <LevelBadge level={e.level} /></p>
+              <div className="flex items-center gap-2 font-medium">{skillName(e.skill)} <LevelBadge level={e.level} /></div>
               {addon.answers[e.skill] && <blockquote className="mt-1 border-l-2 pl-3">{addon.answers[e.skill]}</blockquote>}
             </div>
           ))}

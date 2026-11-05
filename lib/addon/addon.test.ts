@@ -49,6 +49,9 @@ describe("E8.2 short add-on", () => {
     const done = completeAddon(s, a.id, answers);
     expect(done.status).toBe("done");
     expect(done.evidence.map((e) => e.skill).sort()).toEqual([...a.skills].sort());
+    // An answer that gives a reason is evidence, not "needs review".
+    expect(done.evidence.some((e) => e.level === "strong" || e.level === "some")).toBe(true);
+    expect(done.evidence.every((e) => e.level !== "needs_review")).toBe(true);
     for (const e of done.evidence) {
       if (e.source?.type === "clip") expect(answers[e.skill]).toContain(e.source.quote);
     }

@@ -40,7 +40,7 @@ export function AddonRun({ id }: { id: string }) {
   if (addon.status === "done")
     return (
       <main className="mx-auto max-w-2xl space-y-3 p-6" data-testid="addon-sent">
-        <h1 className="text-2xl font-semibold">Add-on sent</h1>
+        <h1 className="font-display text-4xl">Add-on sent</h1>
         <p>Only the employer who asked sees these answers, next to your card.</p>
         <Link className="underline" href="/candidate">Back to your home</Link>
       </main>
@@ -51,7 +51,7 @@ export function AddonRun({ id }: { id: string }) {
   return (
     <main className="mx-auto max-w-2xl space-y-4 p-6" data-testid="addon-run">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Short add-on</h1>
+        <h1 className="font-display text-4xl">Short add-on</h1>
         <p className="tabular-nums" role="timer" aria-label="Time left">{mm}:{ss}</p>
       </div>
       <p className="rounded-xl border bg-card p-4">{ADDON_SITUATION}</p>

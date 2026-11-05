@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { extractEvidence } from "@/lib/ai/evidence";
+import { fromTyping } from "@/lib/checkpoint/transcript";
 import { EvidenceSchema, type Card, type Evidence } from "@/lib/card/types";
 import { SKILL_SLUGS, type SkillSlug } from "@/lib/engine/skills";
 import type { Store } from "@/lib/store/store";
@@ -78,7 +79,7 @@ export function completeAddon(s: Store, id: string, answers: Partial<Record<Skil
   const evidence: Evidence[] = a.skills.flatMap((sk) =>
     extractEvidence({
       targetSkills: [sk],
-      checkpoints: clean[sk] ? [{ id: `${a.id}:${sk}`, nodeId: `addon:${sk}`, kind: "decision", transcript: { text: clean[sk], words: [], status: "ready" } }] : [],
+      checkpoints: clean[sk] ? [{ id: `${a.id}:${sk}`, nodeId: `addon:${sk}`, kind: "decision", transcript: fromTyping(clean[sk], []) }] : [],
       decisionPath: [],
       nodeSkills: { [`addon:${sk}`]: [sk] },
     }),
