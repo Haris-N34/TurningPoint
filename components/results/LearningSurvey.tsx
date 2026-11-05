@@ -25,7 +25,7 @@ export function LearningSurvey({ attemptId }: { attemptId: string }) {
           ))}
         </div>
       </fieldset>
-      <p role="status" className="mt-3 text-sm">{rating ? "Thanks. Your answer is saved on this device only." : ""}</p>
+      <p aria-live="polite" className="mt-3 text-sm">{rating ? "Thanks. Your answer is saved on this device only." : ""}</p>
     </section>
   );
 }

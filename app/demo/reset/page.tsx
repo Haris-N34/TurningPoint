@@ -13,7 +13,7 @@ export default function ResetPage() {
   }, []);
   return (
     <main className="mx-auto max-w-xl space-y-4 px-4 py-10">
-      <h1 className="text-2xl font-semibold">{done ? "Demo reset" : "Resetting…"}</h1>
+      <h1 className="font-display text-4xl">{done ? "Demo reset" : "Resetting…"}</h1>
       {done && (
         <>
           <p data-testid="demo-reset-done">All local data cleared. Demo employers and Maya&apos;s card reloaded.</p>

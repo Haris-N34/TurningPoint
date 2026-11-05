@@ -38,18 +38,19 @@ The video follows `demo-script.md` exactly, so the talker keeps the same lines. 
 | 4 | 1:05 | same | Go to Priya, dialogue with portrait, pick C, checkpoint quotes the choice. Hold 3 s on the question |
 | 5 | 1:20 | same | Answer in text, Done, Submit |
 | 6 | 1:40 | same | Wait for news, Rosa's issue, Defer, "Something more urgent first" |
-| 7 | 2:00 | same | Phone call cutscene, Hang up, budget drain, Face it, Recovery plan at HQ |
-| 8 | 2:30 | `/recruiter` | Anonymous row "Candidate 4F7K", open the card |
-| 9 | 2:40 | `/recruiter/card/att_demo_maya?challenge=ch_demo_energy` | Click the Prioritization quote (clip tab switches), open Said vs did, Shortlist, name appears |
-| 10 | 3:10 | same | Ask about this candidate: "Where did they show prioritization?", click citation, then "Should I hire her?" refused |
-| 11 | 3:35 | `/admin/impact` | Load 200 fictional candidates, fairness flag, an Awaiting data tile |
+| 7 | 2:00 | same | Phone call cutscene, Hang up, budget drain, Face it, the new recovery issue |
+| 8 | 2:25 | `/admin/integrations` | Reject at resume screen on Maya's application, webhook log shows the Second Look line |
+| 9 | 2:45 | `/recruiter?challenge=ch_demo_energy` | Second Look queue, Open card, Restore |
+| 10 | 3:00 | `/recruiter/card/att_demo_maya?challenge=ch_demo_energy` | Click the Prioritization quote, Resume vs Evidence, Final score breakdown, Shortlist, name appears |
+| 10b | 3:25 | same | Ask about this candidate: "Where did they show prioritization?", click citation, then "Should I hire her?" refused |
+| 11 | 3:40 | `/admin/impact` | Load 200 fictional candidates, fairness flag, an Awaiting data tile |
 | 12 | 3:55 | - | Black card with the pitch line, 5 s |
 
-Optional extra shots, only if merged before recording: Ctrl+Shift+D demo panel jump (claude/v2-m5), Second Look restore and Resume vs Evidence (claude/v2-integrations).
+Before shot 1: reset with Ctrl+Shift+D, Reset everything; add the demo resume; start a fresh demo tenant (`demo-script.md`, Setup).
 
 ### Before recording
 
-1. Reset (`demo-script.md`, "Reset"), then `/demo/seed`.
+1. Setup steps 3 to 5 in `demo-script.md` (reset, resume, fresh tenant).
 2. Run `pnpm e2e tests/e2e/demo-script.spec.ts --project=desktop --repeat-each=2`. Record only when it is green.
 3. Hide the Next.js dev indicator: record from a production build (`pnpm build && pnpm start`).
 4. Check the disruption in the turning-point shot matches what the talker says.

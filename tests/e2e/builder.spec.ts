@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { startMapGame, toChoices } from "./mapHelpers";
 
-test("admin builds, tailors, edits, previews and publishes a challenge (E1)", async ({ page, context }) => {
+const EDITED = "Two field techs asked for the site briefing. Nobody has taken deliveries or set-up yet.";
+
+test("admin builds, tailors, edits, previews and publishes a map challenge (E1)", async ({ page, context }) => {
+  test.setTimeout(120_000);
   const started = Date.now();
   await page.goto("/admin");
   await expect(page.getByTestId("admin-home")).toBeVisible();
@@ -27,23 +31,24 @@ test("admin builds, tailors, edits, previews and publishes a challenge (E1)", as
   await expect(page.getByTestId("template-launch-week")).toContainText("minutes");
   await page.getByLabel("Industry flavour").selectOption("Energy");
   await expect(page.getByTestId("tailor-note")).toContainText("Rewritten for Energy");
-  await expect(page.getByTestId("tailored-opening")).toContainText(/energy fair/i);
+  await expect(page.getByTestId("tailored-opening")).toContainText(/community energy fair/i);
+  await expect(page.getByTestId("builder")).toHaveAttribute("data-format", "map");
   await next.click();
 
-  // Step 4: inline edit and checkpoint eligibility (E1.4); validation blocks publish
-  await page.getByTestId("text-n1").fill("Three weeks before opening, you lead a small field team running a community energy fair.");
-  for (const id of ["n3", "n6", "n9", "n10", "n12"]) {
-    const box = page.getByTestId(`eligible-${id}`);
-    if (await box.count()) await box.uncheck();
-  }
+  // Step 4: inline edit of the map's dialogue and checkpoint eligibility (E1.4); validation blocks publish
+  await expect(page.getByTestId("line-n-roles-0")).toContainText("site safety briefings"); // tailored map text
+  await page.getByTestId("line-n-roles-0").fill(EDITED);
+  const boxes = page.locator('[data-testid^="eligible-"]');
+  for (let i = 0; i < (await boxes.count()); i++) await boxes.nth(i).uncheck();
   await expect(page.getByTestId("builder-errors")).toContainText("at least 3 checkpoint-eligible");
   await expect(page.getByRole("button", { name: "Publish" })).toBeDisabled();
-  for (const id of ["n3", "n6", "n9"]) await page.getByTestId(`eligible-${id}`).check();
+  for (const id of ["roles", "vendor-mix", "recovery-plan"]) await page.getByTestId(`eligible-${id}`).check();
   await expect(page.getByTestId("builder-errors")).toBeHidden();
 
   // Preview as candidate in a sandbox (E1.5)
   const [preview] = await Promise.all([context.waitForEvent("page"), page.getByTestId("preview").click()]);
   await expect(preview.getByText("Preview as candidate")).toBeVisible();
+  await expect(preview.getByTestId("title-screen")).toBeVisible();
   await preview.close();
 
   // Publish: link, job code, QR (E1.6)
@@ -52,10 +57,16 @@ test("admin builds, tailors, edits, previews and publishes a challenge (E1)", as
   await expect(page.getByTestId("job-code")).toHaveText(/^TP-[A-Z2-9]{5}$/);
   await expect(page.getByTestId("qr")).toBeVisible();
 
-  // The edited line reaches candidates.
+  // The tailored setting and the edited line reach candidates in the map game.
   await page.getByRole("link", { name: "Open candidate link" }).click();
-  await page.getByRole("button", { name: "I agree, start" }).click();
-  await expect(page.getByTestId("narration")).toContainText("small field team");
+  await expect(page.getByTestId("title-brief")).toContainText("Prairie Grid Energy · Field Operations Analyst");
+  await expect(page.getByTestId("title-brief")).toContainText(/community energy fair/i);
+  await startMapGame(page);
+  await page.getByTestId("list-talk-roles").click();
+  await expect(page.getByTestId("dialogue")).toBeVisible();
+  await page.keyboard.press("Enter"); // skip the typewriter
+  await expect(page.getByTestId("dialogue-text")).toContainText(EDITED);
+  await toChoices(page);
 
   // E1.7 proxy: a scripted first run of the whole setup is far under 10 minutes.
   expect(Date.now() - started).toBeLessThan(10 * 60_000);

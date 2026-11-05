@@ -3,7 +3,7 @@
 Draft for Haris to review. 11 slides. Live demo sits between slides 5 and 6.
 Screenshots are in `docs/screens/`. Numbers come from the research brief in `CONTEXT.md`; check each source before the slide goes final.
 
-Rules for every slide: the Final score sorts and never filters, no auto-reject, no feature that is not in `main` on pitch day. Items marked **[unmerged]** are on a branch today and come off the slide if they are not merged.
+Rules for every slide: the Final score sorts and never filters, no auto-reject, no feature that is not in `main` on pitch day.
 
 ---
 
@@ -102,6 +102,7 @@ See `demo-script.md`. Return to slide 6 after the close line.
 - Every AI sentence links to the exact quote and second.
 - Decision path with the turning point marked.
 - Real story, witness line, integrity notes "for context, not scored".
+- Resume vs Evidence: resume claims are "Claimed", game items "Observed". A claim is "Backed by game evidence" or "Not yet shown", never "false".
 - Evidence first. A Final score only sorts the list, shows its breakdown, and never hides or rejects anyone. Shortlist, Hold or Pass. A pass needs a reason.
 
 **Screenshot:** `results-desktop.png` (crop to the card: skill evidence, decision path, answers)
@@ -132,11 +133,11 @@ See `demo-script.md`. Return to slide 6 after the close line.
 - Publish a link, job code and QR in minutes.
 - Candidates: one card, shared with any employer, no replay. Revoke any share. Delete everything.
 - Mock ATS export with a link back to the card.
-- **[unmerged]** Second Look: a candidate the resume screen rejected, with Strong evidence, comes back for a human look.
+- Second Look: a candidate the ATS rejected at the resume screen, with Strong evidence in 2+ of the employer's skills, goes back to a person to restore or confirm the pass with a reason.
 
 **Screenshots:** `m35-value-mapper.png`, `witness-desktop.png` (small)
 
-**Notes:** Portability is the network effect. The shared framework is what lets a card mean the same thing at two employers. Drop the Second Look line if `claude/v2-integrations` is not merged.
+**Notes:** Portability is the network effect. The shared framework is what lets a card mean the same thing at two employers.
 
 ---
 

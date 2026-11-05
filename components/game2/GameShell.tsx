@@ -16,6 +16,7 @@ import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
 import { scenarioForRun } from "@/lib/ai/services/publish";
+import { applyMapOverrides, type MapOverrides } from "@/lib/challenge/mapTailor";
 import { useGame } from "@/lib/game/store";
 import { parseTime } from "@/lib/game/time";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -38,8 +39,9 @@ function newAttemptId() {
   return "att_" + r.replace(/-/g, "").slice(0, 10);
 }
 
-export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean }) {
-  const scenario = useMemo(() => getMapScenario(mapId)!, [mapId]);
+export function GameShell({ mapId, challenge, sandbox = false, overrides }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean; overrides?: MapOverrides }) {
+  // The employer's wording and checkpoint edits (E1.3, E1.4). Ids and effects are untouched, so replay stays valid.
+  const scenario = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
   const router = useRouter();
   const screen = useGame((g) => g.screen);
   const state = useGame((g) => g.state);
@@ -121,9 +123,26 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
     setScreen("loading");
   }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
 
+  // Demo jump (P.2): /game/<map>?jump=turning-point fast-forwards a fresh run to the turning point. Never saved.
+  const [jump, setJump] = useState(false);
+  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
+  const jumped = useRef(false);
+  useEffect(() => {
+    if (!jump || jumped.current || screen !== "play" || !state) return;
+    jumped.current = true;
+    for (let i = 0; i < 80; i++) {
+      const st = useGame.getState().state;
+      if (!st || st.ended || st.tp.fired) break;
+      for (const c of st.checkpointsDue) dispatch(c.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: c.id });
+      if (useGame.getState().state?.dialogue) dispatch({ type: "leave" });
+      dispatch({ type: "wait" });
+    }
+    setRecapDay(undefined);
+  }, [jump, screen, state, dispatch, setRecapDay]);
+
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
-    if (!state || sandbox || !attemptId) return;
+    if (!state || sandbox || jump || !attemptId) return;
     store().saveRun({
       attemptId,
       challengeId: challenge.id,
@@ -135,7 +154,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
       startedAt: new Date().toISOString(),
       practice: false,
     });
-  }, [state, answers, integrity, attemptId, sandbox, challenge.id, mapId, avatar, phase]);
+  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase]);
 
   // Music: calm, then tense after the turning point (A0).
   useEffect(() => {
@@ -332,7 +351,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
       {/* Title: a still of the map, so the first screen paints fast on phones (A.20). The live map starts at the avatar step. */}
       {screen === "title" && <TitleBackdrop mapId={mapId} label={`${scenario.title}, seen from above`} />}
       {screen === "avatar" && <MapCanvas scenario={scenario} avatar={avatar.look} attract label={`${scenario.title}, seen from above`} />}
-      {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} />}
+      {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} brief={challenge.id.startsWith("map-") ? undefined : challenge} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}
       {(screen === "loading" || screen === "play" || screen === "results") && state && (
         <>

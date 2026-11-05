@@ -131,9 +131,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - [x] E1.1 [D] Skills step: 10 skill cards, pick 3 or 4
 - [x] E1.2 [D] Scenario step: 2+ templates with length and skills
-- [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original
-- [x] E1.4 [D] Inline scene editing, mark checkpoint-eligible
-- [x] E1.5 [D] Preview as candidate, no data saved
+- [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original. Also tailors the v2 map's dialogue for map templates (lib/challenge/mapTailor.ts)
+- [x] E1.4 [D] Inline scene editing, mark checkpoint-eligible. For map templates: edit map lines, questions, options and checkpoint-eligible issues (min 3); stored as map overrides on the challenge
+- [x] E1.5 [D] Preview as candidate, no data saved. Challenges on a template with a v2 map (/c/<slug>, admin preview) play the map game with the employer's edits (tests/e2e/builder.spec.ts, loop.spec.ts)
 - [x] E1.6 [D] Publish creates public link, job code and QR
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
 - [x] C6.1 [H] Add up to 2 witnesses with relationship: slot count, list with relationship and status in words (tests/e2e/witness.spec.ts, desktop and phone)
@@ -183,9 +183,15 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe): zero serious/critical axe findings on every route in light and dark (tests/e2e/a11y.spec.ts, lib/store/accommodations.test.ts; docs/POLISH.md)
 - [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
 - [x] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script (Ctrl+Shift+D panel: roles, seed, reset, jumps; /demo/reset and `pnpm demo:reset`; lib/demo/reset.test.ts, tests/e2e/demo.spec.ts)
+<<<<<<< HEAD
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
 - [x] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics (lib/impact/partG.test.ts, tests/e2e/impact.spec.ts). AI vs human agreement shows "No labels yet" until B.10 gold labels land; it is computed live once they do.
 - [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts passes with --repeat-each=2; Second Look, Resume vs Evidence and the demo panel steps skipped until merged)
+=======
+- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/, updated for the v2 merge: Second Look, Resume vs Evidence, Final score sorts only, Ctrl+Shift+D panel)
+- [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
+- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts covers every script step incl. demo panel reset, Second Look and Resume vs Evidence, green with --repeat-each=2; only the turning-point jump is skipped because the demo panel has no such link, so the script uses a prepared tab. Needs two human rehearsals.)
+>>>>>>> origin/claude/eager-thompson-aydpx2
 - [x] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario (recruiter one-click request on a reused card, 5-minute text mini-scenario for only the missing skills, evidence levels only; lib/addon/addon.test.ts, tests/e2e/addon.spec.ts)
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 

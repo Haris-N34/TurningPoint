@@ -2,6 +2,7 @@ import fixture from "@/fixtures/attempt.json";
 import { getScenario } from "@/content/scenarios";
 import { CardSchema } from "@/lib/card/types";
 import { listChallenges, publish, saveDraft, type Challenge } from "@/lib/challenge/challenge";
+import { diffMap, mapForTemplate, tailorMap } from "@/lib/challenge/mapTailor";
 import { tailorScenario } from "@/lib/challenge/tailor";
 import type { Store } from "@/lib/store/store";
 import { cardConsistencyInput, checkConsistency } from "@/lib/ai/services/consistency";
@@ -18,10 +19,11 @@ export const DEMO_EMPLOYERS = [
 
 export function seedDemo(s: Store, templateId = "launch-week"): Challenge[] {
   const base = getScenario(templateId)!;
+  const map = mapForTemplate(templateId)?.map;
   const out: Challenge[] = [];
   for (const e of DEMO_EMPLOYERS) {
     if (!listChallenges(s).some((c) => c.id === e.id)) {
-      saveDraft(s, { id: e.id, company: e.company, title: e.title, templateId, industry: e.industry, targetSkills: [...e.targetSkills], scenario: tailorScenario(base, e.industry, e.company.name).scenario });
+      saveDraft(s, { id: e.id, company: e.company, title: e.title, templateId, industry: e.industry, targetSkills: [...e.targetSkills], scenario: tailorScenario(base, e.industry, e.company.name).scenario, mapOverrides: map && diffMap(map, tailorMap(map, e.industry, e.company.name).map) });
     }
     const c = publish(s, e.id);
     // Publish-time AI (B.3): dialogue variants cached with each demo challenge.

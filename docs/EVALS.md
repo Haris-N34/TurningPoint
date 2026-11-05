@@ -17,3 +17,15 @@ Generated 2026-11-05 by `pnpm evals:report` (lib/ai/evals). Scanner: `evidence-s
 ## Hallucination misses
 
 None.
+
+## AI cross-check of the gold set (not human validation)
+
+Claude scored all 48 gold answers against the evidence rubric before reading the scanner's output (`lib/ai/evals/gold/crosscheck.claude.json`). This is an AI cross-check, not B.10: it is never used as ground truth or in kappa, and B.10 stays open until both team members score by hand on `/admin/gold`.
+
+| Check | Result |
+|---|---|
+| Exact agreement, scanner vs cross-check | 36 of 48 (75%) |
+| Off by two levels | 3 (g09 resilience, g35 communication, g45 curiosity: strong answers the scanner rated not observed) |
+| Direction of every disagreement | Scanner lower than the cross-check (12 of 12). It never over-credited. |
+
+Reading: the local scanner is conservative. It misses strong evidence phrased without its keywords, most in resilience, communication, curiosity, analytical and empathy. Do not tune it to this AI file; tune after the human labels land, then re-run B.10.
