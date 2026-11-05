@@ -57,7 +57,7 @@ describe("verifyEvidence (G1)", () => {
     const e = bad.evidence[1];
     expect(e.level).toBe("strong");
     // One word changed: no longer an exact substring.
-    if (e.source?.type === "clip") e.source.quote = e.source.quote.replace("protected", "kept");
+    if (e.source?.type === "clip") e.source.quote = e.source.quote.replace("decorations", "decoration");
     expect(verifyEvidence(bad).evidence[1].level).toBe("needs_review");
   });
 

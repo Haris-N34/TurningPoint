@@ -21,16 +21,16 @@
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:367fd03658544f54": {
+ "checkpoint-question@1.0.0:0a241d02125b976e": {
   "output": {
-   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
    "source": "generated"
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:e2060d877ca7c12b": {
+ "checkpoint-question@1.0.0:a834870b4e204c93": {
   "output": {
-   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
+   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
    "source": "generated"
   },
   "model": "local-rules"
@@ -306,7 +306,7 @@
     {
      "skill": "prioritization",
      "level": "strong",
-     "sentence": "Names the trade-off, says why, and considers who it affects, specific to the decision.",
+     "sentence": "Names the trade-off, says why, and considers who it affects.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",
@@ -318,7 +318,7 @@
     {
      "skill": "communication",
      "level": "strong",
-     "sentence": "Names the trade-off, says why, and considers who it affects, specific to the decision.",
+     "sentence": "Names the trade-off, says why, and considers who it affects.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",
@@ -392,9 +392,9 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:7cb85b1eb8598b00": {
+ "recruiter-copilot@1.0.0:2f7e2a703af5c13e": {
   "output": {
-   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:22: “Losing a day would have cost the vendors more than it cost us.”",
+   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:12: “Losing a day would hurt the vendors more than the bands.”",
    "citations": [
     {
      "kind": "transcript",
@@ -405,25 +405,25 @@
     },
     {
      "kind": "transcript",
-     "label": "Checkpoint 2 · 0:22",
+     "label": "Checkpoint 2 · 0:12",
      "checkpointId": "cp2",
-     "quote": "Losing a day would have cost the vendors more than it cost us.",
-     "t": 22.31
+     "quote": "Losing a day would hurt the vendors more than the bands.",
+     "t": 12.69
     }
    ],
    "refused": null
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:e0984adbf31b9c98": {
+ "recruiter-copilot@1.0.0:7c9bfc7903a327bb": {
   "output": {
-   "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage, and protected both market days.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
+   "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
    "citations": [
     {
      "kind": "evidence",
      "label": "Checkpoint 2 · 0:09",
      "checkpointId": "cp2",
-     "quote": "So I cut promotion, decorations and the stage, and protected both market days.",
+     "quote": "So I cut promotion, decorations and the stage.",
      "t": 9.62,
      "skill": "prioritization"
     },
