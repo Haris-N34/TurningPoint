@@ -197,3 +197,5 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - M0 accepted by Div on Board #1 (2026-11-04): foundation PRs #32 to #34 merged into main. #25 deployment deferred until the product is done. #11 to #15 may proceed. Recruiter and employer screens #16 to #18 are delegated to Div.
 
+
+- #19 results, share controls, witness layout and global AI explanation implementation is ready for review. See `docs/reviews/19-results-witness-ai.md`. Optional witness names are explicitly page-local under the existing privacy contract. Acceptance ticks await CI/review; real-device and first-user timing checks remain with #21.
