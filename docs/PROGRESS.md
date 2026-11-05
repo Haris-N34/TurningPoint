@@ -183,9 +183,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)
 - [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
 - [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
-- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video
+- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
-- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug
+- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts passes with --repeat-each=2; Second Look, Resume vs Evidence and the demo panel steps skipped until merged)
 - [ ] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 
