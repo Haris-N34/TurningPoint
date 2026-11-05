@@ -6,7 +6,7 @@ Read `CONTEXT.md` and this file first. Full build spec: `docs/PRD.md` (including
 
 DICC 2026 (Haskayne, UCalgary) case: "Beyond the Page: Rebuilding the Signals of Capability in an Age of AI." AI made resumes and cover letters cheap, so they no longer signal ability.
 
-Turning Point: a short story-based challenge where the plan breaks partway through. Surprise checkpoints ask candidates to defend the exact choices they just made (video, voice or timed text). A final checkpoint links the game to a real experience, optionally confirmed by a witness. Recruiters get a one-minute, evidence-linked Capability Card. No overall score, no auto-reject. Cards are portable across employers because everyone uses one 10-skill framework.
+Turning Point: a short story-based challenge where the plan breaks partway through. Surprise checkpoints ask candidates to defend the exact choices they just made (video, voice or timed text). A final checkpoint links the game to a real experience, optionally confirmed by a witness. Recruiters get a one-minute, evidence-linked Capability Card. No auto-reject: the Final score (PRD v2 Part D) only sorts, never filters. Cards are portable across employers because everyone uses one 10-skill framework.
 
 Pitch line: "McKinsey tests you on its scenario. Turning Point tests how you handle it when the plan breaks."
 
@@ -23,12 +23,12 @@ The end product is a demo. These override the PRD where they conflict:
 - **No database.** Everything is local: run state and cards in `localStorage`, recordings in IndexedDB. Seeded demo data ships as JSON in `fixtures/`. No Supabase, no auth server; the role picker switches roles.
 - **No API keys** except Vercel for hosting. The "AI" jobs run locally and deterministically behind an interface in `lib/ai` (question from the choice log, follow-up from the transcript, rule-based evidence extraction). Voice transcription uses the browser's built-in speech recognition where available; text mode always works.
 - **Emails are simulated:** witness links are shown on screen and copied, not sent.
-- Guardrails still apply: the quote substring check, no overall score, no auto-reject, nothing scored on face or voice.
+- Guardrails still apply: the quote substring check, the Final score sorts but never filters, no auto-reject, nothing scored on face or voice.
 
 ## Hard rules (from the research; never break)
 
 - Never score faces, emotion, voice tone, accent, grammar or fluency. Score transcripts against the rubric only.
-- No overall score and no auto-reject. A human makes every decision, and a pass needs a reason.
+- No auto-reject and no filtering by score. The v2 Final score (Part D) only sorts, always shows its breakdown, and has no threshold anywhere. A human makes every decision, and a pass needs a reason.
 - AI models never receive the candidate's name, email, university or video frames.
 - Every AI evidence quote must match the transcript exactly as a substring, checked in code. Drop any quote that doesn't match.
 - Every checkpoint can be answered without a camera. Timer accommodations of 1.5x or 2x.

@@ -199,7 +199,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await row.getByRole("link").first().click();
     await expect(page).toHaveURL(/\/recruiter\/card\/att_demo_maya/);
     const card = page.getByTestId("capability-card");
-    await expect(card).toContainText("No overall score");
+    // v2 Part D: a Final score exists but only sorts; it never hides or rejects anyone.
+    await expect(card).toContainText("Never used to hide or reject anyone");
     await expect(card).not.toContainText(/score\s*[:=]?\s*\d/i);
     await page.getByTestId("jump-prioritization").click();
     await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");

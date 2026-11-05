@@ -60,7 +60,7 @@ async function clearOverlay(page: Page): Promise<boolean> {
 }
 
 test("The Client Pivot: a full week keyboard-only in list view, with discoveries, to the results (A.8)", async ({ page }) => {
-  test.setTimeout(240_000);
+  test.setTimeout(420_000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/game/client-pivot");

@@ -3,7 +3,7 @@
 Draft for Haris to review. 11 slides. Live demo sits between slides 5 and 6.
 Screenshots are in `docs/screens/`. Numbers come from the research brief in `CONTEXT.md`; check each source before the slide goes final.
 
-Rules for every slide: no overall score, no auto-reject, no feature that is not in `main` on pitch day. Items marked **[unmerged]** are on a branch today and come off the slide if they are not merged.
+Rules for every slide: the Final score sorts and never filters, no auto-reject, no feature that is not in `main` on pitch day. Items marked **[unmerged]** are on a branch today and come off the slide if they are not merged.
 
 ---
 
@@ -102,7 +102,7 @@ See `demo-script.md`. Return to slide 6 after the close line.
 - Every AI sentence links to the exact quote and second.
 - Decision path with the turning point marked.
 - Real story, witness line, integrity notes "for context, not scored".
-- No overall score. Shortlist, Hold or Pass. A pass needs a reason.
+- Evidence first. A Final score only sorts the list, shows its breakdown, and never hides or rejects anyone. Shortlist, Hold or Pass. A pass needs a reason.
 
 **Screenshot:** `results-desktop.png` (crop to the card: skill evidence, decision path, answers)
 
@@ -172,4 +172,4 @@ See `demo-script.md`. Return to slide 6 after the close line.
 - Confirm every number on slides 2 and 3 against its original source and add a footnote.
 - Pick light or dark for the recruiter screenshots.
 - No full Capability Card screenshot from the recruiter view exists in `docs/screens`. `results-desktop.png` is the candidate view of the same card. A fresh recruiter capture would be better for slide 7.
-- The `claude/v2-integrations` branch adds a "Final score" box. That conflicts with "no overall score" in CLAUDE.md. The deck does not mention it. Decide with Div before it merges.
+- The Final score (PRD v2 Part D) is now merged. It sorts only: no threshold, no hide-below, no auto-reject, breakdown on hover. Say "sorts, never filters", not "no score".

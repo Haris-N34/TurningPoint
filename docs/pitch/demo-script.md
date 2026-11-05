@@ -15,8 +15,8 @@ This replaces `docs/demo/V2_SCRIPT.md` once Haris accepts it.
 | 3. Explain-on-pick checkpoint | In main |
 | 4. Defer with a reason | In main. The follow-up checkpoint about the deferral is seeded, so it may or may not fire. |
 | 5. Turning point | In main. Jumping straight to it needs the demo panel (P.2, `claude/v2-m5`). **Confirm once merged.** |
-| 6. Second Look | **Not in main.** On `claude/v2-integrations`. Skip unless merged. |
-| 7. Resume vs Evidence, Final score | **Not in main.** On `claude/v2-integrations`. The Final score conflicts with "no overall score"; do not show it until the team decides. |
+| 6. Second Look | In main. |
+| 7. Resume vs Evidence, Final score | In main. Say the Final score only sorts; it never hides or rejects anyone. |
 | 8. Copilot with citation | In main |
 | 9. Impact dashboard | In main. Second Look rescues and recruiter minutes show "awaiting data". |
 

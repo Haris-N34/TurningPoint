@@ -32,7 +32,8 @@ export default function MapCanvas({ scenario, avatar, attract = false, label }: 
         pixelArt: true,
         roundPixels: true,
         scale: { mode: Phaser.Scale.RESIZE, width: "100%", height: "100%" },
-        fps: { target: 60 },
+        // Test builds draw at 20 fps: headless Chrome renders WebGL in software, and 60 fps per tab starves the test machine.
+        fps: process.env.NEXT_PUBLIC_TEST_HOOKS === "1" ? { target: 20, limit: 20 } : { target: 60 },
         audio: { noAudio: true },
         scene: [Scene],
       });

@@ -15,6 +15,7 @@ import { openIssues, replay, type Action, type CheckpointDue, type GameState } f
 import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
+import { scenarioForRun } from "@/lib/ai/services/publish";
 import { useGame } from "@/lib/game/store";
 import { parseTime } from "@/lib/game/time";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -321,7 +322,10 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
   const due = state?.checkpointsDue[0];
   const showCheckpoint = !!due && !reaction && !cutscene && recapDay === undefined;
   const kpis = useMemo(() => (state?.ended ? computeKpis(scenario, state) : []), [state, scenario]);
-  const node = state?.dialogue ? scenario.nodes.find((n) => n.id === state.dialogue!.node) : undefined;
+  // Dialogue wording variants cached at publish (B.3), picked by the run's seed. Ids and effects never change.
+  const seed = state?.seed;
+  const worded = useMemo(() => (seed && !challenge.id.startsWith("map-") ? scenarioForRun(store(), challenge.id, scenario, seed) : scenario), [seed, scenario, challenge.id]);
+  const node = state?.dialogue ? worded.nodes.find((n) => n.id === state.dialogue!.node) : undefined;
 
   return (
     <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"} data-last-reaction={lastReaction}>

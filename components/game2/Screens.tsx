@@ -69,7 +69,7 @@ export function SettingsForm() {
       </label>
       <label className="flex items-center justify-between gap-2">
         Reduced motion
-        <input type="checkbox" checked={s.reducedMotion} onChange={(e) => set({ reducedMotion: e.target.checked })} />
+        <input type="checkbox" checked={s.reducedMotion} onChange={(e) => set({ reducedMotion: e.target.checked })} data-testid="set-reduced-motion" />
       </label>
       <label className="flex items-center justify-between gap-2">
         Sound effects

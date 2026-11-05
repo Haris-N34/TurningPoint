@@ -6,7 +6,7 @@ Numbers come from the research brief in `CONTEXT.md` and `docs/PRD.md`. Haris: c
 ## Bias and fairness
 
 **1. How is this not just HireVue again?**
-HireVue was criticised for analysing faces. We never score face, emotion, voice tone, accent, grammar or fluency. Questions are about the candidate's own specific choice, evidence comes from their words with an exact quote, there is no overall score, and the card is portable to other employers.
+HireVue was criticised for analysing faces. We never score face, emotion, voice tone, accent, grammar or fluency. Questions are about the candidate's own specific choice, evidence comes from their words with an exact quote, the Final score only sorts and never rejects, and the card is portable to other employers.
 
 **2. Can the AI be biased against how someone writes or speaks?**
 It can, so we test it. A CI test runs the evidence extractor on the same answer with 6 names and dialect variants. If any skill level changes, the build fails. Models never see name, email, university or video.
@@ -75,7 +75,7 @@ The card takes about a minute to read. The inbox filters by skill evidence and s
 
 ## Lines to avoid
 
-- "Our AI decides" or "the score". There is no overall score and no auto-reject.
+- "Our AI decides" or "the score decides". The Final score only sorts; there is no threshold and no auto-reject.
 - "Proven", "validated", "predicts". Not yet.
 - Any number not in the research brief.
 - "Second Look", "Resume vs Evidence", "Final score": not in main. The Final score on `claude/v2-integrations` conflicts with the no-overall-score rule; the team must resolve it before it is shown.

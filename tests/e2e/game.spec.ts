@@ -13,12 +13,13 @@ type TP = {
 };
 const tp = <T,>(page: Page, fn: (tp: TP) => T) => page.evaluate(`(${fn.toString()})(window.__tp)`) as Promise<T>;
 
-async function startGame(page: Page, opts: { list?: boolean; turnBased?: boolean } = {}) {
+async function startGame(page: Page, opts: { list?: boolean; turnBased?: boolean; reducedMotion?: boolean } = {}) {
   await page.goto("/game/launch-week");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await expect(page.getByTestId("title-screen")).toBeVisible();
-  if (opts.list || opts.turnBased) {
+  if (opts.list || opts.turnBased || opts.reducedMotion) {
     await page.getByRole("button", { name: "Settings" }).click();
+    if (opts.reducedMotion) await page.getByTestId("set-reduced-motion").check();
     if (opts.turnBased) await page.getByTestId("set-turn-based").check();
     if (opts.list) await page.getByTestId("set-list-view").check();
   }
@@ -281,4 +282,80 @@ test("screenshots: title, map, dialogue, checkpoint, cutscene, results (A.3)", a
   await page.waitForTimeout(2500);
   await shot("results");
   expect(errors).toEqual([]);
+});
+
+type SceneProbe = { px: number; py: number; camX: number; camY: number; wvX: number; wvY: number; zoom: number; scale: number; tilemap: boolean; fps: number };
+const probe = (page: Page) =>
+  page.evaluate(`(() => {
+    const s = window.__phaser.scene.scenes[0];
+    const cam = s.cameras.main;
+    return { px: s.player.x, py: s.player.y, camX: cam.scrollX, camY: cam.scrollY, wvX: cam.worldView.x, wvY: cam.worldView.y, zoom: cam.zoom, scale: s.scale.width, tilemap: s.cache.tilemap.entries.size > 0, fps: window.__phaser.loop.actualFps };
+  })()`) as Promise<SceneProbe>;
+
+test("map from Tiled JSON; walk with keys and click or tap; camera follows (A.9)", async ({ page }, info) => {
+  await startGame(page, { turnBased: true });
+  await expect.poll(() => page.evaluate("!!window.__phaser?.scene?.scenes?.[0]?.player")).toBe(true);
+  const a = await probe(page);
+  expect(a.tilemap).toBe(true);
+  // Keys: hold an arrow, the player moves and the camera follows.
+  await page.locator("body").focus();
+  await page.keyboard.down("ArrowLeft");
+  await page.waitForTimeout(900);
+  await page.keyboard.up("ArrowLeft");
+  const b = await probe(page);
+  expect(b.px).toBeLessThan(a.px - 4);
+  await expect.poll(async () => (await probe(page)).camX).toBeLessThan(a.camX);
+  // Click (desktop) or tap (phone) on the map: the player walks there.
+  // Try a few spots around the player (some tiles are buildings or water).
+  let moved = 0;
+  for (const [dx, dy] of [[0, 3], [3, 0], [0, -3], [-3, 0], [2, 2], [-2, -2]]) {
+    const c0 = await probe(page);
+    const box = (await page.getByTestId("map-canvas").boundingBox())!;
+    const k = (box.width / c0.scale) * c0.zoom; // world px -> CSS px
+    const x = box.x + (c0.px + dx * 16 - c0.wvX) * k, y = box.y + (c0.py + dy * 16 - c0.wvY) * k;
+    if (info.project.name === "phone") await page.touchscreen.tap(x, y);
+    else await page.mouse.click(x, y);
+    await page.waitForTimeout(1200);
+    const c1 = await probe(page);
+    moved = Math.hypot(c1.px - c0.px, c1.py - c0.py);
+    if (moved > 4) break;
+  }
+  expect(moved).toBeGreaterThan(4);
+});
+
+test("quiz test: choices only ever show with a character, a scene and an animation (A.1, A.2)", async ({ page }) => {
+  await startGame(page, { turnBased: true });
+  await page.getByTestId("go-roles").click();
+  const box = page.getByTestId("dialogue");
+  await expect(box).toBeVisible({ timeout: 15_000 });
+  await toChoices(page);
+  // Character: a portrait with an expression. Scene: the map canvas behind it. Animation: the scene keeps rendering.
+  await expect(box.locator("[data-expression], [role=img]").first()).toBeVisible();
+  await expect(page.getByTestId("map-canvas")).toBeVisible();
+  const f1 = await page.evaluate("window.__phaser.loop.frame");
+  await page.waitForTimeout(500);
+  expect(await page.evaluate("window.__phaser.loop.frame")).toBeGreaterThan(f1 as number);
+  // In-world: the dialogue opened by walking to the person (the player now stands next to Priya).
+  const near = await page.evaluate(`(() => { const s = window.__phaser.scene.scenes[0]; const n = s.npcs.get("priya").sprite; return Math.hypot(n.x - s.player.x, n.y - s.player.y); })()`);
+  expect(near as number).toBeLessThan(40);
+});
+
+test("map view: a full week through the issue tracker, then results (A.21)", async ({ page }) => {
+  // Reduced motion skips the walk animation (walking itself is covered by the A.9 test), so a full week fits CI.
+  test.setTimeout(420_000);
+  await startGame(page, { turnBased: true, reducedMotion: true });
+  await expect(page.getByTestId("map-canvas")).toBeVisible();
+  for (let i = 0; i < 200; i++) {
+    if (await page.getByTestId("to-results").isVisible()) break;
+    if (await clearOverlay(page)) continue;
+    const go = page.locator('[data-testid^="go-"]').first();
+    if (await go.isVisible()) {
+      // A cutscene or recap can open between checks; don't wait on a covered button.
+      if (!(await go.click({ timeout: 3000 }).then(() => true, () => false))) continue;
+      await expect(page.getByTestId("dialogue").or(page.getByTestId("checkpoint"))).toBeVisible({ timeout: 15_000 }).catch(() => {});
+    } else await page.getByTestId("wait").first().click({ timeout: 3000 }).catch(() => {});
+  }
+  await page.getByTestId("to-results").click();
+  await expect(page.getByTestId("results-screen")).toBeVisible();
+  expect(await tp(page, (x) => x.getState().ended)).toBe(true);
 });
