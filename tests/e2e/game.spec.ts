@@ -232,7 +232,7 @@ test("phone: map view with the tracker at the bottom (A.21)", async ({ page }, i
   await startGame(page, { turnBased: true });
   await expect(page.getByTestId("map-canvas")).toBeVisible();
   await expect(page.getByTestId("issue-tracker").last()).toBeVisible();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = (await page.evaluate(() => document.documentElement.scrollWidth)) - page.viewportSize()!.width;
   expect(overflow).toBeLessThanOrEqual(0);
 });
 

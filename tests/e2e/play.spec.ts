@@ -72,6 +72,6 @@ test("fits a 375 px phone without horizontal scroll (C2.5)", async ({ page }) =>
   await page.goto("/play/sample");
   await page.getByRole("button", { name: "I agree, start" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = (await page.evaluate(() => document.documentElement.scrollWidth)) - page.viewportSize()!.width;
   expect(overflow).toBeLessThanOrEqual(0);
 });

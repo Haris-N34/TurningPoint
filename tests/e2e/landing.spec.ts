@@ -23,7 +23,7 @@ test("employer CTA and all four persistent role routes work (M0.11)", async ({ p
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("tp:role")!))).toBe(role);
     await page.reload();
     await expect(page.getByRole("combobox", { name: "Demo role" })).toHaveValue(role);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   }
 });
 
@@ -37,7 +37,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.locator("#main-content")).toBeFocused();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
     expect((await new AxeBuilder({ page }).analyze()).violations.filter(v => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
     expect(errors).toEqual([]);
   });

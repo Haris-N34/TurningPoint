@@ -16,7 +16,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await expect(page.getByLabel("Challenge title")).toHaveValue("Launch Week");
     await page.getByRole("button", { name: "Primary action" }).focus();
     await expect(page.getByRole("button", { name: "Primary action" })).toBeFocused();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
     const audit = await new AxeBuilder({ page }).analyze();
     expect(audit.violations.filter(v => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
   });

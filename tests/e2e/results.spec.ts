@@ -15,7 +15,7 @@ test("results controls and witness confirmation are accessible, with a copyable 
   await expect(page.getByRole("status")).toContainText("Card shared");
   await page.getByTestId("revoke-ch_demo_bank").click();
   await expect(page.getByRole("status")).toContainText("Share withdrawn");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   const resultsAxe = await new AxeBuilder({page}).analyze();
   expect(resultsAxe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
   await page.screenshot({ path: test.info().outputPath("tp-results.png"), fullPage: true });

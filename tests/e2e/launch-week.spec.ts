@@ -15,7 +15,7 @@ test("Launch Week plays all 15 nodes, saves ten decisions and completes real-lif
   expect(run.state.path).toEqual(Array.from({ length: 15 }, (_, i) => `n${i + 1}`));
   expect(run.state.log).toHaveLength(10);
   expect(run.state.turningPointNodeId).toBe("n8");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.getByTestId("see-results").click();
   await expect(page.getByTestId("results")).toBeVisible();
 });

@@ -56,7 +56,7 @@ test("every preparation screen fits and has no serious axe findings", async ({ p
   await page.goto("/candidate/intro");
   for (let i = 0; i < 4; i++) {
     await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
     expect((await new AxeBuilder({ page }).analyze()).violations.filter(v => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
     if (i < 3) await page.getByRole("button", { name: "Continue", exact: true }).click();
   }

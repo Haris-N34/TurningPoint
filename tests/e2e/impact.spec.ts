@@ -21,7 +21,7 @@ test("impact report separates synthetic data, filters employers and shows measur
   await expect(page.getByTestId("impact-started")).toHaveText("0");
   await page.getByLabel("Data source").selectOption("demo");
   await expect(page.getByTestId("impact-started")).toHaveText("200");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   const axe = await new AxeBuilder({page}).analyze();
   expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
   await page.screenshot({ path: test.info().outputPath("tp-impact.png"), fullPage: true });
