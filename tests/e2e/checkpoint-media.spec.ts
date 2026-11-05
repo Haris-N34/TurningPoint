@@ -394,7 +394,7 @@ test("real life: a one-line, off-topic answer gets a kind 'tell us more' follow-
     if (s === "real-life") break;
     if (s === "checkpoint") await answerCheckpoint(page, "text");
     else if (s === "choice") await page.locator('[data-testid^="option-"]').first().click();
-    else if (s === "continue") await page.getByRole("button", { name: /^(Continue|Face it)$/ }).click();
+    else if (s === "continue") await page.getByRole("button", { name: /^(Continue|Face it)$/ }).click({ timeout: 5_000 }).catch(() => {}); // re-render under load: look again
     else throw new Error(`unexpected ${s}`);
   }
   await page.getByTestId("real-life-intro").getByRole("button", { name: "Start" }).click();

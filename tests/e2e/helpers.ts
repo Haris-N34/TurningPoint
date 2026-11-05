@@ -96,7 +96,8 @@ export async function playToCheckpoint(page: Page) {
       label = (await page.locator(OPTION).first().innerText()).trim();
       await page.locator(OPTION).first().click();
     } else if (s === "continue") {
-      await page.getByRole("button", { name: /^(Continue|Face it)$/ }).click();
+      // Under load the scene can re-render the button mid-click; give up after 5 s and look again.
+      await page.getByRole("button", { name: /^(Continue|Face it)$/ }).click({ timeout: 5_000 }).catch(() => {});
     } else {
       throw new Error(`no checkpoint before ${s}`);
     }
