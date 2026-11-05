@@ -80,12 +80,15 @@ export function addWitness(
   const existing = all(s).filter((x) => x.attemptId === w.attemptId);
   if (existing.length >= MAX_WITNESSES) throw new Error(`Up to ${MAX_WITNESSES} witnesses`);
   const mb = mailbox(w.email)!;
+  const emailHash = hashSeed(`${mb.local}@${mb.domain}`).toString(16);
+  // One person, one slot: two confirmations from the same mailbox would read as two witnesses.
+  if (existing.some((x) => x.emailHash === emailHash)) throw new Error("You already added this witness");
   const record: WitnessRecord = {
     id: `w_${token(seed + "id").slice(0, 8)}`,
     attemptId: w.attemptId,
     storyTitle: w.storyTitle,
     relationship: w.relationship,
-    emailHash: hashSeed(`${mb.local}@${mb.domain}`).toString(16),
+    emailHash,
     token: token(seed),
     status: "pending",
     skillsSeen: [],
