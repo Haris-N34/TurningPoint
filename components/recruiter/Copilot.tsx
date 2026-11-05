@@ -10,8 +10,17 @@ import type { Card } from "@/lib/card/types";
 
 const SUGGESTED = ["Where did they show prioritization?", "How did they handle the turning point?", "What did they say about the team?"];
 
-export function Copilot({ card, onCite }: { card: Card; onCite: (c: { checkpointId: string; t: number }) => void }) {
-  const [open, setOpen] = useState(false);
+/** The trigger lives in the card's toolbar so it never covers the answer text. */
+export function CopilotButton({ open, onClick }: { open: boolean; onClick: () => void }) {
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} aria-expanded={open} aria-controls="copilot" data-testid="copilot-open">
+      <span aria-hidden className="text-primary">✦</span>
+      Ask about this candidate
+    </Button>
+  );
+}
+
+export function Copilot({ card, onCite, open, onClose }: { card: Card; onCite: (c: { checkpointId: string; t: number }) => void; open: boolean; onClose: () => void }) {
   const [q, setQ] = useState("");
   const [result, setResult] = useState<(CopilotOutput & { question: string }) | null>(null);
 
@@ -25,25 +34,20 @@ export function Copilot({ card, onCite }: { card: Card; onCite: (c: { checkpoint
     if (c.checkpointId) onCite({ checkpointId: c.checkpointId, t: c.t ?? 0 });
   };
 
-  if (!open) {
-    return (
-      <Button className="fixed bottom-4 right-4 z-30 shadow-lg" onClick={() => setOpen(true)} data-testid="copilot-open">
-        Ask about this candidate
-      </Button>
-    );
-  }
+  if (!open) return null;
 
   return (
     <aside
-      className="fixed inset-x-2 bottom-2 z-30 max-h-[70vh] overflow-y-auto rounded-xl border bg-card p-4 shadow-2xl sm:inset-x-auto sm:right-4 sm:w-[420px]"
+      id="copilot"
+      className="tp-pop mb-4 rounded-xl border bg-card p-4 shadow-card"
       aria-labelledby="copilot-h"
       data-testid="copilot"
     >
       <div className="flex items-baseline justify-between gap-2">
-        <h2 id="copilot-h" className="font-semibold">Copilot</h2>
-        <button type="button" className="text-sm underline" onClick={() => setOpen(false)}>
+        <h2 id="copilot-h" className="text-sm font-semibold">Copilot</h2>
+        <Button type="button" variant="ghost" size="sm" onClick={onClose}>
           Close
-        </button>
+        </Button>
       </div>
       <p className="text-xs text-muted-foreground">Answers only from this card&apos;s evidence, with sources. It won&apos;t judge personal traits or make the hiring call.</p>
       <form
@@ -59,7 +63,7 @@ export function Copilot({ card, onCite }: { card: Card; onCite: (c: { checkpoint
       </form>
       <div className="mt-2 flex flex-wrap gap-1">
         {SUGGESTED.map((s) => (
-          <button key={s} type="button" className="min-h-9 rounded-full border px-3 text-xs" onClick={() => ask(s)}>
+          <button key={s} type="button" className="min-h-9 rounded-full border px-3 text-xs text-muted-foreground transition-colors hover:border-input hover:text-foreground" onClick={() => ask(s)}>
             {s}
           </button>
         ))}

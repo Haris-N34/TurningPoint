@@ -124,3 +124,5 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+@keyframes tp-pop { from { opacity: 0; transform: translateY(2px) scale(0.97); } to { opacity: 1; transform: none; } }
+.tp-pop { animation: tp-pop 220ms ease-out; }

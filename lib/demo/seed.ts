@@ -8,6 +8,7 @@ import type { Store } from "@/lib/store/store";
 import { cardConsistencyInput, checkConsistency } from "@/lib/ai/services/consistency";
 import { preparePublishedContent } from "@/lib/ai/services/publish";
 import { optionsOf } from "@/lib/card/build";
+import { seedPeers } from "./peers";
 
 // Demo data: two fictional employers with published challenges, and Maya's finished card in the
 // first one's inbox so the pitch can open on a real card (PRD, Demo script step 1).
@@ -37,5 +38,7 @@ export function seedDemo(s: Store, templateId = "launch-week"): Challenge[] {
     s.saveCard(maya);
     s.share(maya.attemptId, DEMO_EMPLOYERS[0].id, false);
   }
+  // Synthetic peers so the inbox reads like a real list (clearly labelled, excluded from impact numbers).
+  seedPeers(s, { id: DEMO_EMPLOYERS[0].id, title: DEMO_EMPLOYERS[0].title, company: DEMO_EMPLOYERS[0].company.name });
   return out;
 }

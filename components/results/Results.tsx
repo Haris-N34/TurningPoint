@@ -2,6 +2,7 @@
 
 import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
 import type { Card } from "@/lib/card/types";
@@ -32,20 +33,23 @@ export function Results({ attemptId }: { attemptId: string }) {
   }, [loaded, attemptId]);
 
   if (card === undefined) return <PageSkeleton />;
-  if (card === null) return <main className="mx-auto max-w-2xl px-6 py-16"><span aria-hidden="true" className="text-5xl text-primary">↗</span><h1 className="mt-6 font-display text-4xl">Your card is not on this device</h1><p className="mt-4 text-muted-foreground">Results stay in the browser where you completed the challenge. Return to that browser, or start a new challenge here.</p><Link className="mt-6 inline-flex min-h-11 items-center rounded-md bg-primary px-5 font-medium text-primary-foreground" href="/candidate">Explore challenges</Link></main>;
+  if (card === null) return <main className="mx-auto max-w-2xl px-6 py-16"><span aria-hidden="true" className="text-5xl text-primary">↗</span><h1 className="mt-6 font-display text-4xl">Your card is not on this device</h1><p className="mt-4 text-muted-foreground">Results stay in the browser where you completed the challenge. Return to that browser, or start a new challenge here.</p><Button asChild className="mt-6"><Link href="/candidate">Explore challenges</Link></Button></main>;
 
   // A practice run has no card to share: show its private feedback instead (C8.1, C8.2).
   if (isPracticeChallenge(card.challenge.id)) return <PracticeResults card={card} />;
 
   return (
-    <main className="mx-auto max-w-7xl space-y-8 px-6 py-6 sm:px-10" data-testid="results">
-      <header className="border-b pb-6"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Your evidence / Your control</p><p className="mt-3 max-w-3xl font-display text-3xl">A record of the choices you made.</p><p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">This card uses the same evidence view employers see. With anonymous review on, they see your candidate ID until they shortlist you. Manage recordings, witnesses and employer access below.</p></header>
-      <p className="rounded-lg bg-muted px-4 py-2 text-sm text-muted-foreground">
-        Employers also see a Final score that only sorts their list, weighted by the skills they care about. It never rejects anyone.{" "}
-        <Link href="/how-scores-work" className="underline underline-offset-2">
-          How scores work
-        </Link>
-      </p>
+    <main className="mx-auto max-w-7xl space-y-6 px-4 pb-12 pt-6 sm:px-10" data-testid="results">
+      <header className="flex flex-col gap-3 rounded-xl border border-border/70 bg-card/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Your results</p>
+          <p className="mt-1 font-display text-xl leading-snug">A record of the choices you made.</p>
+        </div>
+        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+          Employers see this same card, with your candidate ID until they shortlist you, plus a Final score that only sorts their list and never rejects anyone.{" "}
+          <Link href="/how-scores-work" className="whitespace-nowrap font-medium text-foreground underline underline-offset-2">How scores work</Link>
+        </p>
+      </header>
       {sent && (
         <p role="status" className="text-sm" data-testid="ats-sent">
           {sent}
