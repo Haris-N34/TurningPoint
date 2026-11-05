@@ -78,8 +78,9 @@ export function computeKpis(s: MapScenario, st: GameState): Kpi[] {
   });
 
   // 4. Budget protected for the core goal
-  const recovery = s.issues.find((i) => i.tags.includes("recovery"));
-  const recChoice = recovery ? st.choices.find((c) => c.issue === recovery.id) : undefined;
+  // Each disruption can spawn its own recovery issue: read the one that was actually committed.
+  const recChoice = st.choices.find((c) => s.issues.some((i) => i.id === c.issue && i.tags.includes("recovery")));
+  const recovery = recChoice ? issueById(s, recChoice.issue) : undefined;
   const share = recChoice && recovery ? nodeById(s, recovery.node).options.find((o) => o.id === recChoice.option)?.kpi.coreBudgetShare ?? null : null;
   kpis.push({
     id: "budget-protected",

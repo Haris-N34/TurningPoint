@@ -5,7 +5,7 @@ import { setProfile } from "./helpers";
 // and the DOM UI with the keyboard.
 
 type TP = {
-  getState: () => { t: number; ended: boolean; dialogue?: unknown; checkpointsDue: { kind: string }[]; issues: Record<string, { status: string }>; tp: { fired: boolean }; order: { asked: boolean } };
+  getState: () => { t: number; ended: boolean; dialogue?: unknown; checkpointsDue: { kind: string }[]; issues: Record<string, { status: string }>; tp: { fired: boolean; disruptionId: string }; order: { asked: boolean } };
   openIssues: () => string[];
   setClock: (t: string) => void;
   act: (issue: string, action: string, arg?: string) => void;
@@ -191,7 +191,10 @@ test("turning point plays as a cutscene, drains the budget and spawns issues (A.
   await page.getByTestId("cutscene-next").click();
   await expect(page.getByTestId("budget-drain")).toBeVisible();
   await page.getByTestId("cutscene-done").click();
-  expect(await tp(page, (x) => x.getState().issues["recovery-plan"].status)).toBe("open");
+  // Each disruption spawns its own recovery issue.
+  const recovery = { "sponsor-pulls-out": "recovery-plan", "venue-cancels": "recovery-venue", "lead-volunteer-quits": "recovery-cover" } as Record<string, string>;
+  const fired = await tp(page, (x) => x.getState().tp.disruptionId);
+  expect(await tp(page, (x) => x.getState().issues)).toHaveProperty([recovery[fired], "status"], "open");
 });
 
 test("evening recap shows the day's numbers (A.14)", async ({ page }) => {

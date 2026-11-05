@@ -28,16 +28,22 @@ describe("time", () => {
 });
 
 describe("Launch Week map content (A3, A6)", () => {
-  it("is valid and has 14 to 18 issues, 7 zones, a recovery plan and feedback issue", () => {
+  it("is valid and has 14 to 18 visible issues per run, 7 zones, a recovery plan and feedback issue", () => {
     expect(MapScenarioSchema.safeParse(raw).success).toBe(true);
-    expect(s.issues.length).toBeGreaterThanOrEqual(14);
-    expect(s.issues.length).toBeLessThanOrEqual(18);
+    // Disruption follow-ups only appear in the run whose disruption spawns them.
+    const tpOnly = new Set(s.turningPoint.disruptions.flatMap((d) => d.spawn));
+    for (const d of s.turningPoint.disruptions) {
+      const run = s.issues.filter((i) => !i.hidden && (!tpOnly.has(i.id) || d.spawn.includes(i.id)));
+      expect(run.length, d.id).toBeGreaterThanOrEqual(14);
+      expect(run.length, d.id).toBeLessThanOrEqual(18);
+    }
     expect(s.zones.map((z) => z.name)).toEqual(expect.arrayContaining(["HQ Tent", "Volunteer Station", "Vendor Row", "Sponsor Office", "Storage Shed", "Main Stage", "Entrance Gate"]));
     expect(s.issues.some((i) => i.tags.includes("feedback"))).toBe(true);
   });
 
-  it("never has more than 4 authored issues open at once if nothing is handled early", () => {
+  it.each(s.turningPoint.disruptions.map((d) => d.id))("never has more than 4 authored issues open at once if nothing is handled early (%s)", (disruptionId) => {
     let st = newGame(s, SEED, { turnBased: true });
+    st = { ...st, tp: { ...st.tp, disruptionId } };
     let max = 0;
     for (let d = 0; d < 5 && !st.ended; d++) {
       for (let k = 0; k < 18 && !st.ended && dayOf(st.t) === d; k++) {
@@ -53,7 +59,7 @@ describe("Launch Week map content (A3, A6)", () => {
     for (const d of s.turningPoint.disruptions)
       for (const id of d.spawn) {
         const node = s.nodes.find((n) => n.id === s.issues.find((i) => i.id === id)!.node)!;
-        if (id === "recovery-plan") expect(node.options.some((o) => o.explainOnPick)).toBe(true);
+        expect(node.options.some((o) => o.explainOnPick), `${d.id} ${id}`).toBe(true);
       }
   });
 });
@@ -163,6 +169,66 @@ describe("turning point (A7)", () => {
     expect(st.budget).toBeLessThan(before);
     expect(st.darkZones).toContain("sponsor");
     expect(["recovery-plan", "team-shaken", "vendors-worried"].every((id) => st.issues[id].status === "open")).toBe(true);
+  });
+
+  const toTurningPoint = (disruptionId: string) => {
+    let st = newGame(s, "seed-tp", { turnBased: true });
+    st = { ...st, tp: { ...st.tp, disruptionId } };
+    st = clearDue(step(s, st, { type: "endDay" }));
+    st = clearDue(step(s, st, { type: "endDay" }));
+    return clearDue(step(s, st, { type: "move", zone: "hq" }));
+  };
+  const recoveryIds = s.issues.filter((i) => i.tags.includes("recovery")).map((i) => i.id);
+
+  it.each([
+    ["sponsor-pulls-out", "recovery-plan", /sponsor/i],
+    ["venue-cancels", "recovery-venue", /site/i],
+    ["lead-volunteer-quits", "recovery-cover", /Priya/],
+  ])("%s spawns its own recovery issue with matching dialogue", (disruptionId, recoveryId, words) => {
+    const st = toTurningPoint(disruptionId as string);
+    expect(st.tp.fired).toBe(true);
+    const def = s.issues.find((i) => i.id === recoveryId)!;
+    expect(def.tags).toContain("recovery");
+    expect(st.issues[recoveryId as string].status).toBe("open");
+    // Only this disruption's recovery issue opens.
+    for (const other of recoveryIds.filter((x) => x !== recoveryId)) expect(st.issues[other].status).toBe("pending");
+    const node = s.nodes.find((n) => n.id === def.node)!;
+    expect(node.lines.map((l) => l.text).join(" ") + " " + node.prompt).toMatch(words as RegExp);
+    // The venue and volunteer plans no longer talk about sponsor money.
+    if (disruptionId !== "sponsor-pulls-out") expect(JSON.stringify(node)).not.toMatch(/sponsor|funding/i);
+  });
+
+  it("each disruption has its own recovery issue and at least one follow-up no other disruption spawns", () => {
+    const ds = s.turningPoint.disruptions;
+    const recovery = ds.map((d) => d.spawn.filter((id) => recoveryIds.includes(id)));
+    for (const r of recovery) expect(r).toHaveLength(1);
+    expect(new Set(recovery.flat()).size).toBe(ds.length);
+    for (const d of ds) {
+      const others = new Set(ds.filter((x) => x !== d).flatMap((x) => x.spawn));
+      const unique = d.spawn.filter((id) => !recoveryIds.includes(id) && !others.has(id));
+      expect(unique.length, d.id).toBeGreaterThanOrEqual(1);
+    }
+    for (const id of recoveryIds) expect(new Set(s.nodes.find((n) => n.id === s.issues.find((i) => i.id === id)!.node)!.options.map((o) => o.label)).size).toBeGreaterThan(1);
+    const labels = recoveryIds.map((id) => s.nodes.find((n) => n.id === s.issues.find((i) => i.id === id)!.node)!.options.map((o) => o.label).join("|"));
+    expect(new Set(labels).size).toBe(recoveryIds.length);
+  });
+
+  it("recovery KPIs read whichever recovery plan the disruption spawned", () => {
+    for (const d of s.turningPoint.disruptions) {
+      let st = toTurningPoint(d.id);
+      const rec = d.spawn.find((id) => recoveryIds.includes(id))!;
+      st = handle(st, rec, "a");
+      const k = computeKpis(s, st);
+      expect(k.find((x) => x.id === "budget-protected")!.value, d.id).not.toBeNull();
+      expect(k.find((x) => x.id === "recovery-speed")!.value, d.id).not.toBeNull();
+    }
+  });
+
+  it("an old sponsor log that commits recovery-plan still replays", () => {
+    let st = toTurningPoint("sponsor-pulls-out");
+    st = step(s, st, { type: "talk", issue: "recovery-plan" });
+    st = step(s, st, { type: "choose", issue: "recovery-plan", option: "d" });
+    expect(st.issues["recovery-plan"]).toMatchObject({ status: "resolved", outcome: "d" });
   });
 
   it("picks the disruption by seed", () => {
