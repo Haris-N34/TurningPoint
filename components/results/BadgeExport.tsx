@@ -17,7 +17,7 @@ export function BadgeExport({ card }: { card: Card }) {
     setBusy(true);
     setErr(null);
     try {
-      // The server re-scores the answers and signs only what it finds; the browser never sends levels.
+      // The server re-scores the answers itself and signs only its own levels (QA: no client-supplied levels).
       const res = await fetch("/api/credentials", {
         method: "POST",
         headers: { "content-type": "application/json" },

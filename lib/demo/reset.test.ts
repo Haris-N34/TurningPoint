@@ -19,7 +19,8 @@ describe("P.2 demo reset", () => {
     expect(mediaCleared).toBe(1);
     expect(kv.getItem("other-app")).toBe("keep");
     expect(kv.getItem("tp:run:att_x")).toBeNull();
-    expect(kv.getItem("tp:x:witnesses")).toBeNull();
+    // The visitor's witnesses are gone; only the seeded demo witness (on Maya's card) is back.
+    expect((JSON.parse(kv.getItem("tp:x:witnesses") ?? "[]") as { attemptId?: string }[]).map((w) => w.attemptId)).toEqual(["att_demo_maya"]);
     expect(s.getRole()).toBe("candidate");
     expect(s.getProfile().displayName ?? "").toBe("");
     // Seed is back: two demo employers, Maya's card shared with the first, plus the labelled synthetic peers.

@@ -133,7 +133,7 @@ describe("issues (A6)", () => {
     st = step(s, st, { type: "delegate", issue: "roles", to: "priya" });
     expect(st.issues.roles.status).toBe("delegated");
     expect(st.morale).toBe(morale - GAME.delegateMoraleCost + 2);
-    expect(() => step(s, st, { type: "delegate", issue: "vendor-mix", to: "priya" })).toThrow(/not open|needs you/);
+    expect(() => step(s, clearDue(st), { type: "delegate", issue: "vendor-mix", to: "priya" })).toThrow(/not open|needs you/);
   });
 
   it("defer needs a reason from the list and applies half the expiry cost", () => {
@@ -277,7 +277,7 @@ describe("checkpoints (A9)", () => {
 
 describe("list view and map view (A10)", () => {
   it("produce identical engine state for the same inputs", () => {
-    const log: Action[] = [
+    const plan: Action[] = [
       { type: "move", zone: "volunteers" },
       { type: "talk", issue: "roles" },
       { type: "choose", issue: "roles", option: "b" },
@@ -286,6 +286,18 @@ describe("list view and map view (A10)", () => {
       { type: "choose", issue: "vendor-mix", option: "a" },
       { type: "endDay" },
     ];
+    // Answer any checkpoint as it comes due (the engine refuses other actions until then).
+    const log: Action[] = [];
+    let st = newGame(s, SEED, { turnBased: true });
+    for (const a of plan) {
+      for (const c of st.checkpointsDue) {
+        const ans: Action = c.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: c.id };
+        st = step(s, st, ans);
+        log.push(ans);
+      }
+      st = step(s, st, a);
+      log.push(a);
+    }
     // Map view sends the same actions, plus drift ticks that turn-based ignores; list view never drifts.
     const map = replay(s, SEED, log.flatMap((a) => [a, { type: "drift", minutes: 2 } as Action]), { turnBased: true });
     const list = replay(s, SEED, log, { turnBased: true });
