@@ -33,9 +33,9 @@ const PICKS: Record<string, string> = {
 };
 
 const CP1_TEXT =
-  "I asked who was free when, because two volunteers already wanted social media and nobody wanted deliveries or set-up. Then I paired Ari, who has run markets before, with a new volunteer on logistics. If I had just assigned it, whoever got stuck alone with logistics would check out by Wednesday. It cost us fifteen minutes on Monday, but I'd rather lose fifteen minutes than lose a volunteer.";
+  "I asked who was free when, because nobody wanted deliveries or set-up. I paired Ari, who has run markets, with a new volunteer on logistics, so nobody was stuck alone. It cost us fifteen minutes, but I'd rather lose time than a volunteer.";
 const CP2_TEXT =
-  "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage, and protected both market days. That hurts the two bands we booked and the market looks plainer, so I called both bands myself that morning. Losing a day would have cost the vendors more than it cost us.";
+  "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage. Losing a day would hurt the vendors more than the bands. I told both bands myself that morning and offered them a slot next year.";
 
 const words = (t: string) => t.split(/\s+/).length;
 const secs = (t: string) => Math.round((words(t) / 2.6) * 100) / 100;
@@ -104,7 +104,8 @@ export function buildMaya(): Card {
   // Evidence keeps the fixture's order: the synthetic impact cohort (lib/impact/seed.ts) maps levels by position.
   const ORDER = ["collaboration", "prioritization", "adaptability", "resilience"];
   const evidence = [...card.evidence].sort((a, b) => ORDER.indexOf(a.skill) - ORDER.indexOf(b.skill));
-  return CardSchema.parse({ ...card, evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
+  // Keep the anonymous id the pitch and tests use ("Candidate 4F7K").
+  return CardSchema.parse({ ...card, anonId: "Candidate 4F7K", evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
 }
 
 describe("Maya's demo card matches the Launch Week run the demo plays", () => {

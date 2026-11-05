@@ -133,7 +133,7 @@ function judge(skill: SkillSlug, text: string, signalled: boolean, context: stri
 }
 
 const SENTENCE: Record<Candidate["level"], string> = {
-  strong: "Names the trade-off, says why, and considers who it affects, specific to the decision.",
+  strong: "Names the trade-off, says why, and considers who it affects.",
   some: "Gives a reason for the decision, without naming a trade-off.",
 };
 
