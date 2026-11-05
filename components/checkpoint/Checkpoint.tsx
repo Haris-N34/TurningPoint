@@ -86,6 +86,13 @@ function deviceNote(wanted: Mode, got: Mode, err: DeviceError | null) {
   return `${why} This one is set to ${got}, which counts exactly the same. You can switch any time.`;
 }
 
+/** One calm line when a device was refused: what happened, what to do, and that the timer waits. */
+function choiceNote(wanted: Mode, voiceOk: boolean, err: DeviceError | null) {
+  const what = wanted === "video" ? (voiceOk ? "camera" : "camera and microphone") : "microphone";
+  const why = err === "denied" ? `The browser didn't allow the ${what}.` : err === "missing" ? `No ${what} found.` : err === "busy" ? `Another app may be using the ${what}.` : `The ${what} didn't start.`;
+  return `${why} ${voiceOk ? "Answer by voice or text instead" : "Answer in text instead"}; it counts exactly the same. The timer waits for you.`;
+}
+
 function useStyles(pixel: boolean) {
   return {
     card: pixel
@@ -119,6 +126,8 @@ export function Checkpoint(p: Props) {
   const [firstCheck] = useState(game && !p.textOnly && !checked);
   // The think timer waits until the camera or mic has started (or we fell back), so a permission prompt never eats it.
   const [settled, setSettled] = useState(mode === "text");
+  // A device was refused: the candidate picks voice or text with one tap, and the think timer waits until then.
+  const [choosing, setChoosing] = useState<{ voice: boolean } | null>(null);
   const [retakes, setRetakes] = useState(0);
   const [result, setResult] = useState<Recording | null>(null);
   const [text, setText] = useState("");
@@ -137,6 +146,7 @@ export function Checkpoint(p: Props) {
   const quietS = useQuiet(r.level, phase === "answer" && mode !== "text");
 
   const setMode = (m: Mode) => {
+    setChoosing(null);
     setModeState(m);
     if (game && !p.textOnly) cameraCheck.set(p.attemptId, m);
     p.onModeChange?.(m);
@@ -165,16 +175,19 @@ export function Checkpoint(p: Props) {
       if (got) return settle();
       // No dead end (C1.3, A1): camera missing means try voice, mic missing means text. Calm, not an error.
       const why = r.getError();
+      // The timer holds until the candidate picks how to answer (one tap), so nobody loses think time to a refused camera.
       if (mode === "video") {
         const voice = await r.prepare("voice");
         if (!alive) return;
         if (voice) {
-          setDeviceMsg(deviceNote("video", "voice", why));
+          setDeviceMsg(choiceNote("video", true, why));
+          setChoosing({ voice: true });
           setModeState("voice");
           return;
         }
       }
-      setDeviceMsg(deviceNote(mode, "text", why));
+      setDeviceMsg(choiceNote(mode, false, why));
+      setChoosing({ voice: false });
       setModeState("text");
     });
     // Never hold the timer forever: an unanswered permission prompt releases it after 20 seconds.
@@ -246,7 +259,7 @@ export function Checkpoint(p: Props) {
     setPhase("review");
   }, [mode, r, text]);
 
-  const thinkLeft = useCountdown(t.thinkS, phase === "think" && settled, () => void beginAnswer());
+  const thinkLeft = useCountdown(t.thinkS, phase === "think" && settled && !choosing, () => void beginAnswer());
   const answerLeft = useCountdown(t.answerS, phase === "answer", finishAnswer);
 
   const retake = async () => {
@@ -325,6 +338,18 @@ export function Checkpoint(p: Props) {
         <p className="text-sm" role="status" data-testid="device-note">
           {deviceMsg}
         </p>
+      )}
+      {choosing && (
+        <div className="flex flex-wrap gap-2" data-testid="device-choice">
+          {choosing.voice && (
+            <button className={s.primary} onClick={() => (setDeviceMsg(null), setMode("voice"))} data-testid="fallback-voice" autoFocus>
+              Answer by voice
+            </button>
+          )}
+          <button className={choosing.voice ? s.plain : s.primary} onClick={() => (setDeviceMsg(null), setMode("text"))} data-testid="fallback-text" autoFocus={!choosing.voice}>
+            Answer in text
+          </button>
+        </div>
       )}
     </>
   );
