@@ -10,6 +10,8 @@ export const PROTECTED = {
   accent: /\b(?:accent\w*|native speaker|non-?native|mother tongue|first language|pronunciation|dialect)\b/i,
   religion: /\b(?:religio\w*|church|mosque|temple|synagogue|muslim|christian|jewish|hindu|sikh|buddhist|atheist|hijab|turban|pray\w*)\b/i,
   pregnancy: /\b(?:pregnan\w*|expecting a baby|baby on the way|family plans|have kids|has kids|childcare)\b/i,
+  // Family and marital status are protected grounds in Canadian human-rights law (QA night).
+  familyStatus: /\b(?:married|marriage|marital|spouse|husband|wife|divorced|widowed|single (?:mom|mother|dad|father|parent)|family status)\b/i,
   nationality: /\b(?:nationality|citizenship|citizen|immigra\w*|visa|where (?:is|are) (?:he|she|they) from|foreign\w*|country of origin)\b/i,
 } as const;
 
