@@ -255,6 +255,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     const card = page.getByTestId("capability-card");
     // v2 Part D: a Final score exists but only sorts; it never hides or rejects anyone.
     await expect(card).toContainText("Never used to hide or reject anyone");
+    await expect(card).toContainText("Sorts only");
+    await expect(card).not.toContainText(/threshold|cut-?off|pass mark|auto-?reject/i);
     await page.getByTestId("jump-prioritization").click();
     await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
     await expect(page.getByTestId("witness-line")).toHaveText("Confirmed by 1 community partner");
