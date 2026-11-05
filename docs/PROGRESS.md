@@ -136,9 +136,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E1.5 [D] Preview as candidate, no data saved
 - [x] E1.6 [D] Publish creates public link, job code and QR
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
-- [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
+- [x] C6.1 [H] Add up to 2 witnesses with relationship: slot count, list with relationship and status in words (tests/e2e/witness.spec.ts, desktop and phone)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
-- [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
+- [x] C6.3 [H] Witness page, no account, phone, under 30 s: names the relationship, skill counter, headed done/used/invalid/expired states (tests/e2e/witness.spec.ts, tests/e2e/a11y.spec.ts on phone)
 - [x] C6.4 [D] Card shows "Confirmed by ..." never the witness email
 - [x] C6.5 [D] Reject witness email matching candidate email or domain alias
 - [x] C7.1 [D] Candidate sees own card exactly as a recruiter would
@@ -149,7 +149,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E8.1 [D] Inbox shows reused cards with covered skills
 - [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
 - [x] E5.2 [D] Exported candidate links back to the card
-- [ ] PV5 [H] "How we use AI" page linked from every screen
+- [x] PV5 [H] "How we use AI" page linked from every screen (global header; tests/e2e/a11y.spec.ts walks every route)
 - Done when: the five-step loop from the PRD Summary works end to end on the deployed site.
 
 ### M4 additions: integration layer (v2 Part C) and scoring (Part D)
@@ -180,8 +180,8 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] C8.1 [D] Practice mode, nothing shared, deleted after 24 h
 - [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
-- [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)
-- [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
+- [x] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe): zero serious/critical axe findings on every route in light and dark (tests/e2e/a11y.spec.ts, lib/store/accommodations.test.ts; docs/POLISH.md)
+- [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
 - [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics

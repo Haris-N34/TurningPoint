@@ -255,7 +255,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
           <div className="flex gap-3">
             <Portrait id={caller.portrait} expression="worried" className="size-20 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45]" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#d9472b]">Turning point</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#c43d22]">Turning point</p>
               <h2 className={cn(pixelTitle.className, "mt-1 text-[13px] leading-snug")}>{d.title}</h2>
               <p className="mt-2 text-[16px]">{caller.name}: “{d.text}”</p>
             </div>
@@ -263,7 +263,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
           {phase === "drain" && (
             <div className="mt-3 rounded-[4px] border-2 border-[#2e222f] bg-white p-2 text-center">
               <p className="text-xs font-semibold uppercase">Budget</p>
-              <motion.p className={cn(pixelTitle.className, "text-[18px] text-[#d9472b]")} data-testid="budget-drain">{shown}</motion.p>
+              <motion.p className={cn(pixelTitle.className, "text-[18px] text-[#c43d22]")} data-testid="budget-drain">{shown}</motion.p>
             </div>
           )}
           <div className="mt-3 flex justify-end">
@@ -374,7 +374,7 @@ export function ResultsScreen({ scenario, state, kpis, onContinue }: { scenario:
         <h3 className="mt-4 text-sm font-bold">Your key moments</h3>
         <ol className="mt-1 flex gap-2 overflow-x-auto pb-2">
           {moments.map((e, i) => (
-            <li key={i} className={cn("min-w-[150px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[12px]", e.kind === "turning_point" ? "bg-[#d9472b] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
+            <li key={i} className={cn("min-w-[150px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[12px]", e.kind === "turning_point" ? "bg-[#c43d22] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
               <span className="block font-bold">{formatTime(e.t)}</span>
               {label(e)}
             </li>

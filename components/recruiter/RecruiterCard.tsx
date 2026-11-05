@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,7 +34,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   };
   useEffect(load, [attemptId, challengeId]);
 
-  if (view === undefined) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (view === undefined) return <PageSkeleton />;
   const back = (
     <Button asChild variant="link" className="px-0">
       <Link href={`/recruiter?challenge=${challengeId}`}>← Inbox</Link>

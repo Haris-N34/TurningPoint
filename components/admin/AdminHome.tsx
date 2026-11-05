@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ export function AdminHome() {
   const [list, setList] = useState<Challenge[] | null>(null);
   const refresh = () => setList(listChallenges(store()));
   useEffect(refresh, []);
-  if (!list) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (!list) return <PageSkeleton />;
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 sm:px-10" data-testid="admin-home">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Employer admin</p>

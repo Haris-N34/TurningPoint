@@ -77,7 +77,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
     setProfile(p);
     // Extra-time accommodations switch on turn-based mode automatically (A5).
     if (p.accommodations.timeMultiplier > 1) setSettings({ turnBased: true });
-    if (p.accommodations.reducedMotion) setSettings({ reducedMotion: true });
+    if (p.accommodations.reducedMotion || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setSettings({ reducedMotion: true });
     setHydrated(true);
     if (!sandbox) {
       const r = s.activeRun(challenge.id);

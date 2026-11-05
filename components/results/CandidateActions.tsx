@@ -7,7 +7,8 @@ import { getChallenge, reusableFor } from "@/lib/challenge/challenge";
 import { SKILLS } from "@/lib/engine/skills";
 import { deleteMyData } from "@/lib/store/delete";
 import { store } from "@/lib/store/store";
-import { addWitness, confirmationLine, RELATIONSHIPS, witnessesFor } from "@/lib/witness/witness";
+import { addWitness, confirmationLine, MAX_WITNESSES, RELATIONSHIPS, witnessesFor } from "@/lib/witness/witness";
+import { RELATIONSHIP_LABELS, witnessStatus } from "@/components/witness/labels";
 
 const skillName = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
 
@@ -45,8 +46,26 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
           <h2 id="w-h" className="font-display text-2xl">Add a witness (optional)</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Someone who saw your real turning point. Employers see the relationship and their sentence, never their email.</p>
           {confirmationLine(card.realStory.witnesses) && <p className="mt-2 text-sm font-medium">{confirmationLine(card.realStory.witnesses)}</p>}
-          {witnesses.length >= 2 && <p className="mt-4 text-sm text-muted-foreground">Both witness slots are in use.</p>}
-          {witnesses.length < 2 && (
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold">Your witnesses</h3>
+            <p className="text-xs text-muted-foreground" data-testid="witness-slots">{witnesses.length} of {MAX_WITNESSES} witnesses added</p>
+          </div>
+          <ul className="mt-2 space-y-2" data-testid="witness-list">
+            {witnesses.map((w, i) => {
+              const status = witnessStatus(w);
+              return (
+                <li key={w.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-background px-3 py-2 text-sm">
+                  <span><span className="font-medium">Witness {i + 1}</span> · {RELATIONSHIP_LABELS[w.relationship]}</span>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${status === "Confirmed" ? "border-primary text-primary" : "text-muted-foreground"}`}>
+                    <span aria-hidden>{status === "Confirmed" ? "✓ " : status === "Waiting for reply" ? "… " : "· "}</span>{status}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {!witnesses.length && <p className="mt-2 rounded-lg border border-dashed px-3 py-3 text-sm text-muted-foreground">No witnesses yet. Add someone who saw your real turning point.</p>}
+          {witnesses.length >= MAX_WITNESSES && <p className="mt-4 text-sm text-muted-foreground">Both witness slots are in use.</p>}
+          {witnesses.length < MAX_WITNESSES && (
             <form
               className="mt-5 grid gap-3"
               onSubmit={(e) => {
@@ -73,7 +92,7 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
               <label className="text-sm font-medium" htmlFor="w-rel">Relationship</label>
               <select id="w-rel" value={rel} onChange={(e) => setRel(e.target.value as typeof rel)} className="min-h-11 w-full rounded-md border bg-background px-3 py-2">
                 {RELATIONSHIPS.map((r) => (
-                  <option key={r} value={r}>{r.replace("_", " ")}</option>
+                  <option key={r} value={r}>{RELATIONSHIP_LABELS[r]}</option>
                 ))}
               </select>
               <button className="min-h-11 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">Add</button>

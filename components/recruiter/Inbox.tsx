@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -75,7 +76,7 @@ export function Inbox() {
 
   useEffect(() => setSel((i) => Math.min(i, Math.max(0, rows.length - 1))), [rows.length]);
 
-  if (challenges === null) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (challenges === null) return <PageSkeleton />;
 
   if (!challenges.length) {
     return (
@@ -232,7 +233,7 @@ export function Inbox() {
           Compare {picked.length ? `(${picked.length})` : ""}
         </Button>
         <span className="text-xs text-muted-foreground" aria-live="polite">
-          {picked.length < COMPARE_MIN ? `Pick ${COMPARE_MIN} or ${COMPARE_MAX} cards to compare side by side.` : `${picked.length} picked. No ranking, no overall score.`}
+          {picked.length < COMPARE_MIN ? `Pick ${COMPARE_MIN} or ${COMPARE_MAX} cards to compare side by side.` : `${picked.length} picked. Side by side, evidence first.`}
         </span>
       </div>
 
@@ -332,10 +333,10 @@ export function Inbox() {
       </p>
 
       {toast && (
-        <div role="status" className="fixed bottom-4 right-4 z-50 max-w-md rounded-xl border bg-card p-4 text-sm shadow-card" data-testid="toast">
+        <div role="status" className="fixed bottom-4 left-4 right-4 z-50 max-w-md rounded-xl sm:left-auto border bg-card p-4 text-sm shadow-card" data-testid="toast">
           <div className="flex items-start justify-between gap-3">
             <p className="font-medium">{toast.text}</p>
-            <button type="button" aria-label="Dismiss" onClick={() => setToast(null)} className="text-muted-foreground">✕</button>
+            <button type="button" aria-label="Dismiss" onClick={() => setToast(null)} className="-m-2 inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground">✕</button>
           </div>
           {toast.payload && (
             <details className="mt-2">
