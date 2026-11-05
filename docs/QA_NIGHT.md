@@ -1,5 +1,14 @@
 # QA night (Nov 5)
 
+## Final summary (15:05 UTC)
+
+- **44 bugs logged: 15 S1, 17 S2, 12 S3. All 44 closed.** 32 fixed by QA (lib, fixtures, tests), 12 fixed by their owners after a failing test or repro from QA (agents A, B, C and the parent), each re-verified on the integration branch.
+- **S1 highlights fixed:** forged and self-asserted badges (`/verify` accepted any key; `/api/credentials` signed any levels; now server re-scores the answers and binds a digest); names with accents, Copilot word timings and resume short school names leaked identity to AI inputs; practice and un-invited results posted to the employer side; accommodation status and focus-loss notes reached employers; generic answers scored Strong; Copilot answered culture-fit and treated marital status as fair game; a full disk crashed the game; Quick mode dropped employer tailoring; demo recovery jump, Final score popover over Shortlist, Maya's card contradicting the demo.
+- **Scanner:** 0.2.0 to 0.7.1 tonight (specificity, one quote per skill, own-words preference, people-action for Collaboration, plain-sentence summaries, clause-boundary quotes). AI cross-check of the gold set: 36/48 before and after every change, same disagreements, never over-credits (`lib/ai/evals/crosscheck.test.ts` holds the floor). B.10 still needs the team's own labels.
+- **Final state (integration 3882eeb merged into night/qa):** lint and typecheck green; vitest 865 passed; full CI-style e2e 248 passed / 0 failed earlier this afternoon with one flaky spec since hardened by its owner; every tests/qa spec green; stage path on a plain production build 10/10 (about 11 s); demo-60s 10/10 on hook builds.
+- **Before sharing the Vercel URL:** set `TP_ISSUER_ED25519_KEY` and `TP_CONSOLE_SECRET` (docs/DEPLOY.md). Never set `NEXT_PUBLIC_TEST_HOOKS` there.
+- **Still worth a human look:** B.10 gold labels (both team members); a timed human rehearsal of the long demo script; physical phone and screen-reader checks (A1 to A5).
+
 Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1 breaks the demo or a hard rule, S2 a user-visible bug, S3 polish.
 
 | # | Bug | Sev | Status | Test | Owner |
