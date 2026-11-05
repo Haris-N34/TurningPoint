@@ -1,6 +1,6 @@
 # AI evals
 
-Generated 2026-11-05 by `pnpm evals:report` (lib/ai/evals). Scanner: `evidence-scanner@1.0.0+0.4.0`, local rules. These run in CI with the unit tests; a drop below the bars fails the build.
+Generated 2026-11-05 by `pnpm evals:report` (lib/ai/evals). Scanner: `evidence-scanner@1.0.0+0.5.0`, local rules. These run in CI with the unit tests; a drop below the bars fails the build.
 
 | Eval | Bar | Result | Status |
 | --- | --- | --- | --- |

@@ -8,6 +8,8 @@ const MAYA_ANON = mayaFixture.anonId;
 async function seed(page: Page) {
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();
+  // The "seeded" page renders before its effect writes the data; wait for Maya's share to be stored.
+  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("tp:shares") ?? "[]") as { attemptId: string }[]).some((s) => s.attemptId === "att_demo_maya"));
 }
 const MAYA = "att_demo_maya";
 const CARD = `/recruiter/card/${MAYA}?challenge=ch_demo_energy`;
@@ -101,7 +103,7 @@ test("card fits one laptop screen and has no serious accessibility issues (E3, A
 test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
   await seed(page);
   await page.evaluate((id) => {
-    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    const shares = JSON.parse(localStorage.getItem("tp:shares") ?? "[]");
     shares.push({ id: `sh_${id}_ch_demo_bank`, attemptId: id, challengeId: "ch_demo_bank", reused: true, createdAt: new Date().toISOString() });
     localStorage.setItem("tp:shares", JSON.stringify(shares));
   }, MAYA);
@@ -111,7 +113,7 @@ test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
   await expect(page.getByTestId("reused-badge")).toContainText("Reused from a previous challenge");
 
   await page.evaluate((id) => {
-    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    const shares = JSON.parse(localStorage.getItem("tp:shares") ?? "[]");
     for (const s of shares) if (s.attemptId === id && s.challengeId === "ch_demo_bank") s.revokedAt = new Date().toISOString();
     localStorage.setItem("tp:shares", JSON.stringify(shares));
   }, MAYA);
@@ -171,4 +173,24 @@ test("employers never see accommodation status: card, inbox and compare (privacy
   await page.goto(`/recruiter/compare?challenge=ch_demo_energy&ids=${MAYA},att_demo_peer_01`);
   await expect(page.getByTestId("compare")).toBeVisible();
   await expect(page.getByTestId("compare")).not.toContainText(hidden);
+});
+
+test("decision path keeps the turning point in view, with arrows when the path scrolls", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "checked at laptop sizes");
+  await seed(page);
+  for (const viewport of [{ width: 1280, height: 720 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto(CARD);
+    const path = page.getByTestId("decision-path");
+    await expect(page.getByTestId("turning-point-marker")).toBeVisible();
+    const m = (await page.getByTestId("turning-point-marker").boundingBox())!;
+    const p = (await path.boundingBox())!;
+    expect(m.x).toBeGreaterThanOrEqual(p.x);
+    expect(m.x + m.width).toBeLessThanOrEqual(p.x + p.width);
+    if (await path.evaluate((el) => el.scrollWidth > el.clientWidth)) {
+      await expect(page.getByTestId("path-right")).toBeVisible();
+      await page.getByTestId("path-right").click();
+      await expect.poll(() => path.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+    }
+  }
 });

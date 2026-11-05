@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import type { Card } from "@/lib/card/types";
-import { store } from "@/lib/store/store";
+import { isPracticeChallenge } from "@/lib/practice/practice";
+import { store, type Store } from "@/lib/store/store";
 import { summarize } from "./summary";
 
 // Browser side of the integration layer: which demo company this browser acts as, the invite token a
@@ -27,12 +28,20 @@ const inviteKey = (challengeId: string) => `invite:${challengeId}`;
 export const saveInvite = (challengeId: string, token: string) => store().setJSON(inviteKey(challengeId), token);
 export const inviteFor = (challengeId: string) => store().getJSON(inviteKey(challengeId), z.string());
 
-/** Send the evidence summary once per attempt. No name, email, transcript or media leaves the browser. */
-export async function reportFinished(card: Card) {
-  const s = store();
+type Delivered = { delivery?: { status: string; provider: string } };
+
+/**
+ * Send the evidence summary once per attempt, and only when the candidate came through an employer's ATS
+ * invite (C.3): applying there is their consent to report back. Never for a practice run (C8.1), never for
+ * a card the candidate has not sent anywhere. No name, email, transcript or media leaves the browser.
+ */
+export async function reportFinished(card: Card, s: Store = store(), post: (body: unknown) => Promise<Delivered> = (b) => integrationsApi<Delivered>("attempts", b)) {
+  if (isPracticeChallenge(card.challenge.id) || s.isPractice(card.attemptId)) return undefined;
+  const invite = s.getJSON(inviteKey(card.challenge.id), z.string());
+  if (!invite) return undefined;
   const key = `reported:${card.attemptId}`;
   if (s.getJSON(key, z.boolean())) return undefined;
-  const r = await integrationsApi<{ delivery?: { status: string; provider: string } }>("attempts", { summary: summarize(card, inviteFor(card.challenge.id)) });
+  const r = await post({ summary: summarize(card, invite) });
   s.setJSON(key, true);
   return r;
 }

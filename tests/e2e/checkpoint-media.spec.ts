@@ -72,8 +72,9 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   await scriptedSpeech(page, [
     [
       { at: 200, type: "interim", text: "I cut the" },
-      { at: 900, type: "final", text: "I cut the second weekend" },
-      { at: 1300, type: "end" }, // browser ends recognition by itself (silence)
+      // Interim words stay up for a few seconds so a slow test machine still sees them.
+      { at: 4000, type: "final", text: "I cut the second weekend" },
+      { at: 4400, type: "end" }, // browser ends recognition by itself (silence)
     ],
     [
       { at: 300, type: "interim", text: "because vendors" },
@@ -84,8 +85,8 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   await expect(cp.getByTestId("mic-meter")).toBeVisible();
   await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "listening");
   await expect(cp.getByTestId("interim")).toHaveText("I cut the");
-  await expect(cp.getByTestId("live-captions")).toContainText("I cut the second weekend");
-  await expect(cp.getByTestId("live-captions")).toContainText("because vendors were the draw", { timeout: 5000 });
+  await expect(cp.getByTestId("live-captions")).toContainText("I cut the second weekend", { timeout: 8000 });
+  await expect(cp.getByTestId("live-captions")).toContainText("because vendors were the draw", { timeout: 10_000 });
   expect(await page.evaluate(() => (window as unknown as { __recStarts: number }).__recStarts)).toBeGreaterThanOrEqual(2);
 
   await cp.getByRole("button", { name: "Done" }).click();
@@ -200,14 +201,17 @@ test("game: the checkpoint pops up as a video interview with the camera on by de
   await expect(cp.getByTestId("choice-letter")).toHaveText("C");
   await expect(cp.getByTestId("checkpoint-question")).toContainText("Walk us through why.");
   await expect(cp.getByTestId("timer-label")).toHaveText("Think 30s");
-  await expect(cp.getByText("Take 30 seconds to think.")).toBeVisible();
+  await expect(cp.getByTestId("think-note")).toContainText("Then 120 seconds to answer.");
   await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 15_000 });
   await expect.poll(() => cp.getByTestId("camera-preview").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 10_000 }).toBeGreaterThan(0);
   // The mic meter moves with the fake device's beep.
   await expect.poll(async () => Number(await cp.getByTestId("mic-meter").getAttribute("data-level")), { timeout: 10_000, intervals: [100] }).toBeGreaterThan(0);
   // Text is always one click away (hard rule: no camera needed).
   await expect(cp.locator('input[value="text"]')).toBeEnabled();
-  if ((page.viewportSize()?.width ?? 0) >= 640) await expect(cp.getByTestId("switch-text")).toBeVisible();
+  // One way to switch: the "Answer by" choices under the preview, with a hint (no duplicate buttons).
+  await expect(cp.getByTestId("camera-hint")).toContainText("Rather not be on camera?");
+  await expect(cp.getByTestId("switch-text")).toHaveCount(0);
+  await expect(cp.getByRole("group", { name: "Answer by" })).toBeVisible();
 
   // Keyboard only: the start button has focus.
   await expect(cp.getByRole("button", { name: /start answering/i })).toBeFocused();
@@ -258,7 +262,8 @@ test("game: timer accommodation still applies in the interview", async ({ page }
     if (!localStorage.getItem("tp:profile")) localStorage.setItem("tp:profile", JSON.stringify({ accommodations: { timeMultiplier: 1.5, textOnly: false } }));
   });
   const cp = await toGameCheckpoint(page);
-  await expect(cp.getByText(/Take 23 seconds to think\. You then have 90 seconds\./)).toBeVisible();
+  await expect(cp.getByTestId("timer-label")).toHaveText("Think 23s");
+  await expect(cp.getByTestId("think-note")).toContainText("Then 90 seconds to answer.");
 });
 
 // The 60 s stage demo: the recovery pick is the run's first checkpoint, so the camera check happens there.
@@ -291,11 +296,27 @@ test("demo path: camera already allowed, the first checkpoint opens on camera wi
   const cp = await toDemoCheckpoint(page);
   await expect(cp.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose B, to keep Saturday and Sunday/);
   await expect(cp.getByTestId("choice-letter")).toHaveText("B");
+  // The recovery plan comes from the HQ laptop, a prop: the hiring panel asks instead.
+  await expect(cp.getByTestId("interviewer")).toContainText("Hiring panel");
+  await expect(cp.getByTestId("interviewer")).not.toContainText(/laptop/i);
   await expect(cp).toHaveAttribute("data-mode", "video");
   await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 5000 });
   // The think timer is already running: no extra click, no waiting on a prompt.
   await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
   await expect(cp.getByRole("button", { name: /start answering/i })).toBeVisible();
+  // Game modals keep the primary action bottom right.
+  const card = (await cp.locator("> div").first().boundingBox())!;
+  const btn = (await cp.getByRole("button", { name: /start answering/i }).boundingBox())!;
+  expect(card.x + card.width - (btn.x + btn.width)).toBeLessThan(40);
+});
+
+test("recruiter card words a retake neutrally", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "one size is enough");
+  await page.goto("/demo/seed");
+  await expect(page.getByTestId("seeded")).toBeVisible();
+  await page.goto("/recruiter/card/att_demo_maya?challenge=ch_demo_energy");
+  await expect(page.getByTestId("integrity")).toContainText("Answered on the second take");
+  await expect(page.getByTestId("capability-card")).not.toContainText("Retake used");
 });
 
 test("demo path: camera and mic refused, the first checkpoint opens calmly in text", async ({ page }, info) => {

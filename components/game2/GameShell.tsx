@@ -431,12 +431,18 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
           )}
+          {/* A pixel frame around the Phaser minimap (160x120, 12 px from the corner; hidden when frozen or short). */}
+          {settings.view === "map" && !frozen && (
+            <div className="pointer-events-none absolute bottom-[9px] right-[9px] z-10 h-[126px] w-[166px] rounded-[4px] border-[3px] border-[#2e222f] shadow-[0_3px_0_#2e222f] [@media(max-height:479px)]:hidden" aria-hidden data-testid="minimap-frame" />
+          )}
           {!cutscene && <Toasts />}
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
           {reaction?.line && <ReactionBox scenario={scenario} {...reaction} />}
+          {/* A silent reaction shows no box, but input still waits for the beat to end (a checkpoint may be next). */}
+          {reaction && !reaction.line && <div className="absolute inset-0 z-40" data-testid="reaction" aria-hidden />}
           {cutscene && (
             <Cutscene
               scenario={scenario}
@@ -515,7 +521,7 @@ function OrderPick({ scenario, state, onDone }: { scenario: ReturnType<typeof ge
             return (
               <li key={i.id}>
                 <button className={cn("flex min-h-11 w-full items-center gap-2 rounded-[4px] border-2 border-[#2e222f] p-2 text-left text-[15px] shadow-[inset_0_-3px_0_#e8d9b5] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166]", n >= 0 ? "bg-[#ffe08a]" : "bg-white hover:bg-[#fff1c4]")} onClick={() => setRank((r) => (n >= 0 ? r.filter((x) => x !== i.id) : [...r, i.id]))} data-testid={`rank-${i.id}`}>
-                  <span className="flex size-6 items-center justify-center rounded-[3px] bg-[#2e222f] text-sm font-bold text-white">{n >= 0 ? n + 1 : ""}</span>
+                  <span className={cn(pixelTitle.className, "flex size-6 shrink-0 items-center justify-center rounded-[3px] border-2 border-[#2e222f] text-[10px]", n >= 0 ? "bg-[#2e222f] text-[#ffd166]" : "bg-white")}>{n >= 0 ? n + 1 : ""}</span>
                   {i.title}
                 </button>
               </li>

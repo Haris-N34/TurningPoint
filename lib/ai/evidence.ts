@@ -1,13 +1,14 @@
 import type { CardCheckpoint, Evidence } from "@/lib/card/types";
 import { verifyEvidence } from "@/lib/card/verify";
 import { locateQuote } from "@/lib/checkpoint/transcript";
+import { protectedMentions } from "./guards/protected";
 import type { SkillSlug } from "@/lib/engine/skills";
 
 // Local, rule-based evidence extraction (demo scope: no API keys). It organises evidence for a human;
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.4.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.5.0" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -133,10 +134,48 @@ function judge(skill: SkillSlug, text: string, signalled: boolean, context: stri
   return quotes.length ? { level, quotes } : undefined;
 }
 
-const SENTENCE: Record<Candidate["level"], string> = {
-  strong: "Names the trade-off, says why, and considers who it affects.",
-  some: "Gives a reason for the decision, without naming a trade-off.",
+// AI summary lines (judge feedback): specific to each skill and to its own quote, so no two skills on a card
+// read the same. A plain lead per skill and level, then up to three concrete words from the quote itself.
+const LEAD: Record<SkillSlug, Record<Candidate["level"], string>> = {
+  "problem-solving": { strong: "Breaks the problem down, picks a fix, and names what it costs", some: "Proposes a fix and says why" },
+  adaptability: { strong: "Changes the plan when it stops working and names what the change costs", some: "Adjusts the plan and gives a reason" },
+  resilience: { strong: "Keeps going after the setback and says what it cost and who it touched", some: "Keeps going after the setback, with a reason" },
+  ambiguity: { strong: "Makes a call without full information and weighs the risk on others", some: "Makes a call under uncertainty and explains it" },
+  prioritization: { strong: "Chooses what to protect and what to cut, and who pays for it", some: "Says what comes first and why" },
+  creativity: { strong: "Finds a resourceful option and weighs what it gives up", some: "Finds a resourceful option and says why" },
+  collaboration: { strong: "Brings people in and weighs time against keeping the team", some: "Involves others in the decision and says why" },
+  empathy: { strong: "Considers how people feel and lets it shape the trade-off", some: "Notices how others are affected and explains the response" },
+  communication: { strong: "Tells the right people early and weighs what to say against the cost", some: "Explains the decision to others and says why" },
+  feedback: { strong: "Takes criticism on board, changes course, and names the cost", some: "Responds to feedback with a reason" },
+  analytical: { strong: "Reads the evidence, compares options, and names the trade-off", some: "Uses evidence to reach the decision" },
+  curiosity: { strong: "Digs for what others missed and weighs what it costs", some: "Looks into the problem before deciding" },
 };
+
+// Verb-like words make poor topics ("losing, hurt"); the topic should name things.
+const VERBISH = /(?:ing|ed)$/i;
+const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said".split(" "));
+
+/** Up to three concrete words from the quote (things, not filler or verbs), in the order and case spoken. */
+function topicOf(quote: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  // Redaction placeholders ([name], [university]) are not topics.
+  for (const raw of quote.replace(/\[[a-z]+\]/g, " ").match(/[A-Za-z][A-Za-z'’-]{3,}/g) ?? []) {
+    const w = raw.replace(/['’]s$/, "");
+    const lw = w.toLowerCase();
+    // Never echo a word the protected-trait guard would flag (it reads summaries outside quotation marks).
+    if (GENERIC.has(lw) || ABSTRACT.has(lw) || VERBS.has(lw) || VERBISH.test(lw) || seen.has(stem(lw)) || protectedMentions(lw).length) continue;
+    seen.add(stem(lw));
+    out.push(w);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+export function summaryLine(skill: SkillSlug, level: Candidate["level"], quote: string): string {
+  const topic = topicOf(quote);
+  return topic.length ? `${LEAD[skill][level]}: ${topic.join(", ")}.` : `${LEAD[skill][level]}.`;
+}
 
 export function extractEvidence(input: ExtractInput): Evidence[] {
   // The decision behind a checkpoint: its question, the option picked and the issue or prompt.
@@ -177,7 +216,7 @@ export function extractEvidence(input: ExtractInput): Evidence[] {
     return {
       skill,
       level: best.level,
-      sentence: SENTENCE[best.level],
+      sentence: summaryLine(skill, best.level, best.quote),
       source: { type: "clip" as const, checkpointId: best.checkpointId, quote: best.quote, startS: loc.startS, endS: loc.endS },
     };
   });

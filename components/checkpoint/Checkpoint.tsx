@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Portrait } from "@/components/game2/Portrait";
+import manifest from "@/public/assets/portraits/manifest.json";
 import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { UNSUPPORTED_MESSAGE } from "@/lib/checkpoint/speech";
@@ -72,6 +73,9 @@ function useCountdown(seconds: number, running: boolean, onZero: () => void) {
   }, [seconds, running]);
   return left;
 }
+
+const portraitIds = new Set((manifest as { portraits: { id: string }[] }).portraits.map((x) => x.id));
+const hasPortrait = (id: string) => portraitIds.has(id);
 
 const hasVideo = (s: MediaStream | null) => !!s?.getVideoTracks().some((t) => t.readyState === "live");
 
@@ -260,7 +264,7 @@ export function Checkpoint(p: Props) {
     const integrity: IntegrityNote[] = [];
     const lost = Math.round(focusLostMs.current / 1000);
     if (lost > 0) integrity.push({ checkpointId: p.id, kind: "focus_lost", detail: `Window lost focus for ${lost} second${lost === 1 ? "" : "s"} during the answer` });
-    if (retakes > 0) integrity.push({ checkpointId: p.id, kind: "retake_used", detail: "Retake used" });
+    if (retakes > 0) integrity.push({ checkpointId: p.id, kind: "retake_used", detail: "Answered on the second take" });
     // Fixing misheard words is allowed before submit (C7.2 forbids edits after). Recruiters see that it happened and the original.
     const recognized = mode === "text" ? undefined : result.transcript.text;
     const changed = recognized === undefined || transcript.text === recognized ? 0 : wordsChanged(recognized, transcript.text);
@@ -298,13 +302,40 @@ export function Checkpoint(p: Props) {
     if (e.type === "paste") setPasteBlocked(true);
   };
 
+  const retakeBtn = retakes < MAX_RETAKES && (
+    <button onClick={retake} className={s.plain}>
+      Retake ({MAX_RETAKES - retakes} left)
+    </button>
+  );
+
+  const startBtn = (
+    <button onClick={() => void beginAnswer()} className={s.primary} autoFocus>
+      I&apos;m ready, start answering
+    </button>
+  );
+
+  const thinkNotes = (
+    <>
+      {mode !== "text" && !speechSupported() && (
+        <p className="text-sm" role="note" data-testid="speech-unsupported">
+          {UNSUPPORTED_MESSAGE}
+        </p>
+      )}
+      {deviceMsg && (
+        <p className="text-sm" role="status" data-testid="device-note">
+          {deviceMsg}
+        </p>
+      )}
+    </>
+  );
+
   const label = p.title ?? (p.kind === "real_life" ? "Real-life checkpoint" : p.kind === "follow_up" ? "One follow-up" : "Checkpoint");
   const recording = phase === "answer" && mode !== "text";
 
   const modePicker = (
-    <fieldset>
-      <legend className="text-sm font-medium">Answer by</legend>
-      <div className="mt-2 flex flex-wrap gap-2" role="radiogroup">
+    <fieldset className={cn(game && "flex flex-wrap items-center gap-x-3 gap-y-2")}>
+      <legend className={cn("text-sm font-medium", game && "float-left mr-3 py-1.5")}>Answer by</legend>
+      <div className={cn("flex flex-wrap gap-2", !game && "mt-2")} role="radiogroup">
         {(["video", "voice", "text"] as Mode[]).map((m) => (
           <label key={m} className={cn(s.chip(mode === m), p.textOnly && m !== "text" && "opacity-40")}>
             <input type="radio" name={`mode-${p.id}`} className="sr-only" value={m} checked={mode === m} disabled={p.textOnly && m !== "text"} onChange={() => (setDeviceMsg(null), setMode(m))} />
@@ -328,7 +359,7 @@ export function Checkpoint(p: Props) {
         </p>
       )}
       {mode === "video" && (
-        <div className={cn("relative aspect-video h-32 max-w-full overflow-hidden bg-black sm:h-auto sm:w-full", game ? "rounded-[4px] border-[3px] border-[#2e222f]" : "rounded-2xl")}>
+        <div className={cn("relative aspect-video h-32 max-w-full overflow-hidden bg-black sm:h-auto sm:max-h-[26svh] sm:w-full", game ? "rounded-[4px] border-[3px] border-[#2e222f]" : "rounded-2xl")}>
           <video ref={videoRef} autoPlay muted playsInline className="h-full w-full -scale-x-100 object-cover" aria-label="Your camera preview" data-testid="camera-preview" />
           {!hasVideo(r.stream) && <p className="absolute inset-0 flex items-center justify-center p-3 text-center text-sm text-white/80">Starting your camera…</p>}
           {recording && (
@@ -348,16 +379,9 @@ export function Checkpoint(p: Props) {
       )}
       {mode !== "text" && <MicMeter level={r.level} pixel={game} />}
       {phase === "think" && game && mode === "video" && (
-        // Phones: the "Answer by" choices right below already do this; skip the duplicate row to save height.
-        <div className="hidden flex-wrap gap-2 sm:flex">
-          <span className="self-center text-xs">Rather not be on camera?</span>
-          <button className={cn(s.plain, "min-h-8 px-2 py-0 text-sm")} onClick={() => (setDeviceMsg(null), setMode("voice"))} data-testid="switch-voice">
-            Voice instead
-          </button>
-          <button className={cn(s.plain, "min-h-8 px-2 py-0 text-sm")} onClick={() => (setDeviceMsg(null), setMode("text"))} data-testid="switch-text">
-            Text instead
-          </button>
-        </div>
+        <p className="text-xs" data-testid="camera-hint">
+          Rather not be on camera? Pick voice or text below.
+        </p>
       )}
       {recording && quietS > 5 && (
         <p className="text-xs" role="status" data-testid="quiet-hint">
@@ -368,19 +392,30 @@ export function Checkpoint(p: Props) {
     </div>
   );
 
+  // Props (the HQ laptop, an old report) don't interview anyone: the hiring panel asks instead.
+  const person = p.interviewer?.portrait && hasPortrait(p.interviewer.portrait) ? p.interviewer : undefined;
+  const ring =
+    phase === "think" ? (
+      <Ring left={thinkLeft} total={t.thinkS} label="Think time" caption={`Think ${t.thinkS}s`} pixel={game} />
+    ) : phase === "answer" ? (
+      <Ring left={answerLeft} total={t.answerS} label="Answer time" caption={`Answer ${t.answerS}s`} pixel={game} />
+    ) : null;
+
   const interviewerSide = game && (
     <div className="flex items-start gap-3" data-testid="interviewer">
       <div className="shrink-0">
-        {p.interviewer?.portrait ? (
-          <Portrait id={p.interviewer.portrait} className="h-12 w-12 sm:h-24 sm:w-24 rounded-[4px] border-[3px] border-[#2e222f]" />
+        {person ? (
+          <Portrait id={person.portrait!} className="h-12 w-12 sm:h-24 sm:w-24 rounded-[4px] border-[3px] border-[#2e222f]" />
         ) : (
           <PanelPortrait className="h-12 w-12 sm:h-24 sm:w-24 rounded-[4px] border-[3px] border-[#2e222f]" />
         )}
       </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold">{p.interviewer?.name ?? "Hiring panel"}</p>
-        <p className="text-xs opacity-80">{p.interviewer?.role ?? (p.kind === "real_life" ? "Last question: something real" : p.kind === "follow_up" ? "One follow-up on what you said" : "Asking about the choice you just made")}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold">{person?.name ?? "Hiring panel"}</p>
+        <p className="text-xs opacity-80">{person?.role ?? (p.kind === "real_life" ? "Last question: something real" : p.kind === "follow_up" ? "One follow-up on what you said" : "Asking about the choice you just made")}</p>
       </div>
+      {/* In the game the timer sits beside the interviewer, so the modal needs no header row. */}
+      <div className="ml-auto">{ring}</div>
     </div>
   );
 
@@ -413,42 +448,46 @@ export function Checkpoint(p: Props) {
               </div>
             )}
           </div>
-          {phase === "think" && <Ring left={thinkLeft} total={t.thinkS} label="Think time" caption={`Think ${t.thinkS}s`} pixel={game} />}
-          {phase === "answer" && <Ring left={answerLeft} total={t.answerS} label="Answer time" caption={`Answer ${t.answerS}s`} pixel={game} />}
+          {!game && ring}
         </div>
 
         {game && (
-          <div className={cn("mt-3 grid gap-4", (phase === "think" || phase === "answer") && "sm:grid-cols-2")}>
+          <div className={cn("mt-2 grid gap-4", (phase === "think" || phase === "answer") && "sm:grid-cols-2")}>
             <div className="space-y-3">
               {interviewerSide}
               <div className={cn("relative p-3", s.well)}>
                 <TypedQuestion text={p.question} className="text-base sm:text-lg" pixel />
               </div>
+              {phase === "think" && (
+                <>
+                  {/* The ring already says "Think 15s"; this line only adds the answer time. */}
+                  <p className="text-sm opacity-80" data-testid="think-note">
+                    Then <Num pixel>{t.answerS}</Num> seconds to answer.{firstCheck && mode === "video" ? "" : " Only your words are used, never your face or voice."}
+                  </p>
+                  {thinkNotes}
+                </>
+              )}
             </div>
-            {(phase === "think" || phase === "answer") && <div className="space-y-3">{mode !== "text" ? you : phase === "think" ? <TextNote /> : null}</div>}
+            {(phase === "think" || phase === "answer") && (
+              <div className="space-y-3">
+                {mode !== "text" ? you : phase === "think" ? <TextNote /> : null}
+                {phase === "think" && modePicker}
+                {/* Primary action bottom right, inside the column so the modal stays short. */}
+                {phase === "think" && <div className="flex justify-end">{startBtn}</div>}
+              </div>
+            )}
           </div>
         )}
 
-        {phase === "think" && (
+        {phase === "think" && !game && (
           <div className="mt-5 space-y-4">
             <p className="text-sm opacity-80">
-              Take <Num pixel={game}>{t.thinkS}</Num> seconds to think. You then have <Num pixel={game}>{t.answerS}</Num> seconds.{firstCheck && mode === "video" ? "" : " Only your words are used, never your face or voice."}
+              Take {t.thinkS} seconds to think. You then have {t.answerS} seconds. Only your words are used, never your face or voice.
             </p>
             {modePicker}
-            {mode !== "text" && !speechSupported() && (
-              <p className="text-sm" role="note" data-testid="speech-unsupported">
-                {UNSUPPORTED_MESSAGE}
-              </p>
-            )}
-            {!game && mode !== "text" && <MicMeter level={r.level} />}
-            {deviceMsg && (
-              <p className="text-sm" role="status" data-testid="device-note">
-                {deviceMsg}
-              </p>
-            )}
-            <button onClick={() => void beginAnswer()} className={s.primary} autoFocus>
-              I&apos;m ready, start answering
-            </button>
+            {thinkNotes}
+            {mode !== "text" && <MicMeter level={r.level} />}
+            {startBtn}
           </div>
         )}
 
@@ -483,9 +522,11 @@ export function Checkpoint(p: Props) {
                 {deviceMsg}
               </p>
             )}
-            <button onClick={finishAnswer} className={s.primary} disabled={mode === "text" && !text.trim()} autoFocus={mode !== "text"}>
-              Done
-            </button>
+            <div className={cn(game && "flex justify-end")}>
+              <button onClick={finishAnswer} className={s.primary} disabled={mode === "text" && !text.trim()} autoFocus={mode !== "text"}>
+                Done
+              </button>
+            </div>
           </div>
         )}
 
@@ -526,15 +567,13 @@ export function Checkpoint(p: Props) {
                 )}
               </div>
             )}
-            <div className="flex flex-wrap gap-2">
+            {/* In the game the primary action sits bottom right like every game modal, with Retake to its left. */}
+            <div className={cn("flex flex-wrap gap-2", game && "justify-end")}>
+              {game && retakeBtn}
               <button onClick={submit} className={s.primary} autoFocus>
                 Submit
               </button>
-              {retakes < MAX_RETAKES && (
-                <button onClick={retake} className={s.plain}>
-                  Retake ({MAX_RETAKES - retakes} left)
-                </button>
-              )}
+              {!game && retakeBtn}
             </div>
           </div>
         )}

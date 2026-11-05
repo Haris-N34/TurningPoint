@@ -54,13 +54,13 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
           initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 180, damping: 16 }}
-          className={cn(pixelTitle.className, "mt-4 text-[34px] leading-[1.15] text-[#fff8e7] [text-shadow:0_4px_0_#c43d22,0_8px_0_#2e222f] sm:text-[56px] lg:text-[64px]")}
+          className={cn(pixelTitle.className, "mt-4 text-[34px] leading-[1.15] text-[#fff8e7] [text-shadow:0_4px_0_#c43d22,0_8px_0_#2e222f] sm:text-[56px] lg:text-[64px] [@media(max-height:520px)]:mt-2 [@media(max-height:520px)]:text-[32px]")}
         >
           TURNING
           <br />
           POINT
         </motion.h1>
-        <p className="mt-5 max-w-[min(520px,90vw)] text-[17px] text-[#fff8e7] sm:text-[19px]">
+        <p className="mt-5 max-w-[min(520px,90vw)] text-[17px] text-[#fff8e7] sm:text-[19px] [@media(max-height:520px)]:mt-2 [@media(max-height:520px)]:text-[16px]">
           You&apos;re the {scenario.role.toLowerCase()}. Midweek, the plan breaks.
         </p>
         {brief && (
@@ -70,15 +70,15 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
             <p className="mt-1">{scenario.summary}</p>
           </Panel>
         )}
-        <div className="mt-7 flex flex-col items-center gap-2">
-          <PixelButton size="lg" className="min-w-[200px]" onClick={onStart} data-testid="start">
+        <div className="mt-7 flex flex-col items-center gap-2 [@media(max-height:520px)]:mt-3">
+          <PixelButton size="lg" className="min-w-[200px] [@media(max-height:520px)]:min-h-11" onClick={onStart} data-testid="start">
             Start
           </PixelButton>
           <motion.p animate={{ opacity: [1, 0.35, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="text-[13px] font-semibold tracking-[0.12em] text-[#fff8e7]/85">
             PRESS ENTER / TAP TO START
           </motion.p>
         </div>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
+        <div className="mt-5 flex flex-wrap justify-center gap-2 [@media(max-height:520px)]:mt-2">
           {canResume && <PixelButton tone="plain" size="sm" onClick={onResume} data-testid="resume">Continue</PixelButton>}
           <PixelButton tone="plain" size="sm" onClick={() => setSettings({ music: !settings.music })} aria-pressed={settings.music}>
             Music {settings.music ? "on" : "off"}
@@ -279,10 +279,8 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
     const c = animate(budget, state.tp.budgetAfter ?? state.budget, { duration: reduce ? 0 : 2.4, ease: "easeOut" });
     return () => c.stop();
   }, [phase, budget, state, reduce]);
-  const ref = useRef<HTMLDivElement>(null);
-  useFocusTrap(ref, phase !== "ring");
   return (
-    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
       <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       {/* The hit: a red edge flash as the money goes. */}

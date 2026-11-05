@@ -10,7 +10,7 @@ const texts = z.record(z.string(), z.string().min(1));
 export const MapOverridesSchema = z.object({
   title: z.string().min(1).optional(),
   summary: z.string().min(1).optional(),
-  /** The Quick mode (Mon to Wed) intro, when the map has one. */
+  /** The Quick mode brief ("Three weekdays..."), tailored like the full one. */
   quickSummary: z.string().min(1).optional(),
   role: z.string().min(1).optional(),
   /** NPC lines, keyed "node:index". */
@@ -37,7 +37,8 @@ function merge(base: MapScenario, ov: MapOverrides): MapScenario {
   const m = structuredClone(base);
   if (ov.title) m.title = ov.title;
   if (ov.summary) m.summary = ov.summary;
-  if (ov.quickSummary && m.quick) m.quick.summary = ov.quickSummary;
+  // Quick mode reads quick.summary first: an employer's wording must reach it too (their own edit when no quick one).
+  if (m.quick && (ov.quickSummary || ov.summary)) m.quick.summary = ov.quickSummary ?? ov.summary;
   if (ov.role) m.role = ov.role;
   for (const n of m.nodes) {
     n.lines.forEach((l, i) => (l.text = ov.lines[`${n.id}:${i}`] ?? l.text));
