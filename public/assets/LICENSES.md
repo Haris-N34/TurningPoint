@@ -37,7 +37,24 @@ Every row includes `neutral.png`, `worried.png`, `happy.png`, `angry.png`:
 
 ## Tiles, map sprites, audio and UI packs
 
-No packs in these categories are included by this portrait change. Div owns
-their integration and must append the actual pack name, source URL, licence and
-included paths when importing them. A plan to use Kenney does not license an
-unidentified asset.
+All Kenney packs are CC0 1.0 (public domain, no attribution required). Credit given anyway. Each pack's own licence file sits next to it.
+
+| Pack | Source | Licence | Included paths |
+|---|---|---|---|
+| Tiny Town | https://kenney.nl/assets/tiny-town | CC0 1.0 (`public/assets/kenney_tiny-town-License.txt`) | `public/assets/tiles/kenney-tiny-town.png` |
+| Tiny Dungeon | https://kenney.nl/assets/tiny-dungeon | CC0 1.0 (`public/assets/kenney_tiny-dungeon-License.txt`) | `public/assets/tiles/kenney-tiny-dungeon.png` |
+| Interface Sounds | https://kenney.nl/assets/interface-sounds | CC0 1.0 (`public/assets/kenney_interface-sounds-License.txt`) | `public/assets/sfx/back_002.ogg`, `click_002.ogg`, `confirmation_002.ogg` |
+| Impact Sounds | https://kenney.nl/assets/impact-sounds | CC0 1.0 (`public/assets/kenney_impact-sounds-License.txt`) | `public/assets/sfx/base-impact.ogg` |
+
+The tile sheets were taken from a public mirror carrying Kenney's licence file, because kenney.nl blocks automated downloads. They are byte copies of the official packs.
+
+Not from a pack (made in code, no licence needed): character sprites (`lib/game/sprites.ts`, generated pixel by pixel), music and most sound effects (`lib/game/sound.ts`, WebAudio synthesis), the map layout (`scripts/build-map.py` writes `public/maps/*.json` in Tiled format).
+
+## Fonts
+
+| Font | Source | Licence | Included paths |
+|---|---|---|---|
+| Pixelify Sans 400, 600 (latin) | Fontsource 5.3.0 (https://fontsource.org/fonts/pixelify-sans) | SIL OFL 1.1 (`components/game2/fonts/OFL-pixelify-sans.txt`) | `components/game2/fonts/pixelify-sans-latin-*.woff2` |
+| Press Start 2P 400 (latin) | Fontsource 5.3.0 (https://fontsource.org/fonts/press-start-2p) | SIL OFL 1.1 (`components/game2/fonts/OFL-press-start-2p.txt`) | `components/game2/fonts/press-start-2p-latin-400-normal.woff2` |
+
+Self-hosted so the build never fetches from Google Fonts. The site fonts in `app/layout.tsx` (Geist, Geist Mono, Lora) still load through `next/font/google`.

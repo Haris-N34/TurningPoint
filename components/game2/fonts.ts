@@ -1,5 +1,17 @@
-import { Pixelify_Sans, Press_Start_2P } from "next/font/google";
+import localFont from "next/font/local";
 
-// Game UI fonts: Pixelify Sans for readable body text, Press Start 2P for titles and HUD numbers.
-export const pixelBody = Pixelify_Sans({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-pixel" });
-export const pixelTitle = Press_Start_2P({ subsets: ["latin"], weight: "400", variable: "--font-pixel-title" });
+// Game UI fonts, self-hosted so builds never depend on a network fetch (SIL OFL 1.1, see public/assets/LICENSES.md).
+// Pixelify Sans for readable body text, Press Start 2P for titles and HUD numbers.
+export const pixelBody = localFont({
+  src: [
+    { path: "./fonts/pixelify-sans-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/pixelify-sans-latin-600-normal.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-pixel",
+  display: "swap",
+});
+export const pixelTitle = localFont({
+  src: [{ path: "./fonts/press-start-2p-latin-400-normal.woff2", weight: "400", style: "normal" }],
+  variable: "--font-pixel-title",
+  display: "swap",
+});
