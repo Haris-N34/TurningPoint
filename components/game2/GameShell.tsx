@@ -75,14 +75,6 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     if (screen === "loading") setSawLoading(true);
   }, [screen]);
   const shownTp = useRef(false);
-  // Text is the calm default in the game: video or voice only when the browser already allows it,
-  // so a checkpoint never opens with a permission prompt or an error on stage.
-  const [mediaOk, setMediaOk] = useState<Record<"video" | "voice", boolean>>({ video: false, voice: false });
-  useEffect(() => {
-    const q = (name: string) =>
-      navigator.permissions?.query({ name: name as PermissionName }).then((r) => r.state === "granted").catch(() => false) ?? Promise.resolve(false);
-    void Promise.all([q("camera"), q("microphone")]).then(([cam, mic]) => setMediaOk({ video: cam && mic, voice: mic }));
-  }, []);
 
   // Profile, accommodations and any unfinished run on this device.
   useEffect(() => {
@@ -468,10 +460,11 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
                 questionSource={interviewQuestion(scenario, state, due).source}
                 attemptId={attemptId}
                 multiplier={profile.accommodations.timeMultiplier}
-                defaultMode={profile.defaultMode === "text" || !mediaOk[profile.defaultMode] ? "text" : profile.defaultMode}
-                skin="pixel"
+                defaultMode={profile.defaultMode}
                 textOnly={profile.accommodations.textOnly}
                 persistMedia={!sandbox}
+                variant="game"
+                interviewer={((n) => (n ? { name: n.name, role: `${n.role} · asking for the hiring panel`, portrait: n.portrait } : undefined))(scenario.npcs.find((n) => n.id === scenario.issues.find((i) => i.id === due.issue)?.npc))}
                 onDone={(r) => onCheckpointDone(due, r)}
               />
             )
@@ -490,7 +483,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       {screen === "results" && state && phase === "real-life" && profile && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/85 p-3">
           <Panel className="w-[min(640px,96vw)] p-4">
-            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} onModeChange={() => {}} onDone={finish} />
+            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} variant="game" onModeChange={() => {}} onDone={finish} />
           </Panel>
         </div>
       )}

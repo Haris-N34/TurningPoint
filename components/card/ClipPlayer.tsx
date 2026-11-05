@@ -107,6 +107,12 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
             ])
           : checkpoint.transcript.text || <em>Transcript unavailable.</em>}
       </p>
+      {checkpoint.recognizedText !== undefined && (
+        <details className="text-xs text-muted-foreground" data-testid="recognized-text">
+          <summary className="cursor-pointer">The candidate fixed words before submitting. Show what speech to text heard</summary>
+          <p className="mt-1 whitespace-pre-wrap">{checkpoint.recognizedText || <em>Speech to text heard nothing.</em>}</p>
+        </details>
+      )}
     </div>
   );
 });

@@ -29,6 +29,11 @@ export const CheckpointSchema = z.object({
   media: z.string().optional(),
   durationS: z.number().min(0),
   transcript: TranscriptSchema,
+  /**
+   * Voice and video: what speech to text heard, kept when the candidate fixed words before submitting.
+   * Recruiters can view it; scoring and evidence quotes use only the submitted transcript.
+   */
+  recognizedText: z.string().optional(),
   retakeUsed: z.boolean().default(false),
   /** Candidate can hide a clip from employers (C7.2). Transcripts cannot be edited. */
   hidden: z.boolean().default(false),
@@ -75,7 +80,7 @@ export const WitnessSchema = z.object({
 
 export const IntegrityNoteSchema = z.object({
   checkpointId: z.string(),
-  kind: z.enum(["focus_lost", "retake_used"]),
+  kind: z.enum(["focus_lost", "retake_used", "transcript_corrected"]),
   detail: z.string(),
 });
 

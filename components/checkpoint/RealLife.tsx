@@ -20,6 +20,8 @@ export function RealLife(p: {
   prompt: string;
   profile: Profile;
   persistMedia?: boolean;
+  /** "game": the two answers pop up as the live interview, like the in-game checkpoints. */
+  variant?: "page" | "game";
   onModeChange: (m: Mode) => void;
   onDone: (r: { results: CheckpointResult[]; story: RealStory }) => void;
 }) {
@@ -35,6 +37,7 @@ export function RealLife(p: {
     textOnly: p.profile.accommodations.textOnly,
     onModeChange: p.onModeChange,
     persistMedia: p.persistMedia,
+    variant: p.variant,
   };
 
   if (step === "intro") {
