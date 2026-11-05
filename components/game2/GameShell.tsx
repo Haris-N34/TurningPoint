@@ -422,7 +422,15 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
             </div>
           )}
           {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. Out of the way while talking. */}
-          {!cutscene && !node && !reaction && (
+          {/* List view already lists every issue by place, so it only needs the Wait control. */}
+          {!cutscene && !node && !reaction && settings.view === "list" && (
+            <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
+              <Panel className="p-1.5">
+                <PixelButton tone="plain" onClick={() => dispatch({ type: "wait" })} data-testid="wait">Wait for news ▸▸</PixelButton>
+              </Panel>
+            </div>
+          )}
+          {!cutscene && !node && !reaction && !showCheckpoint && settings.view === "map" && (
             <div className="tp-scale absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
@@ -487,7 +495,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
         </div>
       )}
       {/* Big screens (1080p and up): the HUD grows with the map so it never looks lost. */}
-      <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } }`}</style>
+      <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } [data-testid="game-shell"] .tp-dialogue { zoom: 1.25; } [data-testid="game-shell"] [data-testid="checkpoint"] > div { zoom: 1.2; } }`}</style>
       {sandbox && <p className="absolute left-1/2 top-0 z-[70] -translate-x-1/2 bg-amber-200 px-3 text-sm font-semibold">Preview as candidate · nothing is saved</p>}
     </div>
   );
