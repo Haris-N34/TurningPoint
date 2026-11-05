@@ -3,7 +3,7 @@ import { parseScenario } from "@/lib/engine/schema";
 import { planRun } from "@/lib/engine/seed";
 import { advance, choose, startRun } from "@/lib/engine/engine";
 import { miniScenario } from "@/tests/fixtures/mini-scenario";
-import { checkpointQuestion, followUpQuestion, FOLLOW_UP_FALLBACK, MAX_QUESTION_WORDS, pickDetail, redactName } from "./questions";
+import { checkpointQuestion, followUpQuestion, FOLLOW_UP_FALLBACK, isThinStory, MAX_QUESTION_WORDS, pickDetail, redactName, THIN_FOLLOW_UP } from "./questions";
 import { timing } from "@/lib/checkpoint/timing";
 import { fromChunks, fromTyping, locateQuote } from "@/lib/checkpoint/transcript";
 
@@ -50,9 +50,26 @@ describe("follow-up question (C5.2)", () => {
     expect(quoted).toMatch(/funder pulled out/);
   });
 
-  it("uses the fallback for empty or tiny answers", () => {
-    expect(followUpQuestion("").question).toBe(FOLLOW_UP_FALLBACK);
-    expect(followUpQuestion("Yes.").question).toBe(FOLLOW_UP_FALLBACK);
+  it("asks kindly for more when the answer is empty or tiny", () => {
+    expect(followUpQuestion("").question).toBe(THIN_FOLLOW_UP);
+    expect(followUpQuestion("Yes.").question).toBe(THIN_FOLLOW_UP);
+    expect(THIN_FOLLOW_UP).not.toBe(FOLLOW_UP_FALLBACK);
+  });
+
+  it("asks for more when the story has no setback or nothing the candidate did", () => {
+    // Off topic, one line.
+    expect(isThinStory("I really like pizza and my favourite colour is blue.")).toBe(true);
+    // Long enough, but nothing went wrong.
+    expect(isThinStory("Last year I organised our club's spring social and everyone came and it was a really fun night for all of us.")).toBe(true);
+    // Something went wrong, but nothing they did.
+    expect(isThinStory("Last summer the festival had a big problem because the main sponsor pulled out two weeks before opening day.")).toBe(true);
+    expect(followUpQuestion("I really like pizza and my favourite colour is blue.").question).toBe(THIN_FOLLOW_UP);
+  });
+
+  it("a story with a setback and an action gets the specific follow-up", () => {
+    const t = "Two summers ago I ran a community garden. In June our funder pulled out and we had half the money.";
+    expect(isThinStory(t)).toBe(false);
+    expect(isThinStory("Our venue cancelled a week before the show, so I called three schools and we moved it to a gym.")).toBe(false);
   });
 
   it("keeps long details short", () => {
