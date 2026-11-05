@@ -213,7 +213,7 @@
       "id": "cp1",
       "nodeId": "roles",
       "kind": "decision",
-      "question": "For nobody wants logistics, you chose \"Ask who's free when, then pair people on logistics\". Why?",
+      "question": "On \"Nobody wants logistics\", you chose B: \"Ask who's free when, then pair people on logistics\". Why that?",
       "questionSource": "generated",
       "mode": "voice",
       "media": "demo/cp1.webm",
