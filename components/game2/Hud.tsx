@@ -80,8 +80,9 @@ export function Clock({ state, turnBased }: { state: GameState; turnBased: boole
 
 export function Toasts() {
   const toasts = useGame((g) => g.toasts);
+  // Phones: under the HUD. Tablets and small laptops: bottom left, clear of the issue list. Desktop: under the clock.
   return (
-    <div className="pointer-events-none absolute left-1/2 top-[4.75rem] z-30 flex w-[min(380px,64vw)] -translate-x-1/2 flex-col items-center gap-1 max-sm:top-[7.5rem] max-sm:w-[92vw]" aria-live="polite">
+    <div className="pointer-events-none absolute left-1/2 top-[7.5rem] z-30 flex w-[92vw] -translate-x-1/2 flex-col items-center gap-1 sm:bottom-4 sm:left-4 sm:top-auto sm:w-[min(380px,50vw)] sm:translate-x-0 sm:items-start lg:bottom-auto lg:left-1/2 lg:top-[4.75rem] lg:w-[380px] lg:-translate-x-1/2 lg:items-center" aria-live="polite">
       <AnimatePresence>
         {toasts.slice(-2).map((t) => (
           <motion.div key={t.id} layout initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}>
@@ -132,7 +133,7 @@ export function IssueTracker({
         </PixelButton>
       </div>
       {open && (
-        <ul className="mt-1.5 max-h-[30svh] space-y-1.5 overflow-y-auto overscroll-contain sm:max-h-[calc(100svh-19rem)]">
+        <ul className="mt-1.5 max-h-[30svh] space-y-1.5 overflow-y-auto overscroll-contain sm:max-h-[max(7.5rem,calc(100svh-19rem))]">
           {issues.map((i) => {
             const st = state.issues[i.id];
             const left = (st.deadline ?? state.t) - state.t;

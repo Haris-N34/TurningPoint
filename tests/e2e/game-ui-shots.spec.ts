@@ -8,6 +8,7 @@ const SIZES = [
   { name: "1440x900", width: 1440, height: 900 },
   { name: "1920x1080", width: 1920, height: 1080 },
   { name: "375x812", width: 375, height: 812 },
+  { name: "812x375", width: 812, height: 375 },
 ];
 
 async function untilVisible(page: Page, id: string) {

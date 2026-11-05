@@ -427,7 +427,8 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       if (o.attract || !this.player) return;
       const frozen = o.isFrozen();
       // The minimap steps aside while a dialogue, checkpoint or cutscene is up.
-      this.minimap?.setVisible(!frozen);
+      // Short screens (phone landscape) have no room for it.
+      this.minimap?.setVisible(!frozen && this.scale.height >= 480);
       this.placeLabels();
       const k = this.keys;
       let vx = 0, vy = 0;
