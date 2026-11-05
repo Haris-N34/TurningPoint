@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, MotionConfig } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -302,7 +303,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       bus.emit("emote", { npc: issue.npc, emote: opt.reaction.emote });
       setReaction({ npc: node.npc, expression: opt.reaction.expression, line: opt.reaction.line });
       setLastReaction(`${node.npc}:${opt.reaction.expression}`);
-      setTimeout(() => setReaction(null), settings.reducedMotion ? 600 : 1500);
+      // A spoken reaction stays long enough to read; a silent one is a short beat for the floaters.
+      setTimeout(() => setReaction(null), settings.reducedMotion ? 600 : opt.reaction.line ? 1500 : 700);
     }
     if (opt.effects.budget && opt.effects.budget < -400) bus.emit("shake", { intensity: 0.004 });
   };
@@ -380,6 +382,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const node = state?.dialogue ? worded.nodes.find((n) => n.id === state.dialogue!.node) : undefined;
 
   return (
+    // Framer animations follow the game's reduced-motion setting as well as the OS preference.
+    <MotionConfig reducedMotion={settings.reducedMotion ? "always" : "user"}>
     <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"} data-last-reaction={lastReaction}>
       {/* Title: a still of the map, so the first screen paints fast on phones (A.20). The live map starts at the avatar step. */}
       {screen === "title" && <TitleBackdrop mapId={mapId} label={`${scenario.title}, seen from above`} />}
@@ -393,7 +397,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           ) : (
             <ListView scenario={scenario} state={state} onTalk={talk} onMove={(z) => dispatch({ type: "move", zone: z })} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} />
           )}
-          {screen === "loading" && <LoadingScreen ready={ready} onDone={() => setScreen(state.ended ? "results" : "play")} />}
+          <AnimatePresence>{screen === "loading" && <LoadingScreen key="loading" ready={ready} onDone={() => setScreen(state.ended ? "results" : "play")} />}</AnimatePresence>
         </>
       )}
       {screen === "play" && state && (
@@ -432,7 +436,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
-          {reaction && <ReactionBox scenario={scenario} {...reaction} />}
+          {reaction?.line && <ReactionBox scenario={scenario} {...reaction} />}
           {cutscene && (
             <Cutscene
               scenario={scenario}
@@ -491,6 +495,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } [data-testid="game-shell"] .tp-dialogue { zoom: 1.25; } [data-testid="game-shell"] [data-testid="checkpoint"] > div { zoom: 1.2; } }`}</style>
       {sandbox && <p className="absolute left-1/2 top-0 z-[70] -translate-x-1/2 bg-amber-200 px-3 text-sm font-semibold">Preview as candidate · nothing is saved</p>}
     </div>
+    </MotionConfig>
   );
 }
 

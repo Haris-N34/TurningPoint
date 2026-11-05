@@ -72,6 +72,10 @@ test("The Client Pivot: a full week keyboard-only in list view, with discoveries
   await page.keyboard.press("Space");
   await page.getByTestId("set-list-view").focus();
   await page.keyboard.press("Space");
+  // Discoveries are a full-week feature; Quick mode (Mon to Wed) is the default.
+  await page.getByTestId("set-full-week").focus();
+  await page.keyboard.press("Space");
+  await expect(page.getByTestId("set-full-week")).toBeChecked();
   const speed = page.getByTestId("settings").getByLabel("Text speed");
   await speed.focus();
   for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowDown");
@@ -105,5 +109,38 @@ test("The Client Pivot: a full week keyboard-only in list view, with discoveries
   await expect(page.getByTestId("kpi-discoveries")).toContainText("3 of 3");
   await expect(page.getByTestId("kpi-data-insight")).toBeVisible();
   await expect(page.getByTestId("kpi-feedback-response")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("The Client Pivot in Quick mode: Mon to Wed in list view to the results, no discoveries to score", async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/game/client-pivot");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByTestId("set-turn-based").check();
+  await page.getByTestId("set-list-view").check();
+  await expect(page.getByTestId("set-full-week")).not.toBeChecked();
+  await page.getByTestId("settings").getByLabel("Text speed").selectOption("instant");
+  await press(page, "start");
+  await press(page, "avatar-done");
+  await expect(page.getByTestId("list-view")).toBeVisible({ timeout: 20_000 });
+  expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("quick");
+  await expect(page.locator('[data-testid^="list-explore-"]')).toHaveCount(0);
+  for (let i = 0; i < 120; i++) {
+    if (await page.getByTestId("to-results").isVisible()) break;
+    if (await clearOverlay(page)) continue;
+    const talk = page.locator('[data-testid^="list-talk-"]').first();
+    if (await talk.isVisible()) {
+      await talk.focus();
+      await page.keyboard.press("Enter");
+    } else await press(page, "wait");
+  }
+  await press(page, "to-results");
+  await expect(page.getByTestId("results-screen")).toBeVisible();
+  await expect(page.getByTestId("kpi-data-insight")).toBeVisible();
+  await expect(page.getByTestId("kpi-feedback-response")).toBeVisible();
+  await expect(page.getByTestId("kpi-discoveries")).toHaveCount(0);
   expect(errors).toEqual([]);
 });

@@ -18,6 +18,8 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 | 13 | Integration console webhook log printed raw applicant emails and full resume text (emails are masked everywhere else). | S2 | Fixed in lib/integrations/webhooks.ts (logSafe) | tests/qa/webhook-log-pii.test.ts | QA (lib/integrations) |
 | 14 | Phone, recruiter card: the open Copilot panel (up to 70vh) covers the answer tabs, so tabs and the cited clip can't be used without closing it. Shows now that Maya's real run has KPIs (answers gain KPI citations). Existing tests/e2e/ai.spec.ts B.6 [phone] fails on it. Screenshot docs/qa/copilot-covers-tabs-phone.png | S2 | Open, sent to parent | tests/e2e/ai.spec.ts:57 [phone] | agent C (components/recruiter/Copilot.tsx) |
 | 15 | Recruiter card decision path clips its last label ("TURNIN…") once a run has 12+ steps (real map runs have 12 to 16). docs/qa/recruiter-card-real-run-1440.png | S3 | Open, sent to parent | none yet | agent C |
+| 16 | One quote backed two skills (Maya's Adaptability and Resilience shared a cp2 quote; generic answers backed Prioritization and Collaboration with one sentence). | S2 | Fixed: scanner 0.4.0, one quote per skill per card, enforced for any provider. Cross-check 36/48 before and after | lib/ai/onequote.test.ts | QA (lib/ai) |
+| 17 | Accommodation status reached employers: recruiter card and compare view carried adjustedTiming ("Adjusted timing" badge). | S1 | Fixed in lib: cardFor and compareFor drop it; one badge line removed from components/recruiter/Compare.tsx to keep the build green (agent C fixing the card UI). Inbox, export, ATS result and API summary verified clean | tests/qa/accommodation-privacy.test.ts | QA (lib/card) + agent C |
 | 2 | Withdrawn card rows in the inbox still carry name and university (if shortlisted before), skill levels, witness status and the Final score; the skill filter still matches them. C7.4 says nothing is shown. | S2 | Fixed in lib/card/inbox.ts | tests/qa/withdrawn-row.test.ts | QA (lib/card) |
 
 ## Risks to note
@@ -30,3 +32,6 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - Refresh mid-game on /game/launch-week (3 runs, one with a checkpoint open): Continue restores the clock and the same checkpoint question. OK.
 - Demo panel opens on every route incl. the game; reset, seed, role switch and every jump from `/` work.
 - demo-60s on the production build, 10 in a row: 10/10 green (24 to 28 s each).
+- Round 3 (new Maya card, production build with test hooks as CI builds it): demo-60s 10/10 green (12 to 21 s), forged-badge e2e 10/10.
+- Quick mode (night/game-flow 1b88ac5, production build): default length is quick; no order question, no recap modal, one checkpoint (the exact recovery-B question); refresh mid-checkpoint restores the clock and question exactly; results and card build with no console errors, consistency has no order note. Full week: refresh mid-checkpoint on Monday restores exactly.
+

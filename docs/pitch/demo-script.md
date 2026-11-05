@@ -14,7 +14,7 @@ This replaces `docs/demo/V2_SCRIPT.md` once Haris accepts it.
 | 2. Value Mapper, publish | Publishes **Launch Week**, not The Client Pivot (the builder offers Launch Week, Client Rescue and a sample; The Client Pivot is a map game at `/game/client-pivot`, not a builder template). |
 | 3. Explain-on-pick checkpoint | As written |
 | 4. Defer with a reason | The follow-up checkpoint about the deferral is seeded, so it may or may not fire. |
-| 5. Turning point | The Ctrl+Shift+D demo panel has no turning-point jump (it jumps to Game, Results, Recruiter card, Admin impact). Use the prepared tab. |
+| 5. Turning point | The Ctrl+Shift+D demo panel's **Turning point** link jumps straight to Tuesday 09:00 in Quick mode (the sponsor pulls out). The prepared full-week tab (Wednesday morning) is the backup. |
 | 6. Second Look | Needs a fresh demo tenant in setup (the mock ATS keeps state on the server). |
 | 7. Resume vs Evidence, Final score | Needs the resume added in setup (the seed has none). Say the Final score only sorts; it never hides or rejects anyone. |
 | 8. Copilot with citation | As written |

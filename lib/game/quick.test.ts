@@ -102,6 +102,8 @@ describe("Quick mode results and card", () => {
     const q = forLength(s, "quick");
     for (const k of computeKpis(q, st)) if (k.value !== null) expect(Number.isFinite(k.value)).toBe(true);
     expect(orderConsistency(q, st)).toEqual([]);
+    // Discoveries are a full-week feature: Quick never scores the candidate on ones they couldn't find.
+    expect(computeKpis(q, st).some((k) => k.id === "discoveries")).toBe(false);
     const card = buildMapCard({
       attemptId: "att_quick",
       scenario: q,
