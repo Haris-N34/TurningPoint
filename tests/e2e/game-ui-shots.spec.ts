@@ -73,17 +73,17 @@ for (const size of SIZES) {
   });
 }
 
-// No camera or microphone permission: the checkpoint must open calmly in text mode.
-test("game UI shot: checkpoint without media permission", async ({ browser }, info) => {
+// Camera refused (agent E's flow): one calm line, Voice takes over, Text is one tap away, and the think timer waits.
+test("game UI shot: checkpoint with the camera refused", async ({ page }, info) => {
   test.skip(process.env.SCREENS !== "1", "set SCREENS=1 to take review shots");
   test.skip(info.project.name !== "desktop", "one size is enough");
   test.setTimeout(120_000);
   const dir = process.env.SHOTS_DIR ?? "docs/screens/night/game-ui/latest";
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, permissions: [] });
-  const page = await ctx.newPage();
-  // The fake-media launch flag grants devices even with no permissions, so refuse them here like a browser that says no.
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.addInitScript(() => {
-    navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+    const md = navigator.mediaDevices;
+    const real = md.getUserMedia.bind(md);
+    md.getUserMedia = (c?: MediaStreamConstraints) => (c?.video ? Promise.reject(new DOMException("denied", "NotAllowedError")) : real(c));
   });
   await page.goto("/game/launch-week?jump=turning-point");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
@@ -95,13 +95,18 @@ test("game UI shot: checkpoint without media permission", async ({ browser }, in
   await untilVisible(page, "choice-b");
   await page.waitForTimeout(500);
   await page.getByTestId("choice-b").click();
-  await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
-  // The game asks for video first, then falls back to voice and to text, calmly.
-  await expect(page.getByTestId("checkpoint").locator('input[value="text"]')).toBeChecked({ timeout: 10_000 });
-  await expect(page.getByTestId("checkpoint")).not.toContainText(/couldn't/i);
-  await page.waitForTimeout(2500);
-  await page.screenshot({ path: `${dir}/10-checkpoint-no-media-1280x720.png`, style: "nextjs-portal { display: none !important; }" });
-  await ctx.close();
+  const cp = page.getByTestId("checkpoint");
+  await expect(cp).toBeVisible({ timeout: 10_000 });
+  await expect(cp).toHaveAttribute("data-mode", "voice", { timeout: 15_000 });
+  const note = cp.getByTestId("device-note");
+  await expect(note).toContainText("didn't allow the camera");
+  await expect(note).toContainText("The timer waits for you.");
+  await expect(cp.locator('label:has(input[value="text"])')).toBeVisible();
+  // Timer held: the think label does not move while they choose.
+  const before = await cp.getByTestId("timer-label").textContent();
+  await page.waitForTimeout(1500);
+  expect(await cp.getByTestId("timer-label").textContent()).toBe(before);
+  await page.screenshot({ path: `${dir}/10-checkpoint-camera-refused-1280x720.png`, style: "nextjs-portal { display: none !important; }" });
 });
 
 // Pause menu, list view and the second map, at the smallest desktop and the phone.
