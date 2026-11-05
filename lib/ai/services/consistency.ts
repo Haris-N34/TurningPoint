@@ -118,6 +118,31 @@ export function consistencyInput(s: MapScenario, st: GameState, answers: CardChe
   return { order, explanations, story };
 }
 
+/** Same checks for a classic (non-map) card: explanations vs the logged choice, and the real story vs follow-up. */
+export function cardConsistencyInput(
+  card: Pick<Card, "checkpoints" | "decisionPath" | "realStory">,
+  optionsFor: (nodeId: string) => Opt[],
+  known: Known = {},
+): ConsistencyInput {
+  const explanations = card.checkpoints
+    .filter((a) => a.kind === "decision")
+    .flatMap((a) => {
+      const step = card.decisionPath.find((d) => d.checkpointId === a.id) ?? card.decisionPath.find((d) => d.nodeId === a.nodeId);
+      if (!step) return [];
+      return [{
+        checkpointId: a.id,
+        transcript: stripPii(a.transcript.text, known),
+        picked: { id: step.optionId, label: step.optionLabel },
+        others: optionsFor(step.nodeId).filter((o) => o.id !== step.optionId),
+      }];
+    });
+  const rs = card.realStory;
+  const rl = card.checkpoints.find((a) => a.id === rs?.checkpointId);
+  const fu = card.checkpoints.find((a) => a.id === rs?.followUpCheckpointId);
+  const story = rl && fu && rs ? { story: stripPii(rl.transcript.text, known), followUp: stripPii(fu.transcript.text, known), title: rs.title } : undefined;
+  return { explanations, story };
+}
+
 export function checkConsistency(input: ConsistencyInput, opts: RunOptions = {}): NonNullable<Card["consistency"]> {
   return runSync(consistencyPrompt, input, opts).output.items;
 }
