@@ -32,6 +32,8 @@ export function cardFor(s: Store, attemptId: string, challengeId: string, anonym
   const hidden = card.checkpoints.filter((c) => c.hidden).map((c) => c.id);
   const visible: Card = {
     ...card,
+    // Accommodations (extra time, turn-based play) are the candidate's business, never the employer's.
+    adjustedTiming: false,
     checkpoints: card.checkpoints.map((c) => (c.hidden ? { ...c, media: undefined } : c)),
   };
   return { status: "ok", card: visible, name: identity(card, anonymous, review?.decision), hiddenClipIds: hidden };

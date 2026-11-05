@@ -7,7 +7,7 @@ import type { SkillSlug } from "@/lib/engine/skills";
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.3.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.4.0" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -115,7 +115,7 @@ type Candidate = { checkpointId: string; quote: string; level: "strong" | "some"
  * Judge one answer for one skill. The rubric applies to the whole answer (a reason in one sentence and
  * the trade-off in the next still counts); the quote is the single sentence that best shows it.
  */
-function judge(skill: SkillSlug, text: string, signalled: boolean, context: string[]): { level: Candidate["level"]; quote: string } | undefined {
+function judge(skill: SkillSlug, text: string, signalled: boolean, context: string[]): { level: Candidate["level"]; quotes: string[] } | undefined {
   const ss = sentences(text);
   const relevant = ss.filter((x) => SKILL_WORDS[skill].test(x));
   if (!relevant.length && !signalled) return undefined;
@@ -128,8 +128,9 @@ function judge(skill: SkillSlug, text: string, signalled: boolean, context: stri
   if (!level) return undefined;
   const pool = relevant.length ? relevant : ss;
   const rank = (x: string) => (TRADE_OFF.test(x) ? 2 : 0) + (REASON.test(x) ? 1 : 0) + (SKILL_WORDS[skill].test(x) ? 1 : 0);
-  const best = [...pool].sort((a, b) => rank(b) - rank(a))[0];
-  return best ? { level, quote: trimQuote(best) } : undefined;
+  // Best first; the rest are fallbacks if a better-fitting skill already uses the best quote.
+  const quotes = [...new Set([...pool].sort((a, b) => rank(b) - rank(a)).map(trimQuote))];
+  return quotes.length ? { level, quotes } : undefined;
 }
 
 const SENTENCE: Record<Candidate["level"], string> = {
@@ -144,18 +145,33 @@ export function extractEvidence(input: ExtractInput): Evidence[] {
     return [cp.question ?? "", ...d.flatMap((x) => [x.optionLabel, x.prompt ?? ""])].filter(Boolean);
   };
   const usable = input.checkpoints.filter((c) => c.transcript.text.trim());
-  const raw: Evidence[] = input.targetSkills.map((skill) => {
-    if (!usable.length) return { skill, level: "needs_review" as const };
-    let best: Candidate | undefined;
+  // Every candidate quote for every skill, scored. Level and design signal first, then the quote's rank.
+  const candidates: (Candidate & { skill: SkillSlug })[] = [];
+  for (const skill of input.targetSkills)
     for (const cp of usable) {
       const signalled = cp.kind === "decision" && (input.nodeSkills[cp.nodeId] ?? []).includes(skill);
       const j = judge(skill, cp.transcript.text, signalled, contextFor(cp));
       if (!j) continue;
-      const sc = (j.level === "strong" ? 10 : 5) + (signalled ? 2 : 0) + (cp.kind === "real_life" ? 1 : 0);
-      if (!best || sc > best.score) best = { checkpointId: cp.id, quote: j.quote, level: j.level, score: sc };
+      const base = (j.level === "strong" ? 10 : 5) + (signalled ? 2 : 0) + (cp.kind === "real_life" ? 1 : 0);
+      j.quotes.forEach((quote, k) => candidates.push({ skill, checkpointId: cp.id, quote, level: j.level, score: base - k * 0.01 }));
     }
+  // One quote backs at most one skill per card: the best-fitting skill takes it, the other uses its next-best
+  // quote or, with none left, reads Not observed. Ties keep the employer's skill order.
+  const order = (s: SkillSlug) => input.targetSkills.indexOf(s);
+  candidates.sort((a, b) => b.score - a.score || order(a.skill) - order(b.skill));
+  const chosen = new Map<SkillSlug, Candidate>();
+  const used = new Set<string>();
+  for (const c of candidates) {
+    const key = `${c.checkpointId}\u0000${c.quote}`;
+    if (chosen.has(c.skill) || used.has(key)) continue;
+    chosen.set(c.skill, c);
+    used.add(key);
+  }
+  const raw: Evidence[] = input.targetSkills.map((skill) => {
+    if (!usable.length) return { skill, level: "needs_review" as const };
+    const best = chosen.get(skill);
     if (!best) return { skill, level: "not_observed" as const };
-    const cp = usable.find((c) => c.id === best!.checkpointId)!;
+    const cp = usable.find((c) => c.id === best.checkpointId)!;
     const loc = locateQuote(cp.transcript, best.quote);
     if (!loc) return { skill, level: "needs_review" as const };
     return {
