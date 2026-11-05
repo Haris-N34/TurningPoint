@@ -166,3 +166,38 @@ test("QA #30: with a conversation pending under a checkpoint, typing a-d in the 
   expect(await page.evaluate(count)).toBe(before); // no option was picked by the typing
   await expect(page.getByTestId("dialogue")).toHaveCount(0);
 });
+
+test("no ligatures in game text: the pixel font's fi glyph never shows (\"first\" not \"Arst\")", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "same CSS on phone");
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  const lig = (sel: string) => page.locator(sel).first().evaluate((el) => getComputedStyle(el).fontVariantLigatures);
+  expect(await lig('[data-testid="title-screen"] h1')).toBe("none");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  await expect(page.getByTestId("coach")).toContainText("first problem");
+  expect(await lig('[data-testid="coach"]')).toBe("none");
+  expect(await lig('[data-testid="issue-tracker"] p')).toBe("none");
+  // Phaser zone signs get a zero-width non-joiner between f and i/l/f.
+  const signs = (await page.evaluate(`window.__phaser.scene.scenes[0].labels.map((l) => l.text.text)`)) as string[];
+  for (const t of signs) expect(t).not.toMatch(/f[ilf]/i);
+});
+
+test("list view: the last card scrolls fully clear of the Wait bar", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "sizes are set here");
+  for (const vp of [{ width: 1280, height: 720 }, { width: 375, height: 812 }]) {
+    await page.setViewportSize(vp);
+    await page.goto("/game/launch-week");
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.getByRole("button", { name: "Settings" }).click();
+    await page.getByTestId("set-list-view").check();
+    await page.getByTestId("start").click();
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("list-view")).toBeVisible({ timeout: 20_000 });
+    await page.getByTestId("list-view").evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    const lastBottom = await page.locator('[data-testid="list-view"] section').last().evaluate((el) => el.getBoundingClientRect().bottom);
+    const barTop = await page.getByTestId("wait").evaluate((el) => (el.parentElement as HTMLElement).getBoundingClientRect().top);
+    expect(lastBottom).toBeLessThanOrEqual(barTop);
+  }
+});

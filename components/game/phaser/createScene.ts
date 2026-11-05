@@ -25,6 +25,9 @@ const TILE = 16;
 const SEVERITY_COLOUR: Record<string, number> = { low: 0x4f9d69, medium: 0xe0a32e, high: 0xd9472b };
 const EMOTE: Record<string, string> = { heart: "♥", sweat: "💧", anger: "💢", note: "♪", exclaim: "!", question: "?" };
 
+/** Canvas text can't turn ligatures off, so a zero-width non-joiner splits f+i/f+l/f+f (the pixel font's "fi" is a wrong glyph). */
+export const noLigatures = (t: string) => t.replace(/f(?=[ilf])/gi, "$&\u200C");
+
 export function createScene(Phaser: typeof PhaserNS, o: Opts) {
   const s = o.scenario;
 
@@ -94,7 +97,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       // The attract map (title and avatar backdrop) shows none: the art carries the mood.
       for (const z of s.zones) {
         if (!o.attract) {
-          const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, z.name, {
+          const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, noLigatures(z.name), {
             fontFamily: o.font ?? "monospace",
             fontSize: "8px",
             fontStyle: "600",
