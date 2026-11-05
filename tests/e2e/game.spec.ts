@@ -42,8 +42,9 @@ async function toChoices(page: Page) {
 }
 
 /** Clear whatever overlay is up, with the keyboard where possible. Returns false when nothing was open. */
-async function clearOverlay(page: Page): Promise<boolean> {
+async function clearOverlay(page: Page, opts: { keepRecap?: boolean } = {}): Promise<boolean> {
   for (const [id, key] of [["cutscene-next", "click"], ["cutscene-done", "click"], ["recap-next", "click"], ["pause-resume", "click"]] as const) {
+    if (opts.keepRecap && id === "recap-next") continue;
     const b = page.getByTestId(id);
     if (await b.isVisible()) {
       await b.focus();
@@ -210,8 +211,9 @@ test("turning point plays as a cutscene, drains the budget and spawns issues (A.
 test("evening recap shows the day's numbers (A.14)", async ({ page }) => {
   // Full week: Quick mode shows a short "Monday done" note instead of the recap.
   await startGame(page, { turnBased: true, full: true });
+  // Never clear the recap we are waiting for (it can appear between the check and the clear).
   for (let i = 0; i < 10 && !(await page.getByTestId("recap").isVisible()); i++) {
-    if (!(await clearOverlay(page))) await page.getByTestId("wait").click();
+    if (!(await clearOverlay(page, { keepRecap: true }))) await page.getByTestId("wait").click({ timeout: 3000 }).catch(() => {});
   }
   await expect(page.getByTestId("recap")).toContainText("Monday is done");
   await expect(page.getByTestId("recap")).toContainText("Budget");

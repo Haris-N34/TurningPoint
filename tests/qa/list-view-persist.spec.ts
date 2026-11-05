@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // QA night, accessibility. List view (the screen-reader and keyboard-first way to play) is not kept across a
 // refresh: after reload and Continue the game is back on the map and Settings shows List view unticked. The
 // run itself is restored (turn-based stays on in the HUD), so only the player's view preference is lost.
-test.fixme("game: list view survives a refresh mid-run (owner: agent A, components/game2 settings)", async ({ page }) => {
+test("game: list view survives a refresh mid-run (owner: agent A, components/game2 settings)", async ({ page }) => {
   await page.goto("/game/launch-week");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await page.getByRole("button", { name: "Settings" }).click();

@@ -65,14 +65,14 @@ export function Clock({ state, turnBased }: { state: GameState; turnBased: boole
   const p = dayProgress(state.t);
   const daysLeft = daysLeftOf(state);
   return (
-    <Panel className="px-2 py-1.5 text-center sm:px-3" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}, ${daysLeft} days left`}>
+    <Panel className="px-2 py-1.5 text-center sm:px-3" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}, ${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`}>
       <p className={cn(pixelTitle.className, "whitespace-nowrap text-[12px] leading-none sm:text-[13px]")} data-testid="clock-time">{formatTime(state.t)}</p>
       {/* Day progress as a pixel bar: gold through the day, red in the evening. */}
       <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-[1px] bg-[#e8d9b5]" aria-hidden>
         <div className="h-full" style={{ width: `${Math.round(p * 100)}%`, backgroundColor: p > 0.75 ? "#c43d22" : "#e0a32e" }} />
       </div>
       <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase leading-none tracking-wide text-[#6a5a4a]">
-        {daysLeft} days left{turnBased && <span className="text-[#4a6fb0]" data-testid="turn-based"> · Turn-based</span>}
+        {daysLeft} {daysLeft === 1 ? "day" : "days"} left{turnBased && <span className="text-[#4a6fb0]" data-testid="turn-based"> · Turn-based</span>}
       </p>
     </Panel>
   );
@@ -83,9 +83,9 @@ export function Toasts() {
   // Phones: under the HUD. Tablets and small laptops: bottom left, clear of the issue list. Desktop: under the clock.
   return (
     <div className="pointer-events-none absolute left-1/2 top-[7.5rem] z-30 flex w-[92vw] -translate-x-1/2 flex-col items-center gap-1 sm:bottom-4 sm:left-4 sm:top-auto sm:w-[min(380px,50vw)] sm:translate-x-0 sm:items-start lg:bottom-auto lg:left-1/2 lg:top-[4.75rem] lg:w-[380px] lg:-translate-x-1/2 lg:items-center" aria-live="polite">
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {toasts.slice(-2).map((t) => (
-          <motion.div key={t.id} layout initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div key={t.id} layout initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
             <Panel tone="ink" className="flex items-center gap-2 px-2.5 py-1 text-[14px] font-semibold" data-testid="toast">
               <span className="flex size-5 shrink-0 items-center justify-center rounded-[3px] bg-[#ffd166] text-[12px] font-bold text-[#2e222f]" aria-hidden>!</span>
               {t.text}
@@ -98,6 +98,7 @@ export function Toasts() {
 }
 
 export function IssueTracker({
+  coach = false,
   scenario,
   state,
   onGo,
@@ -105,6 +106,8 @@ export function IssueTracker({
   onDefer,
   onWait,
 }: {
+  /** First-time hint pointing at the first Go (fresh runs only, until the first action). */
+  coach?: boolean;
   scenario: MapScenario;
   state: GameState;
   onGo: (i: Issue) => void;
@@ -132,6 +135,12 @@ export function IssueTracker({
           Wait ▸▸
         </PixelButton>
       </div>
+      {coach && open && issues.length > 0 && (
+        <p className="relative mt-1.5 rounded-[4px] border-2 border-[#2e222f] bg-[#ffd166] px-2 py-1 pr-6 text-[13px] font-semibold leading-snug text-[#2e222f]" role="status" data-testid="coach">
+          Press Go to walk to your first problem. Arrows or click to move.
+          <span className="absolute -bottom-[9px] right-5 text-[12px] leading-none text-[#2e222f]" aria-hidden>▼</span>
+        </p>
+      )}
       {open && (
         <ul className="mt-1.5 max-h-[30svh] space-y-1.5 overflow-y-auto overscroll-contain sm:max-h-[max(7.5rem,calc(100svh-19rem))]">
           {issues.map((i) => {
@@ -165,7 +174,7 @@ export function IssueTracker({
                       </span>
                     </div>
                   </div>
-                  <button className="m-1 flex min-w-12 items-center justify-center rounded-[4px] border-2 border-[#2e222f] bg-[#c43d22] px-2 text-[14px] font-bold text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#d4492c] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166]" onClick={() => onGo(i)} data-testid={`go-${i.id}`} aria-label={`Go: ${i.title}`}>
+                  <button className="m-1 flex min-w-12 items-center justify-center rounded-[4px] border-2 border-[#2e222f] bg-[#c43d22] px-2 text-[14px] font-bold text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#d4492c] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166] data-[coach=1]:outline data-[coach=1]:outline-[3px] data-[coach=1]:outline-offset-1 data-[coach=1]:outline-[#ffd166]" onClick={() => onGo(i)} data-testid={`go-${i.id}`} aria-label={`Go: ${i.title}`} data-coach={coach && i.id === issues[0]?.id ? "1" : undefined}>
                     Go
                   </button>
                 </div>
