@@ -201,3 +201,26 @@ test("list view: the last card scrolls fully clear of the Wait bar", async ({ pa
     expect(lastBottom).toBeLessThanOrEqual(barTop);
   }
 });
+
+test("QA S3: the same run continued in another tab stops this one with a calm Reload notice", async ({ page, context }, info) => {
+  test.skip(info.project.name !== "desktop", "one run is enough");
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  // The run is saved as soon as play starts.
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).some((k) => k.startsWith("tp:run:")))).toBe(true);
+
+  const other = await context.newPage();
+  await other.goto("/game/launch-week");
+  await expect(other.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await other.getByTestId("resume").click();
+  // Resuming writes the run from this tab, which the first tab hears.
+  await expect(other.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+
+  await expect(page.getByTestId("other-tab")).toContainText("This run continued in another tab.");
+  await expect(page.getByTestId("other-tab-reload")).toBeVisible();
+  await expect(page.getByTestId("pause-menu")).toHaveCount(0);
+  await expect(other.getByTestId("other-tab")).toHaveCount(0);
+});
