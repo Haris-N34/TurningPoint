@@ -1,14 +1,13 @@
 import type { CardCheckpoint, Evidence } from "@/lib/card/types";
 import { verifyEvidence } from "@/lib/card/verify";
 import { locateQuote } from "@/lib/checkpoint/transcript";
-import { protectedMentions } from "./guards/protected";
 import type { SkillSlug } from "@/lib/engine/skills";
 
 // Local, rule-based evidence extraction (demo scope: no API keys). It organises evidence for a human;
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.6.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.7.1" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -28,7 +27,8 @@ const SKILL_WORDS: Record<SkillSlug, RegExp> = {
   ambiguity: /\b(didn'?t know|unclear|uncertain|not sure|guess\w*|risk\w*|bet|without knowing|best call|judg(e)?ment call)\b/i,
   prioritization: /\b(instead of|rather than|first|priorit\w*|protect\w*|cut|matter\w*|most important|trade-?off|focus\w*|dropped)\b/i,
   creativity: /\b(donat\w*|borrow\w*|cheaper|free|idea|found a way|reused|creative|swap\w*|partner\w*|asked .* for)\b/i,
-  collaboration: /\b(team|together|vote\w*|volunteers?|everyone|we|asked (them|the team|people)|shared|split|leads?)\b/i,
+  // A person or team action, not just the word "team" (judge feedback): asked, paired, called in, worked with...
+  collaboration: /\b(asked (?:\w+ ){0,3}(?:who|them|the team|people|everyone|for help)|asked \w+ to|paired|called (?:everyone|the team|them|people) in|called in|worked with|work(?:ed)? together|together with|told (?:the team|everyone|them|the volunteers)|delegat\w*|handed (?:it|\w+) (?:to|over)|split (?:the|it|up)|shared (?:the|it|out)|teamed up|brought (?:in|\w+ in|people together|everyone together)|vot(?:e|ed|ing)|consulted|checked with|sat down with|the team agreed|we agreed|set up (?:a |an )?(?:\w+ ){0,3}(?:standup|stand-up|meeting|call|rota|check-in|huddle)|ran (?:a |an )?(?:\w+ ){0,2}(?:standup|stand-up|meeting|huddle)|got (?:them|everyone|both|the team) (?:talking|together|on board))\b/i,
   empathy: /\b(felt|feel\w*|worr\w*|affect\w*|for them|their side|listen\w*|hear\w*|stress\w*|upset|car(e|ed|es|ing))\b/i,
   communication: /\b(told|tell\w*|explain\w*|wr(o|i)te\w*|messag\w*|email\w*|talk\w*|said|say\w*|announc\w*|updat\w*|let .* know)\b/i,
   feedback: /\b(feedback|critici\w*|crit|pointed out|said .* (mess|wrong)|learned|next time|changed .* because|took it on board)\b/i,
@@ -38,7 +38,7 @@ const SKILL_WORDS: Record<SkillSlug, RegExp> = {
 
 // Rubric features (PRD, Evidence rubric). Dialect-neutral spellings included so wording style is not penalised (G4).
 const REASON = /\b(because|cause|cuz|cos|since|so that|so|that'?s why|the reason|in order to)\b/i;
-const TRADE_OFF = /\b(instead of|rather than|trade-?off|cost (us|me)|gave up|give up|lose|losing|but|over)\b/i;
+const TRADE_OFF = /\b(instead of|rather than|trade-?off|cost (us|me)|gave up|give up|lose|losing|but|over|even though|although|at the cost of)\b/i;
 const AWARE = /\b(team|volunteers?|people|they|them|everyone|vendors?|affect\w*|would change|next time|i'?d (do|change))\b/i;
 
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean);
@@ -107,7 +107,12 @@ function trimQuote(sentence: string): string {
   const m = sentence.match(TRADE_OFF) ?? sentence.match(REASON);
   const at = m?.index !== undefined ? words(sentence.slice(0, m.index)).length : 0;
   const start = Math.max(0, Math.min(at - 8, w.length - MAX_QUOTE_WORDS));
-  return w.slice(start, start + MAX_QUOTE_WORDS).join(" ");
+  const win = w.slice(start, start + MAX_QUOTE_WORDS);
+  // End on a clause boundary when one is close, so a quote never stops mid-thought ("...so I picked").
+  if (start + MAX_QUOTE_WORDS < w.length) {
+    for (let k = win.length - 1; k >= 10; k--) if (/[,;:]$/.test(win[k])) return win.slice(0, k + 1).join(" ").replace(/[,;:]$/, "");
+  }
+  return win.join(" ");
 }
 
 type Candidate = { checkpointId: string; quote: string; level: "strong" | "some"; score: number };
@@ -119,7 +124,8 @@ type Candidate = { checkpointId: string; quote: string; level: "strong" | "some"
 function judge(skill: SkillSlug, text: string, signalled: boolean, context: string[]): { level: Candidate["level"]; quotes: string[] } | undefined {
   const ss = sentences(text);
   const relevant = ss.filter((x) => SKILL_WORDS[skill].test(x));
-  if (!relevant.length && !signalled) return undefined;
+  // Collaboration is never inferred from the decision's design alone: the answer must show people being brought in.
+  if (!relevant.length && (!signalled || skill === "collaboration")) return undefined;
   const reason = REASON.test(text);
   const trade = TRADE_OFF.test(text);
   const aware = AWARE.test(text);
@@ -137,44 +143,24 @@ function judge(skill: SkillSlug, text: string, signalled: boolean, context: stri
 // AI summary lines (judge feedback): specific to each skill and to its own quote, so no two skills on a card
 // read the same. A plain lead per skill and level, then up to three concrete words from the quote itself.
 const LEAD: Record<SkillSlug, Record<Candidate["level"], string>> = {
-  "problem-solving": { strong: "Fixes it and names the cost", some: "Proposes a fix, with a reason" },
-  adaptability: { strong: "Changes plan, names the cost", some: "Adjusts the plan, with a reason" },
-  resilience: { strong: "Keeps going, names the cost", some: "Keeps going, with a reason" },
-  ambiguity: { strong: "Decides unsure, weighs the risk", some: "Decides under doubt, with a reason" },
-  prioritization: { strong: "Protects one thing, cuts another", some: "Puts one thing first, with a reason" },
-  creativity: { strong: "Finds another way, names the cost", some: "Finds another way, with a reason" },
-  collaboration: { strong: "Weighs time against the team", some: "Brings others in, with a reason" },
-  empathy: { strong: "Lets feelings shape the trade-off", some: "Notices who is affected" },
-  communication: { strong: "Tells people early, names the cost", some: "Explains the call to others" },
-  feedback: { strong: "Acts on criticism, names the cost", some: "Responds to feedback, with a reason" },
-  analytical: { strong: "Reads the evidence, weighs options", some: "Uses evidence to decide" },
-  curiosity: { strong: "Digs deeper, names the cost", some: "Looks into it before deciding" },
+  "problem-solving": { strong: "Breaks the problem down and names what the fix costs.", some: "Proposes a fix and says why." },
+  adaptability: { strong: "Changes the plan and names what the change costs.", some: "Adjusts the plan and says why." },
+  resilience: { strong: "Recovers from the setback and says what changed after.", some: "Keeps going after the setback and says why." },
+  ambiguity: { strong: "Makes the call without full information and weighs the risk.", some: "Makes a call under uncertainty and says why." },
+  prioritization: { strong: "Protects what matters most and names what gets cut.", some: "Puts one thing first and says why." },
+  creativity: { strong: "Finds another way and names what it gives up.", some: "Finds another way and says why." },
+  collaboration: { strong: "Brings people in and weighs the time it costs.", some: "Involves others in the decision and says why." },
+  empathy: { strong: "Lets how people feel shape the trade-off.", some: "Notices who is affected and responds." },
+  communication: { strong: "Tells the right people early and weighs what to say.", some: "Explains the decision to others." },
+  feedback: { strong: "Acts on criticism and names what it cost.", some: "Responds to feedback and says why." },
+  analytical: { strong: "Reads the evidence and weighs the options.", some: "Uses evidence to reach the decision." },
+  curiosity: { strong: "Digs for what others missed before deciding.", some: "Looks into the problem before deciding." },
 };
 
-// Verb-like words make poor topics ("losing, hurt"); the topic should name things.
-const VERBISH = /(?:ing|ed)$/i;
-const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said share shared shares".split(" "));
-
-/** Up to three concrete words from the quote (things, not filler or verbs), in the order and case spoken. */
-function topicOf(quote: string): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  // Redaction placeholders ([name], [university]) are not topics.
-  for (const raw of quote.replace(/\[[a-z]+\]/g, " ").match(/[A-Za-z][A-Za-z'’-]{3,}/g) ?? []) {
-    const w = raw.replace(/['’]s$/, "");
-    const lw = w.toLowerCase();
-    // Never echo a word the protected-trait guard would flag (it reads summaries outside quotation marks).
-    if (GENERIC.has(lw) || ABSTRACT.has(lw) || VERBS.has(lw) || VERBISH.test(lw) || seen.has(stem(lw)) || protectedMentions(lw).length) continue;
-    seen.add(stem(lw));
-    out.push(w);
-    if (out.length === 3) break;
-  }
-  return out;
-}
-
-export function summaryLine(skill: SkillSlug, level: Candidate["level"], quote: string): string {
-  const topic = topicOf(quote);
-  return topic.length ? `${LEAD[skill][level]}: ${topic.join(", ")}.` : `${LEAD[skill][level]}.`;
+/** One plain sentence per skill and level (judge feedback: no keyword lists). Distinct across skills, so never repeated on a card. */
+export function summaryLine(skill: SkillSlug, level: Candidate["level"], _quote?: string): string {
+  void _quote;
+  return LEAD[skill][level];
 }
 
 export function extractEvidence(input: ExtractInput): Evidence[] {

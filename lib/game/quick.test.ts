@@ -129,3 +129,31 @@ describe("days left for the HUD", () => {
     expect(daysLeft(newGame(s, "x"))).toBe(5);
   });
 });
+
+describe("the card's decision path has every choice the player made", () => {
+  it.each(MAP_IDS.flatMap((m) => (["quick", "full"] as const).flatMap((l) => ["a", "b", "c"].map((seed) => [m, l, seed] as const))))("%s (%s, seed %s): K handled problems give K path steps, recovery pick and explain-on-pick included", async (id, length, seed) => {
+    const { buildMapCard } = await import("@/lib/card/buildMap");
+    const s = getMapScenario(id)!;
+    const start = newGame(s, seed, { length });
+    const st = replay(s, seed, scriptedRun(s, start, (ids) => ids.at(-1)!), { length });
+    const q = forLength(s, length);
+    const card = buildMapCard({
+      attemptId: "att_path",
+      scenario: q,
+      state: st,
+      answers: [],
+      integrity: [],
+      challenge: { id: "map-" + id, title: q.title, company: "Demo" },
+      candidate: { displayName: "Test", verified: false },
+      timeMultiplier: 1,
+      now: new Date("2026-11-05T00:00:00Z"),
+    });
+    const handled = st.events.filter((e) => ["resolved", "delegated", "deferred"].includes(e.kind));
+    expect(st.choices.length).toBe(st.events.filter((e) => e.kind === "resolved").length);
+    expect(card.decisionPath).toHaveLength(handled.length);
+    expect(card.decisionPath.map((p) => p.nodeId)).toEqual(handled.map((e) => e.issue));
+    for (const c of st.choices) expect(card.decisionPath.find((p) => p.nodeId === c.issue)?.optionLabel).toBe(c.label);
+    const recovery = st.choices.find((c) => q.issues.find((i) => i.id === c.issue)!.tags.includes("recovery"));
+    expect(recovery && card.decisionPath.some((p) => p.nodeId === recovery.issue)).toBe(true);
+  });
+});

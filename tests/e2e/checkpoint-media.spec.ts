@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { playToCheckpoint } from "./helpers";
+import { answerCheckpoint, nextStep, playToCheckpoint } from "./helpers";
 
 // Voice and video answers: speech to text keeps listening, shows live captions, explains errors,
 // and the candidate can type or fix the words before submitting (only the words are scored).
@@ -315,7 +315,8 @@ test("recruiter card words a retake neutrally", async ({ page }, info) => {
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();
   await page.goto("/recruiter/card/att_demo_maya?challenge=ch_demo_energy");
-  await expect(page.getByTestId("integrity")).toContainText("Answered on the second take");
+  await expect(page.getByTestId("retake-cp2")).toHaveText("second take");
+  await expect(page.getByTestId("capability-card")).toContainText("second take", { useInnerText: true });
   await expect(page.getByTestId("capability-card")).not.toContainText("Retake used");
 });
 
@@ -335,4 +336,27 @@ test("demo path: camera and mic refused, the first checkpoint opens calmly in te
   await cp.getByRole("button", { name: "Done" }).click();
   await cp.getByRole("button", { name: "Submit" }).click();
   await expect(cp).toBeHidden({ timeout: 10_000 });
+});
+
+test("real life: a one-line, off-topic answer gets a kind 'tell us more' follow-up", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "one size is enough");
+  test.setTimeout(120_000);
+  await page.goto("/play/sample");
+  await page.getByRole("button", { name: "I agree, start" }).click();
+  for (let i = 0; i < 60; i++) {
+    const s = await nextStep(page);
+    if (s === "real-life") break;
+    if (s === "checkpoint") await answerCheckpoint(page, "text");
+    else if (s === "choice") await page.locator('[data-testid^="option-"]').first().click();
+    else if (s === "continue") await page.getByRole("button", { name: /^(Continue|Face it)$/ }).click();
+    else throw new Error(`unexpected ${s}`);
+  }
+  await page.getByTestId("real-life-intro").getByRole("button", { name: "Start" }).click();
+  const cp = page.getByTestId("checkpoint");
+  await cp.locator('label:has(input[value="text"])').click();
+  await cp.getByRole("button", { name: /start answering/i }).click();
+  await cp.getByTestId("answer-text").fill("I like pizza.");
+  await cp.getByRole("button", { name: "Done" }).click();
+  await cp.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", "Tell us a bit more: what went wrong, and what did you do about it?");
 });

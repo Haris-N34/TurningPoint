@@ -29,19 +29,19 @@
     {
       "skill": "collaboration",
       "level": "strong",
-      "sentence": "Weighs time against the team: fifteen, minutes, volunteer.",
+      "sentence": "Brings people in and weighs the time it costs.",
       "source": {
         "type": "clip",
         "checkpointId": "cp1",
-        "quote": "It cost us fifteen minutes, but I'd rather lose time than a volunteer.",
-        "startS": 11.54,
-        "endS": 16.51
+        "quote": "I asked who was free when, because nobody wanted deliveries or set-up.",
+        "startS": 0,
+        "endS": 4.58
       }
     },
     {
       "skill": "prioritization",
       "level": "strong",
-      "sentence": "Protects one thing, cuts another: promotion, decorations, stage.",
+      "sentence": "Protects what matters most and names what gets cut.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
@@ -53,7 +53,7 @@
     {
       "skill": "adaptability",
       "level": "some",
-      "sentence": "Adjusts the plan, with a reason: vendors, bands.",
+      "sentence": "Adjusts the plan and says why.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
@@ -65,7 +65,7 @@
     {
       "skill": "resilience",
       "level": "some",
-      "sentence": "Keeps going, with a reason: half, money, news.",
+      "sentence": "Keeps going after the setback and says why.",
       "source": {
         "type": "clip",
         "checkpointId": "fu",
@@ -1413,7 +1413,7 @@
   ],
   "audit": {
     "extractor": "local-rules",
-    "version": "0.6.0",
+    "version": "0.7.1",
     "createdAt": "2026-11-04T17:42:00.000Z"
   }
 }

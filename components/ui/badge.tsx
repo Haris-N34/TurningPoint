@@ -23,11 +23,12 @@ const badgeVariants = cva(
   }
 )
 
-export type BadgeProps = React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof badgeVariants>
+export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    // A span, so a badge can sit inside a paragraph or a heading without invalid nesting.
+    <span className={cn(badgeVariants({ variant }), className)} {...props} />
   )
 }
 
