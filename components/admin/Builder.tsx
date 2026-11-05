@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getScenario, SCENARIO_IDS } from "@/content/scenarios";
 import { challengeUrl, publish, qrDataUrl, saveDraft, type Challenge } from "@/lib/challenge/challenge";
-import { INDUSTRIES, tailorScenario, type Industry } from "@/lib/challenge/tailor";
+import { preparePublishedContent } from "@/lib/ai/services/publish";
+import { tailor } from "@/lib/ai/services/tailor";
+import { INDUSTRIES, type Industry } from "@/lib/challenge/tailor";
 import { ScenarioSchema, type Scenario } from "@/lib/engine/schema";
 import { SKILLS, type SkillSlug } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
@@ -39,7 +41,8 @@ export function Builder() {
 
   const applyTemplate = (id: string, ind: Industry) => {
     const base = getScenario(id)!;
-    const r = tailorScenario(base, ind, company.name || undefined);
+    // Scenario Tailor (B2): wording only; structure is locked and checked.
+    const r = tailor(base, ind, company.name || undefined);
     setScenario(r.scenario);
     // E1.3: an invalid rewrite is never used; the builder says so and keeps the original.
     setTailorNote(r.error ? `Couldn't tailor to ${ind}, kept the original: ${r.error}` : r.changed ? `Rewritten for ${ind}. Edit any line in Review.` : null);
@@ -282,6 +285,8 @@ export function Builder() {
               disabled={!valid.success}
               onClick={() => {
                 const c = persist();
+                // Publish-time AI (B.3): dialogue variants are made once here and cached with the challenge.
+                preparePublishedContent(store(), c);
                 setPublished(publish(store(), c.id));
               }}
             >

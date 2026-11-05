@@ -1,4 +1,5 @@
-import { EXTRACTOR, extractEvidence } from "@/lib/ai/evidence";
+import { EXTRACTOR } from "@/lib/ai/evidence";
+import { scanEvidence } from "@/lib/ai/services/scanner";
 import type { RunState } from "@/lib/engine/engine";
 import type { RunPlan } from "@/lib/engine/seed";
 import type { Scenario } from "@/lib/engine/schema";
@@ -62,12 +63,11 @@ export function buildCard(i: BuildInput): Card {
   const nodeSkills: Record<string, SkillSlug[]> = {};
   for (const n of i.scenario.nodes) if (n.type === "choice") nodeSkills[n.id] = n.skillSignals as SkillSlug[];
 
-  const evidence = extractEvidence({
-    targetSkills,
-    checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })),
-    decisionPath,
-    nodeSkills,
-  });
+  // Evidence Scanner (B2): blind inputs, verified quotes. The name and school are stripped before it runs.
+  const evidence = scanEvidence(
+    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })), decisionPath, nodeSkills },
+    { name: i.candidate.displayName, university: i.candidate.university },
+  );
 
   return CardSchema.parse({
     attemptId: i.attemptId,

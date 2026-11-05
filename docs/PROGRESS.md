@@ -116,7 +116,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 ## M3.5. AI Engine (v2 Part B)
 
 - [ ] B.1 [D] All model calls go through lib/ai with a provider interface; the mock provider passes the full e2e suite offline
-- [ ] B.2 [D] Every B2 service exists with a Zod schema, fixtures and a fallback
+- [x] B.2 [D] Every B2 service exists with a Zod schema, fixtures and a fallback (lib/ai/services, registry in lib/ai/prompts/registry.ts, lib/ai/services.test.ts)
 - [ ] B.3 [D] Scenario Tailor and Dialogue Variants run at publish time and are cached; no live generation of game content
 - [ ] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context
 - [ ] B.5 [D] Value Mapper shows mappings with confidence; admin can accept, change or reject each

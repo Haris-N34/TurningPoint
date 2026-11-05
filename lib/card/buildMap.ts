@@ -1,4 +1,6 @@
-import { EXTRACTOR, extractEvidence } from "@/lib/ai/evidence";
+import { EXTRACTOR } from "@/lib/ai/evidence";
+import { checkConsistency, consistencyInput } from "@/lib/ai/services/consistency";
+import { scanEvidence } from "@/lib/ai/services/scanner";
 import type { GameState } from "@/lib/game/engine";
 import { computeKpis } from "@/lib/game/kpis";
 import type { MapScenario } from "@/lib/game/schema";
@@ -63,12 +65,12 @@ export function buildMapCard(i: MapBuildInput): Card {
   const nodeSkills: Record<string, SkillSlug[]> = Object.fromEntries(s.issues.map((x) => [x.id, x.skillSignals as SkillSlug[]]));
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const decisionPath = steps.map(({ t, ...rest }) => rest);
-  const evidence = extractEvidence({
-    targetSkills,
-    checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })),
-    decisionPath,
-    nodeSkills,
-  });
+  const known = { name: i.candidate.displayName, university: i.candidate.university };
+  // Evidence Scanner (B2): blind inputs, verified quotes.
+  const evidence = scanEvidence(
+    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })), decisionPath, nodeSkills },
+    known,
+  );
   return CardSchema.parse({
     attemptId: i.attemptId,
     anonId: anonIdFor(i.attemptId),
@@ -85,7 +87,8 @@ export function buildMapCard(i: MapBuildInput): Card {
     realStory: i.realStory ? { ...i.realStory, witnesses: [] } : undefined,
     integrity: i.integrity,
     kpis: computeKpis(s, st),
-    consistency: orderConsistency(s, st),
+    // Consistency Checker (B2): said vs did, context only.
+    consistency: checkConsistency(consistencyInput(s, st, i.answers, i.realStory ? { ...i.realStory, witnesses: [] } : undefined, known)),
     audit: { extractor: EXTRACTOR.name, version: EXTRACTOR.version, createdAt: now },
   });
 }

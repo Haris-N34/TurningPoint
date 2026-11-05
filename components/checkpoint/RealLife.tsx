@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { followUpQuestion } from "@/lib/ai/questions";
+import { followUp } from "@/lib/ai/services/interviewer";
 import type { Profile } from "@/lib/store/store";
 import { Checkpoint, type CheckpointResult } from "./Checkpoint";
 import type { Mode } from "./useRecorder";
@@ -63,7 +63,7 @@ export function RealLife(p: {
         questionSource="generated"
         onDone={(r) => {
           setResults([r]);
-          setFollow(followUpQuestion(r.checkpoint.transcript.text));
+          setFollow(followUp(r.checkpoint.transcript.text, { name: p.profile.displayName, email: p.profile.email, university: p.profile.university }));
           setStep("follow");
         }}
       />
