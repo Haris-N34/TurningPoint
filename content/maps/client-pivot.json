@@ -945,56 +945,6 @@
       ]
     },
     {
-      "id": "n-scope-creep",
-      "npc": "manager",
-      "lines": [
-        {
-          "who": "manager",
-          "text": "Head office just asked: can the new system also handle online orders?",
-          "expression": "worried"
-        }
-      ],
-      "prompt": "How do you handle the new ask?",
-      "options": [
-        {
-          "id": "a",
-          "label": "Park it for phase 2, and write down why",
-          "effects": {
-            "trust.manager": 2,
-            "trust.cfo": 4
-          },
-          "reaction": {
-            "emote": "note",
-            "expression": "neutral"
-          }
-        },
-        {
-          "id": "b",
-          "label": "Say yes and squeeze it in",
-          "effects": {
-            "morale": -10,
-            "trust.cfo": -4
-          },
-          "reaction": {
-            "emote": "sweat",
-            "expression": "worried"
-          },
-          "explainOnPick": true
-        },
-        {
-          "id": "c",
-          "label": "Say no, it's out of scope",
-          "effects": {
-            "trust.manager": -6
-          },
-          "reaction": {
-            "emote": "anger",
-            "expression": "angry"
-          }
-        }
-      ]
-    },
-    {
       "id": "n-final-deck",
       "npc": "laptop",
       "lines": [
@@ -1561,28 +1511,6 @@
       "tags": [
         "feedback"
       ]
-    },
-    {
-      "id": "scope-creep",
-      "title": "Head office wants online orders too",
-      "npc": "manager",
-      "zone": "client",
-      "node": "n-scope-creep",
-      "severity": "medium",
-      "talkCost": 30,
-      "skillSignals": [
-        "adaptability",
-        "prioritization"
-      ],
-      "checkpointEligible": false,
-      "delegable": false,
-      "onExpire": {
-        "effects": {
-          "trust.cfo": -4
-        }
-      },
-      "spawnAt": "Thu 13:30",
-      "deadline": "Fri 11:00"
     },
     {
       "id": "final-deck",

@@ -725,7 +725,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left.",
+          "text": "The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
           "expression": "worried"
         }
       ],
@@ -794,6 +794,127 @@
       ]
     },
     {
+      "id": "n-recovery-venue",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "Where does the market happen now?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Book the school field nearby and keep the full vendor list",
+          "effects": {
+            "trust.vendors": 4,
+            "morale": -2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.7
+          }
+        },
+        {
+          "id": "b",
+          "label": "Shrink into the church car park: fewer stalls, food and families first",
+          "effects": {
+            "trust.vendors": -6,
+            "trust.community": 2
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.8
+          }
+        },
+        {
+          "id": "c",
+          "label": "Move the market back a week and keep the original layout",
+          "effects": {
+            "morale": -6,
+            "trust.vendors": -8,
+            "trust.community": -4
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-recovery-cover",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "Priya leaves Thursday. Her set-up and gate shifts on Saturday have nobody on them yet.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you cover Priya's shifts?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Cover the gate myself and move Theo to lead set-up",
+          "effects": {
+            "morale": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.8
+          }
+        },
+        {
+          "id": "b",
+          "label": "Share her shifts across the team and drop the late clean-up shift",
+          "effects": {
+            "morale": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.75
+          }
+        },
+        {
+          "id": "c",
+          "label": "Pay a college student to take her shifts",
+          "effects": {
+            "budget": -400,
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.5
+          }
+        }
+      ]
+    },
+    {
       "id": "n-shaken",
       "npc": "priya",
       "lines": [
@@ -838,7 +959,162 @@
             "emote": "sweat",
             "expression": "worried",
             "line": "People are guessing the worst."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-vendors-moved",
+      "npc": "rosa",
+      "lines": [
+        {
+          "who": "rosa",
+          "text": "So where do we set up now? I need power for my oven and a time to unload.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you tell the vendors?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Send every vendor a site map and load-in times today",
+          "effects": {
+            "trust.vendors": 10
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "That's all I needed."
           }
+        },
+        {
+          "id": "b",
+          "label": "Walk the new site with the vendors before giving out spots",
+          "effects": {
+            "trust.vendors": 6,
+            "trust.community": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          },
+          "minutes": 45
+        },
+        {
+          "id": "c",
+          "label": "Tell them to come early and sort spots on the day",
+          "effects": {
+            "trust.vendors": -8
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry",
+            "line": "With an oven? That won't work."
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-handover",
+      "npc": "priya",
+      "lines": [
+        {
+          "who": "priya",
+          "text": "Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "How do you take over Priya's work?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Sit down with Priya and Theo and write it all down",
+          "effects": {
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Good. Nothing gets lost."
+          },
+          "minutes": 30
+        },
+        {
+          "id": "b",
+          "label": "Ask Priya to send her notes tonight",
+          "effects": {
+            "morale": -2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "I'll try, but some of it is in my head."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Split it: the rota to Theo, the vendor contacts to me",
+          "effects": {
+            "morale": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-lost-lead",
+      "npc": "theo",
+      "lines": [
+        {
+          "who": "theo",
+          "text": "Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you steady the team?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Tell the team today who leads what from Thursday",
+          "effects": {
+            "morale": 10
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Clear. That helps."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Ask Theo to step up as lead and tell the team",
+          "effects": {
+            "morale": 6
+          },
+          "reaction": {
+            "emote": "exclaim",
+            "expression": "happy",
+            "line": "Me? Okay. I'll do it."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Let things settle and see who steps up",
+          "effects": {
+            "morale": -8
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried",
+            "line": "People are just waiting around."
+          },
+          "explainOnPick": true
         }
       ]
     },
@@ -876,7 +1152,8 @@
             "emote": "question",
             "expression": "worried",
             "line": "I still need dates and stall details before I can plan."
-          }
+          },
+          "explainOnPick": true
         },
         {
           "id": "c",
@@ -1051,10 +1328,10 @@
     },
     {
       "id": "n-weather",
-      "npc": "priya",
+      "npc": "theo",
       "lines": [
         {
-          "who": "priya",
+          "who": "theo",
           "text": "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
           "expression": "worried"
         }
@@ -1477,6 +1754,124 @@
       }
     },
     {
+      "id": "recovery-venue",
+      "title": "Find a new site",
+      "npc": "laptop",
+      "zone": "hq",
+      "node": "n-recovery-venue",
+      "severity": "high",
+      "talkCost": 60,
+      "skillSignals": [
+        "adaptability",
+        "resilience",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -10
+        }
+      },
+      "lifetime": 480,
+      "tags": [
+        "recovery"
+      ]
+    },
+    {
+      "id": "vendors-moved",
+      "title": "Vendors need the new layout",
+      "npc": "rosa",
+      "zone": "vendors",
+      "node": "n-vendors-moved",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "problem-solving"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.vendors": -12
+        }
+      },
+      "lifetime": 420,
+      "delegateEffects": {
+        "trust.vendors": 2
+      }
+    },
+    {
+      "id": "recovery-cover",
+      "title": "Cover Priya's shifts",
+      "npc": "laptop",
+      "zone": "hq",
+      "node": "n-recovery-cover",
+      "severity": "high",
+      "talkCost": 60,
+      "skillSignals": [
+        "adaptability",
+        "resilience",
+        "prioritization"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -10
+        }
+      },
+      "lifetime": 480,
+      "tags": [
+        "recovery"
+      ]
+    },
+    {
+      "id": "handover",
+      "title": "Priya's handover",
+      "npc": "priya",
+      "zone": "volunteers",
+      "node": "n-handover",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "collaboration",
+        "communication"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -6,
+          "trust.vendors": -6
+        }
+      },
+      "lifetime": 420
+    },
+    {
+      "id": "lost-lead",
+      "title": "The team lost its lead",
+      "npc": "theo",
+      "zone": "storage",
+      "node": "n-lost-lead",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "empathy",
+        "collaboration",
+        "resilience"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -12
+        }
+      },
+      "lifetime": 360
+    },
+    {
       "id": "new-partner",
       "title": "A possible new sponsor",
       "npc": "dana",
@@ -1549,8 +1944,8 @@
     {
       "id": "weather",
       "title": "Rain forecast for Saturday",
-      "npc": "priya",
-      "zone": "volunteers",
+      "npc": "theo",
+      "zone": "storage",
       "node": "n-weather",
       "severity": "medium",
       "talkCost": 30,
@@ -1667,9 +2062,9 @@
           "trust.vendors": -8
         },
         "spawn": [
-          "recovery-plan",
+          "recovery-venue",
           "team-shaken",
-          "vendors-worried"
+          "vendors-moved"
         ]
       },
       {
@@ -1682,9 +2077,9 @@
           "morale": -25
         },
         "spawn": [
-          "recovery-plan",
-          "team-shaken",
-          "vendors-worried"
+          "recovery-cover",
+          "handover",
+          "lost-lead"
         ]
       }
     ]

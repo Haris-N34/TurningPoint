@@ -196,6 +196,7 @@ export const MapScenarioSchema = z
       if (!npcs.has(d.caller)) err(`disruption ${d.id} has unknown caller "${d.caller}"`);
       for (const sp of d.spawn) if (!issues.has(sp)) err(`disruption ${d.id} spawns unknown issue "${sp}"`);
       if (d.darkZone && !zones.has(d.darkZone)) err(`disruption ${d.id} darkens unknown zone "${d.darkZone}"`);
+      if (!d.spawn.some((sp) => s.issues.find((i) => i.id === sp)?.tags.includes("recovery"))) err(`disruption ${d.id} spawns no recovery issue`);
     }
     for (const p of s.turningPoint.pool) if (!s.turningPoint.disruptions.some((d) => d.id === p)) err(`pool has unknown disruption "${p}"`);
     if (!s.issues.some((i) => i.tags.includes("recovery"))) err("needs a recovery-plan issue");

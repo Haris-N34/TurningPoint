@@ -138,12 +138,6 @@ nodes = [
         opt("b", "Explain that the client asked for detail", {"trust.firm": -4}, ("note", "neutral", "Then put the detail at the back."), kpi={"feedback": "defensive"}),
         opt("c", "Say there's no time to change it now", {"trust.firm": -10}, ("anger", "angry"), kpi={"feedback": "dismissive"}, explain=True),
     ]),
-    node("n-scope-creep", "manager", [("manager", "Head office just asked: can the new system also handle online orders?", "worried")],
-         "How do you handle the new ask?", [
-        opt("a", "Park it for phase 2, and write down why", {"trust.manager": 2, "trust.cfo": 4}, ("note", "neutral")),
-        opt("b", "Say yes and squeeze it in", {"morale": -10, "trust.cfo": -4}, ("sweat", "worried"), explain=True),
-        opt("c", "Say no, it's out of scope", {"trust.manager": -6}, ("anger", "angry")),
-    ]),
     node("n-final-deck", "laptop", [("you", "Friday morning. The deck needs to land in four hours.", "neutral")],
          "What do you change last?", [
         opt("a", "Put the answer on slide one and cut the feature list", {"trust.firm": 6}, ("note", "happy")),
@@ -212,8 +206,6 @@ issues = [
           spawn="Thu 09:30", deadline="Thu 15:00", eligible=True, delegable=False, tags=["pitch"], expire=E(trust__cfo=-10)),
     issue("feedback", "The partner hates your deck", "partner", "partner-office", "n-feedback", "medium", 30, ["feedback"],
           spawn="Thu 11:00", deadline="Thu 17:00", eligible=True, delegable=False, tags=["feedback"], expire=E(trust__firm=-8)),
-    issue("scope-creep", "Head office wants online orders too", "manager", "client", "n-scope-creep", "medium", 30, ["adaptability", "prioritization"],
-          spawn="Thu 13:30", deadline="Fri 11:00", delegable=False, expire=E(trust__cfo=-4)),
     issue("final-deck", "Finish the deck", "laptop", "desk", "n-final-deck", "medium", 45, ["communication"],
           spawn="Fri 09:30", deadline="Fri 14:00", delegable=False, expire=E(trust__firm=-6)),
     issue("dev-blocker", "No test data for the demo", "dev", "pod", "n-dev-blocker", "high", 30, ["problem-solving", "adaptability"],
