@@ -20,7 +20,8 @@ maya.chen@example.com | (403) 555-0182
 Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
-- Negotiated donated supplies from a local store, saving $2,000`;
+- Negotiated donated supplies from a local store, saving $2,000
+- Tracked attendance data in a spreadsheet`;
 
 async function seed(page: Page) {
   await page.goto("/demo/seed");
@@ -88,6 +89,8 @@ async function startLaunchWeek(page: Page) {
   await expect(page.getByTestId("title-screen")).toContainText("PRESS ENTER");
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByTestId("set-turn-based").check();
+  // The long demo plays the full week (Quick mode, the default, is the one-minute demo).
+  await page.getByTestId("set-full-week").check();
   await page.getByTestId("start").click();
   await expect(page.getByTestId("avatar-creator")).toBeVisible();
   await page.getByTestId("avatar-done").click();
@@ -217,10 +220,10 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByTestId("start").click();
     await page.getByTestId("avatar-done").click();
     await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
-    // The HUD hides during the cutscene; the clock shows Wednesday morning once it closes.
+    // The HUD hides during the cutscene; the clock shows Tuesday morning (Quick mode, the default) once it closes.
     await page.getByTestId("cutscene-next").click();
     await page.getByTestId("cutscene-done").click();
-    await expect(page.getByTestId("clock-time")).toHaveText(/^Wed 09:/);
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
     // A jumped run is never saved.
     expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("tp:run:")).length)).toBe(0);
   });

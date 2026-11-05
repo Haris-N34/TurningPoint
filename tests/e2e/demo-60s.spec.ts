@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 // The one-minute stage demo (docs/pitch/demo-60s.md), exactly as presented: two prepared tabs.
 test("one-minute demo: turning point, the checkpoint quotes the pick, the recruiter card", async ({ page, context }, info) => {
   test.skip(info.project.name !== "desktop", "stage demo runs on a laptop");
+  // Two tabs and a dev-server compile under parallel load; the demo itself is timed separately below.
+  test.setTimeout(90_000);
   // Landing has a direct way into the game.
   await page.goto("/");
   await expect(page.getByTestId("play-game")).toHaveAttribute("href", "/game/launch-week");

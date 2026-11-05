@@ -7,13 +7,14 @@ import type { SkillSlug } from "@/lib/engine/skills";
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.2.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.3.0" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
   targetSkills: SkillSlug[];
-  checkpoints: Pick<CardCheckpoint, "id" | "nodeId" | "kind" | "transcript">[];
-  decisionPath: { nodeId: string; optionId: string; optionLabel: string }[];
+  /** `question` is the checkpoint question; with the decision it gives the answer's own context (specificity). */
+  checkpoints: (Pick<CardCheckpoint, "id" | "nodeId" | "kind" | "transcript"> & { question?: string })[];
+  decisionPath: { nodeId: string; optionId: string; optionLabel: string; prompt?: string }[];
   /** Skills each choice node is designed to surface (scenario skillSignals). */
   nodeSkills: Record<string, SkillSlug[]>;
 };
@@ -41,6 +42,56 @@ const AWARE = /\b(team|volunteers?|people|they|them|everyone|vendors?|affect\w*|
 
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean);
 
+// Specificity (Strong needs it). Generic trade-off talk ("the team needed it first, but it cost us time") fits
+// any decision, so it caps at Some. Specific means the answer names something from its own decision (a noun
+// or name from the question, the option picked or the issue), or a concrete detail: a number, an amount, a day.
+const GENERIC = new Set(
+  (("this that with from they them their there then than what when where which while would could should about after before " +
+    "again also because cause into just like more most much only other over some such very will your yours have having been being " +
+    "were does doing done make made take took give gave keep kept said says tell told think thought know knew feel felt want wanted " +
+    "need needed needs first last next time times team teams people person everyone everybody someone something thing things stuff " +
+    "work worked plan plans planned decision decide decided choose chose chosen choice pick picked option options call calls way ways " +
+    "lose lost cost costs trade trade-off tradeoff instead rather better best worse right wrong good important priority prioritise " +
+    "prioritize prioritised prioritized matter matters mattered really still even well many lots much less whole part parts point " +
+    "affect affects affected impact impacts involved involve outcome result results reason reasons sure maybe guess why walk through " +
+    "real life faced broke happened happen changed change changes something like").split(" ")),
+);
+const stem = (w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5);
+const contentWords = (text: string) => (text.match(/[A-Za-z][A-Za-z'-]{3,}/g) ?? []).map((w) => w.toLowerCase()).filter((w) => !GENERIC.has(w));
+const NUMBER_WORDS = /\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|hundred|thousand|half|quarter|dozen)\b/i;
+const DAYS = /\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
+
+/**
+ * True if the text names something concrete: a number, an amount, a day or month. Capital letters are never
+ * used, so writing in lower case or with typos changes nothing (F1).
+ */
+export function hasConcreteDetail(text: string): boolean {
+  return /\d/.test(text) || NUMBER_WORDS.test(text) || DAYS.test(text);
+}
+
+// Abstract words that sound like an answer but name nothing that happened. They never count as detail.
+const ABSTRACT = new Set(
+  (("situation situations project projects challenge challenges approach process problem problems solution solutions issue issues " +
+    "task tasks goal goals stakeholder stakeholders informed inform ensure ensured ensuring handle handled handling manage managed " +
+    "managing similar suddenly quickly effectively efficient efficiently clear clearly open openly honest honestly transparent " +
+    "communication communicate communicated collaboration collaborate collaborated adapt adapted adapting adaptable flexible " +
+    "resilience resilient priorities prioritising prioritizing balance balanced considered consider considering understand " +
+    "understood understanding perspective perspectives needs concerns concern everyone's overall ultimately successful success " +
+    "difficult hard tough easy key crucial essential necessary situation's aligned align alignment").split(" ")),
+);
+export const detailWords = (text: string) => new Set(contentWords(text).filter((w) => !ABSTRACT.has(w)).map(stem));
+export const RICH_DETAIL_WORDS = 8;
+
+/**
+ * True if the answer is specific: it names something from its own decision (question, option, issue), or it
+ * holds a concrete detail (number, amount, day), or it describes what happened in rich concrete words.
+ */
+export function isSpecific(text: string, context: string[]): boolean {
+  const ctx = new Set(context.flatMap(contentWords).map(stem));
+  if (ctx.size && contentWords(text).some((w) => ctx.has(stem(w)))) return true;
+  return hasConcreteDetail(text) || detailWords(text).size >= RICH_DETAIL_WORDS;
+}
+
 function sentences(text: string): string[] {
   return text
     .split(/(?<=[.!?])\s+/)
@@ -64,7 +115,7 @@ type Candidate = { checkpointId: string; quote: string; level: "strong" | "some"
  * Judge one answer for one skill. The rubric applies to the whole answer (a reason in one sentence and
  * the trade-off in the next still counts); the quote is the single sentence that best shows it.
  */
-function judge(skill: SkillSlug, text: string, signalled: boolean): { level: Candidate["level"]; quote: string } | undefined {
+function judge(skill: SkillSlug, text: string, signalled: boolean, context: string[]): { level: Candidate["level"]; quote: string } | undefined {
   const ss = sentences(text);
   const relevant = ss.filter((x) => SKILL_WORDS[skill].test(x));
   if (!relevant.length && !signalled) return undefined;
@@ -72,7 +123,7 @@ function judge(skill: SkillSlug, text: string, signalled: boolean): { level: Can
   const trade = TRADE_OFF.test(text);
   const aware = AWARE.test(text);
   let level: Candidate["level"] | undefined;
-  if (relevant.length && reason && trade && aware) level = "strong";
+  if (relevant.length && reason && trade && aware && isSpecific(text, context)) level = "strong";
   else if (reason) level = "some";
   if (!level) return undefined;
   const pool = relevant.length ? relevant : ss;
@@ -82,18 +133,23 @@ function judge(skill: SkillSlug, text: string, signalled: boolean): { level: Can
 }
 
 const SENTENCE: Record<Candidate["level"], string> = {
-  strong: "Names the trade-off, says why, and considers who it affects.",
+  strong: "Names the trade-off, says why, and considers who it affects, specific to the decision.",
   some: "Gives a reason for the decision, without naming a trade-off.",
 };
 
 export function extractEvidence(input: ExtractInput): Evidence[] {
+  // The decision behind a checkpoint: its question, the option picked and the issue or prompt.
+  const contextFor = (cp: ExtractInput["checkpoints"][number]) => {
+    const d = input.decisionPath.filter((x) => x.nodeId === cp.nodeId);
+    return [cp.question ?? "", ...d.flatMap((x) => [x.optionLabel, x.prompt ?? ""])].filter(Boolean);
+  };
   const usable = input.checkpoints.filter((c) => c.transcript.text.trim());
   const raw: Evidence[] = input.targetSkills.map((skill) => {
     if (!usable.length) return { skill, level: "needs_review" as const };
     let best: Candidate | undefined;
     for (const cp of usable) {
       const signalled = cp.kind === "decision" && (input.nodeSkills[cp.nodeId] ?? []).includes(skill);
-      const j = judge(skill, cp.transcript.text, signalled);
+      const j = judge(skill, cp.transcript.text, signalled, contextFor(cp));
       if (!j) continue;
       const sc = (j.level === "strong" ? 10 : 5) + (signalled ? 2 : 0) + (cp.kind === "real_life" ? 1 : 0);
       if (!best || sc > best.score) best = { checkpointId: cp.id, quote: j.quote, level: j.level, score: sc };

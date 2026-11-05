@@ -15,7 +15,7 @@ export function CopilotButton({ open, onClick }: { open: boolean; onClick: () =>
   return (
     <Button variant="outline" size="sm" onClick={onClick} aria-expanded={open} aria-controls="copilot" data-testid="copilot-open">
       <span aria-hidden className="text-primary">✦</span>
-      Ask<span className="hidden sm:inline"> about this candidate</span>
+      <span>Ask<span className="hidden sm:inline"> about this candidate</span></span>
     </Button>
   );
 }

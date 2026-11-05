@@ -286,7 +286,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "The client says 'modernise inventory'. That's not a brief. What do they need from us by Friday?",
+          "text": "The client says 'modernise inventory'. That's not a brief. What do they actually need?",
           "expression": "neutral"
         }
       ],
@@ -344,7 +344,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Stockouts cluster in the small stores, where orders are done by hand",
+          "label": "Stockouts cluster in small stores, where orders are done by hand",
           "effects": {
             "trust.firm": 6
           },
@@ -358,7 +358,7 @@
         },
         {
           "id": "b",
-          "label": "Stockouts are up everywhere, so every store needs the new system",
+          "label": "Stockouts are up everywhere, so every store needs it",
           "effects": {},
           "reaction": {
             "emote": "question",
@@ -659,7 +659,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "The CFO halved the budget and wants a phased plan by Friday. The old plan doesn't fit.",
+          "text": "The CFO halved the budget and wants a phased plan. The old plan doesn't fit.",
           "expression": "worried"
         }
       ],
@@ -667,7 +667,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Phase 1: the small stores only, where stockouts are worst",
+          "label": "Phase 1: small stores only, where stockouts are worst",
           "effects": {
             "morale": 4
           },
@@ -681,7 +681,7 @@
         },
         {
           "id": "b",
-          "label": "Phase 1: every store, but without the forecasting",
+          "label": "Phase 1: every store, without the forecasting",
           "effects": {
             "morale": -2
           },
@@ -711,7 +711,7 @@
         },
         {
           "id": "d",
-          "label": "Phase 1: a cheap pilot in two stores, then decide",
+          "label": "Phase 1: a cheap two-store pilot, then decide",
           "effects": {
             "morale": 2
           },
@@ -731,7 +731,7 @@
       "lines": [
         {
           "who": "dev",
-          "text": "Half the budget means half the work, right? Are we still doing this properly?",
+          "text": "Half the budget, half the work? Are we still doing this properly?",
           "expression": "worried"
         }
       ],
@@ -739,7 +739,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Explain the phases and what each person owns now",
+          "label": "Explain the phases and who owns what now",
           "effects": {
             "morale": 12
           },
@@ -750,7 +750,7 @@
         },
         {
           "id": "b",
-          "label": "Tell them to keep going while you figure it out",
+          "label": "Tell them to keep going while you work it out",
           "effects": {
             "morale": -6
           },
@@ -787,7 +787,7 @@
       "options": [
         {
           "id": "a",
-          "label": "One page: what's in phase 1, what waits, and the cost of each",
+          "label": "One page: phase 1, what waits, and what each costs",
           "effects": {
             "trust.cfo": 10
           },
@@ -899,7 +899,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Ask what he'd put on slide one, and rebuild it around that",
+          "label": "Ask what he'd put on slide one, then rebuild around it",
           "effects": {
             "trust.firm": 10
           },
@@ -1048,7 +1048,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "Their ops lead says your waste number doesn't hold up. Waste went 4% to 5%. Small stores have 19 stockouts a week.",
+          "text": "Their ops lead says waste only went 4% to 5%. Small stores have 19 stockouts a week.",
           "expression": "angry"
         }
       ],
@@ -1697,7 +1697,7 @@
         "id": "budget-halved",
         "title": "The CFO halves the budget",
         "caller": "cfo",
-        "text": "Our board has halved this project's budget. I need a phased plan by Friday. Phase 1 has to pay for itself.",
+        "text": "Our board has halved this project's budget. I need a phased plan this week. Phase 1 has to pay for itself.",
         "budgetCut": 0.5,
         "effects": {
           "morale": -10
@@ -1716,5 +1716,47 @@
     "Someone else is better placed",
     "Low impact, can wait"
   ],
-  "variation": {}
+  "variation": {},
+  "quick": {
+    "summary": "You're a junior analyst at a small tech consultancy. Three days to recommend an inventory system to a regional grocery chain. On Tuesday, the client's CFO cuts the budget in half.",
+    "days": 3,
+    "turningPointAt": "Tue 09:00",
+    "orderQuestion": false,
+    "recapModal": false,
+    "checkpoints": {
+      "seeded": [
+        1,
+        1
+      ],
+      "max": 1,
+      "seedRecovery": true
+    },
+    "issues": {
+      "kickoff": {
+        "spawnAt": "Mon 09:00",
+        "deadline": "Mon 12:00"
+      },
+      "data-read": {
+        "spawnAt": "Mon 10:00",
+        "deadline": "Mon 16:00"
+      },
+      "feedback": {
+        "spawnAt": "Tue 14:00",
+        "deadline": "Wed 11:00"
+      }
+    },
+    "drop": [
+      "dev-estimate",
+      "manager-visit",
+      "analyst-model",
+      "pitch-manager",
+      "pitch-cfo",
+      "final-deck",
+      "dev-blocker",
+      "credibility-hit",
+      "cafe-chat",
+      "store-employee",
+      "dusty-report"
+    ]
+  }
 }

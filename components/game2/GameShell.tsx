@@ -11,7 +11,7 @@ import { buildMapCard } from "@/lib/card/buildMap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { bus } from "@/lib/game/bus";
 import { GAME } from "@/lib/game/config";
-import { openIssues, replay, type Action, type CheckpointDue, type GameState } from "@/lib/game/engine";
+import { forLength, openIssues, replay, type Action, type CheckpointDue, type GameLength, type GameState } from "@/lib/game/engine";
 import { DEMO_JUMP_SEED, playToTurningPoint } from "@/lib/game/demoJump";
 import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
@@ -42,7 +42,8 @@ function newAttemptId() {
 
 export function GameShell({ mapId, challenge, sandbox = false, overrides }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean; overrides?: MapOverrides }) {
   // The employer's wording and checkpoint edits (E1.3, E1.4). Ids and effects are untouched, so replay stays valid.
-  const scenario = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
+  // The engine always gets the authored map (`base`); it derives the quick variant from the run's length itself.
+  const base = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
   const router = useRouter();
   const screen = useGame((g) => g.screen);
   const state = useGame((g) => g.state);
@@ -52,6 +53,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const recapDay = useGame((g) => g.recapDay);
   const avatar = useGame((g) => g.avatar);
   const error = useGame((g) => g.error);
+  // What the screens show: the scenario for this run's length (Quick mode by default, "Full week" in Settings).
+  const length = state?.length ?? settings.length;
+  const scenario = useMemo(() => forLength(base, length), [base, length]);
   const { dispatch, setScreen, setPaused, setCutscene, setRecapDay, floater, toast, init, restore, setSettings } = useGame.getState();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [attemptId, setAttemptId] = useState("");
@@ -63,7 +67,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const [integrity, setIntegrity] = useState<IntegrityNote[]>([]);
   const [phase, setPhase] = useState<"game" | "real-life">("game");
   const [orderRanking, setOrderRanking] = useState<string[] | null>(null);
-  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean } | null>(null);
+  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean; length: GameLength } | null>(null);
   const prev = useRef<GameState | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [sawLoading, setSawLoading] = useState(false);
@@ -84,9 +88,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setHydrated(true);
     if (!sandbox) {
       const r = s.activeRun(challenge.id);
-      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean } | undefined;
+      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean; length?: GameLength } | undefined;
       if (r && extra?.map === mapId && extra.log)
-        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased });
+        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased, length: extra.length ?? "full" });
     }
     return () => music.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,37 +106,44 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   }, [setScreen]);
 
   const [jump, setJump] = useState(false);
-  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    setJump(q.get("jump") === "turning-point");
+    // ?week=full starts the five-day week (same as the "Full week" setting).
+    if (q.get("week") === "full") setSettings({ length: "full" });
+    else if (q.get("week") === "quick") setSettings({ length: "quick" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const begin = useCallback(() => {
     const id = newAttemptId();
     setAttemptId(id);
-    init(scenario, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view });
+    init(base, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view, length: settings.length });
     if (jump) {
       // Demo jump (P.2): a scripted sensible player runs Monday and Tuesday on the fixed seed (sponsor pulls out).
       // Its recaps, checkpoints and toasts stay silent; only the turning point itself is new, so the cutscene plays.
-      const j = playToTurningPoint(scenario, DEMO_JUMP_SEED, { turnBased: settings.turnBased });
+      const j = playToTurningPoint(base, DEMO_JUMP_SEED, { turnBased: settings.turnBased, length: settings.length });
       prev.current = { ...j.state, events: j.state.events.slice(0, j.tpIndex) };
       shownTp.current = false;
-      restore(scenario, j.state, j.log);
+      restore(base, j.state, j.log);
     }
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [init, restore, scenario, settings.turnBased, settings.view, setScreen, jump]);
+  }, [init, restore, base, settings.turnBased, settings.view, settings.length, setScreen, jump]);
 
   const resume = useCallback(() => {
     if (!resumable) return;
-    const st = replay(scenario, resumable.seed, resumable.log, { turnBased: resumable.turnBased });
+    const st = replay(base, resumable.seed, resumable.log, { turnBased: resumable.turnBased, length: resumable.length });
     shownTp.current = st.tp.fired;
     prev.current = st;
-    restore(scenario, st, resumable.log);
+    restore(base, st, resumable.log);
     setAttemptId(resumable.attemptId);
     setAnswers(resumable.answers);
     setIntegrity(resumable.integrity);
     if (resumable.avatar) useGame.setState({ avatar: resumable.avatar });
-    setSettings({ turnBased: resumable.turnBased });
+    setSettings({ turnBased: resumable.turnBased, length: resumable.length });
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
+  }, [resumable, base, restore, setScreen, setSettings, settings.view]);
 
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
@@ -143,7 +154,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       scenarioId: `map:${mapId}`,
       seed: state.seed,
       state: { t: state.t, ended: state.ended },
-      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased },
+      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length },
       status: state.ended && phase === "real-life" ? "finished" : "playing",
       startedAt: new Date().toISOString(),
       practice: false,
@@ -237,7 +248,14 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       }
     }
     // A recap from the same step as the turning point is stale: the cutscene takes over.
-    if (state.recaps.length > p.recaps.length && !state.ended && !hold) setRecapDay(state.recaps.at(-1)!.day);
+    if (state.recaps.length > p.recaps.length && !state.ended && !hold) {
+      const day = state.recaps.at(-1)!.day;
+      // Quick mode: no recap modal, just a short non-blocking note (bus "dayDone" for a banner).
+      if (scenario.recapModal === false) {
+        bus.emit("dayDone", { day });
+        note(`${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]} done`);
+      } else setRecapDay(day);
+    }
   }, [state, scenario, floater, note, setCutscene, setRecapDay]);
 
   const talk = useCallback(
@@ -320,7 +338,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     const s = store();
     s.saveCard(card);
     s.share(attemptId, challenge.id, false);
-    s.saveRun({ attemptId, challengeId: challenge.id, scenarioId: `map:${mapId}`, seed: state.seed, state: { t: state.t, ended: true }, extra: { map: mapId, log: useGame.getState().log, answers: all, integrity: ints }, status: "finished", startedAt: new Date().toISOString(), practice: false });
+    s.saveRun({ attemptId, challengeId: challenge.id, scenarioId: `map:${mapId}`, seed: state.seed, state: { t: state.t, ended: true }, extra: { map: mapId, log: useGame.getState().log, answers: all, integrity: ints, length: state.length }, status: "finished", startedAt: new Date().toISOString(), practice: false });
     router.push(`/results/${attemptId}`);
   };
 
@@ -396,7 +414,15 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
             </div>
           )}
           {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. Out of the way while talking. */}
-          {!cutscene && !node && !reaction && (
+          {/* List view already lists every issue by place, so it only needs the Wait control. */}
+          {!cutscene && !node && !reaction && settings.view === "list" && (
+            <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
+              <Panel className="p-1.5">
+                <PixelButton tone="plain" onClick={() => dispatch({ type: "wait" })} data-testid="wait">Wait for news ▸▸</PixelButton>
+              </Panel>
+            </div>
+          )}
+          {!cutscene && !node && !reaction && !showCheckpoint && settings.view === "map" && (
             <div className="tp-scale absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
@@ -462,7 +488,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
         </div>
       )}
       {/* Big screens (1080p and up): the HUD grows with the map so it never looks lost. */}
-      <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } }`}</style>
+      <style>{`@media (min-width: 1700px) and (min-height: 950px) { [data-testid="game-shell"] .tp-scale { zoom: 1.25; } [data-testid="game-shell"] .tp-dialogue { zoom: 1.25; } [data-testid="game-shell"] [data-testid="checkpoint"] > div { zoom: 1.2; } }`}</style>
       {sandbox && <p className="absolute left-1/2 top-0 z-[70] -translate-x-1/2 bg-amber-200 px-3 text-sm font-semibold">Preview as candidate · nothing is saved</p>}
     </div>
   );

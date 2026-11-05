@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import gold from "@/lib/ai/evals/gold/answers.json";
@@ -82,10 +82,10 @@ export function GoldScoring() {
 
   const a = answers[i];
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8 sm:px-10" data-testid="gold-scoring">
-      <Link href="/admin" className="text-sm underline">← Admin</Link>
-      <p className="mt-4 text-xs font-medium uppercase tracking-[0.18em] text-primary">Gold set</p>
-      <h1 className="mt-1 font-display text-3xl">Score answers by hand</h1>
+    <main className="mx-auto max-w-3xl px-4 pb-12 pt-3 sm:px-10" data-testid="gold-scoring">
+      <BackLink href="/admin">Admin</BackLink>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Gold set</p>
+      <h1 className="mt-2 font-display text-3xl tracking-tight">Score answers by hand</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         These {answers.length} answers check the AI. You score each one for the named skill only. Ignore grammar, spelling and accent. Don&apos;t look at the other person&apos;s scores.
       </p>
@@ -93,7 +93,7 @@ export function GoldScoring() {
       {!rater ? (
         <div className="mt-6 flex gap-2">
           {RATERS.map((r) => (
-            <Button key={r} onClick={() => setRater(r)} data-testid={`rater-${r}`}>
+            <Button key={r} variant="outline" onClick={() => setRater(r)} data-testid={`rater-${r}`}>
               I&apos;m {r === "div" ? "Div" : "Haris"}
             </Button>
           ))}

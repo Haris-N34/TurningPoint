@@ -59,6 +59,14 @@ for (const size of SIZES) {
     await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
     await page.waitForTimeout(3000);
     await shot("09-checkpoint");
+    const cp = page.getByTestId("checkpoint");
+    await cp.locator('label:has(input[value="text"])').click();
+    await cp.getByRole("button", { name: /start answering/i }).click();
+    await cp.getByTestId("answer-text").pressSequentially("Saturday and Sunday keep the vendors whole. Promotion and the stage are nice to have.", { delay: 5 });
+    await shot("09b-checkpoint-answer");
+    await cp.getByRole("button", { name: "Done" }).click();
+    await page.waitForTimeout(300);
+    await shot("09c-checkpoint-review");
   });
 }
 
@@ -92,3 +100,31 @@ test("game UI shot: checkpoint without media permission", async ({ browser }, in
   await page.screenshot({ path: `${dir}/10-checkpoint-no-media-1280x720.png`, style: "nextjs-portal { display: none !important; }" });
   await ctx.close();
 });
+
+// Pause menu, list view and the second map, at the smallest desktop and the phone.
+for (const size of [SIZES[0], SIZES[4]]) {
+  test(`game UI extras ${size.name}`, async ({ page }, info) => {
+    test.skip(process.env.SCREENS !== "1", "set SCREENS=1 to take review shots");
+    test.skip(info.project.name !== "desktop", "sizes are set per test");
+    test.setTimeout(120_000);
+    const dir = process.env.SHOTS_DIR ?? "docs/screens/night/game-ui/latest";
+    await page.setViewportSize({ width: size.width, height: size.height });
+    const shot = (n: string) => page.screenshot({ path: `${dir}/${n}-${size.name}.png`, style: "nextjs-portal { display: none !important; }" });
+    await page.goto("/game/client-pivot");
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.waitForTimeout(1000);
+    await shot("11-pivot-title");
+    await page.getByTestId("start").click();
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+    await page.waitForTimeout(1500);
+    await shot("12-pivot-map");
+    await page.getByTestId("pause").click();
+    await expect(page.getByTestId("pause-menu")).toBeVisible();
+    await shot("13-pause");
+    await page.getByTestId("pause-resume").click();
+    await page.getByTestId("toggle-view").click();
+    await page.waitForTimeout(800);
+    await shot("14-list-view");
+  });
+}
