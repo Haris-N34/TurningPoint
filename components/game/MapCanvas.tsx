@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type PhaserNS from "phaser";
 import type { Look, MapScenario } from "@/lib/game/schema";
 import { useGame } from "@/lib/game/store";
+import { pixelBody } from "@/components/game2/fonts";
 import { createScene } from "./phaser/createScene";
 
 // Client-only Phaser mount (PRD v2, A2). Loaded with next/dynamic and ssr: false by its parent.
@@ -16,12 +17,16 @@ export default function MapCanvas({ scenario, avatar, attract = false, label }: 
     let alive = true;
     const showFps = new URLSearchParams(window.location.search).has("fps");
     const fpsTimer = showFps ? setInterval(() => game && setFps(Math.round(game.loop.actualFps)), 500) : undefined;
-    void import("phaser").then((Phaser) => {
+    const font = pixelBody.style.fontFamily;
+    // Zone signs draw in the pixel font, so wait for it (never longer than a moment).
+    const fontReady = Promise.race([document.fonts?.load(`600 16px ${font}`).catch(() => undefined), new Promise((r) => setTimeout(r, 800))]);
+    void Promise.all([import("phaser"), fontReady]).then(([Phaser]) => {
       if (!alive || !host.current) return;
       const Scene = createScene(Phaser, {
         scenario,
         avatar,
         attract,
+        font,
         getState: () => useGame.getState().state,
         isFrozen: () => {
           const g = useGame.getState();

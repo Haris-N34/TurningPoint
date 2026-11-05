@@ -10,8 +10,8 @@ import { useGame } from "@/lib/game/store";
 import { formatTime } from "@/lib/game/time";
 import { cn } from "@/lib/utils";
 import { pixelTitle } from "./fonts";
-import { Portrait } from "./Portrait";
-import { Panel, PixelButton } from "./ui";
+import { PixelIcon, Portrait } from "./Portrait";
+import { Eyebrow, Panel, PixelButton } from "./ui";
 
 /** The title screen's map: a still image with a slow pan (no game engine on the first screen). */
 export function TitleBackdrop({ mapId, label }: { mapId: string; label: string }) {
@@ -42,34 +42,54 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
     return () => window.removeEventListener("keydown", k);
   }, [onStart, showSettings]);
   return (
-    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-gradient-to-b from-[#2e222f]/40 via-transparent to-[#2e222f]/70 p-4 text-center" data-testid="title-screen" onClick={(e) => e.target === e.currentTarget && onStart()}>
-      <motion.h1 initial={{ y: -20 }} animate={{ y: 0 }} className={cn(pixelTitle.className, "text-[28px] leading-tight text-[#fff8e7] drop-shadow-[0_4px_0_#2e222f] sm:text-[44px]")}>
-        TURNING<br />POINT
-      </motion.h1>
-      <p className="mt-3 rounded-[4px] bg-[#2e222f]/80 px-3 py-1 text-[#ffd166]">{scenario.title}: {scenario.role}</p>
-      {brief && (
-        // An employer's challenge: who it is for and the tailored setting.
-        <div className="mt-2 max-w-[min(560px,92vw)] rounded-[4px] bg-[#2e222f]/80 px-3 py-2 text-sm text-[#fff8e7]" data-testid="title-brief">
-          <h2 className="font-bold">{brief.company} · {brief.title}</h2>
-          <p className="mt-1">{scenario.summary}</p>
+    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center overflow-y-auto p-4 text-center" data-testid="title-screen" onClick={(e) => e.target === e.currentTarget && onStart()}>
+      {/* Vignette: the map stays as mood, the logo owns the middle. */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(46,34,47,0.62)_0%,rgba(46,34,47,0.8)_50%,rgba(20,14,24,0.96)_100%)]" aria-hidden />
+      <div className="relative flex flex-col items-center" onClick={(e) => e.target === e.currentTarget && onStart()}>
+        <motion.p initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="rounded-[4px] border-2 border-[#ffd166] bg-[#2e222f]/90 px-3 py-0.5 text-[14px] font-semibold uppercase tracking-[0.2em] text-[#ffd166]">
+          {scenario.title}
+        </motion.p>
+        <motion.h1
+          initial={{ y: -16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 180, damping: 16 }}
+          className={cn(pixelTitle.className, "mt-4 text-[34px] leading-[1.15] text-[#fff8e7] [text-shadow:0_4px_0_#c43d22,0_8px_0_#2e222f] sm:text-[56px] lg:text-[64px]")}
+        >
+          TURNING
+          <br />
+          POINT
+        </motion.h1>
+        <p className="mt-5 max-w-[min(520px,90vw)] text-[17px] text-[#fff8e7] sm:text-[19px]">
+          You&apos;re the {scenario.role.toLowerCase()}. Midweek, the plan breaks.
+        </p>
+        {brief && (
+          // An employer's challenge: who it is for and the tailored setting.
+          <Panel tone="ink" className="mt-3 max-w-[min(560px,92vw)] px-3 py-2 text-left text-[14px]" data-testid="title-brief">
+            <h2 className="font-semibold text-[#ffd166]">{brief.company} · {brief.title}</h2>
+            <p className="mt-1">{scenario.summary}</p>
+          </Panel>
+        )}
+        <div className="mt-7 flex flex-col items-center gap-2">
+          <PixelButton size="lg" className="min-w-[200px]" onClick={onStart} data-testid="start">
+            Start
+          </PixelButton>
+          <motion.p animate={{ opacity: [1, 0.35, 1] }} transition={{ duration: 1.6, repeat: Infinity }} className="text-[13px] font-semibold tracking-[0.12em] text-[#fff8e7]/85">
+            PRESS ENTER / TAP TO START
+          </motion.p>
         </div>
-      )}
-      <motion.p animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} className={cn(pixelTitle.className, "mt-10 text-[12px] text-white drop-shadow-[0_2px_0_#2e222f]")}>
-        PRESS ENTER / TAP TO START
-      </motion.p>
-      <div className="mt-8 flex flex-wrap justify-center gap-2">
-        <PixelButton onClick={onStart} data-testid="start">Start</PixelButton>
-        {canResume && <PixelButton tone="plain" onClick={onResume} data-testid="resume">Continue</PixelButton>}
-        <PixelButton tone="plain" onClick={() => setSettings({ music: !settings.music })} aria-pressed={settings.music}>
-          Music {settings.music ? "on" : "off"}
-        </PixelButton>
-        <PixelButton tone="plain" onClick={() => setShowSettings((x) => !x)} aria-expanded={showSettings}>Settings</PixelButton>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          {canResume && <PixelButton tone="plain" size="sm" onClick={onResume} data-testid="resume">Continue</PixelButton>}
+          <PixelButton tone="plain" size="sm" onClick={() => setSettings({ music: !settings.music })} aria-pressed={settings.music}>
+            Music {settings.music ? "on" : "off"}
+          </PixelButton>
+          <PixelButton tone="plain" size="sm" onClick={() => setShowSettings((x) => !x)} aria-expanded={showSettings}>Settings</PixelButton>
+        </div>
+        {showSettings && (
+          <Panel className="mt-3 w-[min(360px,92vw)] p-3 text-left" onClick={(e) => e.stopPropagation()}>
+            <SettingsForm />
+          </Panel>
+        )}
       </div>
-      {showSettings && (
-        <Panel className="mt-3 w-[min(360px,92vw)] p-3 text-left" onClick={(e) => e.stopPropagation()}>
-          <SettingsForm />
-        </Panel>
-      )}
     </div>
   );
 }
@@ -250,37 +270,55 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
     return () => c.stop();
   }, [phase, budget, state, reduce]);
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
-      <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "11vh" }} />
-      <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "11vh" }} />
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
+      <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
+      <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       {phase === "ring" ? (
-        <motion.div animate={reduce ? {} : { rotate: [-8, 8, -8] }} transition={{ duration: 0.25, repeat: Infinity }} className={cn(pixelTitle.className, "rounded-[6px] bg-[#fff8e7] px-6 py-4 text-[14px]")}>
-          📞 Incoming call: {caller.name}
+        <motion.div initial={reduce ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
+          <Panel tone="ink" className="flex w-[min(460px,92vw)] items-center gap-4 p-4 sm:p-5" aria-live="assertive">
+            <motion.div className="shrink-0 rounded-[6px] border-[3px] border-[#ffd166] p-0.5" animate={reduce ? {} : { borderColor: ["#ffd166", "#c43d22", "#ffd166"] }} transition={{ duration: 0.8, repeat: Infinity }}>
+              <Portrait id={caller.portrait} expression="worried" className="size-20 rounded-[3px] bg-[#2e222f] sm:size-24" />
+            </motion.div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[#ffd166]">Incoming call</p>
+              <p className={cn(pixelTitle.className, "mt-2 text-[15px] leading-snug sm:text-[18px]")}>{caller.name}</p>
+              <p className="mt-2 flex items-center gap-1.5 text-[14px] text-[#fff8e7]/80" aria-hidden>
+                <motion.span animate={reduce ? {} : { rotate: [-14, 14, -14] }} transition={{ duration: 0.2, repeat: Infinity }} className="inline-block">
+                  <PixelIcon name="phone" className="size-6" />
+                </motion.span>
+                Ringing…
+              </p>
+            </div>
+          </Panel>
         </motion.div>
       ) : (
-        <Panel className="w-[min(560px,92vw)] p-4">
-          <div className="flex gap-3">
-            <Portrait id={caller.portrait} expression="worried" className="size-20 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45]" />
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#c43d22]">Turning point</p>
-              <h2 className={cn(pixelTitle.className, "mt-1 text-[13px] leading-snug")}>{d.title}</h2>
-              <p className="mt-2 text-[16px]">{caller.name}: “{d.text}”</p>
+        <motion.div initial={reduce ? false : { y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-[min(640px,94vw)]">
+          <Panel className="p-4 sm:p-5">
+            <div className="flex gap-4">
+              <Portrait id={caller.portrait} expression="worried" className="size-20 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-28" />
+              <div className="min-w-0">
+                <Eyebrow className="text-[#c43d22]">Turning point</Eyebrow>
+                <h2 className={cn(pixelTitle.className, "mt-1.5 text-[14px] leading-snug sm:text-[17px]")}>{d.title}</h2>
+                <p className="mt-2 text-[17px] leading-snug sm:text-[18px]">
+                  <span className="font-semibold">{caller.name}:</span> “{d.text}”
+                </p>
+              </div>
             </div>
-          </div>
-          {phase === "drain" && (
-            <div className="mt-3 rounded-[4px] border-2 border-[#2e222f] bg-white p-2 text-center">
-              <p className="text-xs font-semibold uppercase">Budget</p>
-              <motion.p className={cn(pixelTitle.className, "text-[18px] text-[#c43d22]")} data-testid="budget-drain">{shown}</motion.p>
-            </div>
-          )}
-          <div className="mt-3 flex justify-end">
-            {phase === "call" ? (
-              <PixelButton onClick={() => setPhase("drain")} autoFocus data-testid="cutscene-next">Hang up</PixelButton>
-            ) : (
-              <PixelButton onClick={onDone} autoFocus data-testid="cutscene-done">Face it</PixelButton>
+            {phase === "drain" && (
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-[4px] border-2 border-[#2e222f] bg-white px-3 py-2">
+                <p className="text-[13px] font-semibold uppercase tracking-wide">Budget</p>
+                <motion.p className={cn(pixelTitle.className, "text-[20px] text-[#c43d22] sm:text-[24px]")} data-testid="budget-drain">{shown}</motion.p>
+              </div>
             )}
-          </div>
-        </Panel>
+            <div className="mt-4 flex justify-end">
+              {phase === "call" ? (
+                <PixelButton onClick={() => setPhase("drain")} autoFocus data-testid="cutscene-next">Hang up</PixelButton>
+              ) : (
+                <PixelButton onClick={onDone} autoFocus data-testid="cutscene-done">Face it</PixelButton>
+              )}
+            </div>
+          </Panel>
+        </motion.div>
       )}
     </div>
   );

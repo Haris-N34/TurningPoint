@@ -70,6 +70,14 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     if (screen === "loading") setSawLoading(true);
   }, [screen]);
   const shownTp = useRef(false);
+  // Text is the calm default in the game: video or voice only when the browser already allows it,
+  // so a checkpoint never opens with a permission prompt or an error on stage.
+  const [mediaOk, setMediaOk] = useState<Record<"video" | "voice", boolean>>({ video: false, voice: false });
+  useEffect(() => {
+    const q = (name: string) =>
+      navigator.permissions?.query({ name: name as PermissionName }).then((r) => r.state === "granted").catch(() => false) ?? Promise.resolve(false);
+    void Promise.all([q("camera"), q("microphone")]).then(([cam, mic]) => setMediaOk({ video: cam && mic, voice: mic }));
+  }, []);
 
   // Profile, accommodations and any unfinished run on this device.
   useEffect(() => {
@@ -191,6 +199,24 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     };
   }, [screen, setPaused, state?.dialogue, state?.checkpointsDue.length]);
 
+  // Toasts wait while the cutscene plays, then show as one line (only the cutscene is on screen during it).
+  const heldToasts = useRef<{ text: string; issue?: string }[]>([]);
+  const note = useCallback((text: string, hold = false, issue?: string) => (hold || useGame.getState().cutscene ? heldToasts.current.push({ text, issue }) : toast(text)), [toast]);
+  useEffect(() => {
+    if (cutscene || !heldToasts.current.length) return;
+    const all = heldToasts.current;
+    heldToasts.current = [];
+    const st = useGame.getState().state;
+    // Only issues that are still open count as new (the demo jump spawns and expires some on the way).
+    const fresh = all.filter((t) => t.text.startsWith("New issue") && (!t.issue || st?.issues[t.issue]?.status === "open")).map((t) => t.text);
+    const lost = all.filter((t) => t.text.startsWith("Ran out")).map((t) => t.text);
+    const other = all.filter((t) => !t.text.startsWith("New issue") && !t.text.startsWith("Ran out")).map((t) => t.text);
+    // The demo jump fast-forwards past problems nobody saw; don't report those.
+    if (lost.length && !jump) toast(lost.length > 1 ? `${lost.length} problems ran out of time` : lost[0]);
+    if (fresh.length) toast(fresh.length > 1 ? `${fresh.length} new issues. They're in your list.` : fresh[0]);
+    other.slice(-1).forEach((t) => toast(t));
+  }, [cutscene, toast, jump]);
+
   // Juice and notifications from engine changes (A0).
   useEffect(() => {
     const p = prev.current;
@@ -202,20 +228,22 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     if (db) floater(`${db > 0 ? "+" : "-"}$${Math.abs(db).toLocaleString("en-CA")}`, db > 0 ? "good" : "bad", "res-budget");
     if (dm) floater(`${dm > 0 ? "+" : ""}${dm} morale`, dm > 0 ? "good" : "bad", "res-morale");
     if (dt) floater(`${dt > 0 ? "+" : ""}${dt} trust`, dt > 0 ? "good" : "bad", "res-trust");
-    for (const e of state.events.slice(p.events.length)) {
+    const fresh = state.events.slice(p.events.length);
+    const hold = fresh.some((e) => e.kind === "turning_point") && !shownTp.current;
+    for (const e of fresh) {
       const issue = scenario.issues.find((i) => i.id === e.issue);
       if (e.kind === "spawned" && issue && !issue.hidden) {
-        toast(`New issue at ${scenario.zones.find((z) => z.id === issue.zone)?.name}: ${issue.title}`);
+        note(`New issue at ${scenario.zones.find((z) => z.id === issue.zone)?.name}: ${issue.title}`, hold, issue.id);
         sfx.notify();
       } else if (e.kind === "expired" && issue && !issue.hidden) {
-        toast(`Ran out of time: ${issue.title}`);
+        note(`Ran out of time: ${issue.title}`, hold);
         sfx.fail();
         bus.emit("shake", { intensity: 0.006 });
       } else if ((e.kind === "resolved" || e.kind === "delegated") && issue) {
         sfx.success();
         bus.emit("burst", { npc: issue.npc });
       } else if (e.kind === "delegate_failed" && issue) {
-        toast(`${scenario.npcs.find((n) => n.id === e.detail)?.name} couldn't sort out ${issue.title.toLowerCase()}`);
+        note(`${scenario.npcs.find((n) => n.id === e.detail)?.name} couldn't sort out ${issue.title.toLowerCase()}`, hold);
         sfx.fail();
       } else if (e.kind === "turning_point" && !shownTp.current) {
         shownTp.current = true;
@@ -223,8 +251,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
         setCutscene(true);
       }
     }
-    if (state.recaps.length > p.recaps.length && !state.ended) setRecapDay(state.recaps.at(-1)!.day);
-  }, [state, scenario, floater, toast, setCutscene, setRecapDay]);
+    // A recap from the same step as the turning point is stale: the cutscene takes over.
+    if (state.recaps.length > p.recaps.length && !state.ended && !hold) setRecapDay(state.recaps.at(-1)!.day);
+  }, [state, scenario, floater, note, setCutscene, setRecapDay]);
 
   const talk = useCallback(
     (issue: Issue) => {
@@ -366,25 +395,28 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       )}
       {screen === "play" && state && (
         <>
-          <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2">
-            <div className="pointer-events-auto"><Resources scenario={scenario} state={state} /></div>
-            <div className="pointer-events-auto"><Clock state={state} turnBased={state.turnBased} /></div>
-            <div className="pointer-events-auto flex flex-col items-end gap-2">
-              <div className="flex gap-1">
-                <PixelButton tone="plain" className="min-h-9 px-2 py-0 text-sm" onClick={() => setSettings({ view: settings.view === "map" ? "list" : "map" })} data-testid="toggle-view">
-                  {settings.view === "map" ? "List view" : "Map view"}
+          {/* HUD: hidden while the cutscene plays so only the cutscene is on screen. */}
+          {!cutscene && (
+            <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2" data-testid="hud">
+              <div className="pointer-events-auto"><Resources scenario={scenario} state={state} /></div>
+              <div className="pointer-events-auto absolute left-1/2 top-0 -translate-x-1/2 max-sm:static max-sm:translate-x-0"><Clock state={state} turnBased={state.turnBased} /></div>
+              <div className="pointer-events-auto flex gap-1 max-sm:flex-col">
+                <PixelButton tone="plain" size="sm" className="min-h-9" onClick={() => setSettings({ view: settings.view === "map" ? "list" : "map" })} data-testid="toggle-view" aria-label={settings.view === "map" ? "List view" : "Map view"}>
+                  {settings.view === "map" ? "List" : "Map"}
                 </PixelButton>
-                <PixelButton tone="plain" className="min-h-9 px-2 py-0 text-sm" onClick={() => setPaused(true)} aria-label="Pause" data-testid="pause">
-                  ❚❚
+                <PixelButton tone="plain" size="sm" className="min-h-9 min-w-9" onClick={() => setPaused(true)} aria-label="Pause" data-testid="pause">
+                  <span aria-hidden className="tracking-[-0.1em]">❚❚</span>
                 </PixelButton>
               </div>
             </div>
-          </div>
-          {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. */}
-          <div className="absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-14">
-            <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
-          </div>
-          <Toasts />
+          )}
+          {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. Out of the way while talking. */}
+          {!cutscene && !node && !reaction && (
+            <div className="absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
+              <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
+            </div>
+          )}
+          {!cutscene && <Toasts />}
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
@@ -417,7 +449,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
                 questionSource={interviewQuestion(scenario, state, due).source}
                 attemptId={attemptId}
                 multiplier={profile.accommodations.timeMultiplier}
-                defaultMode={profile.defaultMode}
+                defaultMode={profile.defaultMode === "text" || !mediaOk[profile.defaultMode] ? "text" : profile.defaultMode}
+                skin="pixel"
                 textOnly={profile.accommodations.textOnly}
                 persistMedia={!sandbox}
                 onDone={(r) => onCheckpointDone(due, r)}

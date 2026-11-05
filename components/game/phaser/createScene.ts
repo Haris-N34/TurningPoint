@@ -15,6 +15,8 @@ type Opts = {
   isFrozen: () => boolean;
   reducedMotion: () => boolean;
   attract?: boolean; // title screen: camera drifts, no player control
+  /** CSS font family for zone signs (the game's pixel body font). */
+  font?: string;
 };
 
 const TILE = 16;
@@ -44,6 +46,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     focusRing?: PhaserNS.GameObjects.Ellipse;
     lastStepTile = "";
     minimap?: PhaserNS.Cameras.Scene2D.Camera;
+    labels: { text: PhaserNS.GameObjects.Text; zone: MapScenario["zones"][number] }[] = [];
 
     constructor() {
       super("market");
@@ -83,17 +86,22 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       this.star.enableCornerCutting();
       this.star.disableDiagonals();
 
-      // Zone signs.
+      // Zone signs in the pixel UI font. They stay inside the view and fade with distance (see placeLabels).
+      // The attract map (title and avatar backdrop) shows none: the art carries the mood.
       for (const z of s.zones) {
-        const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, z.name.toUpperCase(), {
-          fontFamily: "monospace",
-          fontSize: "7px",
-          color: "#fffef4",
-          backgroundColor: "#2e222fcc",
-          padding: { x: 2, y: 1 },
-          resolution: 4,
-        });
-        label.setOrigin(0.5, 1).setDepth(60);
+        if (!o.attract) {
+          const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, z.name, {
+            fontFamily: o.font ?? "monospace",
+            fontSize: "8px",
+            fontStyle: "600",
+            color: "#fff8e7",
+            backgroundColor: "#2e222fe6",
+            padding: { x: 3, y: 1 },
+            resolution: 6,
+          });
+          label.setOrigin(0.5, 1).setDepth(60);
+          this.labels.push({ text: label, zone: z });
+        }
         const dark = this.add.rectangle(z.x * TILE, z.y * TILE, z.w * TILE, z.h * TILE, 0x0b0b1a, 0).setOrigin(0, 0).setDepth(55);
         this.darkRects.set(z.id, dark);
       }
@@ -177,7 +185,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
         const mw = 160, mh = 120;
         this.minimap = this.cameras.add(this.scale.width - mw - 12, this.scale.height - mh - 12, mw, mh).setZoom(mw / map.widthInPixels).setName("minimap");
         this.minimap.setBounds(0, 0, map.widthInPixels, map.heightInPixels).setBackgroundColor(0x2e222f);
-        this.minimap.ignore(this.light);
+        this.minimap.ignore([this.light, ...this.labels.map((l) => l.text)]);
         this.scale.on("resize", () => this.minimap?.setPosition(this.scale.width - mw - 12, this.scale.height - mh - 12));
       }
 
@@ -410,6 +418,9 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
 
       if (o.attract || !this.player) return;
       const frozen = o.isFrozen();
+      // The minimap steps aside while a dialogue, checkpoint or cutscene is up.
+      this.minimap?.setVisible(!frozen);
+      this.placeLabels();
       const k = this.keys;
       let vx = 0, vy = 0;
       if (!frozen) {
@@ -473,6 +484,25 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
             this.walkToNpc(withIssues[this.focusIndex], false);
           }
         }
+      }
+    }
+
+    /** Keep zone signs fully on screen (below the HUD) while their zone is in view; dim the far ones. */
+    placeLabels() {
+      const cam = this.cameras.main;
+      const v = cam.worldView;
+      const top = 76 / cam.zoom; // the HUD strip
+      for (const { text, zone: z } of this.labels) {
+        const zx = z.x * TILE, zy = z.y * TILE, zw = z.w * TILE, zh = z.h * TILE;
+        const inView = zx < v.right && zx + zw > v.x && zy < v.bottom && zy + zh > v.y;
+        text.setVisible(inView);
+        if (!inView) continue;
+        const hw = text.displayWidth / 2 + 2;
+        const x = Phaser.Math.Clamp(zx + zw / 2, v.x + hw, v.right - hw);
+        const y = Phaser.Math.Clamp(zy - 2, v.y + top + text.displayHeight, v.bottom - 2);
+        text.setPosition(Math.round(x), Math.round(y));
+        const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, zx + zw / 2, zy + zh / 2) / TILE;
+        text.setAlpha(Phaser.Math.Clamp(1.4 - d / 18, 0.45, 1));
       }
     }
 
