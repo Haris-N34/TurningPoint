@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import fixture from "@/fixtures/attempt.json";
 import { CardSchema } from "@/lib/card/types";
 import { inboxFor } from "@/lib/card/recruiter";
+import { verifyEvidence } from "@/lib/card/verify";
 import { makeStore, MemoryKV } from "@/lib/store/store";
 import { funnelByChallenge, impactReport } from "./metrics";
 import { IMPACT_EMPLOYERS, OPT_IN_GROUPS, seedImpactDemo, syntheticCohort } from "./seed";
@@ -30,6 +31,15 @@ describe("E7.4 synthetic cohort", () => {
     expect(a.filter((c) => !c.optInGroup).length).toBeGreaterThan(30);
     for (const d of ["shortlist", "hold", "pass"]) expect(a.filter((c) => c.decision === d).length).toBeGreaterThan(10);
     expect(a.filter((c) => c.finished && !c.decision).length).toBeGreaterThan(5);
+  });
+
+  it("gives candidates different answers, and every quote passes the transcript check", () => {
+    const cards = seeded().listCards();
+    for (const id of ["cp1", "cp2", "rl", "fu"]) expect(new Set(cards.map((c) => c.checkpoints.find((x) => x.id === id)!.transcript.text)).size).toBe(4);
+    for (const card of cards) {
+      expect(verifyEvidence(card).dropped).toEqual([]);
+      for (const e of card.evidence) if (e.level !== "not_observed") expect(e.sentence).toBeTruthy();
+    }
   });
 
   it("feeds the recruiter inbox for each employer, anonymous by default", () => {

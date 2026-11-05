@@ -30,6 +30,9 @@ test("compare view: pick 2 or 3 cards, evidence and answers side by side in the 
   await expect(compare.getByTestId("compare-skill-collaboration")).toBeVisible();
   await expect(compare.getByTestId("compare-row-decision-0")).toContainText("transcript");
   await expect(compare.getByTestId("compare-row-real_life-0")).toBeVisible();
+  // Each candidate's own answer, not a copy of the same fixture.
+  const cp2 = await compare.getByTestId("compare-row-decision-1").locator("p.leading-relaxed").allInnerTexts();
+  expect(new Set(cp2).size).toBeGreaterThan(1);
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const axe = await new AxeBuilder({ page }).analyze();
