@@ -30,6 +30,9 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 
 - Issuer key is random per server process unless `TP_ISSUER_ED25519_KEY` is set. On Vercel, a badge issued by one function instance fails `/verify` on another, and every badge fails after a redeploy. Set the env var before the demo.
 
+- `POST /api/integrations/keys` mints a live API key with no auth, and that key reads `/api/v1/attempts` (evidence summaries). Fine for the no-auth demo, but on a public Vercel URL anyone can do it. Gate the console API behind the admin role or a deploy-time secret before sharing the link.
+- API fuzz (malformed JSON, nulls, empty bodies, unknown company, bad did:key) on every route: no 500s, every route rejects cleanly.
+
 ## Runs
 
 - Round 1: crawl of 40 routes x 4 viewports x light/dark, seeded and cleared storage: no console errors, no hydration warnings, no asset 404s, no horizontal overflow. Click-everything pass on every route: no page errors.
