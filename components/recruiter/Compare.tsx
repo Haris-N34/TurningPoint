@@ -45,7 +45,8 @@ export function Compare() {
     );
 
   const { columns, rows } = result;
-  const grid = { gridTemplateColumns: `minmax(7rem, 9rem) repeat(${columns.length}, minmax(13rem, 1fr))` };
+  // Fills the width on a laptop, scrolls inside its own box on a phone (never the page).
+  const grid = { gridTemplateColumns: `minmax(6rem, 9rem) repeat(${columns.length}, minmax(13rem, 1fr))`, minWidth: `${6 + columns.length * 13}rem` };
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-10" data-testid="compare">
@@ -56,9 +57,10 @@ export function Compare() {
         Columns follow the order you picked. There is no overall score and no ranking. Read the evidence, then decide on each card.
       </p>
 
-      <div className="mt-6 overflow-x-auto rounded-xl border bg-card shadow-card" tabIndex={0} role="region" aria-label="Comparison">
-        <div className="grid min-w-max text-sm" style={grid}>
-          <div className="border-b p-3" />
+      <p className="mt-4 text-xs text-muted-foreground sm:hidden" data-testid="compare-scroll-hint">Scroll sideways to see all {columns.length} cards.</p>
+      <div className="mt-2 overflow-x-auto sm:mt-6 rounded-xl border bg-card shadow-card" tabIndex={0} role="region" aria-label="Comparison">
+        <div className="grid w-full text-sm" style={grid}>
+          <div className="sticky left-0 z-10 border-b bg-card p-3" />
           {columns.map((c) => (
             <div key={c.attemptId} className="border-b border-l p-3" data-testid={`compare-col-${c.attemptId}`}>
               <h2 className="font-display text-lg leading-tight">{c.displayName}</h2>
@@ -73,10 +75,10 @@ export function Compare() {
             </div>
           ))}
 
-          <h3 className="col-span-full bg-secondary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skill evidence</h3>
+          <h3 className="col-span-full bg-secondary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><span className="sticky left-3">Skill evidence</span></h3>
           {columns[0].skills.map((sk, i) => (
             <div key={sk.skill} className="contents" data-testid={`compare-skill-${sk.skill}`}>
-              <div className="border-b p-3 font-medium">{skillName(sk.skill)}</div>
+              <div className="sticky left-0 z-10 border-b bg-card p-3 font-medium">{skillName(sk.skill)}</div>
               {columns.map((c) => {
                 const cell = c.skills[i];
                 return (
@@ -89,15 +91,15 @@ export function Compare() {
             </div>
           ))}
 
-          <h3 className="col-span-full bg-secondary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Answers to the same checkpoint</h3>
+          <h3 className="col-span-full bg-secondary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"><span className="sticky left-3">Answers to the same checkpoint</span></h3>
           {rows.map((row, idx) => {
             const n = rows.slice(0, idx + 1).filter((r) => r.kind === row.kind).length;
             const many = rows.filter((r) => r.kind === row.kind).length > 1;
             return (
               <div key={`${row.kind}-${row.slot}`} className="contents" data-testid={`compare-row-${row.kind}-${row.slot}`}>
-                <div className="border-b p-3 font-medium">{ROW_LABEL[row.kind]}{many ? ` ${n}` : ""}</div>
+                <div className="sticky left-0 z-10 border-b bg-card p-3 font-medium">{ROW_LABEL[row.kind]}{many ? ` ${n}` : ""}</div>
                 {row.answers.map((a, j) => (
-                  <div key={columns[j].attemptId} className="max-w-sm border-b border-l p-3">
+                  <div key={columns[j].attemptId} className="border-b border-l p-3">
                     {a ? (
                       <>
                         <p className="text-xs text-muted-foreground">{a.question}</p>

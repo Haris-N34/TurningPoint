@@ -4,6 +4,7 @@ import { getScenario } from "@/content/scenarios";
 import { getChallenge, saveDraft, publish } from "@/lib/challenge/challenge";
 import type { Store } from "@/lib/store/store";
 import { DEMO_PREFIX } from "./metrics";
+import { ANSWER_VARIANTS } from "./answers";
 
 // E7.4: 200 synthetic candidates across 3 fictional employers. Feeds the recruiter inbox,
 // the fairness analytics and /admin/impact. Deterministic: the same seed gives the same cohort.
@@ -94,6 +95,37 @@ export function syntheticCohort(seed = 2026): SyntheticCandidate[] {
   return out;
 }
 
+/** Which answer variant each candidate gave per checkpoint. Own PRNG stream, so the cohort above never shifts. */
+export function answerPicks(seed = 2026): number[][] {
+  const rnd = prng(seed ^ 0x9e3779b9);
+  return Array.from({ length: IMPACT_COHORT_SIZE }, () => ANSWER_VARIANTS.map((v) => Math.floor(rnd() * v.variants.length)));
+}
+
+/** Checkpoints and evidence for one synthetic candidate. Every quote is checked as an exact substring (G1). */
+export function syntheticAnswers(base: Card, picks: number[], levels: SyntheticCandidate["levels"], mode: Mode) {
+  const checkpoints = base.checkpoints.map((cp) => {
+    const k = ANSWER_VARIANTS.findIndex((v) => v.checkpointId === cp.id);
+    const pick = k < 0 ? 0 : picks[k];
+    const text = k < 0 || pick === 0 ? cp.transcript : { text: ANSWER_VARIANTS[k].variants[pick].text, words: [], status: "ready" as const };
+    return { ...cp, mode, media: undefined, transcript: text };
+  });
+  const evidence = base.evidence.map((e, j) => {
+    const level = levels[j];
+    const k = ANSWER_VARIANTS.findIndex((v) => v.skill === e.skill);
+    if (level === "not_observed" || k < 0) return { skill: e.skill, level };
+    const v = ANSWER_VARIANTS[k];
+    const cp = checkpoints.find((c) => c.id === v.checkpointId)!;
+    const { quote, sentence } = v.variants[picks[k]];
+    const at = cp.transcript.text.indexOf(quote);
+    if (at < 0) throw new Error(`Seed quote not in transcript: ${quote}`);
+    const len = cp.transcript.text.length;
+    const startS = Math.round((cp.durationS * at) / len * 100) / 100;
+    const endS = Math.round((cp.durationS * (at + quote.length)) / len * 100) / 100;
+    return { ...e, level, sentence, source: { type: "clip" as const, checkpointId: cp.id, quote, startS, endS } };
+  });
+  return { checkpoints, evidence };
+}
+
 /** Explicit, deterministic synthetic cohort. Never overwrites existing data. */
 export function seedImpactDemo(s: Store) {
   const base = CardSchema.parse(fixture);
@@ -102,13 +134,14 @@ export function seedImpactDemo(s: Store) {
     saveDraft(s, { id: employer.id, company: { name: employer.company, colour: employer.colour }, title: employer.title, templateId: "launch-week", industry: "Non-profit", targetSkills: base.targetSkills, scenario: getScenario("launch-week")! });
     publish(s, employer.id);
   }
+  const picks = answerPicks();
   for (const c of syntheticCohort()) {
     if (s.getRun(c.attemptId) || s.getCard(c.attemptId)) continue;
     const employer = IMPACT_EMPLOYERS.find((e) => e.id === c.employerId)!;
     // Opt-in demographics live only on the run, for aggregate fairness checks. Never on the card.
     s.saveRun({ attemptId: c.attemptId, challengeId: employer.id, scenarioId: "launch-week", seed: c.attemptId, state: {}, status: c.finished ? "finished" : "playing", startedAt: c.date, practice: false, extra: { impactParticipation: { mode: c.mode, adjustedTiming: c.adjustedTiming, ...(c.optInGroup ? { optInGroup: c.optInGroup } : {}) } } });
     if (!c.finished) continue;
-    const evidence = base.evidence.map((e, j) => (c.levels[j] === "not_observed" ? { skill: e.skill, level: c.levels[j] } : { ...e, level: c.levels[j] }));
+    const { checkpoints, evidence } = syntheticAnswers(base, picks[c.i], c.levels, c.mode);
     const n = String(c.i + 1).padStart(3, "0");
     const card = CardSchema.parse({
       ...base,
@@ -120,7 +153,7 @@ export function seedImpactDemo(s: Store) {
       finishedAt: c.date,
       adjustedTiming: c.adjustedTiming,
       evidence,
-      checkpoints: base.checkpoints.map((cp) => ({ ...cp, mode: c.mode, media: undefined })),
+      checkpoints,
       realStory: base.realStory ? { ...base.realStory, title: "Illustrative story from the demo fixture", witnesses: c.witnessConfirmed ? [{ id: `demo-w-${c.i}`, relationship: "peer", status: "confirmed", skillsSeen: ["collaboration"] }] : [] } : undefined,
       review: undefined,
     });
