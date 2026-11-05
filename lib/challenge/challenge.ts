@@ -19,6 +19,10 @@ export const ChallengeSchema = z.object({
   jobCode: z.string().optional(),
   anonymousReview: z.boolean().default(true),
   transcriptFirst: z.boolean().default(false),
+  /** Employer competency names mapped onto the framework by the Value Mapper (B.5); the admin decided each. */
+  customSkills: z
+    .array(z.object({ term: z.string(), skill: z.enum(SKILL_SLUGS).nullable(), confidence: z.number().min(0).max(1), status: z.enum(["accepted", "changed", "rejected"]) }))
+    .default([]),
   createdAt: z.string(),
   publishedAt: z.string().optional(),
 });
@@ -57,7 +61,7 @@ function code(seed: string, n: number) {
 
 export function saveDraft(
   s: Store,
-  d: Pick<Challenge, "company" | "title" | "templateId" | "industry" | "targetSkills"> & { scenario: Scenario; id?: string },
+  d: Pick<Challenge, "company" | "title" | "templateId" | "industry" | "targetSkills"> & { scenario: Scenario; id?: string; customSkills?: Challenge["customSkills"] },
   now = new Date(),
 ): Challenge {
   if (d.targetSkills.length < 3 || d.targetSkills.length > 4) throw new Error("Pick 3 or 4 skills");
