@@ -25,11 +25,13 @@ export function Inbox() {
   const [filter, setFilter] = useState<InboxFilter>({});
   const [sort, setSort] = useState<InboxSort>({ by: "date" });
   const [sel, setSel] = useState(0);
+  const [comparison, setComparison] = useState<{ challengeId?: string; ids: string[] }>({ ids: [] });
   const [toast, setToast] = useState<{ text: string; payload?: GreenhousePayload } | null>(null);
 
   useEffect(() => setChallenges(listChallenges(store()).filter((c) => c.status === "published")), [version]);
   const challengeId = params.get("challenge") ?? challenges?.[0]?.id;
   const challenge = challenges?.find((c) => c.id === challengeId);
+  const compareIds = comparison.challengeId === challengeId ? comparison.ids : [];
 
   const rows: InboxRow[] = useMemo(() => {
     if (!challenge) return [];
@@ -111,7 +113,7 @@ export function Inbox() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 sm:px-10" data-testid="inbox">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0 max-w-full">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Recruiter inbox</p>
           <label htmlFor="challenge-pick" className="sr-only">Challenge</label>
           <select
@@ -192,7 +194,8 @@ export function Inbox() {
         <p className="ml-auto text-xs text-muted-foreground">Keys: J/K move · Enter open · S shortlist</p>
       </fieldset>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
+      <div className="mt-5 flex flex-wrap items-center gap-3"><Button disabled={compareIds.length < 2} onClick={() => router.push(`/recruiter/compare?challenge=${encodeURIComponent(challengeId ?? "")}&ids=${compareIds.map(encodeURIComponent).join(",")}`)}>Compare selected ({compareIds.length}/3)</Button><p className="text-xs text-muted-foreground">Select two or three shared cards. The challenge&apos;s anonymous-review setting applies.</p></div>
+      <div className="relative mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
         <table className="w-full min-w-[720px] text-left text-sm" aria-label="Candidates">
           <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -215,6 +218,7 @@ export function Inbox() {
                 data-testid={`row-${r.attemptId}`}
               >
                 <td className="px-4 py-3 font-medium">
+                  {!r.withdrawn && <label className="mb-2 flex min-h-11 items-center gap-2 text-xs font-normal"><input type="checkbox" className="size-4 shrink-0" aria-label={`Compare ${r.displayName}`} checked={compareIds.includes(r.attemptId)} disabled={!compareIds.includes(r.attemptId) && compareIds.length >= 3} onChange={(e) => setComparison({ challengeId, ids: e.target.checked ? [...compareIds, r.attemptId].slice(0, 3) : compareIds.filter((id) => id !== r.attemptId) })}/>Compare</label>}
                   <Link href={`/recruiter/card/${r.attemptId}?challenge=${challenge?.id}`} className="underline-offset-2 hover:underline">
                     {r.displayName}
                   </Link>
