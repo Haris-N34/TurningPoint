@@ -39,8 +39,12 @@ export type CheckpointDue = {
 
 export type Recap = { day: number; budget: number; morale: number; trust: Record<string, number>; resolved: number; expired: number; deferred: number; delegated: number };
 
+/** Quick mode (Mon to Wed) is the default in the UI; "full" is the five-day week. */
+export type GameLength = "quick" | "full";
+
 export type GameState = {
   scenarioId: string;
+  length: GameLength;
   seed: string;
   t: number;
   turnBased: boolean;
@@ -106,7 +110,44 @@ export function walkMinutes(s: MapScenario, from: string, to: string): number {
   return Math.max(GAME.walkMinutesPer10Tiles, Math.ceil(tiles / 10) * GAME.walkMinutesPer10Tiles);
 }
 
-export function newGame(s: MapScenario, seed: string, opts: { turnBased?: boolean } = {}): GameState {
+const derived = new WeakMap<MapScenario, MapScenario>();
+
+/**
+ * The scenario a run of this length plays. "full" is the map as authored. "quick" applies the map's quick data:
+ * fewer days, an earlier turning point, retimed issues, dropped issues that never spawn, lower checkpoint caps.
+ * Ids, nodes and effects never change, so logs replay. Idempotent: a derived scenario has no quick data left.
+ */
+export function forLength(s: MapScenario, length: GameLength = "full"): MapScenario {
+  if (length === "full" || !s.quick) return s;
+  const hit = derived.get(s);
+  if (hit) return hit;
+  const q = s.quick;
+  const out: MapScenario = {
+    ...s,
+    quick: undefined,
+    summary: q.summary ?? s.summary,
+    days: q.days,
+    checkpoints: q.checkpoints,
+    estimatedMinutes: Math.min(s.estimatedMinutes, 6),
+    turningPoint: { ...s.turningPoint, at: q.turningPointAt },
+    issues: s.issues.map((i) => {
+      if (q.drop.includes(i.id)) {
+        const { spawnAt: _drop, ...rest } = i;
+        void _drop;
+        return { ...rest, checkpointEligible: false };
+      }
+      return { ...i, ...q.issues[i.id] };
+    }),
+  };
+  derived.set(s, out);
+  return out;
+}
+
+const daysOf = (s: MapScenario) => s.days ?? GAME.workDays;
+
+export function newGame(base: MapScenario, seed: string, opts: { turnBased?: boolean; length?: GameLength } = {}): GameState {
+  const length = opts.length ?? "full";
+  const s = forLength(base, length);
   const r = rng(`${seed}:map`);
   const disruptionId = s.turningPoint.pool[Math.floor(r() * s.turningPoint.pool.length)];
   // Follow-ups of the other disruptions never appear in this run, so they can't hold a seeded checkpoint.
@@ -118,7 +159,8 @@ export function newGame(s: MapScenario, seed: string, opts: { turnBased?: boolea
     const j = Math.floor(r() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  const count = r() < 0.5 ? GAME.seededCheckpoints[0] : GAME.seededCheckpoints[1];
+  const seededRange = s.checkpoints?.seeded ?? GAME.seededCheckpoints;
+  const count = r() < 0.5 ? seededRange[0] : seededRange[1];
   let budget = s.resources.budget.start;
   const v = s.variation["budget.start"];
   if (v) budget = Math.round((v[0] + r() * (v[1] - v[0])) / 100) * 100;
@@ -127,6 +169,7 @@ export function newGame(s: MapScenario, seed: string, opts: { turnBased?: boolea
   for (const i of s.issues) issues[i.id] = { status: "pending" };
   const state: GameState = {
     scenarioId: s.id,
+    length,
     seed,
     t: dayStartOf(0),
     turnBased: !!opts.turnBased,
@@ -165,11 +208,11 @@ function applyEffects(state: GameState, e: Record<string, number>, share = 1): v
 }
 
 /** A lifetime ends with the working day (nobody can act at night). With under 30 minutes left, it moves to the next morning. */
-function lifetimeDeadline(at: number, lifetime: number): number {
+function lifetimeDeadline(s: MapScenario, at: number, lifetime: number): number {
   const day = dayOf(at);
   const end = dayEndOf(day);
   if (at + lifetime <= end) return at + lifetime;
-  if (end - at >= 30 || day + 1 >= GAME.workDays) return Math.max(end, at + 30);
+  if (end - at >= 30 || day + 1 >= daysOf(s)) return Math.max(end, at + 30);
   return dayStartOf(day + 1) + 30;
 }
 
@@ -178,7 +221,7 @@ function spawn(s: MapScenario, state: GameState, issueId: string, at: number) {
   if (!st || st.status !== "pending") return;
   const def = issueById(s, issueId);
   // A fixed deadline is authored on the clock; a lifetime is cut at the day end.
-  const deadline = def.deadline ? Math.max(parseTime(def.deadline), at + 30) : def.lifetime ? lifetimeDeadline(at, Math.max(def.lifetime, 30)) : undefined;
+  const deadline = def.deadline ? Math.max(parseTime(def.deadline), at + 30) : def.lifetime ? lifetimeDeadline(s, at, Math.max(def.lifetime, 30)) : undefined;
   state.issues[issueId] = { status: "open", openedAt: at, deadline };
   state.events.push({ t: at, kind: "spawned", issue: issueId });
 }
@@ -232,14 +275,14 @@ function settle(s: MapScenario, state: GameState, target: number): GameState {
       at: dayEnd,
       prio: 3,
       run: () => {
-        if (day + 1 >= GAME.workDays) {
+        if (day + 1 >= daysOf(s)) {
           // Saturday is market day: whatever is still open is out of time (counted in Friday's recap).
           for (const i of s.issues) if (state.issues[i.id].status === "open" && !i.hidden) expire(s, state, i.id, dayEnd);
         }
         state.events.push({ t: dayEnd, kind: "day_end" });
         state.recaps.push(recapOf(state, day));
-        if (day + 1 >= GAME.workDays) {
-          state.t = dayStartOf(GAME.workDays);
+        if (day + 1 >= daysOf(s)) {
+          state.t = dayStartOf(daysOf(s));
           state.events.push({ t: state.t, kind: "market_day" });
           state.ended = true;
           state.dialogue = undefined;
@@ -298,12 +341,12 @@ function logOrderMove(state: GameState, issue: string) {
 }
 
 /** Video slots left after keeping room for the seeded checkpoints still to come (cap 4, A9). */
-function videoSlotsLeft(state: GameState) {
+function videoSlotsLeft(s: MapScenario, state: GameState) {
   const seededLeft = state.plan.seeded.filter((id) => !state.plan.fired.includes(id)).length;
-  return GAME.maxVideoCheckpoints - state.videoCheckpoints - seededLeft;
+  return (s.checkpoints?.max ?? GAME.maxVideoCheckpoints) - state.videoCheckpoints - seededLeft;
 }
 
-function maybeCheckpoint(state: GameState, due: Omit<CheckpointDue, "id" | "kind" | "t">, explain: boolean) {
+function maybeCheckpoint(s: MapScenario, state: GameState, due: Omit<CheckpointDue, "id" | "kind" | "t">, explain: boolean) {
   const issue = due.issue!;
   const seeded = state.plan.seeded.includes(issue) && !state.plan.fired.includes(issue);
   if (seeded) {
@@ -311,7 +354,7 @@ function maybeCheckpoint(state: GameState, due: Omit<CheckpointDue, "id" | "kind
     state.plan.fired.push(issue);
     state.videoCheckpoints++;
     state.checkpointsDue.push({ id: `cp${state.videoCheckpoints}`, kind: explain ? "explain" : "action", t: state.t, ...due });
-  } else if (explain && videoSlotsLeft(state) > 0) {
+  } else if (explain && videoSlotsLeft(s, state) > 0) {
     state.videoCheckpoints++;
     state.checkpointsDue.push({ id: `cp${state.videoCheckpoints}`, kind: "explain", t: state.t, ...due });
   }
@@ -329,7 +372,8 @@ function requireOpen(state: GameState, issue: string) {
 }
 
 /** Apply one action. Returns a new state; never mutates the input. */
-export function step(s: MapScenario, prev: GameState, action: Action): GameState {
+export function step(base: MapScenario, prev: GameState, action: Action): GameState {
+  const s = forLength(base, prev.length ?? "full");
   if (prev.ended && action.type !== "checkpointDone" && action.type !== "orderAnswer") throw new GameError("the week is over");
   const state: GameState = structuredClone(prev);
   state.steps++;
@@ -376,7 +420,7 @@ export function step(s: MapScenario, prev: GameState, action: Action): GameState
       if (def.tags.includes("recovery") && state.recoveryAt === undefined) state.recoveryAt = state.t;
       for (const u of opt.unlocks) spawn(s, state, u, state.t);
       logOrderMove(state, action.issue);
-      maybeCheckpoint(state, { issue: action.issue, action: "choose", optionId: opt.id, optionLabel: opt.label }, opt.explainOnPick);
+      maybeCheckpoint(s, state, { issue: action.issue, action: "choose", optionId: opt.id, optionLabel: opt.label }, opt.explainOnPick);
       return advance(s, state, def.talkCost + opt.minutes);
     }
     case "delegate": {
@@ -401,7 +445,7 @@ export function step(s: MapScenario, prev: GameState, action: Action): GameState
         state.events.push({ t: state.t, kind: "delegate_failed", issue: action.issue, detail: action.to });
       }
       logOrderMove(state, action.issue);
-      maybeCheckpoint(state, { issue: action.issue, action: "delegate", to: vol.name }, false);
+      maybeCheckpoint(s, state, { issue: action.issue, action: "delegate", to: vol.name }, false);
       return advance(s, state, GAME.delegateMinutes);
     }
     case "defer": {
@@ -413,7 +457,7 @@ export function step(s: MapScenario, prev: GameState, action: Action): GameState
       applyEffects(state, def.onExpire.effects, GAME.deferPenaltyShare);
       state.events.push({ t: state.t, kind: "deferred", issue: action.issue, detail: action.reason });
       logOrderMove(state, action.issue);
-      maybeCheckpoint(state, { issue: action.issue, action: "defer", reason: action.reason }, false);
+      maybeCheckpoint(s, state, { issue: action.issue, action: "defer", reason: action.reason }, false);
       return advance(s, state, GAME.deferMinutes);
     }
     case "drift": {
@@ -450,7 +494,7 @@ export function step(s: MapScenario, prev: GameState, action: Action): GameState
 }
 
 /** Replay a whole input log (A10, A16). */
-export function replay(s: MapScenario, seed: string, actions: Action[], opts: { turnBased?: boolean } = {}): GameState {
+export function replay(s: MapScenario, seed: string, actions: Action[], opts: { turnBased?: boolean; length?: GameLength } = {}): GameState {
   return actions.reduce((st, a) => step(s, st, a), newGame(s, seed, opts));
 }
 

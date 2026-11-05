@@ -67,18 +67,24 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
       </div>
       {showSettings && (
         <Panel className="mt-3 w-[min(360px,92vw)] p-3 text-left" onClick={(e) => e.stopPropagation()}>
-          <SettingsForm />
+          <SettingsForm onTitle />
         </Panel>
       )}
     </div>
   );
 }
 
-export function SettingsForm() {
+export function SettingsForm({ onTitle = false }: { onTitle?: boolean }) {
   const s = useGame((g) => g.settings);
   const set = useGame((g) => g.setSettings);
   return (
     <div className="space-y-2 text-sm" data-testid="settings">
+      {onTitle && (
+        <label className="flex items-center justify-between gap-2">
+          Full week (Mon to Fri, about 15 min)
+          <input type="checkbox" checked={s.length === "full"} onChange={(e) => set({ length: e.target.checked ? "full" : "quick" })} data-testid="set-full-week" />
+        </label>
+      )}
       <label className="flex items-center justify-between gap-2">
         Turn-based mode (no clock pressure)
         <input type="checkbox" checked={s.turnBased} onChange={(e) => set({ turnBased: e.target.checked })} data-testid="set-turn-based" />

@@ -193,10 +193,10 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
   test("step 5: turning point cutscene drains the budget and opens the recovery plan", async ({ page }) => {
     // On stage this is the Ctrl+Shift+D jump (claude/v2-m5). Here the test hook stands in for it.
     await startLaunchWeek(page);
-    await tp(page, (x) => x.setClock("Wed 09:00"));
+    await tp(page, (x) => x.setClock("Tue 09:00"));
     for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
       await clearOverlay(page);
-      await tp(page, (x) => x.setClock("Wed 09:00"));
+      await tp(page, (x) => x.setClock("Tue 09:00"));
       if (!(await tp(page, (x) => x.getState().tp.fired))) await page.getByTestId("wait").click();
     }
     await expect(page.getByTestId("cutscene")).toBeVisible();
@@ -217,7 +217,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByTestId("start").click();
     await page.getByTestId("avatar-done").click();
     await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByTestId("clock-time")).toHaveText(/^Wed 09:/);
+    // Quick mode (the default): the jump lands Tuesday morning.
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
     // A jumped run is never saved.
     expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("tp:run:")).length)).toBe(0);
   });

@@ -2095,5 +2095,52 @@
       4500,
       5500
     ]
+  },
+  "quick": {
+    "summary": "Three weekdays to get a community market ready with a local non-profit. Problems pop up across the site and the clock is running. On Tuesday, the plan breaks.",
+    "days": 3,
+    "turningPointAt": "Tue 09:00",
+    "checkpoints": {
+      "seeded": [
+        1,
+        1
+      ],
+      "max": 2
+    },
+    "issues": {
+      "roles": {
+        "spawnAt": "Mon 09:00",
+        "deadline": "Mon 12:00"
+      },
+      "vendor-mix": {
+        "spawnAt": "Mon 10:00",
+        "deadline": "Mon 15:00"
+      },
+      "permit": {
+        "spawnAt": "Mon 11:00",
+        "deadline": "Mon 16:00"
+      },
+      "signups": {
+        "spawnAt": "Tue 13:30",
+        "deadline": "Tue 17:30"
+      },
+      "feedback": {
+        "spawnAt": "Wed 10:00",
+        "deadline": "Wed 15:00"
+      },
+      "dropout": {
+        "spawnAt": "Wed 11:00",
+        "deadline": "Wed 16:00"
+      }
+    },
+    "drop": [
+      "logo",
+      "schedule",
+      "vendor-cut",
+      "fridge",
+      "new-partner",
+      "supplies",
+      "weather"
+    ]
   }
 }

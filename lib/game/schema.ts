@@ -156,6 +156,21 @@ export const MapScenarioSchema = z
     turningPoint: z.object({ at: gameTime, disruptions: z.array(DisruptionSchema).min(1), pool: z.array(id).min(1) }),
     deferReasons: z.array(z.string()).min(2),
     variation: z.record(z.string(), z.tuple([z.number(), z.number()])).default({}),
+    /** Number of working days before market day (default 5). Set on the quick variant. */
+    days: z.number().int().min(2).max(5).optional(),
+    /** Checkpoint caps for this length (default GAME.seededCheckpoints and GAME.maxVideoCheckpoints). */
+    checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1) }).optional(),
+    /** Quick mode (Mon to Wed): data the engine applies when a run's length is "quick" (see forLength). */
+    quick: z
+      .object({
+        summary: z.string().optional(),
+        days: z.number().int().min(2).max(5),
+        turningPointAt: gameTime,
+        checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1) }),
+        issues: z.record(id, z.object({ spawnAt: gameTime.optional(), deadline: gameTime.optional(), lifetime: z.number().int().positive().optional() })).default({}),
+        drop: z.array(id).default([]),
+      })
+      .optional(),
   })
   .superRefine((s, ctx) => {
     const err = (message: string) => ctx.addIssue({ code: "custom", message });
@@ -201,6 +216,11 @@ export const MapScenarioSchema = z
     for (const p of s.turningPoint.pool) if (!s.turningPoint.disruptions.some((d) => d.id === p)) err(`pool has unknown disruption "${p}"`);
     if (!s.issues.some((i) => i.tags.includes("recovery"))) err("needs a recovery-plan issue");
     if (s.issues.filter((i) => i.checkpointEligible).length < 3) err("needs at least 3 checkpoint-eligible issues");
+    if (s.quick) {
+      for (const k of [...Object.keys(s.quick.issues), ...s.quick.drop]) if (!issues.has(k)) err(`quick mode names unknown issue "${k}"`);
+      for (const [k, v] of Object.entries(s.quick.issues))
+        if (v.spawnAt && v.deadline && parseTime(v.deadline) <= parseTime(v.spawnAt)) err(`quick issue ${k} deadline is not after spawn`);
+    }
   });
 
 export type MapScenario = z.infer<typeof MapScenarioSchema>;

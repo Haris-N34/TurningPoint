@@ -245,6 +245,19 @@ scenario = {
     },
     "deferReasons": ["Something more urgent first", "Waiting for client input", "Someone else is better placed", "Low impact, can wait"],
     "variation": {},
+    # Quick mode (the default): Mon to Wed, the budget is cut Tuesday morning, 9 problems, 2 decision checkpoints.
+    "quick": {
+        "summary": "You're a junior analyst at a small tech consultancy. Three days to recommend an inventory system to a regional grocery chain. On Tuesday, the client's CFO cuts the budget in half.", "days": 3, "turningPointAt": "Tue 09:00", "checkpoints": {"seeded": [1, 1], "max": 2},
+        "issues": {
+            "kickoff": {"spawnAt": "Mon 09:00", "deadline": "Mon 12:00"},
+            "data-read": {"spawnAt": "Mon 10:00", "deadline": "Mon 16:00"},
+            "pitch-manager": {"spawnAt": "Mon 13:00", "deadline": "Mon 17:30"},
+            "feedback": {"spawnAt": "Tue 13:00", "deadline": "Tue 17:00"},
+            "pitch-cfo": {"spawnAt": "Wed 09:30", "deadline": "Wed 15:00"},
+            "final-deck": {"spawnAt": "Wed 11:00", "deadline": "Wed 16:00"},
+        },
+        "drop": ["dev-estimate", "manager-visit", "analyst-model", "dev-blocker"],
+    },
 }
 out = pathlib.Path(__file__).resolve().parent.parent / "content/maps/client-pivot.json"
 out.write_text(json.dumps(scenario, indent=2) + "\n")

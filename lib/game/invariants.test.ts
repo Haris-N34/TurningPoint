@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getMapScenario, MAP_IDS } from "@/content/maps";
 import { rng } from "@/lib/engine/seed";
 import { GAME } from "./config";
-import { availableOptions, hiddenAvailable, newGame, nodeById, openIssues, replay, step, type Action, type GameState } from "./engine";
+import { availableOptions, forLength, hiddenAvailable, newGame, nodeById, openIssues, replay, step, type Action, type GameLength, type GameState } from "./engine";
 import { computeKpis } from "./kpis";
 import type { MapScenario } from "./schema";
 import { dayOf } from "./time";
@@ -58,12 +58,12 @@ function checkState(s: MapScenario, st: GameState, where: string) {
     if (x.status === "open" && x.deadline !== undefined) expect(x.deadline, `${where} ${i.id} stuck open`).toBeGreaterThanOrEqual(st.t);
     if (x.closedAt !== undefined && x.openedAt !== undefined) expect(x.closedAt, `${where} ${i.id}`).toBeGreaterThanOrEqual(x.openedAt);
   }
-  expect(st.videoCheckpoints, where).toBeLessThanOrEqual(GAME.maxVideoCheckpoints);
+  expect(st.videoCheckpoints, where).toBeLessThanOrEqual(forLength(s, st.length).checkpoints?.max ?? GAME.maxVideoCheckpoints);
 }
 
-function play(s: MapScenario, seed: string, policy: Policy, turnBased: boolean) {
+function play(s: MapScenario, seed: string, policy: Policy, turnBased: boolean, length: GameLength = "full") {
   const r = rng(`policy:${seed}:${policy}`);
-  let st = newGame(s, seed, { turnBased });
+  let st = newGame(s, seed, { turnBased, length });
   const log: Action[] = [];
   const raised: string[] = [];
   for (let k = 0; k < 600 && !(st.ended && st.checkpointsDue.length === 0); k++) {
@@ -79,15 +79,19 @@ function play(s: MapScenario, seed: string, policy: Policy, turnBased: boolean) 
 
 const CASES = MAP_IDS.flatMap((mapId) => {
   const base = getMapScenario(mapId)!;
-  return base.turningPoint.pool.flatMap((d) => SEEDS.flatMap((seed) => POLICIES.map((policy) => ({ mapId, d, seed, policy }))));
+  return (["quick", "full"] as const).flatMap((length) =>
+    base.turningPoint.pool.flatMap((d) => SEEDS.flatMap((seed) => POLICIES.map((policy) => ({ mapId, length, d, seed, policy })))),
+  );
 });
 
 describe("scripted playthroughs keep the engine invariants", () => {
-  it.each(CASES)("$mapId / $d / $seed / $policy", ({ mapId, d, seed, policy }) => {
+  it.each(CASES)("$mapId / $length / $d / $seed / $policy", ({ mapId, length, d, seed, policy }) => {
     const s = withDisruption(getMapScenario(mapId)!, d);
+    const eff = forLength(s, length);
+    const days = eff.days ?? GAME.workDays;
     for (const turnBased of [false, true]) {
-      const { st, log, raised } = play(s, seed, policy, turnBased);
-      const where = `${mapId} ${d} ${seed} ${policy} tb=${turnBased}`;
+      const { st, log, raised } = play(s, seed, policy, turnBased, length);
+      const where = `${mapId} ${length} ${d} ${seed} ${policy} tb=${turnBased}`;
       // The week ends, every checkpoint is answered, the turning point fired with the forced disruption.
       expect(st.ended, where).toBe(true);
       expect(st.checkpointsDue, where).toEqual([]);
@@ -95,8 +99,8 @@ describe("scripted playthroughs keep the engine invariants", () => {
       // No visible issue is left open once the week is over.
       expect(openIssues(s, st).map((i) => i.id), where).toEqual([]);
       // Five day ends, one recap per working day, and each recap matches that day's events.
-      expect(st.events.filter((e) => e.kind === "day_end").length, where).toBe(GAME.workDays);
-      expect(st.recaps.map((x) => x.day), where).toEqual([0, 1, 2, 3, 4]);
+      expect(st.events.filter((e) => e.kind === "day_end").length, where).toBe(days);
+      expect(st.recaps.map((x) => x.day), where).toEqual([...Array(days).keys()]);
       for (const rc of st.recaps) {
         const ev = st.events.filter((e) => dayOf(e.t) === rc.day);
         const n = (k: string) => ev.filter((e) => e.kind === k).length;
@@ -110,11 +114,11 @@ describe("scripted playthroughs keep the engine invariants", () => {
       // Events are in time order.
       for (let i = 1; i < st.events.length; i++) expect(st.events[i].t, `${where} event ${i}`).toBeGreaterThanOrEqual(st.events[i - 1].t);
       // Checkpoints: at most 4 video ones plus the order question, never twice the same id.
-      expect(raised.filter((x) => x !== "order").length, where).toBeLessThanOrEqual(GAME.maxVideoCheckpoints);
+      expect(raised.filter((x) => x !== "order").length, where).toBeLessThanOrEqual(eff.checkpoints?.max ?? GAME.maxVideoCheckpoints);
       expect(raised.filter((x) => x === "order").length, where).toBeLessThanOrEqual(1);
       expect(new Set(raised).size, where).toBe(raised.length);
       // Anyone who engages gets at least the seeded minimum of checkpoints.
-      if (["first", "last", "random", "explore", "delegate"].includes(policy)) expect(st.videoCheckpoints, where).toBeGreaterThanOrEqual(GAME.seededCheckpoints[0]);
+      if (["first", "last", "random", "explore", "delegate"].includes(policy)) expect(st.videoCheckpoints, where).toBeGreaterThanOrEqual(eff.checkpoints?.seeded[0] ?? GAME.seededCheckpoints[0]);
       // Results KPIs are computable: no NaN, scores 0 to 100 or null.
       for (const k of computeKpis(s, st)) {
         if (k.value !== null) expect(Number.isFinite(k.value), `${where} ${k.id}`).toBe(true);
@@ -125,15 +129,15 @@ describe("scripted playthroughs keep the engine invariants", () => {
         }
       }
       // Replaying the input log gives exactly the live state.
-      expect(replay(s, seed, log, { turnBased }), where).toEqual(st);
+      expect(replay(s, seed, log, { turnBased, length }), where).toEqual(st);
     }
   });
 });
 
 describe("The Client Pivot discoveries are reachable", () => {
-  it.each(SEEDS)("an explorer finds all three and unlocks their options (%s)", (seed) => {
+  it.each(SEEDS.flatMap((seed) => (["quick", "full"] as const).map((length) => [seed, length] as const)))("an explorer finds all three and unlocks their options (%s, %s)", (seed, length) => {
     const s = getMapScenario("client-pivot")!;
-    const { st } = play(s, seed, "explore", false);
+    const { st } = play(s, seed, "explore", false, length);
     expect(st.discoveries).toEqual(expect.arrayContaining(["cafe-chat", "dusty-report", "store-employee"]));
     const unlocked = s.nodes.flatMap((n) => n.options.filter((o) => o.requires.length).map((o) => ({ n, o })));
     for (const { o } of unlocked) expect(o.requires.every((r) => st.discoveries.includes(r))).toBe(true);

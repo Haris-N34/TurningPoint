@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { GAME } from "./config";
-import { GameError, newGame, step, type Action, type GameState } from "./engine";
+import { GameError, newGame, step, type Action, type GameLength, type GameState } from "./engine";
 import type { Look, MapScenario } from "./schema";
 import { DEFAULT_AVATAR } from "./sprites";
 
@@ -13,7 +13,7 @@ export type Screen = "title" | "avatar" | "loading" | "play" | "results";
 export type Floater = { id: number; text: string; tone: "good" | "bad" | "neutral"; key: string };
 export type Toast = { id: number; text: string };
 
-type Settings = { muted: boolean; music: boolean; reducedMotion: boolean; textSpeed: "slow" | "normal" | "fast" | "instant"; turnBased: boolean; view: "map" | "list" };
+type Settings = { muted: boolean; music: boolean; reducedMotion: boolean; textSpeed: "slow" | "normal" | "fast" | "instant"; turnBased: boolean; view: "map" | "list"; length: GameLength };
 
 type Store = {
   scenario?: MapScenario;
@@ -28,7 +28,7 @@ type Store = {
   cutscene: boolean;
   recapDay?: number;
   error?: string;
-  init: (s: MapScenario, seed: string, opts: { turnBased: boolean; view?: "map" | "list" }) => void;
+  init: (s: MapScenario, seed: string, opts: { turnBased: boolean; view?: "map" | "list"; length?: GameLength }) => void;
   dispatch: (a: Action) => GameState | undefined;
   setScreen: (s: Screen) => void;
   setPaused: (p: boolean) => void;
@@ -47,7 +47,7 @@ export const useGame = create<Store>((set, get) => ({
   log: [],
   screen: "title",
   paused: false,
-  settings: { muted: false, music: true, reducedMotion: false, textSpeed: "normal", turnBased: false, view: "map" },
+  settings: { muted: false, music: true, reducedMotion: false, textSpeed: "normal", turnBased: false, view: "map", length: "quick" },
   avatar: { look: DEFAULT_AVATAR, name: "" },
   floaters: [],
   toasts: [],
@@ -55,9 +55,9 @@ export const useGame = create<Store>((set, get) => ({
   init: (s, seed, opts) =>
     set({
       scenario: s,
-      state: newGame(s, seed, { turnBased: opts.turnBased }),
+      state: newGame(s, seed, { turnBased: opts.turnBased, length: opts.length ?? get().settings.length }),
       log: [],
-      settings: { ...get().settings, turnBased: opts.turnBased, view: opts.view ?? get().settings.view },
+      settings: { ...get().settings, turnBased: opts.turnBased, view: opts.view ?? get().settings.view, length: opts.length ?? get().settings.length },
       error: undefined,
     }),
   restore: (s, state, log) => set({ scenario: s, state, log }),
