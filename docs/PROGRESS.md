@@ -136,7 +136,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E1.5 [D] Preview as candidate, no data saved
 - [x] E1.6 [D] Publish creates public link, job code and QR
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
-- [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
+- [x] C6.1 [H] Add up to 2 witnesses with relationship: slot count, list with relationship and status in words (tests/e2e/witness.spec.ts, desktop and phone)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
 - [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
 - [x] C6.4 [D] Card shows "Confirmed by ..." never the witness email
