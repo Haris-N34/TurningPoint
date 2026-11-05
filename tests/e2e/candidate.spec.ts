@@ -24,3 +24,13 @@ test("starting records consent; the improvement opt-in stays off unless ticked (
   await page.getByRole("button", { name: "I agree, start" }).click();
   expect(await profile(page)).toMatchObject({ consentedToRecording: true, improvementOptIn: false });
 });
+
+test("candidate home: one primary action, your own card listed, synthetic inbox peers never shown as yours", async ({ page }) => {
+  await page.goto("/demo/seed");
+  await expect(page.getByTestId("seeded")).toBeVisible();
+  await page.goto("/candidate");
+  await expect(page.getByTestId("play-game")).toBeVisible();
+  const yours = page.getByTestId("your-cards");
+  await expect(yours.getByRole("link")).toHaveCount(1);
+  await expect(yours.getByRole("link")).toHaveAttribute("href", "/results/att_demo_maya");
+});

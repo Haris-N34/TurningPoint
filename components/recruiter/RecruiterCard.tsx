@@ -1,7 +1,7 @@
 "use client";
 
 import { PageSkeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useSearchParams } from "next/navigation";
 import { AddonRequest } from "@/components/addon/AddonRequest";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -41,11 +41,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   useReviewTimer(attemptId, challengeId, !!view && view.status !== "withdrawn");
 
   if (view === undefined) return <PageSkeleton />;
-  const back = (
-    <Button asChild variant="ghost" size="sm" className="-ml-3.5">
-      <Link href={`/recruiter?challenge=${challengeId}`}>← Inbox</Link>
-    </Button>
-  );
+  const back = <BackLink href={`/recruiter?challenge=${challengeId}`}>Inbox</BackLink>;
   if (view === null) return <main className="mx-auto max-w-3xl p-6">{back}<p>This card isn&apos;t shared with this challenge.</p></main>;
   if (view.status === "withdrawn")
     return (
