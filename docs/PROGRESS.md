@@ -191,7 +191,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## Blockers
 
-- #44 portraits were merged in #48. The map content review now covers all 18 issues, with wording fixes in the generator and generated JSON; see `docs/reviews/44-map-content.md`. Implementation complete, awaiting review. Mechanics, timing and checkpoint flags are unchanged. A.23/A.5 acceptance remains with Div's game integration and CI. #46's answer list and #47's initial data contracts have been handed off; those tasks are next.
+- #44 portraits and map wording are merged (#48, #49). The game shell now integrates the portraits; A.5 is accepted in main. #46 independent Codex label proposals await human review in #50.
+
+- #47 dashboard implementation awaits review in #51. It separates local/demo data, includes 200 synthetic attempts across three employers, and shows evidence/funnel/witness/fairness summaries. Current main now supplies persisted consistency context; the dashboard consumes it. G.1 remains open for the remaining telemetry/integration contracts. I.1's two rehearsals still need the complete v2 flow; see `docs/demo/V2_SCRIPT.md`.
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 
