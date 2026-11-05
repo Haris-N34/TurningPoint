@@ -44,7 +44,7 @@ test("C6.3 witness page: names the relationship, counts skills, done state has a
   const started = Date.now();
   await page.goto(link!);
   await expect(page.getByTestId("witness")).toContainText("You were asked as their instructor");
-  const skills = page.getByRole("checkbox");
+  const skills = page.getByRole("group", { name: "Which skills did you see? (optional)", exact: true }).getByRole("checkbox");
   await skills.nth(0).focus();
   await page.keyboard.press("Space");
   await expect(page.getByTestId("skill-count")).toHaveText("1 of 3 selected");

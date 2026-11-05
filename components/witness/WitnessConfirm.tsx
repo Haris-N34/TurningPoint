@@ -52,10 +52,8 @@ export function WitnessConfirm({ token }: { token: string }) {
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">Confirm only what you personally observed. No account is needed. Employers see your relationship, selected skills and optional sentence, not your email. You do not decide whether someone gets hired.</p>
       <fieldset>
-        <div className="flex items-baseline justify-between gap-3">
-          <legend className="text-sm font-medium">Which skills did you see? (optional)</legend>
-          <p className="shrink-0 text-xs text-muted-foreground" data-testid="skill-count" aria-live="polite">{skills.length} of {MAX_SKILLS} selected</p>
-        </div>
+        <legend className="text-sm font-medium">Which skills did you see? (optional)</legend>
+        <p className="mt-1 text-xs text-muted-foreground" data-testid="skill-count" aria-live="polite">{skills.length} of {MAX_SKILLS} selected</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {SKILLS.map((s) => {
             const on = skills.includes(s.slug);
