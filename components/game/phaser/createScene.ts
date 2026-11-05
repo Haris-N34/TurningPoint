@@ -275,11 +275,11 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const pts = e.npcs.map((id) => this.npcs.get(id)?.sprite).filter(Boolean) as PhaserNS.GameObjects.Sprite[];
       let delay = 0;
       for (const p of pts) {
-        this.time.delayedCall(delay, () => cam.pan(p.x, p.y, 700, "Sine.inOut"));
+        this.time.delayedCall(delay, () => cam.pan(p.x, p.y, 700, Phaser.Math.Easing.Sine.InOut));
         delay += 1100;
       }
       this.time.delayedCall(delay, () => {
-        cam.pan(this.player.x, this.player.y, 600, "Sine.inOut");
+        cam.pan(this.player.x, this.player.y, 600, Phaser.Math.Easing.Sine.InOut);
         this.time.delayedCall(650, () => cam.startFollow(this.player, true, 0.12, 0.12));
       });
     };

@@ -113,18 +113,21 @@ export function DialogueBox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tw, isPrompt, opts, focus, onChoose, onLeave]);
 
-  const portraitId = speaker?.portrait ?? scenario.npcs.find((n) => n.id === node.npc)?.portrait ?? "laptop";
+  const facing = scenario.npcs.find((n) => n.id === node.npc);
+  const portraitId = speaker?.portrait ?? facing?.portrait ?? "laptop";
+  // Your own lines show the person you're facing (their portrait), so name them, not "You". At the laptop it's just you.
+  const tag = speaker?.name ?? (node.npc === "laptop" || !facing ? "You" : facing.name);
   const expression = cur.who === "you" ? (node.lines.at(-1)?.expression ?? "neutral") : cur.expression;
 
   return (
-    <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:left-1/2 sm:w-[min(760px,94vw)] sm:-translate-x-1/2" role="dialog" aria-label={`Talking with ${speaker?.name ?? "yourself"}`} data-testid="dialogue">
+    <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:left-1/2 sm:w-[min(760px,94vw)] sm:-translate-x-1/2" role="dialog" aria-label={`Talking with ${node.npc === "laptop" || !facing ? "yourself" : facing.name}`} data-testid="dialogue">
       <Panel className="flex gap-3 p-3 sm:p-4">
         <div className="flex shrink-0 flex-col items-center">
           <Portrait id={portraitId} expression={expression} className="size-14 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-24" />
-          <span className="mt-1 hidden rounded-[3px] bg-[#2e222f] px-2 text-xs font-semibold text-[#fff8e7] sm:block">{speaker?.name ?? (cur.who === "you" ? "You" : "")}</span>
+          <span className="mt-1 hidden rounded-[3px] bg-[#2e222f] px-2 text-xs font-semibold text-[#fff8e7] sm:block">{tag}</span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#9c2c18] sm:hidden">{speaker?.name ?? "You"}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#9c2c18] sm:hidden">{tag}</p>
           <p className="min-h-[3.25rem] text-[17px] leading-snug" aria-live="polite" onClick={() => (tw.done ? !isPrompt && setLine((l) => l + 1) : tw.skip())} data-testid="dialogue-text">
             <span className="sr-only">{cur.text}</span>
             <span aria-hidden>{tw.shown}</span>

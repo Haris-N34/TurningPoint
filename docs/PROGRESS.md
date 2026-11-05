@@ -45,7 +45,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - [ ] A.1 [D] "Quiz test": no gameplay screen shows choices without a character, a scene and an animation
 - [ ] A.2 [D] Every decision happens through an in-world interaction (walk to someone, item, HQ laptop)
-- [ ] A.3 [D] Playwright screenshots of title, map, dialogue, cutscene, checkpoint and results in docs/screens; CHANGELOG records which A0 items are met
+- [x] A.3 [D] Playwright screenshots of title, map, dialogue, cutscene, checkpoint and results in docs/screens; CHANGELOG records which A0 items are met
 - [x] A.4 [D] Title screen, avatar creator, pause menu, loading screen and end-of-week results screen match A0
 - [x] A.5 [D+H] Dialogue: portraits with expressions, typewriter text with skip and blip, A to D buttons with arrow keys, NPC emote reactions, sound
 - [x] A.6 [D] Juice: floating numbers, tweened bars, shake, particles and sound on every resource change

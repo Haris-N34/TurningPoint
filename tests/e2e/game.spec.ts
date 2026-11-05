@@ -235,3 +235,50 @@ test("phone: map view with the tracker at the bottom (A.21)", async ({ page }, i
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+// A.3: screenshots of every game screen into docs/screens. Run with SCREENS=1 (skipped in CI).
+test("screenshots: title, map, dialogue, checkpoint, cutscene, results (A.3)", async ({ page }, info) => {
+  test.skip(process.env.SCREENS !== "1", "set SCREENS=1 to refresh docs/screens");
+  test.setTimeout(300_000);
+  const shot = (name: string) => page.screenshot({ path: `docs/screens/game-${name}-${info.project.name}.png` });
+  const errors: string[] = [];
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text().slice(0, 300)));
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("title-screen")).toBeVisible();
+  await page.waitForTimeout(1500);
+  await shot("title");
+  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByTestId("set-turn-based").check();
+  await page.getByTestId("start").click();
+  await expect(page.getByTestId("avatar-creator")).toBeVisible();
+  await shot("avatar");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  await page.waitForTimeout(1500);
+  await shot("map");
+  await page.getByTestId("go-roles").click();
+  await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
+  await toChoices(page);
+  await page.waitForTimeout(400);
+  await shot("dialogue");
+  await page.getByTestId("choice-c").click();
+  await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
+  await page.waitForTimeout(500);
+  await shot("checkpoint");
+  await clearOverlay(page);
+  for (let i = 0; i < 40 && !(await page.getByTestId("cutscene").isVisible()); i++) {
+    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click();
+  }
+  await expect(page.getByTestId("cutscene")).toBeVisible();
+  await page.waitForTimeout(800);
+  await shot("cutscene");
+  for (let i = 0; i < 200 && !(await page.getByTestId("to-results").isVisible()); i++) {
+    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click();
+  }
+  await page.getByTestId("to-results").click();
+  await expect(page.getByTestId("results-screen")).toBeVisible();
+  await page.waitForTimeout(2500);
+  await shot("results");
+  expect(errors).toEqual([]);
+});
