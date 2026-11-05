@@ -39,3 +39,18 @@ describe("demo jump to the turning point (P.2)", () => {
     expect(replay(s, DEMO_JUMP_SEED, j.log)).toEqual(j.state);
   });
 });
+
+describe("demo jump lands cleanly on every map and length", () => {
+  it.each(["launch-week", "client-pivot"].flatMap((m) => (["quick", "full"] as const).map((l) => [m, l] as const)))("%s (%s): cutscene next, nothing due, no order question waiting", async (mapId, length) => {
+    const { getMapScenario } = await import("@/content/maps");
+    const { expiredBeforeTp: expired } = await import("./demoJump");
+    const s = getMapScenario(mapId)!;
+    const j = playToTurningPoint(s, DEMO_JUMP_SEED, { length });
+    expect(j.state.tp.fired).toBe(true);
+    expect(formatTime(j.state.t)).toBe(length === "quick" ? "Tue 09:00" : "Wed 09:00");
+    expect(j.state.checkpointsDue).toEqual([]);
+    expect(j.state.dialogue).toBeUndefined();
+    expect(expired(s, j)).toEqual([]);
+    expect(replay(s, DEMO_JUMP_SEED, j.log, { length })).toEqual(j.state);
+  });
+});
