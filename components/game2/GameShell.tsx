@@ -19,7 +19,6 @@ import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
 import { scenarioForRun } from "@/lib/ai/services/publish";
 import { applyMapOverrides, type MapOverrides } from "@/lib/challenge/mapTailor";
-import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import { useGame } from "@/lib/game/store";
 import { parseTime } from "@/lib/game/time";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -432,12 +431,18 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
               <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
           )}
+          {/* A pixel frame around the Phaser minimap (160x120, 12 px from the corner; hidden when frozen or short). */}
+          {settings.view === "map" && !frozen && (
+            <div className="pointer-events-none absolute bottom-[9px] right-[9px] z-10 h-[126px] w-[166px] rounded-[4px] border-[3px] border-[#2e222f] shadow-[0_3px_0_#2e222f] [@media(max-height:479px)]:hidden" aria-hidden data-testid="minimap-frame" />
+          )}
           {!cutscene && <Toasts />}
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
           {reaction?.line && <ReactionBox scenario={scenario} {...reaction} />}
+          {/* A silent reaction shows no box, but input still waits for the beat to end (a checkpoint may be next). */}
+          {reaction && !reaction.line && <div className="absolute inset-0 z-40" data-testid="reaction" aria-hidden />}
           {cutscene && (
             <Cutscene
               scenario={scenario}
@@ -504,10 +509,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
 function OrderPick({ scenario, state, onDone }: { scenario: ReturnType<typeof getMapScenario> & object; state: GameState; onDone: (r: string[]) => void }) {
   const open = openIssues(scenario, state);
   const [rank, setRank] = useState<string[]>([]);
-  const ref = useRef<HTMLDivElement>(null);
-  useFocusTrap(ref);
   return (
-    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-3" role="dialog" aria-modal="true" aria-label="The order question" data-testid="order-pick">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-3" role="dialog" aria-label="The order question" data-testid="order-pick">
       <Panel className="w-[min(520px,94vw)] p-4">
         <Eyebrow>Checkpoint</Eyebrow>
         <h2 className={cn(pixelTitle.className, "mt-1.5 text-[13px] leading-relaxed")}>You&apos;ve got {open.length} open problems. Which are you going to first?</h2>

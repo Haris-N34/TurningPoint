@@ -201,14 +201,17 @@ test("game: the checkpoint pops up as a video interview with the camera on by de
   await expect(cp.getByTestId("choice-letter")).toHaveText("C");
   await expect(cp.getByTestId("checkpoint-question")).toContainText("Walk us through why.");
   await expect(cp.getByTestId("timer-label")).toHaveText("Think 30s");
-  await expect(cp.getByText("Take 30 seconds to think.")).toBeVisible();
+  await expect(cp.getByTestId("think-note")).toContainText("Then 120 seconds to answer.");
   await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 15_000 });
   await expect.poll(() => cp.getByTestId("camera-preview").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 10_000 }).toBeGreaterThan(0);
   // The mic meter moves with the fake device's beep.
   await expect.poll(async () => Number(await cp.getByTestId("mic-meter").getAttribute("data-level")), { timeout: 10_000, intervals: [100] }).toBeGreaterThan(0);
   // Text is always one click away (hard rule: no camera needed).
   await expect(cp.locator('input[value="text"]')).toBeEnabled();
-  if ((page.viewportSize()?.width ?? 0) >= 640) await expect(cp.getByTestId("switch-text")).toBeVisible();
+  // One way to switch: the "Answer by" choices under the preview, with a hint (no duplicate buttons).
+  await expect(cp.getByTestId("camera-hint")).toContainText("Rather not be on camera?");
+  await expect(cp.getByTestId("switch-text")).toHaveCount(0);
+  await expect(cp.getByRole("group", { name: "Answer by" })).toBeVisible();
 
   // Keyboard only: the start button has focus.
   await expect(cp.getByRole("button", { name: /start answering/i })).toBeFocused();
@@ -259,7 +262,8 @@ test("game: timer accommodation still applies in the interview", async ({ page }
     if (!localStorage.getItem("tp:profile")) localStorage.setItem("tp:profile", JSON.stringify({ accommodations: { timeMultiplier: 1.5, textOnly: false } }));
   });
   const cp = await toGameCheckpoint(page);
-  await expect(cp.getByText(/Take 23 seconds to think\. You then have 90 seconds\./)).toBeVisible();
+  await expect(cp.getByTestId("timer-label")).toHaveText("Think 23s");
+  await expect(cp.getByTestId("think-note")).toContainText("Then 90 seconds to answer.");
 });
 
 // The 60 s stage demo: the recovery pick is the run's first checkpoint, so the camera check happens there.
@@ -292,6 +296,9 @@ test("demo path: camera already allowed, the first checkpoint opens on camera wi
   const cp = await toDemoCheckpoint(page);
   await expect(cp.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose B, to keep Saturday and Sunday/);
   await expect(cp.getByTestId("choice-letter")).toHaveText("B");
+  // The recovery plan comes from the HQ laptop, a prop: the hiring panel asks instead.
+  await expect(cp.getByTestId("interviewer")).toContainText("Hiring panel");
+  await expect(cp.getByTestId("interviewer")).not.toContainText(/laptop/i);
   await expect(cp).toHaveAttribute("data-mode", "video");
   await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 5000 });
   // The think timer is already running: no extra click, no waiting on a prompt.

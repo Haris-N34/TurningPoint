@@ -424,7 +424,8 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
           const sev = openByNpc.get(id);
           n.bubble.setVisible(!!sev);
           if (sev) {
-            n.bubble.setPosition(n.sprite.x, n.sprite.y - 14);
+            // Props (the laptop, a report) sit low: their bubble hugs them instead of floating onto the building.
+            n.bubble.setPosition(n.sprite.x, n.sprite.y - (n.sprite.visible ? 14 : 8));
             const bg = n.bubble.list[0] as PhaserNS.GameObjects.Arc;
             bg.setFillStyle(SEVERITY_COLOUR[sev]);
             (n.bubble.list[1] as PhaserNS.GameObjects.Text).setColor("#ffffff").setText(sev === "high" ? "!!" : "!");
@@ -524,7 +525,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const big = sw >= 1700 && this.scale.height >= 950; // the HUD is drawn 1.25x there (tp-scale in GameShell)
       const k = big ? 1.25 : 1;
       const top = (132 * k) / z;
-      const listW = desktop ? (320 * k) / z : 0, listBottom = (360 * k) / z;
+      const listW = desktop ? ((sw >= 1024 ? 350 : 320) * k) / z : 0, listBottom = (360 * k) / z;
       // Signs keep one on-screen size whatever the camera zoom (about 18 px tall).
       const scale = (desktop ? 17 : 14) / (8 * z);
       const hide = this.panning || !!o.hideSigns?.();
