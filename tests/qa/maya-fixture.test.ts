@@ -109,6 +109,21 @@ export function buildMaya(): Card {
   return CardSchema.parse({ ...card, anonId: "Candidate 4F7K", evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
 }
 
+/** Duration in seconds from a WebM file's Segment Info (EBML Duration 0x4489, TimecodeScale 0x2AD7B1). */
+export function webmDurationS(buf: Buffer): number | undefined {
+  const scaleAt = buf.indexOf(Buffer.from([0x2a, 0xd7, 0xb1]));
+  let scale = 1_000_000;
+  if (scaleAt >= 0) {
+    const len = buf[scaleAt + 3] & 0x7f;
+    scale = Number(buf.readUIntBE(scaleAt + 4, len));
+  }
+  const at = buf.indexOf(Buffer.from([0x44, 0x89]));
+  if (at < 0) return undefined;
+  const len = buf[at + 2] & 0x7f;
+  const ticks = len === 8 ? buf.readDoubleBE(at + 3) : len === 4 ? buf.readFloatBE(at + 3) : undefined;
+  return ticks === undefined ? undefined : (ticks * scale) / 1e9;
+}
+
 describe("Maya's demo card matches the Launch Week run the demo plays", () => {
   const maya = CardSchema.parse(fixture);
 
@@ -142,6 +157,16 @@ describe("Maya's demo card matches the Launch Week run the demo plays", () => {
         const src = e.source;
         expect(maya.checkpoints.find((c) => c.id === src.checkpointId)!.transcript.text).toContain(src.quote);
       }
+  });
+
+  it("every recording plays exactly as long as the card says (re-cut public/demo with ffmpeg if not)", () => {
+    for (const c of maya.checkpoints) {
+      if (!c.media) continue;
+      const file = path.join(process.cwd(), "public", c.media);
+      const d = webmDurationS(fs.readFileSync(file));
+      expect(d, `${c.media} has no readable duration`).toBeDefined();
+      expect(Math.abs(d! - c.durationS), `${c.media} plays ${d?.toFixed(2)} s, card says ${c.durationS} s`).toBeLessThan(0.3);
+    }
   });
 
   it("the fixture is exactly what this script builds", () => {
