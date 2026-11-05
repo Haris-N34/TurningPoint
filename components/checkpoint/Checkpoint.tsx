@@ -321,7 +321,8 @@ export function Checkpoint(p: Props) {
     </button>
   );
 
-  const startBtn = (
+  // One primary per state: while the voice-or-text choice shows, it is the only way forward.
+  const startBtn = !choosing && (
     <button onClick={() => void beginAnswer()} className={s.primary} autoFocus>
       I&apos;m ready, start answering
     </button>
