@@ -13,6 +13,19 @@ import { pixelTitle } from "./fonts";
 import { Portrait } from "./Portrait";
 import { Panel, PixelButton } from "./ui";
 
+/** The title screen's map: a still image with a slow pan (no game engine on the first screen). */
+export function TitleBackdrop({ mapId, label }: { mapId: string; label: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-[#2e222f]" role="img" aria-label={label} data-testid="title-map">
+      <picture>
+        <source media="(max-width: 640px)" srcSet={`/assets/title/${mapId}-phone.jpg`} />
+        <img src={`/assets/title/${mapId}.jpg`} alt="" fetchPriority="high" className="h-full w-[115%] max-w-none object-cover [image-rendering:pixelated] motion-safe:animate-[tp-pan_28s_ease-in-out_infinite_alternate]" />
+      </picture>
+      <style>{`@keyframes tp-pan { from { transform: translateX(0) } to { transform: translateX(-13%) } }`}</style>
+    </div>
+  );
+}
+
 export function TitleScreen({ scenario, onStart, canResume, onResume }: { scenario: MapScenario; onStart: () => void; canResume: boolean; onResume: () => void }) {
   const settings = useGame((g) => g.settings);
   const setSettings = useGame((g) => g.setSettings);
@@ -30,7 +43,7 @@ export function TitleScreen({ scenario, onStart, canResume, onResume }: { scenar
   }, [onStart, showSettings]);
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-gradient-to-b from-[#2e222f]/40 via-transparent to-[#2e222f]/70 p-4 text-center" data-testid="title-screen" onClick={(e) => e.target === e.currentTarget && onStart()}>
-      <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className={cn(pixelTitle.className, "text-[28px] leading-tight text-[#fff8e7] drop-shadow-[0_4px_0_#2e222f] sm:text-[44px]")}>
+      <motion.h1 initial={{ y: -20 }} animate={{ y: 0 }} className={cn(pixelTitle.className, "text-[28px] leading-tight text-[#fff8e7] drop-shadow-[0_4px_0_#2e222f] sm:text-[44px]")}>
         TURNING<br />POINT
       </motion.h1>
       <p className="mt-3 rounded-[4px] bg-[#2e222f]/80 px-3 py-1 text-[#ffd166]">{scenario.title}: {scenario.role}</p>

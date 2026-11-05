@@ -25,7 +25,7 @@ import { DialogueBox, ReactionBox } from "./DialogueBox";
 import { pixelBody, pixelTitle } from "./fonts";
 import { Clock, IssueTracker, Resources, Toasts } from "./Hud";
 import { ListView } from "./ListView";
-import { AvatarCreator, Cutscene, LoadingScreen, PauseMenu, Recap, ResultsScreen, TitleScreen } from "./Screens";
+import { AvatarCreator, Cutscene, LoadingScreen, PauseMenu, Recap, ResultsScreen, TitleScreen, TitleBackdrop } from "./Screens";
 import { Panel, PixelButton } from "./ui";
 
 const MapCanvas = dynamic(() => import("@/components/game/MapCanvas"), { ssr: false });
@@ -329,7 +329,9 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
 
   return (
     <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"} data-last-reaction={lastReaction}>
-      {(screen === "title" || screen === "avatar") && <MapCanvas scenario={scenario} avatar={avatar.look} attract label="The market at Launch Week, seen from above" />}
+      {/* Title: a still of the map, so the first screen paints fast on phones (A.20). The live map starts at the avatar step. */}
+      {screen === "title" && <TitleBackdrop mapId={mapId} label={`${scenario.title}, seen from above`} />}
+      {screen === "avatar" && <MapCanvas scenario={scenario} avatar={avatar.look} attract label={`${scenario.title}, seen from above`} />}
       {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}
       {(screen === "loading" || screen === "play" || screen === "results") && state && (
