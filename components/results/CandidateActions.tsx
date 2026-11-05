@@ -11,7 +11,7 @@ import { addWitness, confirmationLine, RELATIONSHIPS, witnessesFor } from "@/lib
 
 const skillName = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
 
-// Candidate controls (C6.1, C7.2 to C7.5). Functional version; Haris owns the final layout (#19).
+// Candidate controls (C6.1, C7.2 to C7.5). Keep transcripts immutable and share/revoke actions explicit.
 export function CandidateActions({ card, onChange }: { card: Card; onChange: (c: Card) => void }) {
   const router = useRouter();
   const s = store();
@@ -22,6 +22,9 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
   const options = reusableFor(s, card, activeIds);
   const witnesses = witnessesFor(s, card.attemptId);
 
+  const [name, setName] = useState("");
+  const [linkName, setLinkName] = useState("");
+  const [notice, setNotice] = useState("");
   const [email, setEmail] = useState("");
   const [rel, setRel] = useState<(typeof RELATIONSHIPS)[number]>("supervisor");
   const [link, setLink] = useState<string | null>(null);
@@ -31,24 +34,30 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
     const next = { ...card, checkpoints: card.checkpoints.map((c) => (c.id === id ? { ...c, hidden: !c.hidden } : c)) };
     s.saveCard(next);
     onChange(next);
+    setNotice("Recording visibility updated. Your transcript is unchanged.");
   };
 
   return (
-    <div className="space-y-8">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <p role="status" className="text-sm text-primary lg:col-span-2">{notice}</p>
       {card.realStory && (
-        <section aria-labelledby="w-h" className="rounded-2xl border p-4" data-testid="witness-form">
-          <h2 id="w-h" className="font-semibold">Add a witness (optional)</h2>
-          <p className="text-sm opacity-80">Someone who saw your real turning point. Employers see the relationship and their sentence, never their email.</p>
+        <section aria-labelledby="w-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7" data-testid="witness-form">
+          <h2 id="w-h" className="font-display text-2xl">Add a witness (optional)</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Someone who saw your real turning point. Employers see the relationship and their sentence, never their email.</p>
           {confirmationLine(card.realStory.witnesses) && <p className="mt-2 text-sm font-medium">{confirmationLine(card.realStory.witnesses)}</p>}
+          {witnesses.length >= 2 && <p className="mt-4 text-sm text-muted-foreground">Both witness slots are in use.</p>}
           {witnesses.length < 2 && (
             <form
-              className="mt-3 flex flex-col gap-2 sm:flex-row"
+              className="mt-5 grid gap-3"
               onSubmit={(e) => {
                 e.preventDefault();
                 setErr(null);
                 try {
                   const r = addWitness(s, { attemptId: card.attemptId, storyTitle: card.realStory!.title, email, relationship: rel, candidateEmail: s.getProfile().email });
                   setLink(`${window.location.origin}${r.link}`);
+                  setLinkName(name.trim());
+                  setName("");
+                  setNotice("Witness link created. No email was sent.");
                   setEmail("");
                   refresh();
                 } catch (x) {
@@ -56,29 +65,33 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
                 }
               }}
             >
-              <label className="sr-only" htmlFor="w-email">Witness email</label>
-              <input id="w-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="their@email.com" className="flex-1 rounded-xl border px-3 py-2" />
-              <label className="sr-only" htmlFor="w-rel">Relationship</label>
-              <select id="w-rel" value={rel} onChange={(e) => setRel(e.target.value as typeof rel)} className="rounded-xl border bg-background px-3 py-2">
+              <label htmlFor="w-name" className="text-sm font-medium">Witness name (optional, for this link)</label>
+              <input id="w-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} className="min-h-11 w-full rounded-md border bg-background px-3" />
+              <p className="text-xs text-muted-foreground">The name stays on this page and is not stored or shared with employers.</p>
+              <label className="text-sm font-medium" htmlFor="w-email">Witness email</label>
+              <input id="w-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="their@email.com" className="min-h-11 w-full rounded-md border bg-background px-3 py-2" />
+              <label className="text-sm font-medium" htmlFor="w-rel">Relationship</label>
+              <select id="w-rel" value={rel} onChange={(e) => setRel(e.target.value as typeof rel)} className="min-h-11 w-full rounded-md border bg-background px-3 py-2">
                 {RELATIONSHIPS.map((r) => (
                   <option key={r} value={r}>{r.replace("_", " ")}</option>
                 ))}
               </select>
-              <button className="rounded-full bg-foreground px-4 py-2 font-medium text-background">Add</button>
+              <button className="min-h-11 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">Add</button>
             </form>
           )}
-          {err && <p role="alert" className="mt-2 text-sm text-red-700">{err}</p>}
+          {err && <p role="alert" className="mt-2 text-sm text-destructive">{err}</p>}
           {link && (
             <p className="mt-2 break-all text-sm" data-testid="witness-link">
-              Send them this one-time link (expires in 14 days): <a className="underline" href={link}>{link}</a>
+              Link {linkName ? `for ${linkName}` : "for your witness"} (expires in 14 days). No email was sent. Open it in this browser for the local demo: <a className="underline" href={link}>{link}</a>
             </p>
           )}
+          {link && <button type="button" className="mt-3 min-h-11 rounded-md border px-4 text-sm font-medium" onClick={async () => { try { await navigator.clipboard.writeText(link); setNotice("Witness link copied. No email was sent."); } catch { setNotice("Copy is unavailable. Select and copy the displayed witness link."); } }}>Copy witness link</button>}
         </section>
       )}
 
-      <section aria-labelledby="share-h" className="rounded-2xl border p-4" data-testid="share">
-        <h2 id="share-h" className="font-semibold">Share with another employer</h2>
-        <p className="text-sm opacity-80">Same card, no replay. They see it was reused and which of their skills it covers.</p>
+      <section aria-labelledby="share-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7" data-testid="share">
+        <h2 id="share-h" className="font-display text-2xl">Share with another employer</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Same card, no replay. They see it was reused and which of their skills it covers.</p>
         <ul className="mt-3 space-y-2">
           {options.map(({ challenge, overlap }) => (
             <li key={challenge.id} className="flex flex-wrap items-center justify-between gap-2">
@@ -87,10 +100,11 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
                 <span className="block text-xs opacity-70">Covers: {overlap.map(skillName).join(", ")}</span>
               </span>
               <button
-                className="rounded-full border px-3 py-1 text-sm"
+                className="min-h-11 rounded-md border px-4 py-2 text-sm font-medium"
                 data-testid={`share-${challenge.id}`}
                 onClick={() => {
                   s.share(card.attemptId, challenge.id, true);
+                  setNotice(`Card shared with ${challenge.company.name}. No replay needed.`);
                   refresh();
                 }}
               >
@@ -115,10 +129,11 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
                     </span>
                     {!sh.revokedAt && (
                       <button
-                        className="underline"
+                        className="min-h-11 shrink-0 px-3 underline underline-offset-4"
                         data-testid={`revoke-${sh.challengeId}`}
                         onClick={() => {
                           s.revokeShare(card.attemptId, sh.challengeId);
+                          setNotice("Share withdrawn. That employer can no longer open your card.");
                           refresh();
                         }}
                       >
@@ -133,15 +148,16 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
         )}
       </section>
 
-      <section aria-labelledby="hide-h" className="rounded-2xl border p-4">
-        <h2 id="hide-h" className="font-semibold">Hide a clip</h2>
-        <p className="text-sm opacity-80">Employers won&apos;t see the recording. The transcript stays, and can&apos;t be edited.</p>
+      <section aria-labelledby="hide-h" className="rounded-2xl border bg-card p-5 shadow-card sm:p-7">
+        <h2 id="hide-h" className="font-display text-2xl">Hide a clip</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Employers won&apos;t see the recording. The transcript stays, and can&apos;t be edited.</p>
+        {!card.checkpoints.some((c) => c.media) && <p className="mt-4 text-sm text-muted-foreground">This card has no saved recordings to hide. Text answers remain part of your evidence.</p>}
         <ul className="mt-2 space-y-1">
           {card.checkpoints
             .filter((c) => c.media)
             .map((c) => (
               <li key={c.id}>
-                <label className="flex items-center gap-2 text-sm">
+                <label className="flex min-h-11 items-center gap-3 text-sm">
                   <input type="checkbox" checked={c.hidden} onChange={() => toggleHidden(c.id)} data-testid={`hide-${c.id}`} />
                   Hide recording: “{c.question}”
                 </label>
@@ -150,11 +166,11 @@ export function CandidateActions({ card, onChange }: { card: Card; onChange: (c:
         </ul>
       </section>
 
-      <section aria-labelledby="del-h" className="rounded-2xl border border-red-300 p-4">
-        <h2 id="del-h" className="font-semibold">Delete everything</h2>
-        <p className="text-sm opacity-80">Removes your profile, runs, cards, recordings, shares and witnesses from this device, right now.</p>
+      <section aria-labelledby="del-h" className="rounded-2xl border border-destructive/40 bg-card p-5 sm:p-7">
+        <h2 id="del-h" className="font-display text-2xl">Delete everything</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Removes your profile, runs, cards, recordings, shares and witnesses from this device, right now.</p>
         <button
-          className="mt-2 rounded-full bg-red-700 px-4 py-2 font-medium text-white"
+          className="mt-4 min-h-11 rounded-md bg-destructive px-4 py-2 font-medium text-destructive-foreground"
           data-testid="delete-all"
           onClick={async () => {
             if (!window.confirm("Delete all your Turning Point data? This can't be undone.")) return;
