@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { store } from "@/lib/store/store";
-import { impactReport, type Source } from "@/lib/impact/metrics";
+import { funnelByChallenge, impactReport, type Source } from "@/lib/impact/metrics";
 import { seedImpactDemo } from "@/lib/impact/seed";
 
 type Report = ReturnType<typeof impactReport>;
+type Funnel = ReturnType<typeof funnelByChallenge>;
 const percent = (value: number | null) => value === null ? "No data" : `${Math.round(value * 100)}%`;
 const pending = [
   ["Recruiter minutes per candidate", "Review open/close instrumentation is not available. Decision timestamps do not measure reading time."],
@@ -29,8 +30,20 @@ function GroupTable({ title, groups }: { title: string; groups: Report["groups"]
   </section>;
 }
 
+function FunnelTable({ rows }: { rows: Funnel }) {
+  return <section className="mb-8 rounded-xl border bg-card p-5 sm:p-7" data-testid="funnel-by-challenge">
+    <h2 className="font-display text-2xl">Funnel per challenge</h2>
+    {!rows.length ? <p className="mt-4 text-sm text-muted-foreground">No challenge activity yet.</p> : <div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm">
+      <caption className="sr-only">Started, finished and shortlisted candidates for each challenge.</caption>
+      <thead><tr className="border-b text-xs text-muted-foreground"><th scope="col" className="pb-3 pr-4">Challenge</th><th scope="col" className="pb-3 pr-4">Started</th><th scope="col" className="pb-3 pr-4">Finished</th><th scope="col" className="pb-3">Shortlisted</th></tr></thead>
+      <tbody>{rows.map((f) => <tr key={f.challengeId} className="border-b last:border-0" data-testid={`funnel-${f.challengeId}`}><th scope="row" className="py-4 pr-4 font-medium">{f.company}<span className="block text-xs font-normal text-muted-foreground">{f.title}</span></th><td className="py-4 pr-4 tabular-nums">{f.started}</td><td className="py-4 pr-4 tabular-nums">{f.finished}</td><td className="py-4 tabular-nums">{f.shortlisted}</td></tr>)}</tbody>
+    </table></div>}
+  </section>;
+}
+
 export function ImpactDashboard() {
   const [report, setReport] = useState<Report | null>(null);
+  const [funnel, setFunnel] = useState<Funnel>([]);
   const [source, setSource] = useState<Source>("live");
   const [employer, setEmployer] = useState("");
   const [employers, setEmployers] = useState<{id: string; name: string}[]>([]);
@@ -39,12 +52,14 @@ export function ImpactDashboard() {
   const refresh = () => {
     const s = store();
     setReport(impactReport(s, employer || undefined, source));
+    setFunnel(funnelByChallenge(s, source));
     setEmployers([...new Map(s.listCards().map((c) => [c.challenge.id, {id: c.challenge.id, name: c.challenge.company}])).values()]);
   };
   useEffect(() => {
     const update = () => {
       const s = store();
       setReport(impactReport(s, employer || undefined, source));
+      setFunnel(funnelByChallenge(s, source));
       setEmployers([...new Map(s.listCards().map((c) => [c.challenge.id, {id: c.challenge.id, name: c.challenge.company}])).values()]);
     };
     update();
@@ -67,10 +82,11 @@ export function ImpactDashboard() {
     </div>
     <p className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">{source === "demo" ? "Synthetic illustration. All candidates, responses and outcomes in this cohort are fictional and do not demonstrate real-world impact." : "Local browser activity only. This is not a production cohort or a causal impact study."} A candidate is counted once across reused cards. Employer filters use challenge membership.</p>
     <section aria-label="Participation funnel" className="my-8 grid grid-cols-2 gap-3 lg:grid-cols-4">{[["Started", report.started], ["Finished", report.finished], ["Reviewed", report.reviewed], ["Shortlisted", report.shortlisted]].map(([label,value],i) => <div key={label} className="rounded-xl border bg-card p-5"><p className="text-xs uppercase tracking-widest text-muted-foreground">0{i+1} / {label}</p><p className="mt-3 font-display text-4xl tabular-nums" data-testid={`impact-${String(label).toLowerCase()}`}>{value}</p></div>)}</section>
+    <FunnelTable rows={funnel}/>
     <section aria-label="Evidence and confirmation" className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">{[["At least one Strong skill", percent(report.strongRate), "Finished candidates with relevant Strong evidence / all finished candidates."], ["Cards reviewed", percent(report.reviewedRate), "Finished candidates with a recorded decision / all finished candidates."], ["Stories witness-confirmed", percent(report.witnessRate), `${report.stories} real-life stories. At least one confirmed witness / cards with a story.`], ["Said vs did · Context", percent(report.consistencyRate), `${report.consistencyChecks} recorded checks. Consistent checks / recorded checks, never a penalty.`]].map(([label,value,note]) => <div key={label} className="rounded-xl bg-secondary p-6"><h2 className="font-medium">{label}</h2><p className="mt-3 font-display text-4xl">{value}</p><p className="mt-3 text-sm text-muted-foreground">{note}</p></div>)}</section>
     <section className="mb-8 rounded-xl border bg-card p-5 sm:p-7"><h2 className="font-display text-2xl">Different strengths, visible.</h2><p className="mt-2 text-sm text-muted-foreground">Counts of Strong and Some evidence by target skill. These are profiles, never an overall hiring score.</p><ul className="mt-6 grid gap-5 sm:grid-cols-2">{report.skills.map((s) => <li key={s.slug}><div className="flex justify-between gap-4 text-sm"><span>{s.name}</span><span className="shrink-0 tabular-nums">{s.strong} Strong · {s.some} Some / {s.total}</span></div><div aria-hidden="true" className="mt-2 flex h-2 overflow-hidden rounded bg-muted"><span className="bg-primary" style={{width: `${s.total ? s.strong/s.total*100 : 0}%`}}/><span className="bg-primary/35" style={{width: `${s.total ? s.some/s.total*100 : 0}%`}}/></div></li>)}</ul></section>
     <div className="grid gap-5"><GroupTable title="Fair access / Answer mode" groups={report.groups}/><GroupTable title="Fair access / Timing" groups={report.timing}/><GroupTable title="Fair access / Opt-in groups" groups={report.demographics}/></div>
-    <p className="my-5 text-sm text-muted-foreground">Four-fifths flags compare each eligible group&apos;s shortlist rate with the highest eligible rate in the same table. A flag prompts human investigation; it is not a finding of discrimination. At least 10 completed candidates are required per group. Unknown modes are excluded from comparisons. No demographic membership is inferred.</p>
+    <p className="my-5 text-sm text-muted-foreground">Four-fifths flags compare each eligible group&apos;s shortlist rate with the highest eligible rate in the same table. A flag prompts human investigation; it is not a finding of discrimination. At least 10 completed candidates are required per group. Unknown modes are excluded from comparisons. No demographic membership is inferred. Opt-in demographics appear only here, in aggregate: never on a Capability Card, in the inbox, or in any evidence level.</p>
     <section className="mt-10"><h2 className="font-display text-2xl">What we still need to measure.</h2><div className="mt-5 grid gap-3 sm:grid-cols-2">{pending.map(([label,note]) => <div key={label} className="rounded-xl border border-dashed p-5"><p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Awaiting data</p><h3 className="mt-2 font-medium">{label}</h3><p className="mt-2 text-sm text-muted-foreground">{note}</p></div>)}</div></section>
   </main>;
 }
