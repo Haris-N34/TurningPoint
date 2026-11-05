@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Transcript } from "@/lib/card/types";
 import { createListener, speechCtor, type SpeechState } from "@/lib/checkpoint/speech";
+import { pickMime } from "@/lib/checkpoint/recording";
 import { fromChunks, type SpeechChunk } from "@/lib/checkpoint/transcript";
 
 export type Mode = "video" | "voice" | "text";
@@ -22,6 +23,8 @@ function deviceError(e: unknown): DeviceError {
   if (n === "NotReadableError" || n === "TrackStartError" || n === "AbortError") return "busy";
   return "unavailable";
 }
+
+const hasVideoTrack = (s: MediaStream) => s.getVideoTracks().length > 0;
 
 /**
  * Records video+mic or mic only with MediaRecorder, and transcribes with the browser's speech
@@ -128,7 +131,7 @@ export function useRecorder() {
     setHeard("");
     setInterim("");
     try {
-      const r = new MediaRecorder(s);
+      const r = new MediaRecorder(s, pickMime(hasVideoTrack(s)));
       r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
       r.start(1000);
       rec.current = r;
@@ -164,7 +167,7 @@ export function useRecorder() {
     const l = listener.current;
     const [blob] = await Promise.all([
       new Promise<Blob | undefined>((resolve) => {
-        if (!r || r.state === "inactive") return resolve(chunks.current.length ? new Blob(chunks.current) : undefined);
+        if (!r || r.state === "inactive") return resolve(chunks.current.length ? new Blob(chunks.current, r?.mimeType ? { type: r.mimeType } : undefined) : undefined);
         r.onstop = () => resolve(new Blob(chunks.current, { type: r.mimeType }));
         r.stop();
       }),
