@@ -2,7 +2,8 @@
 
 `answers.json` holds 48 checkpoint answers, 4 per skill across the 12 framework skills, with mixed quality, length and dialect. The text is fixed: don't edit answers once scoring starts.
 
-Two people score it independently against the evidence rubric in `docs/PRD.md`:
+Two people score it independently against the evidence rubric in `docs/PRD.md`. Easiest way: open `/admin/gold` in the app (`pnpm dev`), pick your name, press 1, 2 or 3 for each answer, then copy the result into the file below.
+
 
 - Haris: `labels.haris.json`
 - Div: `labels.div.json`
