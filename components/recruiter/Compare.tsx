@@ -72,7 +72,6 @@ export function Compare() {
               <h2 className="font-display text-lg leading-tight">{c.displayName}</h2>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {c.anonymous && <Badge variant="outline">Anonymous review</Badge>}
-                {c.adjustedTiming && <Badge variant="outline">Adjusted timing</Badge>}
                 <Badge variant="secondary">{c.witnessConfirmed ? "Witness confirmed" : "No witness yet"}</Badge>
               </div>
               <Link href={`/recruiter/card/${c.attemptId}?challenge=${challengeId}`} className="mt-2 inline-block text-xs underline underline-offset-2">

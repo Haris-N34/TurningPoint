@@ -11,6 +11,13 @@ export type ClipHandle = { seek: (seconds: number) => void };
  * "Transcript first" hides the video until the reviewer chooses to reveal it (E6.2).
  * Text answers have no media; the transcript is the answer.
  */
+/** Poster for video answers: a calm card with the duration, so an unplayed clip never looks like an empty box. */
+function videoPoster(durationS: number) {
+  const d = `${Math.floor(durationS / 60)}:${String(Math.round(durationS % 60)).padStart(2, "0")}`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><rect width="640" height="360" fill="#2b2620"/><circle cx="320" cy="160" r="38" fill="#a63e20"/><path d="M310 140 L310 180 L344 160 Z" fill="#fff"/><text x="320" y="240" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#f1ede5">Video answer · ${d}</text><text x="320" y="270" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#bcb4a7">Click a quote or press play. The transcript is below.</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 type Highlight = { t: number; quote: string; n: number };
 
 /** Indexes of the transcript words that make up a quote starting near second `t`. */
@@ -80,7 +87,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-44 w-full rounded-xl bg-foreground/90 object-contain" data-testid="clip-media" />
+            <video ref={el} src={src} poster={videoPoster(checkpoint.durationS)} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-44 w-full rounded-xl bg-foreground/90 object-contain" data-testid="clip-media" />
           ) : (
             <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}
