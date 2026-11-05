@@ -1,5 +1,5 @@
 import { timing } from "@/lib/checkpoint/timing";
-import { availableOptions, issueById, nodeById, step, type Action, type GameState } from "./engine";
+import { availableOptions, forLength, issueById, nodeById, step, type Action, type GameState } from "./engine";
 import type { MapScenario } from "./schema";
 
 // A.19: how long a full run takes for a player at normal pace. Real seconds per action, from the
@@ -51,7 +51,7 @@ export function paceOf(s: MapScenario, start: GameState, actions: Action[], p = 
     else if (a.type === "wait" || a.type === "move") add("waiting", p.waitS);
     else if (a.type === "orderAnswer") add("checkpoints", p.orderRankS + cp("decision"));
     else if (a.type === "checkpointDone") add("checkpoints", cp("decision"));
-    if (st.recaps.length > before.recaps.length) add("recaps", p.recapS * (st.recaps.length - before.recaps.length));
+    if (st.recaps.length > before.recaps.length && forLength(s, start.length).recapModal !== false) add("recaps", p.recapS * (st.recaps.length - before.recaps.length));
     if (st.tp.fired && !before.tp.fired) add("cutscene", p.cutsceneS);
   }
   add("results", p.resultsS);

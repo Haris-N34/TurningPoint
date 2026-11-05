@@ -16,18 +16,23 @@ describe("Quick mode (Mon to Wed)", () => {
     expect(q.turningPoint.at).toBe("Tue 09:00");
     expect(forLength(q, "quick")).toBe(q);
     expect(forLength(s, "full")).toBe(s);
-    // Same ids, nodes and effects: only timing and which issues spawn change.
+    // Same ids, options and effects: only timing and which issues spawn change.
     expect(q.issues.map((i) => i.id)).toEqual(s.issues.map((i) => i.id));
-    expect(q.nodes).toEqual(s.nodes);
+    const strip = (n: (typeof s.nodes)[number]) => ({ ...n, options: n.options.map((o) => ({ ...o, unlocks: [] })) });
+    expect(q.nodes.map(strip)).toEqual(s.nodes.map(strip));
+    // Dropped issues can't come back as follow-ups.
+    const drop = new Set(s.quick!.drop);
+    expect(q.nodes.flatMap((n) => n.options.flatMap((o) => o.unlocks)).filter((u) => drop.has(u))).toEqual([]);
+    expect(q.issues.map((i) => i.onExpire.spawn).filter((x) => x && drop.has(x))).toEqual([]);
   });
 
-  it.each(MAP_IDS)("%s quick runs have 7 to 9 visible problems for every disruption", (id) => {
+  it.each(MAP_IDS)("%s quick runs have 6 to 7 visible problems for every disruption", (id) => {
     const q = forLength(getMapScenario(id)!, "quick");
     const tpOnly = new Set(q.turningPoint.disruptions.flatMap((d) => d.spawn));
     for (const d of q.turningPoint.disruptions) {
       const run = q.issues.filter((i) => !i.hidden && ((i.spawnAt && !tpOnly.has(i.id)) || d.spawn.includes(i.id)));
-      expect(run.length, d.id).toBeGreaterThanOrEqual(7);
-      expect(run.length, d.id).toBeLessThanOrEqual(9);
+      expect(run.length, d.id).toBeGreaterThanOrEqual(6);
+      expect(run.length, d.id).toBeLessThanOrEqual(7);
     }
   });
 
@@ -42,8 +47,23 @@ describe("Quick mode (Mon to Wed)", () => {
       expect(formatTime(st.tp.at!)).toBe("Tue 09:00");
       expect(st.recaps.map((r) => r.day)).toEqual([0, 1, 2]);
       expect(formatTime(st.t)).toBe("Thu 09:00");
-      expect(st.videoCheckpoints).toBeLessThanOrEqual(2);
-      expect(st.videoCheckpoints).toBeGreaterThanOrEqual(1);
+      // One decision checkpoint (on the recovery pick), no order question.
+      expect(st.videoCheckpoints).toBe(1);
+      expect(st.order.asked).toBe(false);
+    }
+  });
+
+  it.each(MAP_IDS)("%s quick: the recovery pick's explain-on-pick checkpoint always fires, whatever was picked before", (id) => {
+    const s = getMapScenario(id)!;
+    for (const seed of ["a", "b", "c", "d", "e", DEMO_JUMP_SEED]) {
+      for (const pick of [(ids: string[]) => ids[0], (ids: string[]) => ids.at(-1)!]) {
+        const start = newGame(s, seed, { length: "quick" });
+        const log = scriptedRun(s, start, pick);
+        const st = replay(s, seed, log, { length: "quick" });
+        const rec = st.choices.find((c) => forLength(s, "quick").issues.find((i) => i.id === c.issue)!.tags.includes("recovery"));
+        expect(rec, seed).toBeDefined();
+        expect(st.plan.fired, seed).toEqual([rec!.issue]);
+      }
     }
   });
 
@@ -63,10 +83,37 @@ describe("Quick mode (Mon to Wed)", () => {
     expect(j.state.tp.disruptionId).toBe("sponsor-pulls-out");
     expect(expiredBeforeTp(forLength(s, "quick"), j)).toEqual([]);
     expect(j.state.checkpointsDue).toEqual([]);
-    expect(j.state.order.asked).toBe(true);
+    // No order question in Quick mode.
+    expect(j.state.order.asked).toBe(false);
     let st = step(s, j.state, { type: "talk", issue: "recovery-plan" });
     st = step(s, st, { type: "choose", issue: "recovery-plan", option: "b" });
     expect(st.checkpointsDue.some((c) => c.issue === "recovery-plan" && c.optionId === "b")).toBe(true);
     expect(replay(s, DEMO_JUMP_SEED, j.log, { length: "quick" })).toEqual(j.state);
+  });
+});
+
+describe("Quick mode results and card", () => {
+  it.each(MAP_IDS)("%s: KPIs compute and the card builds with no order question (said vs did is empty, never an error)", async (id) => {
+    const { computeKpis } = await import("./kpis");
+    const { buildMapCard, orderConsistency } = await import("@/lib/card/buildMap");
+    const s = getMapScenario(id)!;
+    const start = newGame(s, "card", { length: "quick" });
+    const st = replay(s, "card", scriptedRun(s, start), { length: "quick" });
+    const q = forLength(s, "quick");
+    for (const k of computeKpis(q, st)) if (k.value !== null) expect(Number.isFinite(k.value)).toBe(true);
+    expect(orderConsistency(q, st)).toEqual([]);
+    const card = buildMapCard({
+      attemptId: "att_quick",
+      scenario: q,
+      state: st,
+      answers: [],
+      integrity: [],
+      challenge: { id: "map-" + id, title: q.title, company: "Demo" },
+      candidate: { displayName: "Test", verified: false },
+      timeMultiplier: 1,
+      now: new Date("2026-11-05T00:00:00Z"),
+    });
+    expect(card.attemptId).toBe("att_quick");
+    expect((card.consistency ?? []).filter((c) => c.kind === "order")).toEqual([]);
   });
 });

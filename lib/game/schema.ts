@@ -159,14 +159,20 @@ export const MapScenarioSchema = z
     /** Number of working days before market day (default 5). Set on the quick variant. */
     days: z.number().int().min(2).max(5).optional(),
     /** Checkpoint caps for this length (default GAME.seededCheckpoints and GAME.maxVideoCheckpoints). */
-    checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1) }).optional(),
+    checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1), seedRecovery: z.boolean().optional() }).optional(),
+    /** False turns off the order question (Quick mode). */
+    orderQuestion: z.boolean().optional(),
+    /** False shows a short non-blocking "day done" note instead of the evening recap modal (Quick mode). */
+    recapModal: z.boolean().optional(),
     /** Quick mode (Mon to Wed): data the engine applies when a run's length is "quick" (see forLength). */
     quick: z
       .object({
         summary: z.string().optional(),
+        orderQuestion: z.boolean().optional(),
+        recapModal: z.boolean().optional(),
         days: z.number().int().min(2).max(5),
         turningPointAt: gameTime,
-        checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1) }),
+        checkpoints: z.object({ seeded: z.tuple([z.number().int().min(0), z.number().int().min(0)]), max: z.number().int().min(1), seedRecovery: z.boolean().optional() }),
         issues: z.record(id, z.object({ spawnAt: gameTime.optional(), deadline: gameTime.optional(), lifetime: z.number().int().positive().optional() })).default({}),
         drop: z.array(id).default([]),
       })

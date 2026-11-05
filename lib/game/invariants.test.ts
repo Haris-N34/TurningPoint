@@ -72,6 +72,12 @@ function play(s: MapScenario, seed: string, policy: Policy, turnBased: boolean, 
     st = step(s, st, a);
     log.push(a);
     for (const c of st.checkpointsDue) if (!before.checkpointsDue.some((x) => x.id === c.id)) raised.push(c.id);
+    // A new recap shows the state at that day's end (the HUD after the step only differs if the turning point hit next morning).
+    if (st.recaps.length > before.recaps.length) {
+      const rc = st.recaps.at(-1)!;
+      if (st.tp.fired && !before.tp.fired) expect(rc.budget, `recap day ${rc.day}`).toBe(st.tp.budgetBefore);
+      else expect({ budget: rc.budget, morale: rc.morale, trust: rc.trust }, `recap day ${rc.day}`).toEqual({ budget: st.budget, morale: st.morale, trust: st.trust });
+    }
     checkState(s, st, `${policy} step ${k} ${a.type}`);
   }
   return { st, log, raised };
@@ -135,9 +141,14 @@ describe("scripted playthroughs keep the engine invariants", () => {
 });
 
 describe("The Client Pivot discoveries are reachable", () => {
-  it.each(SEEDS.flatMap((seed) => (["quick", "full"] as const).map((length) => [seed, length] as const)))("an explorer finds all three and unlocks their options (%s, %s)", (seed, length) => {
+  it.each(SEEDS)("Quick mode has no discoveries to find (%s): they are a full-week feature", (seed) => {
     const s = getMapScenario("client-pivot")!;
-    const { st } = play(s, seed, "explore", false, length);
+    expect(hiddenAvailable(s, newGame(s, seed, { length: "quick" }))).toEqual([]);
+  });
+
+  it.each(SEEDS)("an explorer finds all three and unlocks their options (%s)", (seed) => {
+    const s = getMapScenario("client-pivot")!;
+    const { st } = play(s, seed, "explore", false, "full");
     expect(st.discoveries).toEqual(expect.arrayContaining(["cafe-chat", "dusty-report", "store-employee"]));
     const unlocked = s.nodes.flatMap((n) => n.options.filter((o) => o.requires.length).map((o) => ({ n, o })));
     for (const { o } of unlocked) expect(o.requires.every((r) => st.discoveries.includes(r))).toBe(true);

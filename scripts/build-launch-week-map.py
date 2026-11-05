@@ -255,18 +255,16 @@ scenario = {
     },
     "deferReasons": ["Something more urgent first", "Waiting for information", "Someone else is better placed", "Low impact, can wait"],
     "variation": {"budget.start": [4500, 5500]},
-    # Quick mode (the default): Mon to Wed, the plan breaks Tuesday morning, 9 problems, 2 decision checkpoints.
+    # Quick mode (the default): Mon to Wed, the plan breaks Tuesday morning, 6 problems, 1 decision checkpoint (the recovery pick), no order question or recap modals.
     "quick": {
-        "summary": "Three weekdays to get a community market ready with a local non-profit. Problems pop up across the site and the clock is running. On Tuesday, the plan breaks.", "days": 3, "turningPointAt": "Tue 09:00", "checkpoints": {"seeded": [1, 1], "max": 2},
+        "summary": "Three weekdays to get a community market ready with a local non-profit. Problems pop up across the site and the clock is running. On Tuesday, the plan breaks.", "days": 3, "turningPointAt": "Tue 09:00", "orderQuestion": False, "recapModal": False,
+        "checkpoints": {"seeded": [1, 1], "max": 1, "seedRecovery": True},
         "issues": {
             "roles": {"spawnAt": "Mon 09:00", "deadline": "Mon 12:00"},
             "vendor-mix": {"spawnAt": "Mon 10:00", "deadline": "Mon 15:00"},
-            "permit": {"spawnAt": "Mon 11:00", "deadline": "Mon 16:00"},
-            "signups": {"spawnAt": "Tue 13:30", "deadline": "Tue 17:30"},
             "feedback": {"spawnAt": "Wed 10:00", "deadline": "Wed 15:00"},
-            "dropout": {"spawnAt": "Wed 11:00", "deadline": "Wed 16:00"},
         },
-        "drop": ["logo", "schedule", "vendor-cut", "fridge", "new-partner", "supplies", "weather"],
+        "drop": ["permit", "logo", "schedule", "vendor-cut", "signups", "fridge", "new-partner", "supplies", "weather", "dropout"],
     },
 }
 out = pathlib.Path(__file__).resolve().parent.parent / "content/maps/launch-week.json"

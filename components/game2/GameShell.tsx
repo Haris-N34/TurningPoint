@@ -256,7 +256,14 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       }
     }
     // A recap from the same step as the turning point is stale: the cutscene takes over.
-    if (state.recaps.length > p.recaps.length && !state.ended && !hold) setRecapDay(state.recaps.at(-1)!.day);
+    if (state.recaps.length > p.recaps.length && !state.ended && !hold) {
+      const day = state.recaps.at(-1)!.day;
+      // Quick mode: no recap modal, just a short non-blocking note (bus "dayDone" for a banner).
+      if (scenario.recapModal === false) {
+        bus.emit("dayDone", { day });
+        note(`${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]} done`);
+      } else setRecapDay(day);
+    }
   }, [state, scenario, floater, note, setCutscene, setRecapDay]);
 
   const talk = useCallback(

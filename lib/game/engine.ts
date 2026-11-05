@@ -128,15 +128,22 @@ export function forLength(s: MapScenario, length: GameLength = "full"): MapScena
     summary: q.summary ?? s.summary,
     days: q.days,
     checkpoints: q.checkpoints,
+    orderQuestion: q.orderQuestion,
+    recapModal: q.recapModal,
     estimatedMinutes: Math.min(s.estimatedMinutes, 6),
     turningPoint: { ...s.turningPoint, at: q.turningPointAt },
+    // A dropped issue never appears, not even as an unlocked or escalated follow-up.
+    nodes: s.nodes.map((n) =>
+      n.options.some((o) => o.unlocks.some((u) => q.drop.includes(u))) ? { ...n, options: n.options.map((o) => ({ ...o, unlocks: o.unlocks.filter((u) => !q.drop.includes(u)) })) } : n,
+    ),
     issues: s.issues.map((i) => {
       if (q.drop.includes(i.id)) {
         const { spawnAt: _drop, ...rest } = i;
         void _drop;
         return { ...rest, checkpointEligible: false };
       }
-      return { ...i, ...q.issues[i.id] };
+      const onExpire = i.onExpire.spawn && q.drop.includes(i.onExpire.spawn) ? { effects: i.onExpire.effects } : i.onExpire;
+      return { ...i, ...q.issues[i.id], onExpire };
     }),
   };
   derived.set(s, out);
@@ -183,7 +190,8 @@ export function newGame(base: MapScenario, seed: string, opts: { turnBased?: boo
     events: [],
     choices: [],
     discoveries: [],
-    plan: { seeded: shuffled.slice(0, count), fired: [] },
+    // Quick mode seeds the recovery issue, so its explain-on-pick (the demo's checkpoint) always has the slot.
+    plan: { seeded: s.checkpoints?.seedRecovery ? chosen.spawn.filter((id) => issueById(s, id).tags.includes("recovery")) : shuffled.slice(0, count), fired: [] },
     checkpointsDue: [],
     videoCheckpoints: 0,
     order: { asked: false, did: [] },
@@ -325,7 +333,7 @@ export const hiddenAvailable = (s: MapScenario, state: GameState) =>
   s.issues.filter((i) => i.hidden && state.issues[i.id].status === "open");
 
 function maybeAskOrder(s: MapScenario, state: GameState) {
-  if (state.order.asked || state.dialogue || state.ended) return;
+  if (s.orderQuestion === false || state.order.asked || state.dialogue || state.ended) return;
   if (openIssues(s, state).length >= GAME.orderQuestionOpenIssues) {
     state.order = { ...state.order, asked: true, askedAt: state.t };
     state.checkpointsDue.push({ id: "order", kind: "order", t: state.t });

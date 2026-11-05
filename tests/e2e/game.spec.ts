@@ -177,7 +177,8 @@ test("delegate and defer from the issue tracker (A.13)", async ({ page }) => {
 });
 
 test("choice-triggered video checkpoint quotes the option picked (A.7)", async ({ page }) => {
-  await startGame(page, { turnBased: true });
+  // Full week: Quick mode keeps its one decision checkpoint for the recovery pick.
+  await startGame(page, { turnBased: true, full: true });
   await page.getByTestId("go-roles").click();
   await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
   await toChoices(page);
@@ -207,7 +208,8 @@ test("turning point plays as a cutscene, drains the budget and spawns issues (A.
 });
 
 test("evening recap shows the day's numbers (A.14)", async ({ page }) => {
-  await startGame(page, { turnBased: true });
+  // Full week: Quick mode shows a short "Monday done" note instead of the recap.
+  await startGame(page, { turnBased: true, full: true });
   for (let i = 0; i < 10 && !(await page.getByTestId("recap").isVisible()); i++) {
     if (!(await clearOverlay(page))) await page.getByTestId("wait").click();
   }
@@ -256,7 +258,7 @@ test("screenshots: title, map, dialogue, checkpoint, cutscene, results (A.3)", a
   const errors: string[] = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text().slice(0, 300)));
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/game/launch-week");
+  await page.goto("/game/launch-week?week=full");
   await expect(page.getByTestId("title-screen")).toBeVisible();
   await page.waitForTimeout(1500);
   await shot("title");
@@ -356,6 +358,11 @@ test("Quick mode is the default: Mon to Wed, the plan breaks Tuesday; Full week 
   expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("quick");
   await tp(page, (x) => x.setClock("Tue 09:00"));
   expect(await tp(page, (x) => x.getState().tp.fired)).toBe(true);
+  // No order question and no recap modal in Quick mode.
+  expect(await tp(page, (x) => x.getState().order.asked)).toBe(false);
+  await expect(page.getByTestId("cutscene")).toBeVisible();
+  while (await clearOverlay(page));
+  await expect(page.getByTestId("recap")).toHaveCount(0);
   await startGame(page, { full: true });
   expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("full");
 });

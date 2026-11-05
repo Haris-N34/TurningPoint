@@ -88,6 +88,8 @@ async function startLaunchWeek(page: Page) {
   await expect(page.getByTestId("title-screen")).toContainText("PRESS ENTER");
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByTestId("set-turn-based").check();
+  // The long demo plays the full week (Quick mode, the default, is the one-minute demo).
+  await page.getByTestId("set-full-week").check();
   await page.getByTestId("start").click();
   await expect(page.getByTestId("avatar-creator")).toBeVisible();
   await page.getByTestId("avatar-done").click();
@@ -193,10 +195,10 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
   test("step 5: turning point cutscene drains the budget and opens the recovery plan", async ({ page }) => {
     // On stage this is the Ctrl+Shift+D jump (claude/v2-m5). Here the test hook stands in for it.
     await startLaunchWeek(page);
-    await tp(page, (x) => x.setClock("Tue 09:00"));
+    await tp(page, (x) => x.setClock("Wed 09:00"));
     for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
       await clearOverlay(page);
-      await tp(page, (x) => x.setClock("Tue 09:00"));
+      await tp(page, (x) => x.setClock("Wed 09:00"));
       if (!(await tp(page, (x) => x.getState().tp.fired))) await page.getByTestId("wait").click();
     }
     await expect(page.getByTestId("cutscene")).toBeVisible();

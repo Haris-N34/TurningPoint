@@ -2100,12 +2100,15 @@
     "summary": "Three weekdays to get a community market ready with a local non-profit. Problems pop up across the site and the clock is running. On Tuesday, the plan breaks.",
     "days": 3,
     "turningPointAt": "Tue 09:00",
+    "orderQuestion": false,
+    "recapModal": false,
     "checkpoints": {
       "seeded": [
         1,
         1
       ],
-      "max": 2
+      "max": 1,
+      "seedRecovery": true
     },
     "issues": {
       "roles": {
@@ -2116,31 +2119,22 @@
         "spawnAt": "Mon 10:00",
         "deadline": "Mon 15:00"
       },
-      "permit": {
-        "spawnAt": "Mon 11:00",
-        "deadline": "Mon 16:00"
-      },
-      "signups": {
-        "spawnAt": "Tue 13:30",
-        "deadline": "Tue 17:30"
-      },
       "feedback": {
         "spawnAt": "Wed 10:00",
         "deadline": "Wed 15:00"
-      },
-      "dropout": {
-        "spawnAt": "Wed 11:00",
-        "deadline": "Wed 16:00"
       }
     },
     "drop": [
+      "permit",
       "logo",
       "schedule",
       "vendor-cut",
+      "signups",
       "fridge",
       "new-partner",
       "supplies",
-      "weather"
+      "weather",
+      "dropout"
     ]
   }
 }
