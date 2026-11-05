@@ -8,6 +8,8 @@ const MAYA_ANON = mayaFixture.anonId;
 async function seed(page: Page) {
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();
+  // The "seeded" page renders before its effect writes the data; wait for Maya's share to be stored.
+  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("tp:shares") ?? "[]") as { attemptId: string }[]).some((s) => s.attemptId === "att_demo_maya"));
 }
 const MAYA = "att_demo_maya";
 const CARD = `/recruiter/card/${MAYA}?challenge=ch_demo_energy`;
@@ -101,7 +103,7 @@ test("card fits one laptop screen and has no serious accessibility issues (E3, A
 test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
   await seed(page);
   await page.evaluate((id) => {
-    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    const shares = JSON.parse(localStorage.getItem("tp:shares") ?? "[]");
     shares.push({ id: `sh_${id}_ch_demo_bank`, attemptId: id, challengeId: "ch_demo_bank", reused: true, createdAt: new Date().toISOString() });
     localStorage.setItem("tp:shares", JSON.stringify(shares));
   }, MAYA);
@@ -111,7 +113,7 @@ test("reused and withdrawn cards (E8.1, C7.4)", async ({ page }) => {
   await expect(page.getByTestId("reused-badge")).toContainText("Reused from a previous challenge");
 
   await page.evaluate((id) => {
-    const shares = JSON.parse(localStorage.getItem("tp:shares")!);
+    const shares = JSON.parse(localStorage.getItem("tp:shares") ?? "[]");
     for (const s of shares) if (s.attemptId === id && s.challengeId === "ch_demo_bank") s.revokedAt = new Date().toISOString();
     localStorage.setItem("tp:shares", JSON.stringify(shares));
   }, MAYA);
@@ -191,4 +193,23 @@ test("decision path keeps the turning point in view, with arrows when the path s
       await expect.poll(() => path.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
     }
   }
+});
+
+test("employers never see focus-loss notes; the candidate sees them for information", async ({ page }) => {
+  await seed(page);
+  // Make sure the card carries a focus-loss note, whatever the fixture holds.
+  await page.evaluate((id) => {
+    const key = `tp:card:${id}`;
+    const card = JSON.parse(localStorage.getItem(key)!);
+    card.integrity = [...card.integrity.filter((n: { kind: string }) => n.kind !== "focus_lost"), { checkpointId: "cp2", kind: "focus_lost", detail: "Window lost focus for 3 seconds during the answer" }];
+    localStorage.setItem(key, JSON.stringify(card));
+  }, MAYA);
+  await page.goto(CARD);
+  await expect(page.getByTestId("capability-card")).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(/lost focus/i);
+  await page.goto(`/recruiter/compare?challenge=ch_demo_energy&ids=${MAYA},att_demo_peer_01`);
+  await expect(page.getByTestId("compare")).not.toContainText(/lost focus/i);
+  await page.goto(`/results/${MAYA}`);
+  await expect(page.getByTestId("integrity")).toContainText(/lost focus/i);
+  await expect(page.getByTestId("integrity")).toContainText("For your information");
 });

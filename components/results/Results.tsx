@@ -60,6 +60,7 @@ export function Results({ attemptId }: { attemptId: string }) {
         identity={{ displayName: card.candidate.displayName || card.anonId, university: card.candidate.university, anonymous: false }}
         hiddenClipIds={card.checkpoints.filter((c) => c.hidden).map((c) => c.id)}
         showFinalScore={false}
+        audience="candidate"
       />
       <CandidateActions card={card} onChange={setCard} />
       <ResumeIntake card={card} onChange={setCard} />

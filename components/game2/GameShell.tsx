@@ -136,7 +136,15 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
 
   const resume = useCallback(() => {
     if (!resumable) return;
-    const st = replay(base, resumable.seed, resumable.log, { turnBased: resumable.turnBased, length: resumable.length });
+    let st: GameState;
+    try {
+      st = replay(base, resumable.seed, resumable.log, { turnBased: resumable.turnBased, length: resumable.length });
+    } catch {
+      // A save from an older build that the engine now refuses (e.g. a talk under a checkpoint): start fresh, never crash.
+      setResumable(null);
+      toast("That saved run can't be continued on this version. Starting fresh.");
+      return;
+    }
     shownTp.current = st.tp.fired;
     prev.current = st;
     restore(base, st, resumable.log);
@@ -150,7 +158,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     coach.current = false;
     setReady(view === "list");
     setScreen("loading");
-  }, [resumable, base, restore, setScreen, setSettings, settings.view]);
+  }, [resumable, base, restore, setScreen, setSettings, settings.view, toast]);
 
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {

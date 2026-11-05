@@ -34,6 +34,8 @@ export function cardFor(s: Store, attemptId: string, challengeId: string, anonym
     ...card,
     // Accommodations (extra time, turn-based play) are the candidate's business, never the employer's.
     adjustedTiming: false,
+    // Focus-loss notes are the candidate's only (judge feedback); retakes stay as context.
+    integrity: card.integrity.filter((i) => i.kind !== "focus_lost"),
     checkpoints: card.checkpoints.map((c) => (c.hidden ? { ...c, media: undefined } : c)),
   };
   return { status: "ok", card: visible, name: identity(card, anonymous, review?.decision), hiddenClipIds: hidden };

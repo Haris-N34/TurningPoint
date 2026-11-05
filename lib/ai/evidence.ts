@@ -8,7 +8,7 @@ import type { SkillSlug } from "@/lib/engine/skills";
 // it never decides. Inputs are transcripts, the choice log and skill signals only: no name, email,
 // school, audio features or video (G2, F1). Grammar, accent and fluency are never considered.
 
-export const EXTRACTOR = { name: "local-rules", version: "0.5.0" };
+export const EXTRACTOR = { name: "local-rules", version: "0.6.0" };
 export const MAX_QUOTE_WORDS = 25;
 
 export type ExtractInput = {
@@ -137,23 +137,23 @@ function judge(skill: SkillSlug, text: string, signalled: boolean, context: stri
 // AI summary lines (judge feedback): specific to each skill and to its own quote, so no two skills on a card
 // read the same. A plain lead per skill and level, then up to three concrete words from the quote itself.
 const LEAD: Record<SkillSlug, Record<Candidate["level"], string>> = {
-  "problem-solving": { strong: "Breaks the problem down, picks a fix, and names what it costs", some: "Proposes a fix and says why" },
-  adaptability: { strong: "Changes the plan when it stops working and names what the change costs", some: "Adjusts the plan and gives a reason" },
-  resilience: { strong: "Keeps going after the setback and says what it cost and who it touched", some: "Keeps going after the setback, with a reason" },
-  ambiguity: { strong: "Makes a call without full information and weighs the risk on others", some: "Makes a call under uncertainty and explains it" },
-  prioritization: { strong: "Chooses what to protect and what to cut, and who pays for it", some: "Says what comes first and why" },
-  creativity: { strong: "Finds a resourceful option and weighs what it gives up", some: "Finds a resourceful option and says why" },
-  collaboration: { strong: "Brings people in and weighs time against keeping the team", some: "Involves others in the decision and says why" },
-  empathy: { strong: "Considers how people feel and lets it shape the trade-off", some: "Notices how others are affected and explains the response" },
-  communication: { strong: "Tells the right people early and weighs what to say against the cost", some: "Explains the decision to others and says why" },
-  feedback: { strong: "Takes criticism on board, changes course, and names the cost", some: "Responds to feedback with a reason" },
-  analytical: { strong: "Reads the evidence, compares options, and names the trade-off", some: "Uses evidence to reach the decision" },
-  curiosity: { strong: "Digs for what others missed and weighs what it costs", some: "Looks into the problem before deciding" },
+  "problem-solving": { strong: "Fixes it and names the cost", some: "Proposes a fix, with a reason" },
+  adaptability: { strong: "Changes plan, names the cost", some: "Adjusts the plan, with a reason" },
+  resilience: { strong: "Keeps going, names the cost", some: "Keeps going, with a reason" },
+  ambiguity: { strong: "Decides unsure, weighs the risk", some: "Decides under doubt, with a reason" },
+  prioritization: { strong: "Protects one thing, cuts another", some: "Puts one thing first, with a reason" },
+  creativity: { strong: "Finds another way, names the cost", some: "Finds another way, with a reason" },
+  collaboration: { strong: "Weighs time against the team", some: "Brings others in, with a reason" },
+  empathy: { strong: "Lets feelings shape the trade-off", some: "Notices who is affected" },
+  communication: { strong: "Tells people early, names the cost", some: "Explains the call to others" },
+  feedback: { strong: "Acts on criticism, names the cost", some: "Responds to feedback, with a reason" },
+  analytical: { strong: "Reads the evidence, weighs options", some: "Uses evidence to decide" },
+  curiosity: { strong: "Digs deeper, names the cost", some: "Looks into it before deciding" },
 };
 
 // Verb-like words make poor topics ("losing, hurt"); the topic should name things.
 const VERBISH = /(?:ing|ed)$/i;
-const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said".split(" "));
+const VERBS = new Set("hurt hurts paid pays come comes came told tells kept keep went goes gone would could should might must lose lost wanted asked said share shared shares".split(" "));
 
 /** Up to three concrete words from the quote (things, not filler or verbs), in the order and case spoken. */
 function topicOf(quote: string): string[] {
@@ -192,7 +192,9 @@ export function extractEvidence(input: ExtractInput): Evidence[] {
       const j = judge(skill, cp.transcript.text, signalled, contextFor(cp));
       if (!j) continue;
       const base = (j.level === "strong" ? 10 : 5) + (signalled ? 2 : 0) + (cp.kind === "real_life" ? 1 : 0);
-      j.quotes.forEach((quote, k) => candidates.push({ skill, checkpointId: cp.id, quote, level: j.level, score: base - k * 0.01 }));
+      // A quote in the skill's own words beats one picked only because the decision was meant to surface the skill
+      // (a prioritization sentence must not back Resilience when a real setback sentence exists).
+      j.quotes.forEach((quote, k) => candidates.push({ skill, checkpointId: cp.id, quote, level: j.level, score: base + (SKILL_WORDS[skill].test(quote) ? 3 : 0) - k * 0.01 }));
     }
   // One quote backs at most one skill per card: the best-fitting skill takes it, the other uses its next-best
   // quote or, with none left, reads Not observed. Ties keep the employer's skill order.

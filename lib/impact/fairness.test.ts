@@ -1,3 +1,4 @@
+import { DEMO_PREFIX } from "./metrics";
 import { describe, expect, it } from "vitest";
 import fixture from "@/fixtures/attempt.json";
 import { CardSchema } from "@/lib/card/types";
@@ -14,13 +15,20 @@ const seeded = () => {
 };
 
 describe("E7.4 synthetic cohort", () => {
-  it("is deterministic: 200 candidates, 3 employers, clearly synthetic names", () => {
+  it("is deterministic: 200 candidates, 3 employers, fictional names, every one flagged synthetic", () => {
     const a = syntheticCohort();
     expect(a).toEqual(syntheticCohort());
     expect(a).toHaveLength(200);
     expect(new Set(a.map((c) => c.employerId)).size).toBe(3);
     const s = seeded();
-    for (const card of s.listCards()) expect(card.candidate.displayName).toMatch(/^Synthetic candidate \d{3}$/);
+    // Fictional first and last names from fixed lists, so the same index always gives the same name.
+    for (const card of s.listCards()) expect(card.candidate.displayName).toMatch(/^[A-Z][a-z]+ [A-Z][a-z]+$/);
+    expect(s.listCards().map((c) => c.candidate.displayName)).toEqual(seeded().listCards().map((c) => c.candidate.displayName));
+    // Every synthetic candidate is flagged: their attempt id carries the demo prefix and the run says synthetic.
+    for (const card of s.listCards()) {
+      expect(card.attemptId.startsWith(DEMO_PREFIX)).toBe(true);
+      expect((s.getRun(card.attemptId)?.extra.impactDemo as { synthetic?: boolean } | undefined)?.synthetic).toBe(true);
+    }
     expect(new Set(s.listCards().map((c) => c.candidate.displayName)).size).toBe(160);
   });
 
@@ -48,7 +56,7 @@ describe("E7.4 synthetic cohort", () => {
       const rows = inboxFor(s, e.id, ["adaptability", "resilience", "prioritization", "collaboration"]);
       expect(rows.length).toBeGreaterThan(50);
       // Anonymous first review: only shortlisted candidates show their (synthetic) name.
-      for (const r of rows) expect(r.displayName).toMatch(r.status === "shortlist" ? /^Synthetic candidate \d{3}$/ : /^Candidate D\d{3}$/);
+      for (const r of rows) expect(r.displayName).toMatch(r.status === "shortlist" ? /^[A-Z][a-z]+ [A-Z][a-z]+$/ : /^Candidate D\d{3}$/);
       expect(new Set(rows.map((r) => r.status)).size).toBeGreaterThanOrEqual(3);
     }
   });

@@ -386,6 +386,9 @@ function requireOpen(state: GameState, issue: string) {
 export function step(base: MapScenario, prev: GameState, action: Action): GameState {
   const s = forLength(base, prev.length ?? "full");
   if (prev.ended && action.type !== "checkpointDone" && action.type !== "orderAnswer") throw new GameError("the week is over");
+  // A due checkpoint comes first: nothing else moves the game on until it's answered (no talk under a checkpoint).
+  if (prev.checkpointsDue.length && !["checkpointDone", "orderAnswer", "leave", "drift"].includes(action.type)) throw new GameError("answer the checkpoint first");
+  if (prev.checkpointsDue.length && action.type === "drift") return prev;
   const state: GameState = structuredClone(prev);
   state.steps++;
   switch (action.type) {
@@ -405,7 +408,8 @@ export function step(base: MapScenario, prev: GameState, action: Action): GameSt
         const cost = walkMinutes(s, state.zone, def.zone);
         state.zone = def.zone;
         advance(s, state, cost);
-        if (state.ended || state.issues[action.issue].status !== "open") return state;
+        // Something came up on the walk (an expiry, the order question): deal with that before talking.
+        if (state.ended || state.issues[action.issue].status !== "open" || state.checkpointsDue.length) return state;
       }
       state.dialogue = { issue: action.issue, node: def.node };
       state.events.push({ t: state.t, kind: "talked", issue: action.issue });

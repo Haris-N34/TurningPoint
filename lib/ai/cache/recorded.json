@@ -281,7 +281,7 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.5.0:8a277183690d9e87": {
+ "evidence-scanner@1.0.0+0.6.0:8a277183690d9e87": {
   "output": {
    "evidence": [
     {
@@ -300,13 +300,13 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.5.0:a4b72d16d4ba74f1": {
+ "evidence-scanner@1.0.0+0.6.0:a4b72d16d4ba74f1": {
   "output": {
    "evidence": [
     {
      "skill": "prioritization",
      "level": "strong",
-     "sentence": "Chooses what to protect and what to cut, and who pays for it: second, weekend, vendor.",
+     "sentence": "Protects one thing, cuts another: second, weekend, vendor.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",
@@ -318,7 +318,7 @@
     {
      "skill": "communication",
      "level": "strong",
-     "sentence": "Tells the right people early and weighs what to say against the cost: same.",
+     "sentence": "Tells people early, names the cost: same.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",
@@ -392,7 +392,7 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:8bde9cef8df56366": {
+ "recruiter-copilot@1.0.0:1d691749d49eea88": {
   "output": {
    "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
    "citations": [
@@ -421,7 +421,7 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:b17bbbaa790261a2": {
+ "recruiter-copilot@1.0.0:a722a560be04b370": {
   "output": {
    "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:12: “Losing a day would hurt the vendors more than the bands.”",
    "citations": [

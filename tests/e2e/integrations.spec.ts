@@ -169,3 +169,9 @@ test("portable credential: download from results, verify, and a tampered file fa
   await expect(page.getByTestId("verify-result")).toHaveAttribute("data-valid", "false");
   await expect(page.getByTestId("verify-result")).toContainText("changed after it was issued");
 });
+
+test("integration console is open when no console secret is set (default)", async ({ page }) => {
+  await page.goto("/admin/integrations");
+  await expect(page.getByTestId("integration-console")).toBeVisible();
+  await expect(page.getByTestId("console-secret")).toHaveCount(0);
+});
