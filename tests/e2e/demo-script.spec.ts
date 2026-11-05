@@ -13,6 +13,15 @@ const tp = <T,>(page: Page, fn: (tp: TP) => T) => page.evaluate(`(${fn.toString(
 
 const CARD = "/recruiter/card/att_demo_maya?challenge=ch_demo_energy";
 
+// The resume used in setup. Same shape as tests/e2e/resume.spec.ts.
+const RESUME = `Maya Chen
+maya.chen@example.com | (403) 555-0182
+
+Experience
+Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
+- Led a team of 50 volunteers and kept every volunteer informed when funding was cut
+- Negotiated donated supplies from a local store, saving $2,000`;
+
 async function seed(page: Page) {
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();
@@ -99,8 +108,22 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await expect(page.getByTestId("seeded")).toContainText("Bow River Credit Union");
   });
 
-  test("step 0b: Ctrl+Shift+D demo panel and reset", async () => {
-    test.skip(true, "Demo panel (P.2) is being built on claude/v2-m5; not in main yet. Confirm once merged.");
+  test("step 0b: Ctrl+Shift+D demo panel resets, reseeds and jumps to the game", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.setItem("tp:run:att_leftover", "{}"));
+    await expect(page.getByTestId("demo-panel")).toHaveCount(0);
+    await page.keyboard.press("Control+Shift+D");
+    const panel = page.getByTestId("demo-panel");
+    await expect(panel).toBeVisible();
+    await page.getByTestId("demo-reset").click();
+    await expect(page.getByTestId("demo-msg")).toContainText("Reset done");
+    const keys = await page.evaluate(() => Object.keys(localStorage));
+    expect(keys).not.toContain("tp:run:att_leftover");
+    expect(keys).toContain("tp:card:att_demo_maya");
+    await panel.getByRole("link", { name: "Game", exact: true }).click();
+    // First hit compiles the game route in dev; allow for it.
+    await expect(page).toHaveURL(/\/game\/launch-week$/, { timeout: 30_000 });
+    await expect(page.getByTestId("title-screen")).toBeVisible();
   });
 
   test("step 1: title screen", async ({ page }) => {
@@ -185,11 +208,29 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
   });
 
   test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async () => {
-    test.skip(true, "Demo shortcut (P.2) is being built on claude/v2-m5; not in main yet. Confirm once merged.");
+    test.skip(true, "The merged demo panel (P.2) jumps to Game, Results, Recruiter card and Admin impact only; it has no turning-point jump. The script uses the prepared tab instead.");
   });
 
-  test("step 6: Second Look restores a candidate the mock ATS rejected", async () => {
-    test.skip(true, "Second Look and the integration console (C.10, C.11) are on claude/v2-integrations; not in main yet.");
+  test("step 6: Second Look restores a candidate the mock ATS rejected", async ({ page }) => {
+    await seed(page);
+    await page.goto("/admin/integrations");
+    await expect(page.getByTestId("integration-console")).toBeVisible();
+    // Fresh tenant per run, as in setup: the mock ATS state lives on the server.
+    const before = await page.getByTestId("integration-console").locator("code").first().innerText();
+    await page.getByTestId("fresh-company").click();
+    await expect(page.getByTestId("integration-console").locator("code").first()).not.toHaveText(before);
+    await page.getByTestId("reject-gh_app_maya").click();
+    await expect(page.getByTestId("webhook-log")).toContainText("Second Look: Rejected at resume screen; Strong evidence in Prioritization and Collaboration");
+    await page.goto("/recruiter?challenge=ch_demo_energy");
+    const q = page.getByTestId("second-look-queue");
+    await expect(q).toContainText("Rejected at resume screen");
+    await expect(page.getByTestId("row-att_demo_maya")).toBeVisible(); // nobody is removed from the inbox
+    await q.getByRole("link", { name: "Open card" }).click();
+    await expect(page.getByTestId("second-look-panel")).toBeVisible();
+    await page.getByTestId("second-look-restore").click();
+    await expect(page.getByTestId("second-look-done")).toContainText("restored to consideration");
+    await page.goto("/recruiter?challenge=ch_demo_energy");
+    await expect(page.getByTestId("second-look-rescued")).toContainText("this season: 1");
   });
 
   test("step 7a: inbox is anonymous, shortlist reveals the name", async ({ page }) => {
@@ -213,8 +254,24 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await expect(page.getByTestId("card-name")).toHaveText("Maya Chen");
   });
 
-  test("step 7b: Resume vs Evidence on the card", async () => {
-    test.skip(true, "Resume vs Evidence (C.7) is on claude/v2-integrations; not in main yet.");
+  test("step 7b: Resume vs Evidence and the Final score breakdown", async ({ page }) => {
+    await seed(page);
+    // Setup step: the candidate adds a resume with consent (demo-script.md, Setup).
+    await page.goto("/results/att_demo_maya");
+    const intake = page.getByTestId("resume-intake");
+    await intake.getByTestId("resume-text").fill(RESUME);
+    await intake.getByTestId("resume-consent").check();
+    await intake.getByTestId("resume-analyze").click();
+    await expect(intake.getByTestId("resume-added")).toContainText("claims");
+    await page.goto(CARD);
+    const rve = page.getByTestId("resume-vs-evidence");
+    await expect(rve).toContainText("Resume: basic capabilities");
+    await expect(rve).toContainText("Game: evidence");
+    await expect(rve).toContainText("Backed by game evidence");
+    await expect(rve).toContainText("Not yet shown");
+    await expect(rve).not.toContainText(/Maya|Chen|Bow Valley|example\.com/i);
+    await page.getByTestId("final-score").getByRole("button").focus();
+    await expect(page.getByTestId("final-score-breakdown")).toContainText("Resume 25%");
   });
 
   test("step 8: Copilot answers with a citation and refuses a hiring question", async ({ page }) => {

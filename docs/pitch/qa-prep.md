@@ -68,7 +68,7 @@ The demo costs nothing: the AI runs locally with no model calls. In production t
 They test you on their scenario and give a score. We test how you handle it when your own plan breaks, ask about your exact choice, link it to a real story, give evidence instead of a score, and let the candidate reuse the card.
 
 **19. How does it fit an employer's ATS?**
-Today: shortlist export to a mock Greenhouse endpoint, with a link back to each card. Webhooks and Second Look (bringing back strong candidates the resume screen rejected) are built on a branch and not in this demo yet. Don't claim them unless merged.
+Today: shortlist export to a mock Greenhouse endpoint, with a link back to each card. Two mock ATS adapters (Greenhouse-shaped and Workday-shaped) with signed webhooks: a new application gets an invite, a finished result posts back with a link to the card, failures retry with backoff. Second Look brings back candidates the ATS rejected at the resume screen when their evidence is Strong in 2+ target skills; a person must restore or confirm the pass. Both ATSs are mocks we run; no real ATS integration yet.
 
 **20. How does it scale to 244 applications per role?**
 The card takes about a minute to read. The inbox filters by skill evidence and supports keyboard review. Because cards are portable, a candidate plays once and shares many times, so volume per candidate goes down too. Real recruiter minutes are not measured yet; the dashboard shows "awaiting data".
@@ -78,4 +78,5 @@ The card takes about a minute to read. The inbox filters by skill evidence and s
 - "Our AI decides" or "the score decides". The Final score only sorts; there is no threshold and no auto-reject.
 - "Proven", "validated", "predicts". Not yet.
 - Any number not in the research brief.
-- "Second Look", "Resume vs Evidence", "Final score": not in main. The Final score on `claude/v2-integrations` conflicts with the no-overall-score rule; the team must resolve it before it is shown.
+- "No score". There is a Final score. Say it sorts, shows its breakdown, and never filters, hides or rejects anyone.
+- "Integrates with Greenhouse/Workday". The adapters run against our own mocks.

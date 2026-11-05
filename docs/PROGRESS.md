@@ -183,9 +183,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe): zero serious/critical axe findings on every route in light and dark (tests/e2e/a11y.spec.ts, lib/store/accommodations.test.ts; docs/POLISH.md)
 - [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
 - [x] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script (Ctrl+Shift+D panel: roles, seed, reset, jumps; /demo/reset and `pnpm demo:reset`; lib/demo/reset.test.ts, tests/e2e/demo.spec.ts)
-- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
+- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/, updated for the v2 merge: Second Look, Resume vs Evidence, Final score sorts only, Ctrl+Shift+D panel)
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
-- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts passes with --repeat-each=2; Second Look, Resume vs Evidence and the demo panel steps skipped until merged)
+- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts covers every script step incl. demo panel reset, Second Look and Resume vs Evidence, green with --repeat-each=2; only the turning-point jump is skipped because the demo panel has no such link, so the script uses a prepared tab. Needs two human rehearsals.)
 - [x] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario (recruiter one-click request on a reused card, 5-minute text mini-scenario for only the missing skills, evidence levels only; lib/addon/addon.test.ts, tests/e2e/addon.spec.ts)
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 
