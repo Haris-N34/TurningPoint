@@ -251,6 +251,8 @@ test("game: no camera means a calm switch to voice, and no mic means text", asyn
   await page.evaluate(() => ((window as unknown as { __noMic?: boolean }).__noMic = true));
   await cp.locator('label:has(input[value="video"])').click();
   await expect(cp).toHaveAttribute("data-mode", "text", { timeout: 15_000 });
+  // No mic either: one tap on "Answer in text", then start.
+  await cp.getByTestId("fallback-text").click();
   await cp.getByRole("button", { name: /start answering/i }).click();
   await cp.getByTestId("answer-text").fill("I took logistics myself so the team stayed happy.");
   await cp.getByRole("button", { name: "Done" }).click();
@@ -367,6 +369,8 @@ test("demo path: camera denied, calm one-line note, one tap to voice or text, ti
   await expect(cp.getByTestId("fallback-voice")).toBeVisible();
   await expect(cp.getByTestId("fallback-text")).toBeVisible();
   await expect(cp.getByTestId("fallback-voice")).toBeInViewport();
+  // One primary action at a time: "start answering" waits until a mode is picked.
+  await expect(cp.getByRole("button", { name: /start answering/i })).toHaveCount(0);
   await page.waitForTimeout(2000);
   expect(await thinkLeft(page)).toBe(15);
   await page.waitForTimeout(500);
@@ -376,6 +380,7 @@ test("demo path: camera denied, calm one-line note, one tap to voice or text, ti
   await cp.getByTestId("fallback-voice").click();
   await expect(cp).toHaveAttribute("data-mode", "voice");
   await expect(cp.getByTestId("device-choice")).toHaveCount(0);
+  await expect(cp.getByRole("button", { name: /start answering/i })).toBeFocused();
   await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
 });
 
