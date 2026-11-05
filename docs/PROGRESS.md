@@ -172,11 +172,11 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## M5. Polish and proof
 
-- [ ] E4.1 [H] Compare view (2 or 3 cards)
-- [ ] E7.1 [H] Funnel counts per challenge
-- [ ] E7.2 [H] Completion and shortlist rate by mode and accommodation
-- [ ] E7.3 [D+H] Opt-in demographics, four-fifths warning
-- [ ] E7.4 [H] Seed data: 200 fake candidates
+- [x] E4.1 [H] Compare view (2 or 3 cards): pick in the inbox, /recruiter/compare, order as picked, no score or ranking (lib/card/compare.test.ts, tests/e2e/compare.spec.ts)
+- [x] E7.1 [H] Funnel counts per challenge: table on /admin/impact (funnelByChallenge, lib/impact/fairness.test.ts, tests/e2e/fairness.spec.ts)
+- [x] E7.2 [H] Completion and shortlist rate by mode and accommodation (lib/impact/fairness.test.ts)
+- [x] E7.3 [D+H] Opt-in demographics, four-fifths warning; never on cards, inbox rows or evidence (lib/impact/fairness.test.ts)
+- [x] E7.4 [H] Seed data: 200 fake candidates, 3 employers, deterministic generator, synthetic names; loads from the inbox or /admin/impact (lib/impact/seed.ts)
 - [ ] C8.1 [D] Practice mode, nothing shared, deleted after 24 h
 - [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)

@@ -7,9 +7,11 @@ import { LevelBadge, skillName } from "@/components/card/CapabilityCard";
 import { Button } from "@/components/ui/button";
 import { buildExport, sendToAts, type GreenhousePayload } from "@/lib/ats/ats";
 import { type InboxFilter, type InboxRow, type InboxSort, type Level, type Status } from "@/lib/card/inbox";
+import { COMPARE_MAX, COMPARE_MIN } from "@/lib/card/compare";
 import { decide, inboxFor } from "@/lib/card/recruiter";
 import { listChallenges, updateSettings, type Challenge } from "@/lib/challenge/challenge";
 import { seedDemo } from "@/lib/demo/seed";
+import { seedImpactDemo } from "@/lib/impact/seed";
 import type { SkillSlug } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
 import { cn } from "@/lib/utils";
@@ -25,10 +27,13 @@ export function Inbox() {
   const [filter, setFilter] = useState<InboxFilter>({});
   const [sort, setSort] = useState<InboxSort>({ by: "date" });
   const [sel, setSel] = useState(0);
+  // E4.1: pick 2 or 3 cards to compare, in the order picked.
+  const [picked, setPicked] = useState<string[]>([]);
   const [toast, setToast] = useState<{ text: string; payload?: GreenhousePayload } | null>(null);
 
   useEffect(() => setChallenges(listChallenges(store()).filter((c) => c.status === "published")), [version]);
   const challengeId = params.get("challenge") ?? challenges?.[0]?.id;
+  useEffect(() => setPicked([]), [challengeId]);
   const challenge = challenges?.find((c) => c.id === challengeId);
 
   const rows: InboxRow[] = useMemo(() => {
@@ -85,6 +90,16 @@ export function Inbox() {
         >
           Load demo data
         </Button>
+        <Button
+          className="ml-3 mt-6"
+          variant="outline"
+          onClick={() => {
+            seedImpactDemo(store());
+            setVersion((v) => v + 1);
+          }}
+        >
+          Load 200 fictional candidates
+        </Button>
       </main>
     );
   }
@@ -111,14 +126,14 @@ export function Inbox() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 sm:px-10" data-testid="inbox">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0 max-w-full">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Recruiter inbox</p>
           <label htmlFor="challenge-pick" className="sr-only">Challenge</label>
           <select
             id="challenge-pick"
             value={challenge?.id}
             onChange={(e) => router.push(`/recruiter?challenge=${e.target.value}`)}
-            className="mt-2 min-h-11 max-w-full rounded-md border border-input bg-background px-3 font-display text-xl"
+            className="mt-2 min-h-11 w-full max-w-full truncate rounded-md border border-input bg-background px-3 font-display text-xl sm:w-auto"
           >
             {challenges.map((c) => (
               <option key={c.id} value={c.id}>
@@ -192,10 +207,25 @@ export function Inbox() {
         <p className="ml-auto text-xs text-muted-foreground">Keys: J/K move · Enter open · S shortlist</p>
       </fieldset>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+        <Button
+          size="sm"
+          disabled={picked.length < COMPARE_MIN || !challenge}
+          onClick={() => challenge && router.push(`/recruiter/compare?challenge=${challenge.id}&ids=${picked.join(",")}`)}
+          data-testid="compare-open"
+        >
+          Compare {picked.length ? `(${picked.length})` : ""}
+        </Button>
+        <span className="text-xs text-muted-foreground" aria-live="polite">
+          {picked.length < COMPARE_MIN ? `Pick ${COMPARE_MIN} or ${COMPARE_MAX} cards to compare side by side.` : `${picked.length} picked. No ranking, no overall score.`}
+        </span>
+      </div>
+
+      <div className="relative mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
         <table className="w-full min-w-[720px] text-left text-sm" aria-label="Candidates">
           <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
+              <th className="px-4 py-3 font-medium"><span className="sr-only">Compare</span></th>
               <th className="px-4 py-3 font-medium">Candidate</th>
               <th className="px-4 py-3 font-medium">Date</th>
               <th className="px-4 py-3 font-medium">Status</th>
@@ -214,6 +244,22 @@ export function Inbox() {
                 className={cn("border-b last:border-0", i === sel && "bg-accent/50", r.withdrawn && "text-muted-foreground")}
                 data-testid={`row-${r.attemptId}`}
               >
+                <td className="px-4 py-3">
+                  {!r.withdrawn && (
+                    <input
+                      type="checkbox"
+                      className="size-5"
+                      aria-label={`Compare ${r.displayName}`}
+                      checked={picked.includes(r.attemptId)}
+                      disabled={!picked.includes(r.attemptId) && picked.length >= COMPARE_MAX}
+                      onChange={(e) => {
+                        const on = e.target.checked;
+                        setPicked((p) => (on ? [...p, r.attemptId].slice(0, COMPARE_MAX) : p.filter((x) => x !== r.attemptId)));
+                      }}
+                      data-testid={`pick-${r.attemptId}`}
+                    />
+                  )}
+                </td>
                 <td className="px-4 py-3 font-medium">
                   <Link href={`/recruiter/card/${r.attemptId}?challenge=${challenge?.id}`} className="underline-offset-2 hover:underline">
                     {r.displayName}
@@ -258,7 +304,7 @@ export function Inbox() {
             ))}
             {!rows.length && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
+                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
                   No candidates match. Share the link {challenge ? `/c/${challenge.publicSlug}` : ""} or clear the filters.
                 </td>
               </tr>
