@@ -30,3 +30,6 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - Refresh mid-game on /game/launch-week (3 runs, one with a checkpoint open): Continue restores the clock and the same checkpoint question. OK.
 - Demo panel opens on every route incl. the game; reset, seed, role switch and every jump from `/` work.
 - demo-60s on the production build, 10 in a row: 10/10 green (24 to 28 s each).
+- Round 3 (new Maya card, production build with test hooks as CI builds it): demo-60s 10/10 green (12 to 21 s), forged-badge e2e 10/10.
+- Quick mode (night/game-flow 1b88ac5, production build): default length is quick; no order question, no recap modal, one checkpoint (the exact recovery-B question); refresh mid-checkpoint restores the clock and question exactly; results and card build with no console errors, consistency has no order note. Full week: refresh mid-checkpoint on Monday restores exactly.
+
