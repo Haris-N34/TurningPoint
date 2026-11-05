@@ -19,6 +19,8 @@ export type BusEvents = {
   pan: { npcs: string[] };
   /** React -> Phaser: freeze input (dialogue, checkpoint, pause). */
   freeze: { frozen: boolean };
+  /** React -> UI: a working day ended (Quick mode shows a short banner instead of the recap modal). */
+  dayDone: { day: number };
   /** Phaser -> React: assets loaded. */
   ready: undefined;
 };
