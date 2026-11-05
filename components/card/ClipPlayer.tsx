@@ -115,7 +115,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
           Reveal video
         </button>
       )}
-      <p className="max-h-32 overflow-y-auto text-sm leading-relaxed" tabIndex={0} aria-label="Transcript" data-testid="transcript-words">
+      <p className="text-sm leading-relaxed lg:max-h-[8.55rem] lg:overflow-y-auto" tabIndex={0} aria-label="Transcript" data-testid="transcript-words">
         {checkpoint.transcript.words.length
           ? checkpoint.transcript.words.map((w, i) => [
               i > 0 ? (marked.has(i) && marked.has(i - 1) ? <span key={`s${i}`} className="bg-accent">{" "}</span> : " ") : null,
