@@ -182,7 +182,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   useEffect(() => {
     const onVis = () => document.hidden && screen === "play" && setPaused(true);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && screen === "play" && !state?.dialogue && !(state?.checkpointsDue.length ?? 0)) setPaused(!useGame.getState().paused);
+      if (e.key === "Escape" && !e.defaultPrevented && screen === "play" && !state?.dialogue && !(state?.checkpointsDue.length ?? 0)) setPaused(!useGame.getState().paused);
     };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("keydown", onKey);
