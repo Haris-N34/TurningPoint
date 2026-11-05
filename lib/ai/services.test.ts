@@ -209,7 +209,7 @@ describe("services run through the provider", () => {
   it("each call is logged with its prompt id and version", () => {
     const calls: AiCall[] = [];
     runSync(variantsPrompt, fixturesOf(variantsPrompt)[0].input as never, { provider: new LocalProvider(), log: (c) => calls.push(c) });
-    expect(calls[0]).toMatchObject({ promptId: "dialogue-variants", promptVersion: "1.0.0", service: "Dialogue Variants", valid: true });
+    expect(calls[0]).toMatchObject({ promptId: "dialogue-variants", promptVersion: "1.0.1", service: "Dialogue Variants", valid: true });
   });
   it("the fixture card parses", () => {
     expect(CardSchema.safeParse(attempt).success).toBe(true);

@@ -1,1 +1,957 @@
-{}
+{
+ "candidate-coach@1.0.0:5704f3f2155e8fdf": {
+  "output": {
+   "strengths": [
+    "You said why you made the call.",
+    "You named what you gave up.",
+    "You thought about who it affected."
+   ],
+   "tips": []
+  },
+  "model": "local-rules"
+ },
+ "candidate-coach@1.0.0:9c866f8688ed3983": {
+  "output": {
+   "strengths": [],
+   "tips": [
+    "Add the reason: 'I did X because Y.'",
+    "Name what you gave up: 'instead of…' or 'rather than…'.",
+    "Say who the decision affected and how."
+   ]
+  },
+  "model": "local-rules"
+ },
+ "checkpoint-question@1.0.0:884b9100a8100c16": {
+  "output": {
+   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
+   "source": "generated"
+  },
+  "model": "local-rules"
+ },
+ "checkpoint-question@1.0.0:89e8023db197c554": {
+  "output": {
+   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "source": "generated"
+  },
+  "model": "local-rules"
+ },
+ "consistency-checker@1.0.0:58bbc5cf17539faf": {
+  "output": {
+   "items": [
+    {
+     "kind": "order",
+     "said": "Said they'd go to the vendor deposit first",
+     "did": "Went to the vendor deposit first",
+     "consistent": true
+    },
+    {
+     "kind": "explanation",
+     "said": "I went with the cheaper venue because the deposit was due Friday.",
+     "did": "Picked B: Book the cheaper venue",
+     "consistent": true
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "consistency-checker@1.0.0:6043d4a467f5aeaf": {
+  "output": {
+   "items": [
+    {
+     "kind": "order",
+     "said": "Said they'd go to the sponsor call first",
+     "did": "Went to the broken stall first instead",
+     "consistent": false
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "dialogue-variants@1.0.1:9637040b7e314866": {
+  "output": {
+   "variants": [
+    {
+     "key": "n-roles:0",
+     "texts": [
+      "Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks.",
+      "Two volunteers want to run social media. Nobody wants logistics, and that is where Saturday breaks.",
+      "Quick one. Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks."
+     ]
+    },
+    {
+     "key": "n-vendor-mix:0",
+     "texts": [
+      "We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
+      "Hey. We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
+      "Listen. We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours."
+     ]
+    },
+    {
+     "key": "n-permit:0",
+     "texts": [
+      "The food permit form isn't filed. The city office closes early tomorrow.",
+      "The food permit form is not filed. The city office closes early tomorrow.",
+      "Right. The food permit form isn't filed. The city office closes early tomorrow."
+     ]
+    },
+    {
+     "key": "n-logo:0",
+     "texts": [
+      "Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
+      "Heads up. Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
+      "Quick one. Our board wants the logo on every table, banner and bag. That was the spirit of the deal."
+     ]
+    },
+    {
+     "key": "n-schedule:0",
+     "texts": [
+      "Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
+      "Look. Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
+      "Quick one. Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up."
+     ]
+    },
+    {
+     "key": "n-vendor-cut:0",
+     "texts": [
+      "I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
+      "I will do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
+      "Listen. I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it."
+     ]
+    },
+    {
+     "key": "n-signups:0",
+     "texts": [
+      "Only twelve families have signed up. Last year's market had sixty by now.",
+      "Alright. Only twelve families have signed up. Last year's market had sixty by now.",
+      "Right. Only twelve families have signed up. Last year's market had sixty by now."
+     ]
+    },
+    {
+     "key": "n-fridge:0",
+     "texts": [
+      "The fridge rental fell through. Without cold storage, half the food can't be sold.",
+      "The fridge rental fell through. Without cold storage, half the food cannot be sold.",
+      "Right. The fridge rental fell through. Without cold storage, half the food can't be sold."
+     ]
+    },
+    {
+     "key": "n-recovery:0",
+     "texts": [
+      "The sponsor money is gone. The plan on the screen doesn't add up any more.",
+      "The sponsor money is gone. The plan on the screen does not add up any more.",
+      "Quick one. The sponsor money is gone. The plan on the screen doesn't add up any more."
+     ]
+    },
+    {
+     "key": "n-shaken:0",
+     "texts": [
+      "The group chat went quiet after the news. Two people asked if it's even happening.",
+      "The group chat went quiet after the news. Two people asked if it is even happening.",
+      "Quick one. The group chat went quiet after the news. Two people asked if it's even happening."
+     ]
+    },
+    {
+     "key": "n-vendors-worried:0",
+     "texts": [
+      "Is the market still on? I've ordered flour for two days.",
+      "Is the market still on? I have ordered flour for two days.",
+      "Listen. Is the market still on? I've ordered flour for two days."
+     ]
+    },
+    {
+     "key": "n-new-partner:0",
+     "texts": [
+      "The credit union down the street might put in $800, if we pitch it this afternoon.",
+      "Alright. The credit union down the street might put in $800, if we pitch it this afternoon.",
+      "Right. The credit union down the street might put in $800, if we pitch it this afternoon."
+     ]
+    },
+    {
+     "key": "n-feedback:0",
+     "texts": [
+      "Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it.",
+      "Honestly? The plan is all vendors and no community. The families we serve will not see themselves in it.",
+      "Right. Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it."
+     ]
+    },
+    {
+     "key": "n-supplies:0",
+     "texts": [
+      "After the cuts we're short eight tables and two tents.",
+      "After the cuts we are short eight tables and two tents.",
+      "Right. After the cuts we're short eight tables and two tents."
+     ]
+    },
+    {
+     "key": "n-weather:0",
+     "texts": [
+      "Rain is forecast for Saturday morning. Forty percent.",
+      "Look. Rain is forecast for Saturday morning. Forty percent.",
+      "Quick one. Rain is forecast for Saturday morning. Forty percent."
+     ]
+    },
+    {
+     "key": "n-dropout:0",
+     "texts": [
+      "I'm sorry. My supplier fell through and I can't come tomorrow.",
+      "I am sorry. My supplier fell through and I cannot come tomorrow.",
+      "Listen. I'm sorry. My supplier fell through and I can't come tomorrow."
+     ]
+    },
+    {
+     "key": "n-permit-fine:0",
+     "texts": [
+      "The city called. Without the permit we get fined, or shut down Saturday.",
+      "Heads up. The city called. Without the permit we get fined, or shut down Saturday.",
+      "Right. The city called. Without the permit we get fined, or shut down Saturday."
+     ]
+    },
+    {
+     "key": "n-kenji-leaves:0",
+     "texts": [
+      "I'm packing up. I'll do the food festival instead.",
+      "I am packing up. I will do the food festival instead.",
+      "Listen. I'm packing up. I'll do the food festival instead."
+     ]
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "dialogue-variants@1.0.1:9defff0ef0c2b3ca": {
+  "output": {
+   "variants": [
+    {
+     "key": "n1:0",
+     "texts": [
+      "We're $400 short and the hall wants it by Friday.",
+      "We are $400 short and the hall wants it by Friday.",
+      "Okay. We're $400 short and the hall wants it by Friday."
+     ]
+    },
+    {
+     "key": "n1:1",
+     "texts": [
+      "Can you talk to the vendors before noon?",
+      "Heads up. Can you talk to the vendors before noon?",
+      "Right. Can you talk to the vendors before noon?"
+     ]
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "evidence-scanner@1.0.0+0.2.0:8a277183690d9e87": {
+  "output": {
+   "evidence": [
+    {
+     "skill": "prioritization",
+     "level": "not_observed"
+    },
+    {
+     "skill": "collaboration",
+     "level": "not_observed"
+    },
+    {
+     "skill": "analytical",
+     "level": "not_observed"
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "evidence-scanner@1.0.0+0.2.0:a4b72d16d4ba74f1": {
+  "output": {
+   "evidence": [
+    {
+     "skill": "prioritization",
+     "level": "strong",
+     "sentence": "Names the trade-off, says why, and considers who it affects.",
+     "source": {
+      "type": "clip",
+      "checkpointId": "cp1",
+      "quote": "I cut the second weekend instead of the vendor spots, because the vendors had already paid for stock and the team agreed.",
+      "startS": 0,
+      "endS": 15.64
+     }
+    },
+    {
+     "skill": "communication",
+     "level": "strong",
+     "sentence": "Names the trade-off, says why, and considers who it affects.",
+     "source": {
+      "type": "clip",
+      "checkpointId": "cp1",
+      "quote": "I told everyone the same day.",
+      "startS": 15.71,
+      "endS": 19.93
+     }
+    },
+    {
+     "skill": "curiosity",
+     "level": "not_observed"
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "follow-up-question@1.0.0:4beb824837aadfe0": {
+  "output": {
+   "question": "You said \"last spring our community garden lost its water access\". How did you tell the people it affected?",
+   "source": "generated"
+  },
+  "model": "local-rules"
+ },
+ "follow-up-question@1.0.0:75992275f3efb265": {
+  "output": {
+   "question": "What was the hardest part to tell your team?",
+   "source": "fallback"
+  },
+  "model": "local-rules"
+ },
+ "recruiter-copilot@1.0.0:44d1b918bfc1cb67": {
+  "output": {
+   "answer": "Checkpoint 2, at 0:07: “The vendors were the reason people came, and some of them had already paid for stock.”",
+   "citations": [
+    {
+     "kind": "transcript",
+     "label": "Checkpoint 2 · 0:07",
+     "checkpointId": "cp2",
+     "quote": "The vendors were the reason people came, and some of them had already paid for stock.",
+     "t": 7.79
+    }
+   ],
+   "refused": null
+  },
+  "model": "local-rules"
+ },
+ "recruiter-copilot@1.0.0:f9ac00a13b9d472d": {
+  "output": {
+   "answer": "Prioritization: Strong. Checkpoint 2, at 0:02: “I cut the second weekend instead of cutting vendor spots.”",
+   "citations": [
+    {
+     "kind": "evidence",
+     "label": "Checkpoint 2 · 0:02",
+     "checkpointId": "cp2",
+     "quote": "I cut the second weekend instead of cutting vendor spots.",
+     "t": 2.77,
+     "skill": "prioritization"
+    }
+   ],
+   "refused": null
+  },
+  "model": "local-rules"
+ },
+ "scenario-tailor@1.0.0:fad725403db20430": {
+  "output": {
+   "id": "launch-week",
+   "version": 1,
+   "title": "Launch Week",
+   "summary": "Lead a student energy fair with a community utility. Build a plan, recover when it breaks, and explain what you protect.",
+   "industryFlavour": "energy",
+   "targetSkills": [
+    "adaptability",
+    "prioritization",
+    "collaboration",
+    "resilience"
+   ],
+   "start": "n1",
+   "resources": {
+    "budget": {
+     "label": "Budget",
+     "start": 5000,
+     "min": 0,
+     "unit": "$"
+    },
+    "morale": {
+     "label": "Team morale",
+     "start": 70,
+     "min": 0,
+     "max": 100
+    },
+    "time": {
+     "label": "Days left",
+     "start": 21,
+     "min": 0
+    }
+   },
+   "variation": {
+    "teamSize": [
+     6,
+     10
+    ]
+   },
+   "disruptions": [
+    {
+     "id": "sponsor-pulls-out",
+     "title": "The main sponsor pulls out",
+     "text": "Monday, 7 a.m. The sponsor freezes its community funding. The $3,000 instalment in your $5,000 opening grant is gone. The utility cannot cover it, and suppliers need confirmation by noon. Your commitments still stand until you renegotiate them.",
+     "effects": {
+      "budget": -3000
+     },
+     "next": "n9"
+    },
+    {
+     "id": "venue-cancels",
+     "title": "The venue cancels",
+     "text": "Monday, 7 a.m. A burst pipe closes the field office. A smaller accessible courtyard is available, but moving permits, refrigeration and signs will consume five days. Suppliers need an answer by noon. You cannot promise the old layout.",
+     "effects": {
+      "time": -5,
+      "budget": -500
+     },
+     "next": "n9"
+    },
+    {
+     "id": "lead-volunteer-quits",
+     "title": "Your lead volunteer leaves",
+     "text": "Monday, 7 a.m. Your logistics lead must leave to care for a family member. Their supplier contacts are in a shared folder, but nobody else has rehearsed deliveries. Two volunteers say they cannot take on more hours. You have until noon to revise responsibilities.",
+     "effects": {
+      "morale": -35,
+      "time": -2
+     },
+     "next": "n9"
+    }
+   ],
+   "disruptionPool": [
+    "sponsor-pulls-out",
+    "venue-cancels",
+    "lead-volunteer-quits"
+   ],
+   "estimatedMinutes": 15,
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Three weeks before opening, you lead {teamSize} students planning a community energy fair with the fictional Neighbour Table utility. The goal is affordable food and a fair opportunity for small suppliers, not maximum attendance. Your opening grant is $5,000. Leena, the community lead, asks for a plan that volunteers can actually deliver. Read each situation, weigh the trade-offs, and choose your next move. There is no perfect route.",
+     "art": {
+      "key": "market-plan",
+      "alt": "Students and a community coordinator plan a energy fair around a table."
+     },
+     "type": "scene",
+     "next": "n2"
+    },
+    {
+     "id": "n2",
+     "text": "Your opening budget must cover supplier access, refrigeration, signs and promotion. The hall is donated. Small solar installers need fee support; established trucks bring their own equipment but charge more. Which opening commitment will you make?",
+     "art": {
+      "key": "vendor-stalls",
+      "alt": "Produce stalls and crates line a wide aisle inside a field office."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Reserve $600 for small-supplier access and simple promotion",
+       "effects": {
+        "budget": -600,
+        "morale": 5,
+        "time": -1
+       },
+       "next": "n3"
+      },
+      {
+       "id": "b",
+       "label": "Spend $1,000 on established trucks and wider promotion",
+       "effects": {
+        "budget": -1000,
+        "time": -1
+       },
+       "next": "n3"
+      },
+      {
+       "id": "c",
+       "label": "Keep $300 for basic signs and recruit suppliers yourself",
+       "effects": {
+        "budget": -300,
+        "time": -2
+       },
+       "next": "n3"
+      }
+     ],
+     "checkpointEligible": false,
+     "skillSignals": [
+      "prioritization"
+     ]
+    },
+    {
+     "id": "n3",
+     "text": "Two volunteers want site safety briefings. Nobody volunteers for delivery logistics. One student has only evenings free; another has never handled food storage. Leena needs named contacts tomorrow. How do you divide the work without assuming everyone has the same availability?",
+     "art": {
+      "key": "team-roles",
+      "alt": "Students divide tasks around a fair planning table."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Assign roles and publish a simple delivery checklist",
+       "effects": {
+        "morale": -5,
+        "time": -1
+       },
+       "next": "n4"
+      },
+      {
+       "id": "b",
+       "label": "Ask availability, then pair volunteers on logistics",
+       "effects": {
+        "morale": 8,
+        "time": -2
+       },
+       "next": "n4"
+      },
+      {
+       "id": "c",
+       "label": "Take logistics yourself and keep the team on outreach",
+       "effects": {
+        "morale": 4,
+        "time": -3
+       },
+       "next": "n4"
+      }
+     ],
+     "checkpointEligible": true,
+     "skillSignals": [
+      "collaboration",
+      "prioritization"
+     ],
+     "fallbackQuestion": "What did your approach to the logistics gap protect, and whose workload did it increase?"
+    },
+    {
+     "id": "n4",
+     "text": "The plan is on one shared page. Supplier access and safe food storage are essentials; decorations and a second promotional push can wait. Leena asks each workstream to name an owner and a backup. The budget and days-left meters show the consequences of your commitments. A reserve buys flexibility, but leaving every decision open also costs time. Your next update must tell partners what is confirmed and what is still uncertain.",
+     "art": {
+      "key": "budget-table",
+      "alt": "A calculator, coins and a blank notebook sit beside a produce crate."
+     },
+     "type": "scene",
+     "next": "n5"
+    },
+    {
+     "id": "n5",
+     "text": "A required laboratory session clashes with the only delivery rehearsal. Half the students cannot attend. The supplier can offer a separate briefing for a fee, or you can rehearse with a smaller group. Opening is still two weeks away.",
+     "art": {
+      "key": "schedule-clash",
+      "alt": "Students compare calendars outside a field office."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Pay $200 for a second supplier briefing",
+       "effects": {
+        "budget": -200,
+        "time": -1
+       },
+       "next": "n6"
+      },
+      {
+       "id": "b",
+       "label": "Train two backups and share a delivery checklist",
+       "effects": {
+        "time": -2,
+        "morale": 5
+       },
+       "next": "n6"
+      },
+      {
+       "id": "c",
+       "label": "Move the whole rehearsal to the weekend",
+       "effects": {
+        "time": -2,
+        "morale": -5
+       },
+       "next": "n6"
+      }
+     ],
+     "checkpointEligible": false,
+     "skillSignals": [
+      "problem-solving",
+      "collaboration"
+     ]
+    },
+    {
+     "id": "n6",
+     "text": "A popular supplier asks for a larger share of stall space and a reduced fee. They say their following will draw visitors. Two smaller suppliers would lose their places. Your agreement promised fair access, but sign-ups are below plan. What will you offer?",
+     "art": {
+      "key": "vendor-talk",
+      "alt": "An organiser and suppliers discuss stall space across a fair counter."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Keep equal stall space and explain the access promise",
+       "effects": {
+        "morale": 5,
+        "time": -1
+       },
+       "next": "n7"
+      },
+      {
+       "id": "b",
+       "label": "Offer a larger stall in exchange for subsidised meals",
+       "effects": {
+        "budget": -200,
+        "time": -1
+       },
+       "next": "n7"
+      },
+      {
+       "id": "c",
+       "label": "Split the stall across two shifts to keep every supplier",
+       "effects": {
+        "time": -2,
+        "morale": -3
+       },
+       "next": "n7"
+      }
+     ],
+     "checkpointEligible": true,
+     "skillSignals": [
+      "communication",
+      "prioritization"
+     ],
+     "fallbackQuestion": "Which trade-off in the supplier agreement mattered most, and how would you explain it to the smaller suppliers?"
+    },
+    {
+     "id": "n7",
+     "text": "Week-one registrations are half your estimate. A community partner says the online form is difficult on a phone; students say people may simply arrive without booking. You can afford one more outreach effort before confirming supplies.",
+     "art": {
+      "key": "outreach",
+      "alt": "A volunteer helps a resident at an information desk."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Phone community partners and offer assisted sign-up",
+       "effects": {
+        "time": -2,
+        "morale": 5
+       },
+       "next": "n8"
+      },
+      {
+       "id": "b",
+       "label": "Buy $300 of targeted local promotion",
+       "effects": {
+        "budget": -300,
+        "time": -1
+       },
+       "next": "n8"
+      },
+      {
+       "id": "c",
+       "label": "Reduce the first food order and accept walk-ins",
+       "effects": {
+        "budget": 100,
+        "morale": -3,
+        "time": -1
+       },
+       "next": "n8"
+      }
+     ],
+     "checkpointEligible": false,
+     "skillSignals": [
+      "problem-solving",
+      "empathy"
+     ]
+    },
+    {
+     "id": "n8",
+     "text": "The plan breaks. Your next decision must account for the new constraint.",
+     "art": {
+      "key": "plan-breaks",
+      "alt": "Two students pause beside folded fair tables after an unexpected update."
+     },
+     "type": "event",
+     "turningPoint": true,
+     "effects": {}
+    },
+    {
+     "id": "n9",
+     "text": "You have read the disruption. The noon update cannot promise the original plan unchanged. Leena asks for one workable opening and a clear statement of what you are dropping. Which scope change gives you room to recover?",
+     "art": {
+      "key": "recovery-plan",
+      "alt": "A team rearranges a smaller fair layout with a clear central path."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Run one compact fair day and release optional bookings",
+       "effects": {
+        "budget": 400,
+        "time": 2,
+        "morale": -5
+       },
+       "next": "n10"
+      },
+      {
+       "id": "b",
+       "label": "Keep both dates but remove paid promotion and decoration",
+       "effects": {
+        "budget": 300,
+        "time": -1
+       },
+       "next": "n10"
+      },
+      {
+       "id": "c",
+       "label": "Delay opening two days to rebuild the plan with partners",
+       "effects": {
+        "time": -2,
+        "morale": 5
+       },
+       "next": "n10"
+      }
+     ],
+     "checkpointEligible": true,
+     "skillSignals": [
+      "adaptability",
+      "resilience"
+     ],
+     "fallbackQuestion": "What did you stop doing after the disruption, and what risk remains in your revised plan?"
+    },
+    {
+     "id": "n10",
+     "text": "A neighbourhood cooperative can contribute $700, lend equipment and connect you with volunteers. In exchange, it wants a prominent stall and a decision today. You have not checked its food-handling capacity. Another partner can offer a smaller equipment loan with no cash.",
+     "art": {
+      "key": "new-partner",
+      "alt": "A community partner lends a trolley and crates to an organiser."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Accept $700 conditional on a safety check and written roles",
+       "effects": {
+        "budget": 700,
+        "time": -2
+       },
+       "next": "n11"
+      },
+      {
+       "id": "b",
+       "label": "Take the equipment-only loan and keep the supplier layout",
+       "effects": {
+        "budget": 200,
+        "time": -1
+       },
+       "next": "n11"
+      },
+      {
+       "id": "c",
+       "label": "Ask existing suppliers to share equipment before adding a partner",
+       "effects": {
+        "time": -2,
+        "morale": 5
+       },
+       "next": "n11"
+      }
+     ],
+     "checkpointEligible": true,
+     "skillSignals": [
+      "creativity",
+      "ambiguity"
+     ],
+     "fallbackQuestion": "What uncertainty did you accept in your partner decision, and what would make you change course?"
+    },
+    {
+     "id": "n11",
+     "text": "The group chat fills with questions. A volunteer says the earlier plan wasted their time. Others ask whether they should cancel their shifts. Leena wants a factual update before rumours reach suppliers. How will you rebuild a shared picture?",
+     "art": {
+      "key": "team-briefing",
+      "alt": "Volunteers gather around an organiser holding the revised plan."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Hold a short briefing, name the changes and invite concerns",
+       "effects": {
+        "time": -1,
+        "morale": 10
+       },
+       "next": "n12"
+      },
+      {
+       "id": "b",
+       "label": "Send revised roles with a private route for availability concerns",
+       "effects": {
+        "time": -1,
+        "morale": 5
+       },
+       "next": "n12"
+      },
+      {
+       "id": "c",
+       "label": "Speak to each workstream lead before sending the whole update",
+       "effects": {
+        "time": -2,
+        "morale": 8
+       },
+       "next": "n12"
+      }
+     ],
+     "checkpointEligible": false,
+     "skillSignals": [
+      "communication",
+      "collaboration"
+     ]
+    },
+    {
+     "id": "n12",
+     "text": "The final budget review leaves three competing needs: an accessible booking line layout, a small supplier travel allowance, and an extra promotional push. Basic food safety is already protected. You cannot fully fund all three. Leena asks what you will protect and what you will tell the people losing support.",
+     "art": {
+      "key": "market-day",
+      "alt": "Volunteers guide visitors through a community energy fair."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Protect access and reduce promotion, explaining the smaller reach",
+       "effects": {
+        "budget": -200,
+        "morale": 5
+       },
+       "next": "n13"
+      },
+      {
+       "id": "b",
+       "label": "Protect supplier travel and use volunteers for booking line support",
+       "effects": {
+        "budget": -250,
+        "time": -1
+       },
+       "next": "n13"
+      },
+      {
+       "id": "c",
+       "label": "Split the funds and tell partners which gaps need monitoring",
+       "effects": {
+        "budget": -300,
+        "time": -1,
+        "morale": -3
+       },
+       "next": "n13"
+      }
+     ],
+     "checkpointEligible": true,
+     "skillSignals": [
+      "prioritization",
+      "empathy"
+     ],
+     "fallbackQuestion": "Who benefits from the need you protected, and how would you handle the gap left for others?"
+    },
+    {
+     "id": "n13",
+     "text": "Fair day happens with your revised plan. Volunteers report that people found affordable meals, but the booking line was confusing and one supplier felt uninformed about the changes. At the debrief, Leena says: “You kept it going. Next time, tell partners earlier what they are losing.” You do not yet have reliable attendance or surplus figures. What do you do with that feedback?",
+     "art": {
+      "key": "debrief",
+      "alt": "An organiser, coordinator and supplier discuss the day beside folded stalls."
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "label": "Ask the supplier for a specific example and agree one change",
+       "effects": {
+        "time": -1,
+        "morale": 5
+       },
+       "next": "n14"
+      },
+      {
+       "id": "b",
+       "label": "Review the update timeline with Leena and assign a new owner",
+       "effects": {
+        "time": -1,
+        "morale": 3
+       },
+       "next": "n14"
+      },
+      {
+       "id": "c",
+       "label": "Explain the constraints, then ask what information was missing",
+       "effects": {
+        "time": -1,
+        "morale": 2
+       },
+       "next": "n14"
+      }
+     ],
+     "checkpointEligible": false,
+     "skillSignals": [
+      "feedback",
+      "empathy"
+     ]
+    },
+    {
+     "id": "n14",
+     "text": "When have you faced something like this in real life? What broke, what did you decide, and what changed? A class project, community role, paid work or caring responsibility can all be relevant. Describe your own contribution and a specific trade-off.",
+     "art": {
+      "key": "debrief",
+      "alt": "An organiser, coordinator and supplier discuss the day beside folded stalls."
+     },
+     "type": "checkpoint",
+     "kind": "real_life",
+     "next": "n15"
+    },
+    {
+     "id": "n15",
+     "text": "Launch Week is complete. Your remaining resources show the consequences of the choices you made, not a hiring score. Your decision path and explanations are evidence for a person to review. There is no single winning route.",
+     "art": {
+      "key": "debrief",
+      "alt": "An organiser, coordinator and supplier discuss the day beside folded stalls."
+     },
+     "type": "end"
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "value-mapper@1.0.0:0f5016e1d2b3b918": {
+  "output": {
+   "mappings": [
+    {
+     "term": "Synergy",
+     "skill": null,
+     "confidence": 0,
+     "why": "No close match in the framework. Pick one or reject.",
+     "alternatives": []
+    }
+   ]
+  },
+  "model": "local-rules"
+ },
+ "value-mapper@1.0.0:3f6b85e6c3ce508a": {
+  "output": {
+   "mappings": [
+    {
+     "term": "Communicate tech and business",
+     "skill": "communication",
+     "confidence": 0.9,
+     "why": "\"communicat\" is a signal for Communication.",
+     "alternatives": []
+    },
+    {
+     "term": "Analytical thinking",
+     "skill": "analytical",
+     "confidence": 0.95,
+     "why": "Same name as \"Analytical thinking\" in the framework.",
+     "alternatives": []
+    },
+    {
+     "term": "Make new discoveries",
+     "skill": "curiosity",
+     "confidence": 0.8,
+     "why": "\"discover\" is a signal for Curiosity and discovery.",
+     "alternatives": []
+    }
+   ]
+  },
+  "model": "local-rules"
+ }
+}

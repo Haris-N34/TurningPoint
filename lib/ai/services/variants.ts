@@ -38,7 +38,7 @@ function toggleContractions(text: string): string {
 }
 
 const OPENERS = ["Okay.", "Right.", "Listen.", "Quick one."];
-const ALT_OPENERS = ["So,", "Look,", "Hey,", "Alright,"];
+const ALT_OPENERS = ["Look.", "Heads up.", "Hey.", "Alright."];
 
 export function localVariants(line: VariantLine): string[] {
   const h = hashSeed(line.who);
@@ -53,7 +53,7 @@ const facts = (s: string) => (s.match(/\$?\d[\d,.]*%?/g) ?? []).map((x) => x.rep
 
 export const variantsPrompt: PromptDef<VariantsInput, VariantsOutput> = {
   id: "dialogue-variants",
-  version: "1.0.0",
+  version: "1.0.1",
   service: "Dialogue Variants",
   tier: "fast",
   system: [

@@ -91,3 +91,21 @@ test("B.8 AI health shows calls, latency, cost and validation failures", async (
   }
   await expect(page.getByTestId("ai-row-all-services")).toBeVisible();
 });
+
+test("B.9 the demo makes no request to a model provider", async ({ page }) => {
+  const external: string[] = [];
+  await page.route(/anthropic\.com|openai\.com|googleapis\.com\/v1beta/, (r) => {
+    external.push(r.request().url());
+    return r.abort();
+  });
+  await seed(page);
+  await page.goto(CARD);
+  await page.getByTestId("copilot-open").click();
+  await page.getByTestId("copilot-q").fill("Where did they show prioritization?");
+  await page.getByTestId("copilot-ask").click();
+  await expect(page.getByTestId("copilot-answer")).toHaveAttribute("data-refused", "no");
+  await page.goto("/admin/ai-health");
+  await page.getByTestId("ai-selfcheck").click();
+  await expect(page.getByTestId("ai-row-all-services")).toBeVisible();
+  expect(external).toEqual([]);
+});
