@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
 import type { Card } from "@/lib/card/types";
@@ -17,12 +18,17 @@ export function Results({ attemptId }: { attemptId: string }) {
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-6 py-6 sm:px-10" data-testid="results">
       <p className="rounded-lg bg-muted px-4 py-2 text-sm text-muted-foreground">
-        This is exactly what an employer sees. With anonymous review on, they see your candidate ID until they shortlist you.
+        This is exactly what an employer sees. With anonymous review on, they see your candidate ID until they shortlist you. Employers also see a Final
+        score that only sorts their list, weighted by the skills they care about.{" "}
+        <Link href="/how-scores-work" className="underline underline-offset-2">
+          How scores work
+        </Link>
       </p>
       <CapabilityCard
         card={card}
         identity={{ displayName: card.candidate.displayName || card.anonId, university: card.candidate.university, anonymous: false }}
         hiddenClipIds={card.checkpoints.filter((c) => c.hidden).map((c) => c.id)}
+        showFinalScore={false}
       />
       <CandidateActions card={card} onChange={setCard} />
     </main>

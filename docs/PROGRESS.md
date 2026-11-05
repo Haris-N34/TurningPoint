@@ -165,10 +165,10 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] C.9 [D] Open Badges 3.0 export plus /verify; a tampered file fails verification (test)
 - [ ] C.10 [D] Integration console shows the live webhook log and can re-send a failed delivery
 - [ ] C.11 [D] Second Look works end to end from a mock ATS rejection; rescued count on analytics
-- [ ] D.1 [D] Unit tests: formula, low confidence, no-resume candidates, 40% resume cap, employer weights
-- [ ] D.2 [D] No setting or query hides or rejects candidates by score (test asserts no threshold exists)
-- [ ] D.3 [D] "How scores work" page renders the live config and version
-- [ ] D.4 [D] Final score box top right with breakdown on hover; card leads with evidence
+- [x] D.1 [D] Unit tests: formula, low confidence, no-resume candidates, 40% resume cap, employer weights
+- [x] D.2 [D] No setting or query hides or rejects candidates by score (test asserts no threshold exists)
+- [x] D.3 [D] "How scores work" page renders the live config and version
+- [x] D.4 [D] Final score box top right with breakdown on hover; card leads with evidence
 
 ## M5. Polish and proof
 
