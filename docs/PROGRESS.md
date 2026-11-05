@@ -50,7 +50,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] A.5 [D+H] Dialogue: portraits with expressions, typewriter text with skip and blip, A to D buttons with arrow keys, NPC emote reactions, sound
 - [x] A.6 [D] Juice: floating numbers, tweened bars, shake, particles and sound on every resource change
 - [x] A.7 [D] Choice-triggered video fires on explainOnPick options and quotes the option picked; cap 4 per run; seeded still guarantee 2
-- [ ] A.8 [D] "The Client Pivot" fully playable: own map, NPCs, data mini-view, hidden discoveries, KPIs
+- [x] A.8 [D] "The Client Pivot" fully playable: own map, NPCs, data mini-view, hidden discoveries, KPIs (lib/game/clientPivot.test.ts, tests/e2e/client-pivot.spec.ts)
 - [ ] A.9 [D] Map loads from Tiled JSON; walk with keys, click and tap; camera follows
 - [x] A.10 [D] NPCs show urgency bubbles (icon + label, not colour only); talking opens a React dialogue driven by scenario nodes
 - [x] A.11 [D] Clock advances by action costs and drift, pauses in dialogue, checkpoints, pause menu and on blur; shows day, time and progress ring

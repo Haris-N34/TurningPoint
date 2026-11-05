@@ -53,6 +53,8 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
   const [attemptId, setAttemptId] = useState("");
   const [ready, setReady] = useState(false);
   const [reaction, setReaction] = useState<Reaction | null>(null);
+  // The last reaction stays readable after the 1.5 s popup closes (tests, screen readers via the log).
+  const [lastReaction, setLastReaction] = useState<string>("");
   const [answers, setAnswers] = useState<CardCheckpoint[]>([]);
   const [integrity, setIntegrity] = useState<IntegrityNote[]>([]);
   const [phase, setPhase] = useState<"game" | "real-life">("game");
@@ -246,6 +248,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
     if (opt.reaction) {
       bus.emit("emote", { npc: issue.npc, emote: opt.reaction.emote });
       setReaction({ npc: node.npc, expression: opt.reaction.expression, line: opt.reaction.line });
+      setLastReaction(`${node.npc}:${opt.reaction.expression}`);
       setTimeout(() => setReaction(null), settings.reducedMotion ? 600 : 1500);
     }
     if (opt.effects.budget && opt.effects.budget < -400) bus.emit("shake", { intensity: 0.004 });
@@ -321,7 +324,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
   const node = state?.dialogue ? scenario.nodes.find((n) => n.id === state.dialogue!.node) : undefined;
 
   return (
-    <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"}>
+    <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"} data-last-reaction={lastReaction}>
       {(screen === "title" || screen === "avatar") && <MapCanvas scenario={scenario} avatar={avatar.look} attract label="The market at Launch Week, seen from above" />}
       {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}

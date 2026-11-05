@@ -1,0 +1,1792 @@
+{
+  "id": "client-pivot",
+  "version": 1,
+  "title": "The Client Pivot",
+  "summary": "You're a junior analyst at a small tech consultancy. Five days to recommend an inventory system to a regional grocery chain. Midweek, the client's CFO cuts the budget in half.",
+  "role": "Junior analyst",
+  "industryFlavour": "tech",
+  "targetSkills": [
+    "communication",
+    "analytical",
+    "curiosity",
+    "adaptability"
+  ],
+  "estimatedMinutes": 14,
+  "map": {
+    "tiled": "/maps/client-pivot.json",
+    "width": 40,
+    "height": 30,
+    "start": "desk"
+  },
+  "resources": {
+    "budget": {
+      "label": "Project budget",
+      "start": 40000,
+      "unit": "$"
+    },
+    "morale": {
+      "label": "Team morale",
+      "start": 70
+    }
+  },
+  "stakeholders": [
+    {
+      "id": "cfo",
+      "label": "Client CFO",
+      "start": 50
+    },
+    {
+      "id": "manager",
+      "label": "Store manager",
+      "start": 50
+    },
+    {
+      "id": "firm",
+      "label": "Your partner",
+      "start": 60
+    }
+  ],
+  "zones": [
+    {
+      "id": "bus-stop",
+      "name": "Bus Stop",
+      "x": 17,
+      "y": 1,
+      "w": 6,
+      "h": 3
+    },
+    {
+      "id": "pod",
+      "name": "Team Pod",
+      "x": 3,
+      "y": 4,
+      "w": 9,
+      "h": 6
+    },
+    {
+      "id": "partner-office",
+      "name": "Partner's Office",
+      "x": 26,
+      "y": 4,
+      "w": 12,
+      "h": 6
+    },
+    {
+      "id": "desk",
+      "name": "Your Desk",
+      "x": 16,
+      "y": 12,
+      "w": 8,
+      "h": 5
+    },
+    {
+      "id": "whiteboard",
+      "name": "Whiteboard Room",
+      "x": 3,
+      "y": 19,
+      "w": 8,
+      "h": 6
+    },
+    {
+      "id": "cafe",
+      "name": "Caf\u00e9",
+      "x": 28,
+      "y": 19,
+      "w": 9,
+      "h": 6
+    },
+    {
+      "id": "client",
+      "name": "Client Site (by bus)",
+      "x": 14,
+      "y": 23,
+      "w": 12,
+      "h": 6,
+      "remote": true
+    }
+  ],
+  "npcs": [
+    {
+      "id": "dev",
+      "name": "Tomi",
+      "role": "Developer",
+      "zone": "pod",
+      "tile": {
+        "x": 6,
+        "y": 7
+      },
+      "portrait": "developer",
+      "look": {
+        "skin": "#6b4430",
+        "hair": "#2a1d18",
+        "hairStyle": "curly",
+        "outfit": "#6e2a3a",
+        "extra": "none"
+      },
+      "volunteer": {
+        "reliability": 0.7
+      }
+    },
+    {
+      "id": "analyst",
+      "name": "Mei",
+      "role": "Data analyst",
+      "zone": "pod",
+      "tile": {
+        "x": 9,
+        "y": 7
+      },
+      "portrait": "analyst",
+      "look": {
+        "skin": "#f0c8a8",
+        "hair": "#1f1a20",
+        "hairStyle": "long",
+        "outfit": "#2f6f68",
+        "extra": "glasses"
+      },
+      "volunteer": {
+        "reliability": 0.75
+      }
+    },
+    {
+      "id": "partner",
+      "name": "Mr. Adeyemi",
+      "role": "Consulting partner",
+      "zone": "partner-office",
+      "tile": {
+        "x": 32,
+        "y": 7
+      },
+      "portrait": "partner",
+      "look": {
+        "skin": "#8d5a3b",
+        "hair": "#8a8a8a",
+        "hairStyle": "short",
+        "outfit": "#3a3d45",
+        "accent": "#efe4cf",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "manager",
+      "name": "Rachel",
+      "role": "Store manager",
+      "zone": "client",
+      "tile": {
+        "x": 17,
+        "y": 25
+      },
+      "portrait": "store-manager",
+      "look": {
+        "skin": "#f1c9a5",
+        "hair": "#b24a28",
+        "hairStyle": "bun",
+        "outfit": "#4f6b32",
+        "accent": "#efe4cf",
+        "extra": "vest"
+      }
+    },
+    {
+      "id": "cfo",
+      "name": "Mr. Lindqvist",
+      "role": "Client CFO",
+      "zone": "client",
+      "tile": {
+        "x": 23,
+        "y": 25
+      },
+      "portrait": "cfo",
+      "look": {
+        "skin": "#e8c0a0",
+        "hair": "#9a9a9a",
+        "hairStyle": "short",
+        "outfit": "#283a5c",
+        "accent": "#a3242c",
+        "extra": "glasses"
+      }
+    },
+    {
+      "id": "former",
+      "name": "Gloria",
+      "role": "Former client employee",
+      "zone": "cafe",
+      "tile": {
+        "x": 32,
+        "y": 22
+      },
+      "portrait": "former-employee",
+      "look": {
+        "skin": "#7a4a32",
+        "hair": "#c9c4c0",
+        "hairStyle": "curly",
+        "outfit": "#c4892c",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "kai",
+      "name": "Kai",
+      "role": "Store employee on break",
+      "zone": "client",
+      "tile": {
+        "x": 20,
+        "y": 27
+      },
+      "portrait": "store-employee",
+      "look": {
+        "skin": "#d9a17a",
+        "hair": "#3a2418",
+        "hairStyle": "short",
+        "outfit": "#3f6b3a",
+        "accent": "#efe4cf",
+        "extra": "apron"
+      }
+    },
+    {
+      "id": "old-report",
+      "name": "A dusty binder",
+      "role": "2019 rollout report",
+      "zone": "whiteboard",
+      "tile": {
+        "x": 9,
+        "y": 23
+      },
+      "portrait": "prop:report",
+      "look": {
+        "skin": "#000000",
+        "hair": "#000000",
+        "hairStyle": "bald",
+        "outfit": "#000000",
+        "extra": "none"
+      }
+    },
+    {
+      "id": "laptop",
+      "name": "Your laptop",
+      "role": "Data dashboards",
+      "zone": "desk",
+      "tile": {
+        "x": 20,
+        "y": 15
+      },
+      "portrait": "laptop",
+      "look": {
+        "skin": "#000000",
+        "hair": "#000000",
+        "hairStyle": "bald",
+        "outfit": "#000000",
+        "extra": "none"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n-kickoff",
+      "npc": "partner",
+      "lines": [
+        {
+          "who": "partner",
+          "text": "The client says 'modernise inventory'. That's not a brief. What do they actually need from us by Friday?",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "How do you frame the problem?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Pin down one measurable goal with the client first",
+          "effects": {
+            "trust.firm": 8
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Good. A goal we can be held to."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Start building a full system comparison right away",
+          "effects": {
+            "morale": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried",
+            "line": "That's a lot of work toward an unclear goal."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Ask the team what they think the brief is",
+          "effects": {
+            "morale": 4,
+            "trust.firm": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-data",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "Three dashboards from the client. Mei pulled them last night.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What's the finding that matters?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Stockouts are concentrated in the small stores, where orders are placed by hand",
+          "effects": {
+            "trust.firm": 6
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          },
+          "kpi": {
+            "insight": "correct"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Stockouts are rising everywhere, so every store needs the new system",
+          "effects": {},
+          "reaction": {
+            "emote": "question",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "insight": "partial"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Food waste is the real problem, so lead with waste",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "unlocks": [
+            "credibility-hit"
+          ],
+          "kpi": {
+            "insight": "wrong"
+          }
+        }
+      ],
+      "charts": [
+        {
+          "title": "Stockouts per week",
+          "unit": "",
+          "points": [
+            [
+              "Big stores",
+              3
+            ],
+            [
+              "Mid stores",
+              5
+            ],
+            [
+              "Small stores",
+              19
+            ]
+          ]
+        },
+        {
+          "title": "Food waste (% of stock)",
+          "unit": "%",
+          "points": [
+            [
+              "2023",
+              4
+            ],
+            [
+              "2024",
+              4
+            ],
+            [
+              "2025",
+              5
+            ]
+          ]
+        },
+        {
+          "title": "Weekly orders placed by hand",
+          "unit": "",
+          "points": [
+            [
+              "Big stores",
+              2
+            ],
+            [
+              "Mid stores",
+              6
+            ],
+            [
+              "Small stores",
+              14
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n-dev-estimate",
+      "npc": "dev",
+      "lines": [
+        {
+          "who": "dev",
+          "text": "Honest answer? Integrating with their old till system is six weeks, not two.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you do with Tomi's estimate?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Put the real estimate in the plan and flag the risk",
+          "effects": {
+            "trust.firm": 4,
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Thanks for not shaving it down."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Ask him to find a two-week version",
+          "effects": {
+            "morale": -8
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry",
+            "line": "That's how projects fail."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Leave integration out of the recommendation",
+          "effects": {
+            "trust.cfo": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-manager-visit",
+      "npc": "manager",
+      "lines": [
+        {
+          "who": "manager",
+          "text": "Last time head office 'modernised', my staff spent a month typing everything twice.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "What do you ask her?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask her to walk you through how orders work today",
+          "effects": {
+            "trust.manager": 10
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Nobody from head office has asked me that."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Reassure her the new system is much better",
+          "effects": {
+            "trust.manager": -4
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "neutral",
+            "line": "They all say that."
+          }
+        },
+        {
+          "id": "c",
+          "label": "Promise nothing changes for her team",
+          "effects": {
+            "trust.manager": 4,
+            "trust.cfo": -4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-analyst-model",
+      "npc": "analyst",
+      "lines": [
+        {
+          "who": "analyst",
+          "text": "I can forecast demand per store or per region. Per store is more accurate but takes two extra days.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "Which forecast model?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Per store for the small stores only",
+          "effects": {
+            "morale": 3
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "Smart. That's where the problem is."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Per store everywhere",
+          "effects": {
+            "morale": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "minutes": 60
+        },
+        {
+          "id": "c",
+          "label": "Per region, it's good enough",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-pitch-manager",
+      "npc": "manager",
+      "lines": [
+        {
+          "who": "manager",
+          "text": "So what are you actually recommending? In plain words, please.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "How do you explain it to the store manager?",
+      "options": [
+        {
+          "id": "a",
+          "label": "'Your small stores stop running out of milk, and you stop typing orders by hand.'",
+          "effects": {
+            "trust.manager": 12
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Now that I understand."
+          },
+          "kpi": {
+            "fit": "good"
+          }
+        },
+        {
+          "id": "b",
+          "label": "'We'll deploy a cloud ERP with ML-driven demand forecasting and API integration.'",
+          "effects": {
+            "trust.manager": -8
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "worried",
+            "line": "...What?"
+          },
+          "kpi": {
+            "fit": "poor"
+          }
+        },
+        {
+          "id": "c",
+          "label": "'Kai told me the night shift reorders from memory. This fixes that first.'",
+          "effects": {
+            "trust.manager": 16
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "That's exactly it."
+          },
+          "explainOnPick": true,
+          "requires": [
+            "store-employee"
+          ],
+          "kpi": {
+            "fit": "good"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-phased-plan",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "The CFO cut the budget in half and wants a phased plan by Friday. The original plan doesn't fit any more.",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What goes in phase 1?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Phase 1: the small stores only, where stockouts are worst",
+          "effects": {
+            "morale": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.85
+          }
+        },
+        {
+          "id": "b",
+          "label": "Phase 1: every store, but without the forecasting",
+          "effects": {
+            "morale": -2
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.55
+          }
+        },
+        {
+          "id": "c",
+          "label": "Push back and ask for the full budget",
+          "effects": {
+            "trust.cfo": -10
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "worried"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "coreBudgetShare": 0.3
+          }
+        },
+        {
+          "id": "d",
+          "label": "Phase 1: a cheap pilot in two stores, then decide",
+          "effects": {
+            "morale": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          },
+          "kpi": {
+            "coreBudgetShare": 0.7
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-team-worried",
+      "npc": "dev",
+      "lines": [
+        {
+          "who": "dev",
+          "text": "Half the budget means half the work, right? Are we still doing this properly?",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "What do you tell the team?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Explain the phases and what each person owns now",
+          "effects": {
+            "morale": 12
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Tell them to keep going while you figure it out",
+          "effects": {
+            "morale": -6
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Say the scope is the same, just faster",
+          "effects": {
+            "morale": -10
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-cfo-call",
+      "npc": "cfo",
+      "lines": [
+        {
+          "who": "cfo",
+          "text": "I need to know by tonight what you're cutting. Not the theory. What changes.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "What do you send the CFO?",
+      "options": [
+        {
+          "id": "a",
+          "label": "One page: what's in phase 1, what waits, and the cost of each",
+          "effects": {
+            "trust.cfo": 10
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "Finally, something I can sign."
+          }
+        },
+        {
+          "id": "b",
+          "label": "The full technical deck with a cover note",
+          "effects": {
+            "trust.cfo": -6
+          },
+          "reaction": {
+            "emote": "question",
+            "expression": "angry"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Ask for a week to rework everything",
+          "effects": {
+            "trust.cfo": -12
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          },
+          "explainOnPick": true
+        }
+      ]
+    },
+    {
+      "id": "n-pitch-cfo",
+      "npc": "cfo",
+      "lines": [
+        {
+          "who": "cfo",
+          "text": "Convince me phase 1 is worth the money.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "How do you make the case to the CFO?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Lead with cost per store and payback: the small stores pay it back in 9 months",
+          "effects": {
+            "trust.cfo": 12
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "That's a number I can take to the board."
+          },
+          "kpi": {
+            "fit": "good"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Walk him through the architecture diagram",
+          "effects": {
+            "trust.cfo": -8
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried",
+            "line": "I'm not the IT department."
+          },
+          "kpi": {
+            "fit": "poor"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Show why the 2019 rollout failed and how phase 1 avoids it",
+          "effects": {
+            "trust.cfo": 16
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "You did your homework."
+          },
+          "explainOnPick": true,
+          "requires": [
+            "cafe-chat"
+          ],
+          "kpi": {
+            "fit": "good"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-feedback",
+      "npc": "partner",
+      "lines": [
+        {
+          "who": "partner",
+          "text": "I read your deck. Honestly, it's unreadable. Twenty slides of features and no answer on slide one.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "How do you take it?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask what he'd put on slide one, and rebuild it around that",
+          "effects": {
+            "trust.firm": 10
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "Answer first. Then evidence."
+          },
+          "kpi": {
+            "feedback": "open"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Explain that the client asked for detail",
+          "effects": {
+            "trust.firm": -4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Then put the detail at the back."
+          },
+          "kpi": {
+            "feedback": "defensive"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Say there's no time to change it now",
+          "effects": {
+            "trust.firm": -10
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          },
+          "explainOnPick": true,
+          "kpi": {
+            "feedback": "dismissive"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-scope-creep",
+      "npc": "manager",
+      "lines": [
+        {
+          "who": "manager",
+          "text": "Head office just asked: can the new system also handle online orders?",
+          "expression": "worried"
+        }
+      ],
+      "prompt": "How do you handle the new ask?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Park it for phase 2, and write down why",
+          "effects": {
+            "trust.manager": 2,
+            "trust.cfo": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Say yes and squeeze it in",
+          "effects": {
+            "morale": -10,
+            "trust.cfo": -4
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true
+        },
+        {
+          "id": "c",
+          "label": "Say no, it's out of scope",
+          "effects": {
+            "trust.manager": -6
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-final-deck",
+      "npc": "laptop",
+      "lines": [
+        {
+          "who": "you",
+          "text": "Friday morning. The deck needs to land in four hours.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What do you change last?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Put the answer on slide one and cut the feature list",
+          "effects": {
+            "trust.firm": 6
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Add more appendix slides to be safe",
+          "effects": {},
+          "reaction": {
+            "emote": "sweat",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "c",
+          "label": "Add the 2019 lessons-learned slide from the old report",
+          "effects": {
+            "trust.cfo": 6,
+            "trust.firm": 4
+          },
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy"
+          },
+          "requires": [
+            "dusty-report"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n-dev-blocker",
+      "npc": "dev",
+      "lines": [
+        {
+          "who": "dev",
+          "text": "The client still hasn't sent test data. I can't show the demo without it.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "What do you do?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Call Rachel and ask for one store's data today",
+          "effects": {
+            "trust.manager": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "happy"
+          },
+          "minutes": 30
+        },
+        {
+          "id": "b",
+          "label": "Build the demo on made-up numbers",
+          "effects": {
+            "trust.cfo": -6
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          },
+          "explainOnPick": true
+        },
+        {
+          "id": "c",
+          "label": "Drop the demo from the pitch",
+          "effects": {
+            "morale": -4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-credibility",
+      "npc": "partner",
+      "lines": [
+        {
+          "who": "partner",
+          "text": "The client's ops lead says your waste number doesn't hold up. Waste has been flat for three years.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "How do you respond?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Own the misread and re-run the analysis",
+          "effects": {
+            "trust.firm": 4
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral",
+            "line": "Good. Fix it fast."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Defend the waste angle",
+          "effects": {
+            "trust.firm": -8,
+            "trust.cfo": -6
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-kickoff-miss",
+      "npc": "partner",
+      "lines": [
+        {
+          "who": "partner",
+          "text": "We're two days in and still don't have an agreed goal with the client.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "What now?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Book 20 minutes with the client today to agree one goal",
+          "effects": {
+            "trust.firm": 2
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Keep going and agree it at the end",
+          "effects": {
+            "trust.firm": -6
+          },
+          "reaction": {
+            "emote": "sweat",
+            "expression": "worried"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-manager-escalates",
+      "npc": "manager",
+      "lines": [
+        {
+          "who": "manager",
+          "text": "I heard nothing from you, so I told the CFO I'm against this.",
+          "expression": "angry"
+        }
+      ],
+      "prompt": "Can you win her back?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Apologise and go through the plan with her now",
+          "effects": {
+            "trust.manager": 6
+          },
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        },
+        {
+          "id": "b",
+          "label": "Go over her head to the CFO",
+          "effects": {
+            "trust.manager": -10
+          },
+          "reaction": {
+            "emote": "anger",
+            "expression": "angry"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-cafe-chat",
+      "npc": "former",
+      "lines": [
+        {
+          "who": "former",
+          "text": "You're the consultants? I ran stock at the small stores until 2020. The last system failed because nobody asked the night shift.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What do you ask Gloria?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask what the night shift actually does",
+          "effects": {},
+          "reaction": {
+            "emote": "heart",
+            "expression": "happy",
+            "line": "They reorder from memory. Always have."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Thank her and head back",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-store-employee",
+      "npc": "kai",
+      "lines": [
+        {
+          "who": "kai",
+          "text": "Honestly? When the system's down at night, we just reorder from memory. Half the stockouts are that.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "What do you do with that?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ask if you can mention it to Rachel",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "happy",
+            "line": "Sure, she knows."
+          }
+        },
+        {
+          "id": "b",
+          "label": "Note it down",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n-dusty-report",
+      "npc": "old-report",
+      "lines": [
+        {
+          "who": "you",
+          "text": "A binder labelled '2019 Inventory Rollout: Lessons Learned'. Nobody has opened it in years.",
+          "expression": "neutral"
+        }
+      ],
+      "prompt": "Do you read it?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Read it properly and take notes",
+          "effects": {},
+          "reaction": {
+            "emote": "exclaim",
+            "expression": "happy"
+          },
+          "minutes": 30
+        },
+        {
+          "id": "b",
+          "label": "Skim the summary",
+          "effects": {},
+          "reaction": {
+            "emote": "note",
+            "expression": "neutral"
+          }
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "kickoff",
+      "title": "What does the client actually need?",
+      "npc": "partner",
+      "zone": "partner-office",
+      "node": "n-kickoff",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "adaptability"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -4
+        },
+        "spawn": "kickoff-miss"
+      },
+      "spawnAt": "Mon 09:00",
+      "deadline": "Mon 12:00"
+    },
+    {
+      "id": "data-read",
+      "title": "Read the inventory data",
+      "npc": "laptop",
+      "zone": "desk",
+      "node": "n-data",
+      "severity": "high",
+      "talkCost": 45,
+      "skillSignals": [
+        "analytical"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -8
+        }
+      },
+      "spawnAt": "Mon 10:00",
+      "deadline": "Tue 10:00",
+      "tags": [
+        "data"
+      ]
+    },
+    {
+      "id": "dev-estimate",
+      "title": "Tomi's integration estimate",
+      "npc": "dev",
+      "zone": "pod",
+      "node": "n-dev-estimate",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "analytical"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -4
+        }
+      },
+      "spawnAt": "Mon 13:00",
+      "deadline": "Mon 17:30"
+    },
+    {
+      "id": "manager-visit",
+      "title": "Rachel is wary of head office",
+      "npc": "manager",
+      "zone": "client",
+      "node": "n-manager-visit",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "empathy",
+        "communication",
+        "curiosity"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.manager": -8
+        }
+      },
+      "spawnAt": "Tue 09:30",
+      "deadline": "Tue 13:00"
+    },
+    {
+      "id": "analyst-model",
+      "title": "Mei needs a forecast model",
+      "npc": "analyst",
+      "zone": "pod",
+      "node": "n-analyst-model",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "analytical",
+        "prioritization"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "morale": -4
+        }
+      },
+      "spawnAt": "Tue 11:00",
+      "deadline": "Tue 16:00",
+      "delegateEffects": {
+        "morale": 1
+      }
+    },
+    {
+      "id": "pitch-manager",
+      "title": "Explain it to the store manager",
+      "npc": "manager",
+      "zone": "client",
+      "node": "n-pitch-manager",
+      "severity": "high",
+      "talkCost": 45,
+      "skillSignals": [
+        "communication",
+        "empathy"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.manager": -6
+        },
+        "spawn": "manager-escalates"
+      },
+      "spawnAt": "Tue 14:00",
+      "deadline": "Wed 11:00",
+      "tags": [
+        "pitch"
+      ]
+    },
+    {
+      "id": "phased-plan",
+      "title": "Phased plan by Friday",
+      "npc": "laptop",
+      "zone": "desk",
+      "node": "n-phased-plan",
+      "severity": "high",
+      "talkCost": 60,
+      "skillSignals": [
+        "adaptability",
+        "prioritization",
+        "creativity"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -10
+        }
+      },
+      "lifetime": 480,
+      "tags": [
+        "recovery"
+      ]
+    },
+    {
+      "id": "team-worried",
+      "title": "The team is worried",
+      "npc": "dev",
+      "zone": "pod",
+      "node": "n-team-worried",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "collaboration",
+        "communication"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "morale": -10
+        }
+      },
+      "lifetime": 360
+    },
+    {
+      "id": "cfo-call",
+      "title": "The CFO wants to know what changes",
+      "npc": "cfo",
+      "zone": "client",
+      "node": "n-cfo-call",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication",
+        "adaptability"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.cfo": -10
+        }
+      },
+      "lifetime": 420
+    },
+    {
+      "id": "pitch-cfo",
+      "title": "Make the case to the CFO",
+      "npc": "cfo",
+      "zone": "client",
+      "node": "n-pitch-cfo",
+      "severity": "high",
+      "talkCost": 45,
+      "skillSignals": [
+        "communication",
+        "analytical"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.cfo": -10
+        }
+      },
+      "spawnAt": "Thu 09:30",
+      "deadline": "Thu 15:00",
+      "tags": [
+        "pitch"
+      ]
+    },
+    {
+      "id": "feedback",
+      "title": "The partner hates your deck",
+      "npc": "partner",
+      "zone": "partner-office",
+      "node": "n-feedback",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "feedback"
+      ],
+      "checkpointEligible": true,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -8
+        }
+      },
+      "spawnAt": "Thu 11:00",
+      "deadline": "Thu 17:00",
+      "tags": [
+        "feedback"
+      ]
+    },
+    {
+      "id": "scope-creep",
+      "title": "Head office wants online orders too",
+      "npc": "manager",
+      "zone": "client",
+      "node": "n-scope-creep",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "adaptability",
+        "prioritization"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.cfo": -4
+        }
+      },
+      "spawnAt": "Thu 13:30",
+      "deadline": "Fri 11:00"
+    },
+    {
+      "id": "final-deck",
+      "title": "Finish the deck",
+      "npc": "laptop",
+      "zone": "desk",
+      "node": "n-final-deck",
+      "severity": "medium",
+      "talkCost": 45,
+      "skillSignals": [
+        "communication"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -6
+        }
+      },
+      "spawnAt": "Fri 09:30",
+      "deadline": "Fri 14:00"
+    },
+    {
+      "id": "dev-blocker",
+      "title": "No test data for the demo",
+      "npc": "dev",
+      "zone": "pod",
+      "node": "n-dev-blocker",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "problem-solving",
+        "adaptability"
+      ],
+      "checkpointEligible": false,
+      "delegable": true,
+      "onExpire": {
+        "effects": {
+          "trust.cfo": -4
+        }
+      },
+      "spawnAt": "Fri 11:00",
+      "deadline": "Fri 16:00",
+      "delegateEffects": {
+        "trust.manager": 2
+      }
+    },
+    {
+      "id": "credibility-hit",
+      "title": "Your waste number doesn't hold up",
+      "npc": "partner",
+      "zone": "partner-office",
+      "node": "n-credibility",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "analytical",
+        "feedback"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -10
+        }
+      },
+      "lifetime": 240
+    },
+    {
+      "id": "kickoff-miss",
+      "title": "Still no agreed goal",
+      "npc": "partner",
+      "zone": "partner-office",
+      "node": "n-kickoff-miss",
+      "severity": "medium",
+      "talkCost": 30,
+      "skillSignals": [
+        "communication"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.firm": -6
+        }
+      },
+      "lifetime": 180
+    },
+    {
+      "id": "manager-escalates",
+      "title": "Rachel went to the CFO",
+      "npc": "manager",
+      "zone": "client",
+      "node": "n-manager-escalates",
+      "severity": "high",
+      "talkCost": 30,
+      "skillSignals": [
+        "empathy"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {
+          "trust.manager": -8
+        }
+      },
+      "lifetime": 120
+    },
+    {
+      "id": "cafe-chat",
+      "title": "Coffee with a former employee",
+      "npc": "former",
+      "zone": "cafe",
+      "node": "n-cafe-chat",
+      "severity": "low",
+      "talkCost": 30,
+      "skillSignals": [
+        "curiosity"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {}
+      },
+      "spawnAt": "Mon 09:00",
+      "tags": [
+        "discovery"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "store-employee",
+      "title": "A store employee on break",
+      "npc": "kai",
+      "zone": "client",
+      "node": "n-store-employee",
+      "severity": "low",
+      "talkCost": 15,
+      "skillSignals": [
+        "curiosity"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {}
+      },
+      "spawnAt": "Mon 09:00",
+      "tags": [
+        "discovery"
+      ],
+      "hidden": true
+    },
+    {
+      "id": "dusty-report",
+      "title": "A dusty report",
+      "npc": "old-report",
+      "zone": "whiteboard",
+      "node": "n-dusty-report",
+      "severity": "low",
+      "talkCost": 15,
+      "skillSignals": [
+        "curiosity",
+        "analytical"
+      ],
+      "checkpointEligible": false,
+      "delegable": false,
+      "onExpire": {
+        "effects": {}
+      },
+      "spawnAt": "Mon 09:00",
+      "tags": [
+        "discovery"
+      ],
+      "hidden": true
+    }
+  ],
+  "turningPoint": {
+    "at": "Wed 09:00",
+    "pool": [
+      "budget-halved"
+    ],
+    "disruptions": [
+      {
+        "id": "budget-halved",
+        "title": "The CFO halves the budget",
+        "caller": "cfo",
+        "text": "Our board has cut this project's budget in half. I need a phased plan from you by Friday. Phase 1 has to pay for itself.",
+        "budgetCut": 0.5,
+        "effects": {
+          "morale": -10
+        },
+        "spawn": [
+          "phased-plan",
+          "team-worried",
+          "cfo-call"
+        ]
+      }
+    ]
+  },
+  "deferReasons": [
+    "Something more urgent first",
+    "Waiting for client input",
+    "Someone else is better placed",
+    "Low impact, can wait"
+  ],
+  "variation": {}
+}

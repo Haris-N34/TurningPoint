@@ -9,9 +9,11 @@ type Expr = "neutral" | "worried" | "happy" | "angry";
 export function Portrait({ id, expression = "neutral", className }: { id: string; expression?: Expr; className?: string }) {
   const p = (manifest as { portraits: { id: string; name: string; expressions: Record<Expr, { src: string; alt: string }> }[] }).portraits.find((x) => x.id === id);
   if (!p) {
+    // No drawn portrait: props ("prop:<thing>") and the laptop get an icon, any other character a generic one.
+    const [icon, label] = id === "laptop" ? ["💻", "Your laptop"] : id.startsWith("prop:") ? ["📄", "An old report"] : ["🧑", "A person"];
     return (
-      <div className={cn("flex items-center justify-center bg-[#2e3a4a] text-3xl", className)} role="img" aria-label="Your laptop">
-        <span aria-hidden>💻</span>
+      <div className={cn("flex items-center justify-center bg-[#2e3a4a] text-3xl", className)} role="img" aria-label={label}>
+        <span aria-hidden>{icon}</span>
       </div>
     );
   }

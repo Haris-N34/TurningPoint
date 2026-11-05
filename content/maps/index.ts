@@ -1,8 +1,9 @@
 import { parseMapScenario, type MapScenario } from "@/lib/game/schema";
+import clientPivot from "./client-pivot.json";
 import launchWeek from "./launch-week.json";
 
-// Every v2 map scenario the game can play. "The Client Pivot" is added here when it lands (A12).
-const RAW: Record<string, unknown> = { "launch-week": launchWeek };
+// Every v2 map scenario the game can play.
+const RAW: Record<string, unknown> = { "launch-week": launchWeek, "client-pivot": clientPivot };
 
 export const MAP_IDS = Object.keys(RAW);
 const cache = new Map<string, MapScenario>();
