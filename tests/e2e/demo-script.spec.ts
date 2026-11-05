@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { openDemoPanel } from "./helpers";
 import mayaFixture from "../../fixtures/attempt.json";
 
 // Maya's anonymous ID comes from the demo fixture, so a fixture rebuild never breaks the check.
@@ -119,9 +120,7 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.goto("/");
     await page.evaluate(() => localStorage.setItem("tp:run:att_leftover", "{}"));
     await expect(page.getByTestId("demo-panel")).toHaveCount(0);
-    await page.keyboard.press("Control+Shift+D");
-    const panel = page.getByTestId("demo-panel");
-    await expect(panel).toBeVisible();
+    const panel = await openDemoPanel(page);
     await page.getByTestId("demo-reset").click();
     await expect(page.getByTestId("demo-msg")).toContainText("Reset done");
     const keys = await page.evaluate(() => Object.keys(localStorage));
@@ -237,8 +236,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
   test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async ({ page }) => {
     await seed(page);
     await page.goto("/");
-    await page.keyboard.press("Control+Shift+D");
-    await page.getByTestId("demo-panel").getByRole("link", { name: "Turning point" }).click();
+    await openDemoPanel(page);
+    await page.getByTestId("demo-panel").getByRole("link", { name: "Turning point", exact: true }).click();
     await expect(page).toHaveURL(/jump=turning-point/);
     await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
     await page.getByTestId("start").click();

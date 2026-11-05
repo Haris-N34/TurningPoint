@@ -364,6 +364,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     const opt = node.options.find((o) => o.id === option)!;
     sfx.click();
     dispatch({ type: "choose", issue: issue.id, option });
+    // The pick lands on the map: the player pops a "!" (and the person or laptop reacts below).
+    bus.emit("emote", { npc: "__player", emote: "exclaim" });
     if (opt.reaction) {
       bus.emit("emote", { npc: issue.npc, emote: opt.reaction.emote });
       setReaction({ npc: node.npc, expression: opt.reaction.expression, line: opt.reaction.line });
@@ -442,6 +444,18 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const showCoach = screen === "play" && coach.current && logLen === 0;
   const due = state?.checkpointsDue[0];
   const showCheckpoint = !!due && !reaction && !cutscene && recapDay === undefined;
+  // "Cut to the interview": a short scanline wipe each time a checkpoint opens (skipped with reduced motion).
+  const [cut, setCut] = useState(0);
+  const wasCheckpoint = useRef(false);
+  useEffect(() => {
+    if (showCheckpoint && !wasCheckpoint.current && !settings.reducedMotion) setCut(Date.now());
+    wasCheckpoint.current = showCheckpoint;
+  }, [showCheckpoint, settings.reducedMotion]);
+  useEffect(() => {
+    if (!cut) return;
+    const t = setTimeout(() => setCut(0), 700);
+    return () => clearTimeout(t);
+  }, [cut]);
   const kpis = useMemo(() => (state?.ended ? computeKpis(scenario, state) : []), [state, scenario]);
   // Dialogue wording variants cached at publish (B.3), picked by the run's seed. Ids and effects never change.
   const seed = state?.seed;
@@ -570,6 +584,16 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
               </Panel>
             </div>
           )}
+          <AnimatePresence>
+            {cut > 0 && (
+              <motion.div key={cut} className="pointer-events-none fixed inset-0 z-[56] overflow-hidden" initial={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }} aria-hidden data-testid="interview-cut">
+                <motion.div className="absolute inset-0 bg-[#140e18] [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_2px,transparent_2px,transparent_4px)]" initial={{ scaleY: 1 }} animate={{ scaleY: 0 }} transition={{ delay: 0.3, duration: 0.3, ease: "easeIn" }} />
+                <motion.p className={cn(pixelTitle.className, "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[4px] border-[3px] border-[#fff8e7] bg-[#c43d22] px-3 py-2 text-[14px] text-white sm:text-[18px]")} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: [0.6, 1.05, 1], opacity: [0, 1, 1, 0] }} transition={{ duration: 0.6, times: [0, 0.3, 0.5, 1] }}>
+                  ● LIVE INTERVIEW
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {paused && !elsewhere && <PauseMenu onResume={() => setPaused(false)} />}
           {state.ended && !due && (
             <div className="absolute inset-0 z-40">
