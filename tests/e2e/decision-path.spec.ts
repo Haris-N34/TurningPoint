@@ -34,3 +34,42 @@ test("Quick run from a challenge link: the card's decision path has every handle
   await expect(page.getByTestId("decision-path").locator("li")).toHaveCount(handled);
   await expect(page.getByText(`${handled} choices`)).toBeVisible();
 });
+
+// Judge 13:55: a full-week run in list view with 3 talks and the order pick logged 2 steps. Talk to exactly
+// three problems (answering the order question and any checkpoint), then let the week run out.
+test("full week in list view: 3 talks plus the order pick give 3 decision-path steps and '3 choices'", async ({ page }) => {
+  test.setTimeout(240_000);
+  await installFakeSpeech(page);
+  await setProfile(page, { displayName: "Path Tester", email: "path.tester@ucalgary.ca", verified: true, university: "University of Calgary" });
+  await page.goto("/demo/seed");
+  await page.getByTestId("play-ch_demo_energy").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByTestId("set-full-week").check();
+  await page.getByTestId("set-turn-based").check();
+  await page.getByTestId("set-list-view").check();
+  await page.getByTestId("start").click();
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("list-view")).toBeVisible({ timeout: 20_000 });
+  let talks = 0;
+  let orderPicked = false;
+  for (let i = 0; i < 200; i++) {
+    if (await page.getByTestId("to-results").isVisible()) break;
+    if (await page.getByTestId("order-pick").isVisible()) orderPicked = true;
+    if (await clearOverlay(page)) continue;
+    const talk = page.locator('[data-testid^="list-talk-"]').first();
+    if (talks < 3 && (await talk.isVisible())) {
+      await talk.click();
+      talks++;
+    } else await page.getByTestId("wait").first().click();
+  }
+  const handled = await handledCount(page);
+  expect(orderPicked).toBe(true);
+  expect(handled).toBe(3);
+  await page.getByTestId("to-results").click();
+  await page.getByTestId("results-continue").click();
+  await finishRealLife(page);
+  await expect(page).toHaveURL(/\/results\//, { timeout: 20_000 });
+  await expect(page.getByTestId("decision-path").locator("li")).toHaveCount(3);
+  await expect(page.getByText("3 choices")).toBeVisible();
+});
