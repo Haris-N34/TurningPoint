@@ -28,7 +28,8 @@ export function Header() {
             <span aria-hidden className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">↗</span>
             Turning Point<span aria-hidden className="text-primary">.</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/how-we-use-ai" className="mr-3 inline-flex min-h-11 items-center text-xs text-muted-foreground underline underline-offset-4">How we use AI</Link>
             <label htmlFor="demo-role" className="text-xs font-medium text-muted-foreground">Demo role</label>
             <select id="demo-role" value={activeRole} onChange={e => {
               const role = Role.parse(e.target.value);
