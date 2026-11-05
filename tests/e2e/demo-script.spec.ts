@@ -191,7 +191,7 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
   });
 
   test("step 5: turning point cutscene drains the budget and opens the recovery plan", async ({ page }) => {
-    // On stage this is the Ctrl+Shift+D jump (claude/v2-m5). Here the test hook stands in for it.
+    // Fast check of the cutscene itself. The stage path (prepared tab) is the next test.
     await startLaunchWeek(page);
     await tp(page, (x) => x.setClock("Wed 09:00"));
     for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
@@ -204,6 +204,41 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await expect(page.getByTestId("budget-drain")).toBeVisible();
     await page.getByTestId("cutscene-done").click();
     // Each disruption has its own recovery issue (recovery-plan, recovery-venue or recovery-cover).
+    expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
+  });
+
+  test("step 5 stage path: prepared tab paused on Tuesday resumes into the turning point", async ({ page }) => {
+    test.setTimeout(240_000);
+    // Setup: play Monday and Tuesday with Wait for news only, as the script says. No test hooks.
+    await startLaunchWeek(page);
+    // Stop at Tue 15:00 with nothing open. The next Wait for news jumps straight to Wed 09:00
+    // (there is no Tuesday recap before the turning point).
+    for (let i = 0; i < 200; i++) {
+      await page.waitForTimeout(300); // let overlays animate in before deciding
+      expect(await tp(page, (x) => x.getState().tp.fired), "turning point fired before Tue 15:00").toBe(false);
+      if (await clearOverlay(page)) continue;
+      if ((await page.getByTestId("clock-time").innerText()).startsWith("Tue 15:")) break;
+      await page.getByTestId("wait").click();
+    }
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 15:/);
+    expect(await tp(page, (x) => x.getState().tp.fired)).toBe(false);
+    // Refresh, like reopening the tab before the pitch.
+    await page.reload();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.getByTestId("resume").click();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+    expect(await tp(page, (x) => x.getState().tp.fired)).toBe(false);
+    // On stage: close the recap if shown, then Wait for news until the call comes.
+    for (let i = 0; i < 40 && !(await page.getByTestId("cutscene").isVisible()); i++) {
+      if (await page.getByTestId("recap-next").isVisible()) await page.getByTestId("recap-next").click();
+      else if (!(await clearOverlay(page))) await page.getByTestId("wait").click();
+    }
+    await expect(page.getByTestId("cutscene")).toBeVisible();
+    await expect(page.getByTestId("cutscene-next")).toHaveText("Hang up");
+    await page.getByTestId("cutscene-next").click();
+    await expect(page.getByTestId("budget-drain")).toBeVisible();
+    await expect(page.getByTestId("cutscene-done")).toHaveText("Face it");
+    await page.getByTestId("cutscene-done").click();
     expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
   });
 
