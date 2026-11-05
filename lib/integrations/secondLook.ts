@@ -69,20 +69,24 @@ export async function decideSecondLook(companyId: string, entryId: string, decis
   if (e.status !== "queued") throw new SecondLookError("Already decided");
   if (!e.openedAt) throw new SecondLookError("Open the card before deciding");
   if (decision === "confirm_pass" && !reason.trim()) throw new SecondLookError("A pass needs a reason");
-  e.status = decision === "restore" ? "restored" : "confirmed_pass";
-  e.decidedAt = nowIso();
-  e.decisionReason = reason.trim() || undefined;
+  const why = reason.trim() || undefined;
   const ats = adapterFor(e.provider, companyId);
   const link = `${origin}/recruiter/card/${e.attemptId}?challenge=${e.challengeId}`;
+  // Tell the ATS first. The entry changes only once the ATS has it, so a failed call stays queued and can be retried.
   if (decision === "restore") {
-    await inProcessFetch(
+    // A note first: it fails on an unknown applicant before anything in the ATS changes.
+    await ats.postNote(e.applicantId, `Restored by Turning Point Second Look. ${e.reason}.${why ? ` Recruiter: ${why}.` : ""} Card: ${link}`);
+    const res = await inProcessFetch(
       e.provider === "greenhouse" ? `/api/mock-ats/greenhouse/${companyId}/v1/applications/${e.applicantId}` : `/api/mock-ats/workday/${companyId}/ccx/api/v1/jobApplications/${e.applicantId}`,
       { method: "PATCH", body: JSON.stringify({ status: "active", stage: "Application Review", reviewed: true }) },
     );
-    await ats.postNote(e.applicantId, `Restored by Turning Point Second Look. ${e.reason}.${e.decisionReason ? ` Recruiter: ${e.decisionReason}.` : ""} Card: ${link}`);
+    if (res.status >= 400) throw new SecondLookError(`The ATS did not restore the applicant (${res.status})`);
   } else {
-    await ats.postNote(e.applicantId, `Second Look reviewed; pass confirmed by a recruiter. Reason: ${e.decisionReason}. Card: ${link}`);
+    await ats.postNote(e.applicantId, `Second Look reviewed; pass confirmed by a recruiter. Reason: ${why}. Card: ${link}`);
   }
+  e.status = decision === "restore" ? "restored" : "confirmed_pass";
+  e.decidedAt = nowIso();
+  e.decisionReason = why;
   return e;
 }
 

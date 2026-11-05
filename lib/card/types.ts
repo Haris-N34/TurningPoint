@@ -95,7 +95,7 @@ export const CardSchema = z.object({
   challenge: z.object({ id: z.string(), title: z.string(), company: z.string() }),
   scenario: z.object({ id: z.string(), version: z.number(), seed: z.string(), disruptionId: z.string() }),
   finishedAt: z.string(),
-  /** Only ever shown as "adjusted timing" (E3.1). */
+  /** The candidate's own view only. Never reaches an employer: cardFor and compareFor drop it (QA night #17). */
   adjustedTiming: z.boolean().default(false),
   targetSkills: z.array(skill).min(1),
   evidence: z.array(EvidenceSchema),
