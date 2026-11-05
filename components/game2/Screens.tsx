@@ -281,7 +281,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
         <motion.div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_160px_40px_rgba(196,61,34,0.85)]" initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0.25, 0.6, 0] }} transition={{ duration: 1.6, times: [0, 0.12, 0.4, 0.55, 1] }} aria-hidden />
       )}
       {phase === "ring" ? (
-        <motion.div initial={reduce ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
+        <motion.div className="tp-scale" initial={reduce ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
           <Panel tone="ink" className="flex w-[min(460px,92vw)] items-center gap-4 p-4 sm:p-5" aria-live="assertive">
             <motion.div className="shrink-0 rounded-[6px] border-[3px] border-[#ffd166] p-0.5" animate={reduce ? {} : { borderColor: ["#ffd166", "#c43d22", "#ffd166"] }} transition={{ duration: 0.8, repeat: Infinity }}>
               <Portrait id={caller.portrait} expression="worried" className="size-20 rounded-[3px] bg-[#2e222f] sm:size-24" />
@@ -299,7 +299,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
           </Panel>
         </motion.div>
       ) : (
-        <motion.div initial={reduce ? false : { y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-[min(640px,94vw)]">
+        <motion.div initial={reduce ? false : { y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="tp-scale w-[min(640px,94vw)]">
           <Panel className="p-4 sm:p-5">
             <div className="flex gap-4">
               <Portrait id={caller.portrait} expression="worried" className="size-20 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-28" />
@@ -408,31 +408,31 @@ export function ResultsScreen({ scenario, state, kpis, onContinue }: { scenario:
     return `${verb}: ${i?.title}`;
   };
   return (
-    <div className="absolute inset-0 z-40 overflow-y-auto bg-[#2e222f]/85 p-3 sm:p-6" data-testid="results-screen">
-      <Panel className="mx-auto w-[min(860px,96vw)] p-4">
+    <div className="absolute inset-0 z-40 flex overflow-y-auto bg-[#2e222f]/85 p-3 sm:p-6" data-testid="results-screen">
+      <Panel className="m-auto w-[min(880px,96vw)] p-4 sm:p-5">
         <Eyebrow>Week complete</Eyebrow>
-        <h2 className={cn(pixelTitle.className, "mt-1 text-[16px]")}>Week in review</h2>
+        <h2 className={cn(pixelTitle.className, "mt-1.5 text-[18px]")}>Week in review</h2>
         <div className="mt-3 grid gap-2 sm:grid-cols-4">
           {kpis.map((k) => (
             <div key={k.id} className="rounded-[4px] border-2 border-[#2e222f] bg-white p-2" data-testid={`kpi-${k.id}`}>
-              <p className="text-[11px] font-semibold uppercase leading-tight">{k.label}</p>
-              <p className={cn(pixelTitle.className, "mt-1 text-[13px]")}>
+              <p className="text-[13px] font-semibold leading-tight">{k.label}</p>
+              <p className={cn(pixelTitle.className, "mt-1.5 text-[16px] text-[#c43d22]")}>
                 {k.value === null ? "–" : k.value <= 1 && k.id !== "stakeholder-balance" && k.id !== "morale-trajectory" && k.id !== "recovery-speed" && k.id !== "discoveries" ? <Counter to={k.value * 100} suffix="%" /> : <Counter to={k.value} decimals={k.id === "recovery-speed" ? 1 : 0} />}
               </p>
-              <p className="mt-1 text-[11px] text-[#6a5a4a]">{k.display}</p>
+              <p className="mt-1 text-[12px] leading-snug text-[#6a5a4a]">{k.display}</p>
             </div>
           ))}
         </div>
-        <h3 className="mt-4 text-sm font-bold">Your key moments</h3>
+        <h3 className="mt-4 text-[15px] font-semibold">Your key moments</h3>
         <ol className="mt-1 flex gap-2 overflow-x-auto pb-2">
           {moments.map((e, i) => (
-            <li key={i} className={cn("min-w-[150px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[12px]", e.kind === "turning_point" ? "bg-[#c43d22] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
+            <li key={i} className={cn("min-w-[160px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[13px] leading-snug", e.kind === "turning_point" ? "bg-[#c43d22] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
               <span className="block font-bold">{formatTime(e.t)}</span>
               {label(e)}
             </li>
           ))}
         </ol>
-        <p className="mt-3 text-sm">One last thing: link this week to something real you&apos;ve lived through.</p>
+        <p className="mt-3 text-[15px]">One last thing: link this week to something real you&apos;ve lived through.</p>
         <div className="mt-3 flex justify-end">
           <PixelButton onClick={onContinue} autoFocus data-testid="results-continue">Continue</PixelButton>
         </div>

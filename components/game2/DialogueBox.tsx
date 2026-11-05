@@ -127,7 +127,7 @@ export function DialogueBox({
   const expression = cur.who === "you" ? (node.lines.at(-1)?.expression ?? "neutral") : cur.expression;
 
   return (
-    <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(820px,94vw)] sm:-translate-x-1/2" role="dialog" aria-label={`Talking with ${node.npc === "laptop" || !facing ? "yourself" : facing.name}`} data-testid="dialogue">
+    <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(820px,94vw)] sm:-translate-x-1/2 tp-dialogue" role="dialog" aria-label={`Talking with ${node.npc === "laptop" || !facing ? "yourself" : facing.name}`} data-testid="dialogue">
       <SpeakerPlate name={tag} />
       {/* Phones: portrait beside the line, choices full width below. Desktop: everything right of the portrait. */}
       <Panel className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 p-3 pt-4 sm:gap-x-4 sm:p-4 sm:pt-5">
@@ -211,7 +211,7 @@ function SpeakerPlate({ name }: { name: string }) {
 export function ReactionBox({ scenario, npc, expression, line }: { scenario: MapScenario; npc: string; expression: "neutral" | "worried" | "happy" | "angry"; line?: string }) {
   const n = scenario.npcs.find((x) => x.id === npc);
   return (
-    <div className="pointer-events-none absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(820px,94vw)] sm:-translate-x-1/2" data-testid="reaction">
+    <div className="pointer-events-none absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:bottom-4 sm:left-1/2 sm:w-[min(820px,94vw)] sm:-translate-x-1/2 tp-dialogue" data-testid="reaction">
       <SpeakerPlate name={n?.name ?? "You"} />
       <Panel className="flex items-center gap-3 p-3 pt-4 sm:gap-4 sm:p-4 sm:pt-5">
         <Portrait id={n?.portrait ?? "laptop"} expression={expression} className="size-16 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-24" />
