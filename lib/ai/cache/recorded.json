@@ -281,7 +281,7 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.2.0:8a277183690d9e87": {
+ "evidence-scanner@1.0.0+0.3.0:8a277183690d9e87": {
   "output": {
    "evidence": [
     {
@@ -300,13 +300,13 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.2.0:a4b72d16d4ba74f1": {
+ "evidence-scanner@1.0.0+0.3.0:a4b72d16d4ba74f1": {
   "output": {
    "evidence": [
     {
      "skill": "prioritization",
      "level": "strong",
-     "sentence": "Names the trade-off, says why, and considers who it affects.",
+     "sentence": "Names the trade-off, says why, and considers who it affects, specific to the decision.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",
@@ -318,7 +318,7 @@
     {
      "skill": "communication",
      "level": "strong",
-     "sentence": "Names the trade-off, says why, and considers who it affects.",
+     "sentence": "Names the trade-off, says why, and considers who it affects, specific to the decision.",
      "source": {
       "type": "clip",
       "checkpointId": "cp1",

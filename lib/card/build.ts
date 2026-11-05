@@ -66,7 +66,7 @@ export function buildCard(i: BuildInput): Card {
 
   // Evidence Scanner (B2): blind inputs, verified quotes. The name and school are stripped before it runs.
   const evidence = scanEvidence(
-    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })), decisionPath, nodeSkills },
+    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, question, transcript }) => ({ id, nodeId, kind, question, transcript })), decisionPath, nodeSkills },
     { name: i.candidate.displayName, university: i.candidate.university },
   );
 

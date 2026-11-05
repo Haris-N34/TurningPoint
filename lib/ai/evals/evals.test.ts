@@ -118,6 +118,10 @@ describe("gold-set accuracy eval (B3, B.10)", () => {
       ...(h.correct === 20 ? ["None."] : []),
       "",
     ].join("\n");
-    fs.writeFileSync(path.join(process.cwd(), "docs/EVALS.md"), md);
+    // Hand-written sections after the generated part (the AI cross-check) are kept.
+    const file = path.join(process.cwd(), "docs/EVALS.md");
+    const prev = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : "";
+    const keep = prev.indexOf("## AI cross-check");
+    fs.writeFileSync(file, keep >= 0 ? `${md}\n${prev.slice(keep)}` : md);
   });
 });

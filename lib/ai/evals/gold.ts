@@ -16,6 +16,8 @@ export const GoldItemSchema = z.object({
   /** Skills the decision was designed to surface (scenario skillSignals). */
   nodeSkills: z.array(z.enum(SKILL_SLUGS)).default([]),
   transcript: z.string().min(1),
+  /** The checkpoint question the answer replies to: the decision context the scanner uses for specificity. */
+  question: z.string().optional(),
   /** One label per human rater. Null until scored. */
   labels: z.record(z.string(), LevelSchema.nullable()).default({}),
 });
@@ -36,7 +38,7 @@ export function joinGold(answers: unknown, labelFiles: Record<string, unknown>):
   return a.answers.map((x) => {
     const labels: Record<string, Level | null> = {};
     for (const [name, l] of Object.entries(raters)) if (name !== "gold") labels[name] = l[x.id] ?? null;
-    return { id: x.id, skill: x.skill, kind: "decision" as const, nodeSkills: x.nodeSkills ?? [x.skill], transcript: x.answer, labels, gold: raters.gold?.[x.id] };
+    return { id: x.id, skill: x.skill, kind: "decision" as const, nodeSkills: x.nodeSkills ?? [x.skill], transcript: x.answer, question: x.checkpointQuestion, labels, gold: raters.gold?.[x.id] };
   });
 }
 
@@ -52,7 +54,7 @@ export function humanLevel(item: GoldItem): Level | undefined {
 }
 
 export const scanLevel = (item: GoldItem, opts: RunOptions = {}): Level => {
-  const cp = { id: "g", nodeId: "n", kind: item.kind, transcript: fromChunks([{ text: item.transcript, startS: 0, endS: 30 }]) };
+  const cp = { id: "g", nodeId: "n", kind: item.kind, question: item.question, transcript: fromChunks([{ text: item.transcript, startS: 0, endS: 30 }]) };
   return asLevel(scanEvidence({ targetSkills: [item.skill as SkillSlug], checkpoints: [cp], decisionPath: [], nodeSkills: { n: item.nodeSkills } }, {}, opts)[0].level);
 };
 
