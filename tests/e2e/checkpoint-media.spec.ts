@@ -370,7 +370,8 @@ test("demo path: camera denied, calm one-line note, one tap to voice or text, ti
   await page.waitForTimeout(2000);
   expect(await thinkLeft(page)).toBe(15);
   await page.waitForTimeout(500);
-  await page.screenshot({ path: `docs/screens/night/checkpoint/${info.project.name}-5-camera-denied.png`, style: "nextjs-portal{display:none!important}" });
+  // SCREENS=1 refreshes the committed review shots (docs/screens/night/checkpoint/*-5-camera-denied.png).
+  if (process.env.SCREENS === "1") await page.screenshot({ path: `docs/screens/night/checkpoint/${info.project.name}-5-camera-denied.png`, style: "nextjs-portal{display:none!important}" });
 
   await cp.getByTestId("fallback-voice").click();
   await expect(cp).toHaveAttribute("data-mode", "voice");
