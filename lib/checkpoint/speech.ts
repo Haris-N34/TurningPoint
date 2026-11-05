@@ -12,6 +12,7 @@ export type SpeechRec = {
   lang: string;
   onresult: ((e: SpeechEvent) => void) | null;
   onend: (() => void) | null;
+  onstart?: (() => void) | null;
   onerror: ((e: { error?: string; message?: string }) => void) | null;
   start(): void;
   stop(): void;
@@ -28,25 +29,30 @@ export function speechCtor(w: unknown = typeof window === "undefined" ? undefine
 /** What the candidate sees about live transcription. */
 export type SpeechState =
   | { kind: "off" }
+  /** Asked the browser to listen; it has not confirmed yet. */
+  | { kind: "starting" }
   | { kind: "listening" }
   | { kind: "unsupported" }
   /** Stopped for good this answer. The recording continues; the candidate types or fixes the words after. */
   | { kind: "error"; code: string; message: string };
 
+const AFTER = "Keep talking: your recording is saved, and we'll turn it into text on this device when you finish.";
 const MESSAGES: Record<string, string> = {
-  "not-allowed": "Your browser blocked speech to text. Your recording is still going. You can type or fix your words before you submit.",
-  "service-not-allowed": "Speech to text is turned off in this browser. Your recording is still going. You can type your words before you submit.",
-  "audio-capture": "We can't reach a microphone for speech to text. Check it is plugged in and not used by another app, or answer in text.",
-  network: "Speech to text needs an internet connection in this browser and it dropped. Your recording is still going. You can type or fix your words before you submit.",
-  "language-not-supported": "Speech to text doesn't support your language setting here. Your recording is still going. You can type your words before you submit.",
+  "not-allowed": `This browser blocked live captions. ${AFTER}`,
+  "service-not-allowed": `Live captions are turned off in this browser. ${AFTER}`,
+  "audio-capture": `Live captions can't reach the microphone. ${AFTER}`,
+  network: `Live captions need an internet connection in this browser and it dropped. ${AFTER}`,
+  "language-not-supported": `Live captions don't support your language setting here. ${AFTER}`,
+  // The browser has the speech API but no speech service behind it (Chromium, Brave, some Edge builds).
+  "no-service": `Live captions aren't working in this browser. ${AFTER}`,
 };
 
 export const UNSUPPORTED_MESSAGE =
-  "This browser can't turn speech into text. We'll still record your answer, and you type what you said before you submit. Chrome and Edge transcribe live.";
+  "This browser can't show live captions. We'll still record your answer and turn it into text on this device when you finish. You can fix any words before you submit.";
 
 /** Plain-words message for a recognition error code. */
 export function speechErrorMessage(code: string) {
-  return MESSAGES[code] ?? "Speech to text stopped. Your recording is still going. You can type or fix your words before you submit.";
+  return MESSAGES[code] ?? `Live captions stopped. ${AFTER}`;
 }
 
 /** Errors that end live transcription for this answer. "no-speech" and "aborted" just restart. */
@@ -62,6 +68,8 @@ export type ListenerOpts = {
   onFinal: (text: string, atS: number) => void;
   onInterim: (text: string) => void;
   onState: (s: SpeechState) => void;
+  /** How long the browser may take to confirm it started listening before we call it unavailable. */
+  startTimeoutMs?: number;
   /** Wait before restarting after the browser ends recognition by itself. */
   restartDelayMs?: number;
   setTimer?: (fn: () => void, ms: number) => unknown;
@@ -84,6 +92,10 @@ export function createListener(o: ListenerOpts) {
   let quickEnds = 0;
   let networkErrors = 0;
   let startedAt = 0;
+  let confirmed = false; // the browser said it started (onstart) for the current recognizer
+  let silentEnds = 0; // recognizers that ended without ever starting
+  let everConfirmed = false;
+  let startTimer: unknown;
   let timer: unknown;
   let endWaiters: (() => void)[] = [];
 
@@ -104,12 +116,22 @@ export function createListener(o: ListenerOpts) {
     r.continuous = true;
     r.interimResults = true;
     r.lang = o.lang ?? "en-US";
+    r.onstart = () => {
+      confirmed = everConfirmed = true;
+      silentEnds = 0;
+      o.onState({ kind: "listening" });
+    };
     r.onresult = (e) => {
       let live = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const res = e.results[i];
         const text = (res?.[0]?.transcript ?? "").trim();
         if (!text) continue;
+        if (!confirmed) {
+          // Some browsers deliver results without onstart.
+          confirmed = everConfirmed = true;
+          o.onState({ kind: "listening" });
+        }
         if (res.isFinal) {
           o.onFinal(text, o.now());
           quickEnds = 0;
@@ -136,6 +158,8 @@ export function createListener(o: ListenerOpts) {
         w.forEach((f) => f());
         return;
       }
+      // Ended without ever starting, twice: there is no speech service behind the API here.
+      if (!confirmed && ++silentEnds >= 2) return fail("no-service");
       // Ended within a second of starting, again and again: give up rather than spin.
       if (o.now() - startedAt < 1) quickEnds++;
       if (quickEnds > 5) return fail("unknown");
@@ -149,10 +173,25 @@ export function createListener(o: ListenerOpts) {
 
   const begin = () => {
     startedAt = o.now();
+    confirmed = false;
     try {
       rec = spawn();
+      // "Listening" waits for the browser's onstart; until then the candidate sees that it is starting.
+      if (!everConfirmed) o.onState({ kind: "starting" }); // restarts stay "listening": no flicker
+      const mine = rec;
       rec.start();
-      o.onState({ kind: "listening" });
+      // Never confirmed within a few seconds: there is no working speech service here. Say so, stop trying.
+      if (!everConfirmed)
+        startTimer = setT(() => {
+          if (rec !== mine || confirmed || !active || fatal) return;
+          fail("no-service");
+          try {
+            if (mine.abort) mine.abort();
+            else mine.stop();
+          } catch {
+            // already stopped
+          }
+        }, o.startTimeoutMs ?? 4000);
     } catch {
       rec = null;
       fail("unknown");
@@ -163,6 +202,7 @@ export function createListener(o: ListenerOpts) {
     start() {
       active = true;
       fatal = false;
+      everConfirmed = false;
       restarts = 0;
       quickEnds = 0;
       networkErrors = 0;
@@ -172,6 +212,7 @@ export function createListener(o: ListenerOpts) {
     stop(waitMs = 1500): Promise<void> {
       active = false;
       clearT(timer);
+      clearT(startTimer);
       const r = rec;
       if (!r) {
         flushInterim();

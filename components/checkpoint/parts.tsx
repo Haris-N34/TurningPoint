@@ -56,12 +56,23 @@ export function Ring({
             strokeDashoffset={c * (1 - left / total)}
           />
         </svg>
-        <span className={cn("absolute inset-0 flex items-center justify-center font-semibold tabular-nums", pixel ? cn(pixelTitle.className, "text-[12px]") : "text-sm")}>
+        <span
+          className={cn(
+            "absolute inset-0 flex items-center justify-center font-semibold tabular-nums",
+            pixel ? cn(pixelTitle.className, "text-[12px]") : "text-sm",
+          )}
+        >
           {Math.ceil(left)}
         </span>
       </div>
       {/* The total, so it matches "Take 15 seconds" while the ring counts down. */}
-      <span className={cn("font-semibold", pixel ? cn(pixelTitle.className, "text-[9px]") : "text-xs")} data-testid="timer-label">
+      <span
+        className={cn(
+          "font-semibold",
+          pixel ? cn(pixelTitle.className, "text-[9px]") : "text-xs",
+        )}
+        data-testid="timer-label"
+      >
         {caption}
       </span>
     </div>
@@ -192,13 +203,15 @@ export function Captions({
     if (box.current) box.current.scrollTop = box.current.scrollHeight;
   }, [heard, interim]);
   const status =
-    speech.kind === "listening"
-      ? "Listening. Your words appear below as you speak."
-      : speech.kind === "error"
-        ? speech.message
-        : speech.kind === "unsupported"
-          ? UNSUPPORTED_MESSAGE
-          : "";
+    speech.kind === "starting"
+      ? "Starting live captions…"
+      : speech.kind === "listening"
+        ? "Listening. Your words appear below as you speak."
+        : speech.kind === "error"
+          ? speech.message
+          : speech.kind === "unsupported"
+            ? UNSUPPORTED_MESSAGE
+            : "";
   return (
     <div className="space-y-1">
       <p
@@ -284,6 +297,18 @@ export function PanelPortrait({ className }: { className?: string }) {
 }
 
 /** A number in the game's title font: in the pixel body font 5 reads as S and 8 as B. */
-export function Num({ children, pixel }: { children: React.ReactNode; pixel?: boolean }) {
-  return pixel ? <span className={cn(pixelTitle.className, "text-[0.75em]")}>{children}</span> : <>{children}</>;
+export function Num({
+  children,
+  pixel,
+}: {
+  children: React.ReactNode;
+  pixel?: boolean;
+}) {
+  return pixel ? (
+    <span className={cn(pixelTitle.className, "text-[0.75em]")}>
+      {children}
+    </span>
+  ) : (
+    <>{children}</>
+  );
 }

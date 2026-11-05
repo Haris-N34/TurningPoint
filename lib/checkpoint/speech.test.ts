@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createListener, isFatal, speechErrorMessage, type SpeechEvent, type SpeechRec, type SpeechState } from "./speech";
 
 // A fake recognizer we drive by hand. Each `new` is recorded so restarts are visible.
-function harness() {
+function harness(opts: { silent?: boolean } = {}) {
   const made: Fake[] = [];
   class Fake implements SpeechRec {
     continuous = false;
@@ -11,6 +11,7 @@ function harness() {
     onresult: ((e: SpeechEvent) => void) | null = null;
     onend: (() => void) | null = null;
     onerror: ((e: { error?: string }) => void) | null = null;
+    onstart: (() => void) | null = null;
     started = 0;
     stopped = 0;
     constructor() {
@@ -18,6 +19,8 @@ function harness() {
     }
     start() {
       this.started++;
+      // A browser with a speech service confirms with onstart; one without (Chromium, Brave) never does.
+      if (!opts.silent) this.onstart?.();
     }
     stop() {
       this.stopped++;
@@ -111,7 +114,7 @@ describe("speech listener", () => {
     expect(h.made.length).toBe(1);
     const last = h.states.at(-1)!;
     expect(last.kind).toBe("error");
-    expect(last.kind === "error" && last.message).toMatch(/blocked speech to text/);
+    expect(last.kind === "error" && last.message).toMatch(/blocked live captions/);
   });
 
   it("network errors get a few retries, then a message", () => {
@@ -153,6 +156,35 @@ describe("speech listener", () => {
     expect(isFatal("audio-capture")).toBe(true);
     expect(isFatal("no-speech")).toBe(false);
     expect(speechErrorMessage("audio-capture")).toMatch(/microphone/);
-    expect(speechErrorMessage("weird")).toMatch(/type or fix/);
+    expect(speechErrorMessage("weird")).toMatch(/turn it into text on this device/);
+  });
+
+  it("says 'starting' until the browser confirms, never 'listening' on its own", () => {
+    const h = harness({ silent: true });
+    h.l.start();
+    expect(h.states.at(-1)).toEqual({ kind: "starting" });
+  });
+
+  it("no speech service and the browser never ends it either: gives up after the start timeout", () => {
+    const h = harness({ silent: true });
+    h.l.start();
+    h.runTimers(); // the 4 s start timer fires with nothing confirmed
+    expect(h.states.at(-1)).toMatchObject({ kind: "error", code: "no-service" });
+  });
+
+  it("no speech service behind the API (ends without starting): stops quickly with a plain message", () => {
+    const h = harness({ silent: true });
+    h.l.start();
+    h.tick(0.1);
+    h.made[0].onend!();
+    h.runTimers();
+    if (h.made[1]) {
+      h.made[1].onend!();
+      h.runTimers();
+    }
+    expect(h.made.length).toBeLessThanOrEqual(2);
+    const last = h.states.at(-1)!;
+    expect(last).toMatchObject({ kind: "error", code: "no-service" });
+    expect(last.kind === "error" && last.message).toMatch(/Live captions aren't working in this browser/);
   });
 });

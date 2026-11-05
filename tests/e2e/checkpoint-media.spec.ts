@@ -5,7 +5,20 @@ import { answerCheckpoint, nextStep, playToCheckpoint } from "./helpers";
 // Voice and video answers: speech to text keeps listening, shows live captions, explains errors,
 // and the candidate can type or fix the words before submitting (only the words are scored).
 
-type Script = { at: number; type: "interim" | "final" | "end" | "error"; text?: string; error?: string }[];
+type Script = { at: number; type: "interim" | "final" | "end" | "error" | "nostart"; text?: string; error?: string }[];
+
+/** What the stubbed on-device model "hears" (tests never download the real model). */
+const ON_DEVICE = "We kept both days and cut the stage and promotion instead.";
+
+// Stub the on-device transcriber: it still decodes the real recording, then returns fixed words.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((said: string) => {
+    (window as unknown as { __tpLocalAsr: (a: Float32Array) => Promise<unknown> }).__tpLocalAsr = async (audio) => {
+      (window as unknown as { __asrSamples: number }).__asrSamples = audio.length;
+      return { text: said, chunks: [{ text: said, timestamp: [0.5, 4] }] };
+    };
+  }, ON_DEVICE);
+});
 
 /** A scripted SpeechRecognition. Each start() plays `perStart[n]` (the last one repeats). */
 async function scriptedSpeech(page: Page, perStart: Script[]) {
@@ -21,13 +34,17 @@ async function scriptedSpeech(page: Page, perStart: Script[]) {
       onerror: ((e: unknown) => void) | null = null;
       private timers: ReturnType<typeof setTimeout>[] = [];
       private ended = false;
+      onstart: (() => void) | null = null;
       start() {
         const play = plays[Math.min(w.__recStarts, plays.length - 1)];
         w.__recStarts++;
+        // Like a real browser with a speech service: confirm it started. "nostart" mimics Chromium/Brave.
+        if (!play.some((st) => st.type === "nostart")) setTimeout(() => this.onstart?.(), 50);
         for (const step of play)
           this.timers.push(
             setTimeout(() => {
               if (this.ended) return;
+              if (step.type === "nostart") return;
               if (step.type === "end") return this.end();
               if (step.type === "error") return this.onerror?.({ error: step.error });
               const res = Object.assign([{ transcript: step.text }], { isFinal: step.type === "final" });
@@ -108,20 +125,58 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   expect(integrity).toContainEqual(expect.objectContaining({ kind: "transcript_corrected", detail: "Transcript corrected before submit: 1 word changed (context, not scored)" }));
 });
 
-test("a blocked speech service says so in plain words and the candidate types instead", async ({ page }) => {
+test("a blocked speech service says so in plain words, and the recording is turned into text on this device", async ({ page }) => {
   await scriptedSpeech(page, [[{ at: 100, type: "error", error: "not-allowed" }, { at: 150, type: "end" }]]);
   const cp = await toVoiceAnswer(page);
-  await expect(cp.getByTestId("speech-status")).toContainText("blocked speech to text");
+  await expect(cp.getByTestId("speech-status")).toContainText("This browser blocked live captions");
   await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "error");
+  await page.waitForTimeout(1500);
   await cp.getByRole("button", { name: "Done" }).click();
-  await expect(cp.getByText("We didn't catch any words")).toBeVisible();
+  await expect(cp.getByTestId("transcript")).toHaveValue(ON_DEVICE, { timeout: 15_000 });
+  // The real recording was decoded and handed to the model.
+  expect(await page.evaluate(() => (window as unknown as { __asrSamples: number }).__asrSamples)).toBeGreaterThan(16000);
+  await cp.getByTestId("transcript").fill("We kept both days and cut the stage.");
+  await cp.getByRole("button", { name: "Submit" }).click();
+  await expect(cp).toBeHidden();
+  const a = await savedAnswer(page);
+  expect(a.transcript.text).toBe("We kept both days and cut the stage.");
+  expect((a as unknown as { recognizedText: string }).recognizedText).toBe(ON_DEVICE);
+});
+
+// The reported bug: camera and recording work, the browser has the speech API but no speech service
+// behind it (Chromium, Brave, some Edge builds), so live captions never start and no words came through.
+test("no speech service behind the API: says so within seconds, then the recording becomes text on this device", async ({ page }) => {
+  await scriptedSpeech(page, [[{ at: 0, type: "nostart" }]]);
+  const cp = await toVoiceAnswer(page);
+  await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "starting");
+  await expect(cp.getByTestId("speech-status")).toContainText("Live captions aren't working in this browser", { timeout: 8000 });
+  await expect(cp.getByTestId("speech-status")).not.toContainText("Listening");
+  await cp.getByRole("button", { name: "Done" }).click();
+  await expect(cp.getByTestId("transcript")).toHaveValue(ON_DEVICE, { timeout: 15_000 });
+  await cp.getByRole("button", { name: "Submit" }).click();
+  await expect(cp).toBeHidden();
+  const a = await savedAnswer(page);
+  expect(a.mode).toBe("voice");
+  expect(a.transcript.text).toBe(ON_DEVICE);
+  expect(a.transcript.words.length).toBeGreaterThan(0);
+});
+
+test("on-device transcription fails (offline): plain message, the candidate types the words", async ({ page }) => {
+  await scriptedSpeech(page, [[{ at: 0, type: "nostart" }]]);
+  await page.addInitScript(() => {
+    (window as unknown as { __tpLocalAsr: () => Promise<never> }).__tpLocalAsr = () => Promise.reject(new Error("offline"));
+  });
+  const cp = await toVoiceAnswer(page);
+  await page.waitForTimeout(1000);
+  await cp.getByRole("button", { name: "Done" }).click();
+  await expect(cp.getByText("We couldn't turn the recording into text here")).toBeVisible({ timeout: 15_000 });
   await cp.getByTestId("transcript").fill("I cut the second weekend.");
   await cp.getByRole("button", { name: "Submit" }).click();
   await expect(cp).toBeHidden();
   expect((await savedAnswer(page)).transcript.text).toBe("I cut the second weekend.");
 });
 
-test("no speech recognition (Firefox): a heads-up before answering, recording still works, type the words", async ({ page }) => {
+test("no speech recognition (Firefox): a heads-up before answering, the recording becomes text on this device", async ({ page }) => {
   await page.addInitScript(() => {
     const w = window as unknown as Record<string, unknown>;
     delete w.SpeechRecognition;
@@ -132,18 +187,18 @@ test("no speech recognition (Firefox): a heads-up before answering, recording st
   await playToCheckpoint(page);
   const cp = page.getByTestId("checkpoint");
   await cp.locator('label:has(input[value="voice"])').click();
-  await expect(cp.getByTestId("speech-unsupported")).toContainText("can't turn speech into text");
+  await expect(cp.getByTestId("speech-unsupported")).toContainText("can't show live captions");
   await cp.getByRole("button", { name: /start answering/i }).click();
   await expect(cp).toHaveAttribute("data-phase", "answer", { timeout: 20_000 });
   await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "unsupported");
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1500);
   await cp.getByRole("button", { name: "Done" }).click();
-  await cp.getByTestId("transcript").fill("We kept both days and cut vendor spots.");
+  await expect(cp.getByTestId("transcript")).toHaveValue(ON_DEVICE, { timeout: 15_000 });
   await cp.getByRole("button", { name: "Submit" }).click();
   await expect(cp).toBeHidden();
   const a = await savedAnswer(page);
   expect(a.mode).toBe("voice");
-  expect(a.transcript.text).toBe("We kept both days and cut vendor spots.");
+  expect(a.transcript.text).toBe(ON_DEVICE);
 });
 
 test("paste is blocked when fixing the transcript too", async ({ page }) => {

@@ -11,7 +11,31 @@ export type { SpeechState };
 
 export const speechSupported = () => !!speechCtor();
 
-export type Recording = { blob?: Blob; durationS: number; transcript: Transcript; mimeType?: string };
+/** audio: an audio-only copy, kept in memory for on-device transcription, never saved. */
+export type Recording = { blob?: Blob; audio?: Blob; durationS: number; transcript: Transcript; mimeType?: string };
+
+/** Record a stream to a Blob. Returns a stop function that resolves with the recording. */
+function recordTo(s: MediaStream, video: boolean) {
+  const parts: Blob[] = [];
+  let r: MediaRecorder | null = null;
+  try {
+    r = new MediaRecorder(s, pickMime(video));
+    r.ondataavailable = (e) => e.data.size && parts.push(e.data);
+    r.start(1000);
+  } catch {
+    r = null;
+  }
+  return {
+    mimeType: r?.mimeType,
+    stop: () =>
+      new Promise<Blob | undefined>((resolve) => {
+        if (!r || r.state === "inactive") return resolve(parts.length ? new Blob(parts, r?.mimeType ? { type: r.mimeType } : undefined) : undefined);
+        const rr = r;
+        rr.onstop = () => resolve(parts.length ? new Blob(parts, { type: rr.mimeType }) : undefined);
+        rr.stop();
+      }),
+  };
+}
 
 /** Why the camera or mic could not start, in plain words. */
 export type DeviceError = "denied" | "missing" | "busy" | "unavailable";
@@ -39,8 +63,8 @@ export function useRecorder() {
   const [speech, setSpeech] = useState<SpeechState>({ kind: "off" });
   const [interim, setInterim] = useState("");
   const [heard, setHeard] = useState("");
-  const rec = useRef<MediaRecorder | null>(null);
-  const chunks = useRef<Blob[]>([]);
+  const rec = useRef<ReturnType<typeof recordTo> | null>(null);
+  const audioRec = useRef<ReturnType<typeof recordTo> | null>(null);
   const listener = useRef<ReturnType<typeof createListener> | null>(null);
   const speechChunks = useRef<SpeechChunk[]>([]);
   const t0 = useRef(0);
@@ -124,20 +148,15 @@ export function useRecorder() {
   );
 
   const start = useCallback((s: MediaStream) => {
-    chunks.current = [];
     speechChunks.current = [];
     t0.current = performance.now();
     lastEnd.current = 0;
     setHeard("");
     setInterim("");
-    try {
-      const r = new MediaRecorder(s, pickMime(hasVideoTrack(s)));
-      r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
-      r.start(1000);
-      rec.current = r;
-    } catch {
-      rec.current = null;
-    }
+    const video = hasVideoTrack(s);
+    rec.current = recordTo(s, video);
+    // Video answers also keep an audio-only copy: it is what on-device transcription reads.
+    audioRec.current = video && s.getAudioTracks().length ? recordTo(new MediaStream(s.getAudioTracks()), false) : null;
     const Ctor = speechCtor();
     if (!Ctor) {
       setSpeech({ kind: "unsupported" });
@@ -164,20 +183,19 @@ export function useRecorder() {
   const stop = useCallback(async (): Promise<Recording> => {
     const durationS = +((performance.now() - t0.current) / 1000).toFixed(2);
     const r = rec.current;
+    const a = audioRec.current;
     const l = listener.current;
-    const [blob] = await Promise.all([
-      new Promise<Blob | undefined>((resolve) => {
-        if (!r || r.state === "inactive") return resolve(chunks.current.length ? new Blob(chunks.current, r?.mimeType ? { type: r.mimeType } : undefined) : undefined);
-        r.onstop = () => resolve(new Blob(chunks.current, { type: r.mimeType }));
-        r.stop();
-      }),
+    const [blob, audio] = await Promise.all([
+      r ? r.stop() : Promise.resolve(undefined),
+      a ? a.stop() : Promise.resolve(undefined),
       // Give recognition a moment to deliver its last words.
       l ? l.stop(1500) : Promise.resolve(),
     ]);
     listener.current = null;
     rec.current = null;
+    audioRec.current = null;
     setInterim("");
-    return { blob, durationS, transcript: fromChunks(speechChunks.current), mimeType: r?.mimeType };
+    return { blob, audio: audio ?? blob, durationS, transcript: fromChunks(speechChunks.current), mimeType: r?.mimeType };
   }, []);
 
   return { stream, level, error, speech, interim, heard, prepare, start, stop, release: cleanup, getError: () => errorRef.current };

@@ -8,7 +8,8 @@ import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { UNSUPPORTED_MESSAGE } from "@/lib/checkpoint/speech";
 import { MAX_RETAKES, timing, type CheckpointKind } from "@/lib/checkpoint/timing";
-import { applyCorrection, fromTyping, wordsChanged } from "@/lib/checkpoint/transcript";
+import { transcribeLocally, warmLocalAsr } from "@/lib/checkpoint/localAsr";
+import { applyCorrection, fromChunks, fromTyping, wordsChanged } from "@/lib/checkpoint/transcript";
 import { cameraCheck, media } from "@/lib/store/media";
 import { cn } from "@/lib/utils";
 import { Captions, MicMeter, Num, PanelPortrait, Ring, TypedQuestion, useQuiet } from "./parts";
@@ -132,6 +133,9 @@ export function Checkpoint(p: Props) {
   const [result, setResult] = useState<Recording | null>(null);
   const [text, setText] = useState("");
   const [fixed, setFixed] = useState("");
+  // On-device transcription of the recording, when live captions heard nothing.
+  const [asr, setAsr] = useState<"idle" | "working" | "empty" | "failed">("idle");
+  const asrRun = useRef(0);
   const [pasteBlocked, setPasteBlocked] = useState(false);
   const [deviceMsg, setDeviceMsg] = useState<string | null>(null);
   const wordTimes = useRef<number[]>([]);
@@ -244,6 +248,8 @@ export function Checkpoint(p: Props) {
     setText("");
     setFixed("");
     setResult(null);
+    asrRun.current++;
+    setAsr("idle");
     if (m !== "text" && st) r.start(st);
     setPhase("answer");
   }, [mode, r]);
@@ -255,9 +261,29 @@ export function Checkpoint(p: Props) {
       const rec = await r.stop();
       setResult(rec);
       setFixed(rec.transcript.text);
+      // Live captions got nothing (no speech service, blocked, offline): turn the recording into text on this device.
+      if (!rec.transcript.text && rec.audio) {
+        const run = ++asrRun.current;
+        setAsr("working");
+        transcribeLocally(rec.audio, rec.durationS)
+          .then((chunks) => {
+            if (asrRun.current !== run) return;
+            const tr = fromChunks(chunks);
+            if (!tr.text) return setAsr("empty");
+            setResult((x) => (x ? { ...x, transcript: tr } : x));
+            setFixed((f) => (f.trim() ? f : tr.text)); // never overwrite words the candidate already typed
+            setAsr("idle");
+          })
+          .catch(() => asrRun.current === run && setAsr("failed"));
+      }
     }
     setPhase("review");
   }, [mode, r, text]);
+
+  // Fetch the on-device model as soon as live captions are known not to work, so it's ready at Done.
+  useEffect(() => {
+    if (phase === "answer" && (r.speech.kind === "error" || r.speech.kind === "unsupported")) warmLocalAsr();
+  }, [phase, r.speech.kind]);
 
   const thinkLeft = useCountdown(t.thinkS, phase === "think" && settled && !choosing, () => void beginAnswer());
   const answerLeft = useCountdown(t.answerS, phase === "answer", finishAnswer);
@@ -571,10 +597,19 @@ export function Checkpoint(p: Props) {
                   What we heard
                 </label>
                 <p className="text-xs opacity-80" id={`fix-help-${p.id}`}>
-                  {result.transcript.text
-                    ? "Fix any words we misheard. These words are what is scored, never your face or voice."
-                    : "We didn't catch any words. Type what you said so your answer counts. Your recording is saved either way."}
+                  {asr === "working"
+                    ? "Turning your recording into text on this device. This takes a few seconds and nothing is uploaded. You can start typing if you like."
+                    : asr === "failed"
+                      ? "We couldn't turn the recording into text here. Type what you said so your answer counts. Your recording is saved either way."
+                      : result.transcript.text
+                        ? "Fix any words we misheard. These words are what is scored, never your face or voice."
+                        : "We didn't catch any words. Type what you said so your answer counts. Your recording is saved either way."}
                 </p>
+                {asr === "working" && (
+                  <p className="mt-1 text-xs font-semibold" role="status" data-testid="asr-status">
+                    Transcribing…
+                  </p>
+                )}
                 <textarea
                   id={`fix-${p.id}`}
                   aria-describedby={`fix-help-${p.id}`}
@@ -596,7 +631,7 @@ export function Checkpoint(p: Props) {
             {/* In the game the primary action sits bottom right like every game modal, with Retake to its left. */}
             <div className={cn("flex flex-wrap gap-2", game && "justify-end")}>
               {game && retakeBtn}
-              <button onClick={submit} className={s.primary} autoFocus>
+              <button onClick={submit} className={s.primary} autoFocus disabled={asr === "working" && !fixed.trim()}>
                 Submit
               </button>
               {!game && retakeBtn}
