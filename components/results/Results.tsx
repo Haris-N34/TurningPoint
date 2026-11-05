@@ -6,6 +6,7 @@ import { CapabilityCard } from "@/components/card/CapabilityCard";
 import type { Card } from "@/lib/card/types";
 import { store } from "@/lib/store/store";
 import { CandidateActions } from "./CandidateActions";
+import { ResumeIntake } from "./ResumeIntake";
 
 // Candidate's results (C7): their own card exactly as an employer sees it, plus their controls.
 export function Results({ attemptId }: { attemptId: string }) {
@@ -30,6 +31,7 @@ export function Results({ attemptId }: { attemptId: string }) {
         hiddenClipIds={card.checkpoints.filter((c) => c.hidden).map((c) => c.id)}
         showFinalScore={false}
       />
+      <ResumeIntake card={card} onChange={setCard} />
       <CandidateActions card={card} onChange={setCard} />
     </main>
   );

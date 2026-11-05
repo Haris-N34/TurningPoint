@@ -158,10 +158,10 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] C.2 [D] Inbound webhook creates an invite; signature, timestamp and idempotency enforced (bad signature, replay, duplicate tests)
 - [ ] C.3 [D] Outbound result appears in the mock ATS with a link back; failures retry with backoff and show in the console
 - [ ] C.4 [D] Public API with API keys, rate limits and generated OpenAPI docs at /developers
-- [ ] C.5 [D] Resume Analyzer strips identity and prestige fields before any model call (fixtures with names, schools, years, addresses)
-- [ ] C.6 [D] Resume items labelled Claimed, game items Observed; links "Backed by game evidence" or "Not yet shown", never "false"
-- [ ] C.7 [D] Two-column Resume vs Evidence view on the Capability Card
-- [ ] C.8 [D] Counterfactual: same resume with different names and schools gives identical resume signals
+- [x] C.5 [D] Resume Analyzer strips identity and prestige fields before any model call (fixtures with names, schools, years, addresses)
+- [x] C.6 [D] Resume items labelled Claimed, game items Observed; links "Backed by game evidence" or "Not yet shown", never "false"
+- [x] C.7 [D] Two-column Resume vs Evidence view on the Capability Card
+- [x] C.8 [D] Counterfactual: same resume with different names and schools gives identical resume signals
 - [ ] C.9 [D] Open Badges 3.0 export plus /verify; a tampered file fails verification (test)
 - [ ] C.10 [D] Integration console shows the live webhook log and can re-send a failed delivery
 - [ ] C.11 [D] Second Look works end to end from a mock ATS rejection; rescued count on analytics

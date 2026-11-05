@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { scoreCard } from "@/lib/scoring/score";
 import { ClipPlayer, type ClipHandle } from "./ClipPlayer";
 import { FinalScoreBox } from "./FinalScoreBox";
+import { ResumeEvidence } from "./ResumeEvidence";
 
 // The Capability Card (E3). One component for the recruiter and for the candidate's own preview (C7.1).
 // It fits a laptop screen: evidence on the left, decision path and clips on the right.
@@ -258,6 +259,8 @@ export function CapabilityCard({
           </section>
         )}
       </div>
+
+      <ResumeEvidence card={{ ...card, evidence }} onJump={jump} />
     </article>
   );
 }

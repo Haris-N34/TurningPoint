@@ -82,9 +82,9 @@ export function linkClaim(claim: ExtractedClaim, card: Pick<Card, "evidence" | "
 export function analyzeResume(
   raw: string,
   card: Pick<Card, "evidence" | "checkpoints" | "decisionPath" | "kpis">,
-  opts: { source: "upload" | "ats"; knownNames?: string[]; now?: string; analyzer?: (redacted: string) => ExtractedClaim[] },
+  opts: { source: "upload" | "ats"; knownNames?: string[]; knownSchools?: string[]; now?: string; analyzer?: (redacted: string) => ExtractedClaim[] },
 ): ResumeAnalysis {
-  const red = redactResume(raw, { knownNames: opts.knownNames });
+  const red = redactResume(raw, { knownNames: opts.knownNames, knownSchools: opts.knownSchools });
   const extracted = (opts.analyzer ?? extractClaims)(red.text);
   const claims = extracted.map((c, i) => {
     const link = linkClaim(c, card);

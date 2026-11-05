@@ -24,7 +24,7 @@ export function splitRoleLine(line: string): { role: string; org?: string } {
   return m ? { role: m[1].trim(), org: m[2].replace(/\s*[|,]\s*[^|,]*\[year\].*$/, "").trim() } : { role: t };
 }
 
-export function redactResume(raw: string, opts: { knownNames?: string[] } = {}): Redacted {
+export function redactResume(raw: string, opts: { knownNames?: string[]; knownSchools?: string[] } = {}): Redacted {
   const counts = new Map<Redaction["kind"], number>();
   const sub = (text: string, re: RegExp, kind: Redaction["kind"], to: string | ((m: string) => string)) =>
     text.replace(re, (m) => {
@@ -68,7 +68,8 @@ export function redactResume(raw: string, opts: { knownNames?: string[] } = {}):
   // Graduation and other years.
   text = sub(text, /\b(?:19|20)\d{2}\b/g, "year", "[year]");
 
-  // Schools become "University".
+  // Schools become "University": any the profile or ATS named, then anything shaped like a school.
+  for (const s of opts.knownSchools ?? []) if (s.trim().length > 2) text = sub(text, new RegExp(escape(s.trim()), "gi"), "school", "University");
   const W = `[A-Z][\\p{L}.'&-]*`;
   text = sub(
     text,
