@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { Game } from "@/components/game/Game";
 import { challengeScenario, getChallenge, getChallengeBySlug, type Challenge } from "@/lib/challenge/challenge";
@@ -13,7 +14,7 @@ export function ChallengePlay({ slug, challengeId, sandbox = false }: { slug?: s
     setC((slug ? getChallengeBySlug(s, slug) : challengeId ? getChallenge(s, challengeId) : undefined) ?? null);
   }, [slug, challengeId]);
 
-  if (c === undefined) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (c === undefined) return <PageSkeleton />;
   if (c === null) return <main className="mx-auto max-w-xl p-6">This challenge isn&apos;t available.</main>;
   return (
     <>

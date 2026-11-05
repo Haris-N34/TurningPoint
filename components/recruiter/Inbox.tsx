@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -69,7 +70,7 @@ export function Inbox() {
 
   useEffect(() => setSel((i) => Math.min(i, Math.max(0, rows.length - 1))), [rows.length]);
 
-  if (challenges === null) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (challenges === null) return <PageSkeleton />;
 
   if (!challenges.length) {
     return (
@@ -111,14 +112,14 @@ export function Inbox() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 sm:px-10" data-testid="inbox">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0 max-w-full">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Recruiter inbox</p>
           <label htmlFor="challenge-pick" className="sr-only">Challenge</label>
           <select
             id="challenge-pick"
             value={challenge?.id}
             onChange={(e) => router.push(`/recruiter?challenge=${e.target.value}`)}
-            className="mt-2 min-h-11 max-w-full rounded-md border border-input bg-background px-3 font-display text-xl"
+            className="mt-2 min-h-11 w-full max-w-full truncate rounded-md border border-input bg-background px-3 font-display text-xl sm:w-auto"
           >
             {challenges.map((c) => (
               <option key={c.id} value={c.id}>
@@ -192,7 +193,7 @@ export function Inbox() {
         <p className="ml-auto text-xs text-muted-foreground">Keys: J/K move · Enter open · S shortlist</p>
       </fieldset>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
+      <div className="relative mt-4 overflow-x-auto rounded-xl border bg-card shadow-card">
         <table className="w-full min-w-[720px] text-left text-sm" aria-label="Candidates">
           <thead className="border-b text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -271,10 +272,10 @@ export function Inbox() {
       </p>
 
       {toast && (
-        <div role="status" className="fixed bottom-4 right-4 z-50 max-w-md rounded-xl border bg-card p-4 text-sm shadow-card" data-testid="toast">
+        <div role="status" className="fixed bottom-4 left-4 right-4 z-50 max-w-md rounded-xl sm:left-auto border bg-card p-4 text-sm shadow-card" data-testid="toast">
           <div className="flex items-start justify-between gap-3">
             <p className="font-medium">{toast.text}</p>
-            <button type="button" aria-label="Dismiss" onClick={() => setToast(null)} className="text-muted-foreground">✕</button>
+            <button type="button" aria-label="Dismiss" onClick={() => setToast(null)} className="-m-2 inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground">✕</button>
           </div>
           {toast.payload && (
             <details className="mt-2">

@@ -181,7 +181,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
 - [x] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe): zero serious/critical axe findings on every route in light and dark (tests/e2e/a11y.spec.ts, lib/store/accommodations.test.ts; docs/POLISH.md)
-- [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
+- [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
 - [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
