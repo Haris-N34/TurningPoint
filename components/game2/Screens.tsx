@@ -253,13 +253,13 @@ export function LoadingScreen({ ready, onDone }: { ready: boolean; onDone: () =>
     if (ready && minDone) onDone();
   }, [ready, minDone, onDone]);
   return (
-    <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#2e222f] p-6 text-center text-[#fff8e7]" data-testid="loading-screen" aria-busy="true">
+    <motion.div exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#2e222f] p-6 text-center text-[#fff8e7]" data-testid="loading-screen" aria-busy="true">
       <p className={cn(pixelTitle.className, "text-[14px] sm:text-[16px]")}>Loading…</p>
       <div className="mt-5 h-4 w-64 overflow-hidden rounded-[2px] border-[3px] border-[#fff8e7] p-0.5">
         <motion.div className="h-full bg-[#ffd166]" initial={{ width: "5%" }} animate={{ width: ready ? "100%" : "80%" }} transition={{ duration: 1.2 }} />
       </div>
       <p className="mt-6 max-w-md text-[15px] text-[#fff8e7]/85"><span className="font-semibold text-[#ffd166]">Tip:</span> {tip}</p>
-    </div>
+    </motion.div>
   );
 }
 

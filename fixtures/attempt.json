@@ -69,9 +69,9 @@
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
-        "quote": "Losing a day would hurt the vendors more than the bands.",
-        "startS": 12.69,
-        "endS": 16.89
+        "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
+        "startS": 0,
+        "endS": 9.58
       }
     }
   ],
@@ -1428,7 +1428,7 @@
   ],
   "audit": {
     "extractor": "local-rules",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "createdAt": "2026-11-04T17:42:00.000Z"
   }
 }

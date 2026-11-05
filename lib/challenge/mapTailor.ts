@@ -10,7 +10,7 @@ const texts = z.record(z.string(), z.string().min(1));
 export const MapOverridesSchema = z.object({
   title: z.string().min(1).optional(),
   summary: z.string().min(1).optional(),
-  /** Quick mode (Mon to Wed) has its own summary on the title screen. */
+  /** The Quick mode (Mon to Wed) intro, when the map has one. */
   quickSummary: z.string().min(1).optional(),
   role: z.string().min(1).optional(),
   /** NPC lines, keyed "node:index". */
