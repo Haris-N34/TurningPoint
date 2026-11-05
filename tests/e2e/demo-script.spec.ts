@@ -5,7 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 // Steps that need unmerged branches are skipped with the branch named in the reason.
 
 type TP = {
-  getState: () => { t: number; tp: { fired: boolean }; issues: Record<string, { status: string }> };
+  getState: () => { t: number; tp: { fired: boolean; disruptionId: string }; issues: Record<string, { status: string }> };
   setClock: (t: string) => void;
 };
 const tp = <T,>(page: Page, fn: (tp: TP) => T) => page.evaluate(`(${fn.toString()})(window.__tp)`) as Promise<T>;
@@ -179,7 +179,10 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByTestId("cutscene-next").click();
     await expect(page.getByTestId("budget-drain")).toBeVisible();
     await page.getByTestId("cutscene-done").click();
-    expect(await tp(page, (x) => x.getState().issues["recovery-plan"].status)).toBe("open");
+    // The disruption is picked by seed; each one opens its own recovery issue.
+    const recovery = { "sponsor-pulls-out": "recovery-plan", "venue-cancels": "recovery-venue", "lead-volunteer-quits": "recovery-cover" } as Record<string, string>;
+    const fired = await tp(page, (x) => x.getState().tp.disruptionId);
+    expect(await tp(page, (x) => x.getState().issues)).toHaveProperty([recovery[fired], "status"], "open");
   });
 
   test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async () => {
@@ -201,7 +204,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     const card = page.getByTestId("capability-card");
     // v2 Part D: a Final score exists but only sorts; it never hides or rejects anyone.
     await expect(card).toContainText("Never used to hide or reject anyone");
-    await expect(card).not.toContainText(/score\s*[:=]?\s*\d/i);
+    await expect(card).toContainText("Sorts only");
+    await expect(card).not.toContainText(/threshold|cut-?off|pass mark|auto-?reject/i);
     await page.getByTestId("jump-prioritization").click();
     await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
     await expect(page.getByTestId("witness-line")).toHaveText("Confirmed by 1 community partner");
