@@ -23,6 +23,7 @@ export function AdminHome() {
             <Button variant="outline" onClick={() => { seedDemo(store()); refresh(); }}>Load demo data</Button>
           )}
           <Button asChild><Link href="/admin/new">New challenge</Link></Button>
+          <Button asChild variant="outline"><Link href="/admin/ai-health">AI health</Link></Button>
         </div>
       </div>
       <ul className="mt-8 grid gap-4 sm:grid-cols-2">

@@ -118,11 +118,11 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] B.1 [D] All model calls go through lib/ai with a provider interface; the mock provider passes the full e2e suite offline
 - [x] B.2 [D] Every B2 service exists with a Zod schema, fixtures and a fallback (lib/ai/services, registry in lib/ai/prompts/registry.ts, lib/ai/services.test.ts)
 - [x] B.3 [D] Scenario Tailor and Dialogue Variants run at publish time and are cached; no live generation of game content (lib/ai/services/publish.ts, lib/ai/publish.test.ts)
-- [ ] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context
-- [ ] B.5 [D] Value Mapper shows mappings with confidence; admin can accept, change or reject each
-- [ ] B.6 [D] Recruiter Copilot answers only with citations; refuses protected-trait and hire/no-hire questions (tests)
+- [x] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context (lib/ai/consistency.test.ts, tests/e2e/ai.spec.ts)
+- [x] B.5 [D] Value Mapper shows mappings with confidence; admin can accept, change or reject each (components/admin/ValueMapper.tsx, lib/ai/valueMapper.test.ts, tests/e2e/ai.spec.ts)
+- [x] B.6 [D] Recruiter Copilot answers only with citations; refuses protected-trait and hire/no-hire questions (tests: lib/ai/copilot.test.ts, tests/e2e/ai.spec.ts)
 - [ ] B.7 [D] Counterfactual bias test, hallucination eval and gold-set accuracy eval run in CI and block merge on failure
-- [ ] B.8 [D] ai_calls telemetry on an admin "AI health" page: calls, latency p50/p95, cost, validation failures
+- [x] B.8 [D] ai_calls telemetry on an admin "AI health" page: calls, latency p50/p95, cost, validation failures (/admin/ai-health, lib/ai/telemetry.ts)
 - [ ] B.9 [D] AI_MODE=cached lets the whole demo run without network access to the model provider
 - [ ] B.10 [D+H] Gold set of 40+ hand-scored answers (both team members); kappa in docs/EVALS.md
 - Done when: all B items pass in CI.

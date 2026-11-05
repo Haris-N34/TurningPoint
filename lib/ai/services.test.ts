@@ -22,7 +22,7 @@ import type { AiCall } from "./telemetry";
 
 // B.2: every B2 service exists with a Zod schema, fixtures and a fallback.
 
-const log = (_: AiCall) => {};
+const log = (call: AiCall) => void call;
 const opts = { provider: new LocalProvider(), log };
 
 describe("registry", () => {
