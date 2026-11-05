@@ -121,6 +121,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     coach.current = !jump;
     const id = newAttemptId();
     setAttemptId(id);
+    claimedAt.current = Date.now();
     init(base, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view, length: settings.length });
     if (jump) {
       // Demo jump (P.2): a scripted sensible player runs Monday and Tuesday on the fixed seed (sponsor pulls out).
@@ -149,6 +150,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     prev.current = st;
     restore(base, st, resumable.log);
     setAttemptId(resumable.attemptId);
+    claimedAt.current = Date.now();
     setAnswers(resumable.answers);
     setIntegrity(resumable.integrity);
     if (resumable.avatar) useGame.setState({ avatar: resumable.avatar });
@@ -160,21 +162,44 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setScreen("loading");
   }, [resumable, base, restore, setScreen, setSettings, settings.view, toast]);
 
+  // The same run continued in another tab: stop here, save nothing more, ask for a reload (QA S3).
+  const [elsewhere, setElsewhere] = useState(false);
+  const claimedAt = useRef(0);
+  const elsewhereRef = useRef(false);
+  elsewhereRef.current = elsewhere;
+  useEffect(() => {
+    if (!attemptId || sandbox || jump) return;
+    // Each tab stamps when it took the run (claimedAt). Only a newer claim stops this tab; the newest tab wins.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== `tp:run:${attemptId}` || !e.newValue) return;
+      let theirs = 0;
+      try {
+        theirs = Number((JSON.parse(e.newValue) as { extra?: { claimedAt?: number } }).extra?.claimedAt ?? 0);
+      } catch {}
+      if (theirs > claimedAt.current) {
+        setElsewhere(true);
+        setPaused(true);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [attemptId, sandbox, jump, setPaused]);
+
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
-    if (!state || sandbox || jump || !attemptId) return;
+    if (!state || sandbox || jump || !attemptId || elsewhere) return;
     store().saveRun({
       attemptId,
       challengeId: challenge.id,
       scenarioId: `map:${mapId}`,
       seed: state.seed,
       state: { t: state.t, ended: state.ended },
-      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length, view: settings.view, reducedMotion: settings.reducedMotion },
+      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length, view: settings.view, reducedMotion: settings.reducedMotion, claimedAt: claimedAt.current },
       status: state.ended && phase === "real-life" ? "finished" : "playing",
       startedAt: new Date().toISOString(),
       practice: false,
     });
-  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase, settings.view, settings.reducedMotion]);
+  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase, settings.view, settings.reducedMotion, elsewhere]);
 
   // Music: calm, then tense after the turning point (A0).
   useEffect(() => {
@@ -200,7 +225,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   useEffect(() => {
     const onVis = () => document.hidden && screen === "play" && setPaused(true);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !e.defaultPrevented && screen === "play" && !state?.dialogue && !(state?.checkpointsDue.length ?? 0)) setPaused(!useGame.getState().paused);
+      if (e.key === "Escape" && !e.defaultPrevented && !elsewhereRef.current && screen === "play" && !state?.dialogue && !(state?.checkpointsDue.length ?? 0)) setPaused(!useGame.getState().paused);
     };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("keydown", onKey);
@@ -536,7 +561,16 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
               />
             )
           )}
-          {paused && <PauseMenu onResume={() => setPaused(false)} />}
+          {elsewhere && (
+            <div className="absolute inset-0 z-[65] flex items-center justify-center bg-[#2e222f]/80 p-4" role="alertdialog" aria-modal="true" aria-label="Run continued in another tab" data-testid="other-tab">
+              <Panel className="w-[min(420px,92vw)] p-4 text-center">
+                <p className="text-[17px] font-semibold">This run continued in another tab.</p>
+                <p className="mt-1 text-[14px] text-[#6a5a4a]">Reload to keep going from the latest save.</p>
+                <PixelButton className="mt-4" autoFocus onClick={() => window.location.reload()} data-testid="other-tab-reload">Reload</PixelButton>
+              </Panel>
+            </div>
+          )}
+          {paused && !elsewhere && <PauseMenu onResume={() => setPaused(false)} />}
           {state.ended && !due && (
             <div className="absolute inset-0 z-40">
               <PixelButton className="absolute bottom-4 left-1/2 -translate-x-1/2" onClick={() => setScreen("results")} data-testid="to-results">
