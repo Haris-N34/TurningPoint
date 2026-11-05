@@ -20,6 +20,7 @@ import { store } from "@/lib/store/store";
 import { cn } from "@/lib/utils";
 import { SecondLookQueue } from "./SecondLook";
 
+const PAGE = 20;
 const STATUS_LABEL: Record<Status, string> = { new: "New", shortlist: "Shortlisted", hold: "On hold", pass: "Passed", withdrawn: "Withdrawn" };
 
 // Candidate inbox (E2): one table per challenge, filters, sorting, keyboard review, fair-review settings, ATS export.
@@ -39,6 +40,9 @@ export function Inbox() {
   useEffect(() => setChallenges(listChallenges(store()).filter((c) => c.status === "published")), [version]);
   const challengeId = params.get("challenge") ?? challenges?.[0]?.id;
   useEffect(() => setPicked([]), [challengeId]);
+  // Long inboxes show 20 rows at a time; nobody is removed, the rest are one click (or J) away.
+  const [limit, setLimit] = useState(PAGE);
+  useEffect(() => setLimit(PAGE), [challengeId, filter, sort]);
   const challenge = challenges?.find((c) => c.id === challengeId);
 
   const rows: InboxRow[] = useMemo(() => {
@@ -66,7 +70,12 @@ export function Inbox() {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
       if (["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "j") setSel((i) => Math.min(rows.length - 1, i + 1));
+      if (e.key === "j")
+        setSel((i) => {
+          const next = Math.min(rows.length - 1, i + 1);
+          if (next >= limit) setLimit((l) => l + PAGE);
+          return next;
+        });
       else if (e.key === "k") setSel((i) => Math.max(0, i - 1));
       else if (e.key === "Enter" && t.tagName !== "BUTTON" && t.tagName !== "A") open(rows[Math.max(0, sel)]);
       else if (e.key === "s") shortlist(rows[Math.max(0, sel)]);
@@ -75,7 +84,7 @@ export function Inbox() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [rows, sel, open, shortlist]);
+  }, [rows, sel, open, shortlist, limit]);
 
   useEffect(() => setSel((i) => Math.min(i, rows.length - 1)), [rows.length]);
 
@@ -247,7 +256,7 @@ export function Inbox() {
               </tr>
             </thead>
             <tbody className="max-sm:block">
-              {rows.map((r, i) => (
+              {rows.slice(0, limit).map((r, i) => (
                 <tr
                   key={r.attemptId}
                   aria-selected={i === sel}
@@ -332,6 +341,23 @@ export function Inbox() {
             </tbody>
           </table>
         </div>
+        {rows.length > PAGE && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/70 px-4 py-2.5 text-sm" data-testid="inbox-pager">
+            <p className="text-muted-foreground" aria-live="polite">
+              Showing 1 to {Math.min(limit, rows.length)} of {rows.length}
+            </p>
+            {limit < rows.length && (
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setLimit((l) => l + PAGE)} data-testid="show-more">
+                  Show {Math.min(PAGE, rows.length - limit)} more
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setLimit(rows.length)} data-testid="show-all">
+                  Show all
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/70 bg-muted/30 px-4 py-2.5">
           <div className="flex flex-wrap items-center gap-3">
             <Button

@@ -23,7 +23,7 @@
  },
  "checkpoint-question@1.0.0:900df2d4ed0eb5c8": {
   "output": {
-   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "question": "You've got 1 open problems: \"Nobody wants logistics\". Which are you going to first, and why?",
    "source": "generated"
   },
   "model": "local-rules"
@@ -392,7 +392,7 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:c2b790306f456caf": {
+ "recruiter-copilot@1.0.0:6e6fcaff05c8979e": {
   "output": {
    "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:12: “Losing a day would hurt the vendors more than the bands.”",
    "citations": [
@@ -415,7 +415,7 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:dc565b39b9a2cad5": {
+ "recruiter-copilot@1.0.0:8c3a43bc4fabdc56": {
   "output": {
    "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
    "citations": [

@@ -17,7 +17,7 @@ export default function CandidateHome() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Candidate</p>
         <h1 className="mt-4 max-w-xl font-display text-4xl leading-[1.1] tracking-tight sm:text-5xl">Let your next move speak for you.</h1>
         <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
-          Lead a team through one week. The plan breaks, and short checkpoints ask why you chose what you did.
+          Lead a team through the days before a launch. The plan breaks, and short checkpoints ask why you chose what you did.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Button asChild size="lg">
@@ -25,7 +25,7 @@ export default function CandidateHome() {
               Play the game <span aria-hidden>→</span>
             </Link>
           </Button>
-          <p className="text-sm text-muted-foreground">Launch Week · about 15 minutes</p>
+          <p className="text-sm text-muted-foreground">Launch Week · about 5 minutes</p>
         </div>
         <ul className="mt-8 flex flex-col gap-2 text-sm text-muted-foreground">
           <li className="flex items-center gap-2"><span aria-hidden className="size-1.5 rounded-full bg-primary" />Video, voice or text, your choice</li>

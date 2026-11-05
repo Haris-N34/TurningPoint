@@ -144,3 +144,31 @@ export function tailorMap(base: MapScenario, industry: Industry, company?: strin
     return { map: base, changed: false, error: e instanceof Error ? e.message : String(e) };
   }
 }
+
+/**
+ * Builder errors in plain words (QA night): which line, question or option is wrong, not a raw schema message
+ * like "Too small: expected string to have >=1 characters". Unknown issues keep their own message.
+ */
+export function friendlyMapErrors(issues: { path: PropertyKey[]; message: string; code?: string }[], map: MapScenario): string[] {
+  const who = (id: string) => map.npcs.find((n) => n.id === id)?.name ?? (id === "laptop" ? "the laptop" : id);
+  const out = issues.map((i) => {
+    const [a, n, b, k, c] = i.path;
+    const empty = /too small|>=1|at least 1|empty/i.test(i.message);
+    if (a === "nodes" && typeof n === "number") {
+      const node = map.nodes[n];
+      const where = node ? `${who(node.npc)}'s conversation ("${node.prompt}")` : `a conversation`;
+      if (b === "lines" && typeof k === "number") return empty ? `Line ${k + 1} of ${where} is empty. Every line needs text.` : `Line ${k + 1} of ${where}: ${i.message}`;
+      if (b === "prompt") return empty ? `The question in ${where} is empty.` : `The question in ${where}: ${i.message}`;
+      if (b === "options" && typeof k === "number") {
+        const letter = node?.options[k]?.id?.toUpperCase() ?? String(k + 1);
+        if (c === "label") return empty ? `Option ${letter} in ${where} has no text.` : `Option ${letter} in ${where}: ${i.message}`;
+        return `Option ${letter} in ${where}: ${i.message}`;
+      }
+    }
+    if (a === "issues" && typeof n === "number" && b === "title") return empty ? `The title of problem ${n + 1} is empty.` : `Problem ${n + 1} title: ${i.message}`;
+    if (a === "title" || a === "summary" || a === "role") return empty ? `The challenge ${String(a)} is empty.` : `${String(a)}: ${i.message}`;
+    return i.message;
+  });
+  return [...new Set(out)];
+}
+

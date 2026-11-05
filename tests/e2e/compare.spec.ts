@@ -8,6 +8,7 @@ test("compare view: pick 2 or 3 cards, evidence and answers side by side in the 
   await page.goto("/recruiter");
   await page.getByRole("button", { name: "Load 200 fictional candidates" }).click();
   await page.goto("/recruiter?challenge=ch_impact_energy");
+  await page.getByTestId("show-all").click(); // the inbox pages by 20; the picks below span the list
   const open = page.getByTestId("compare-open");
   await expect(open).toBeDisabled();
   await page.getByTestId(`pick-${id(10)}`).check();
