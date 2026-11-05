@@ -15,6 +15,8 @@ type Opts = {
   isFrozen: () => boolean;
   reducedMotion: () => boolean;
   attract?: boolean; // title screen: camera drifts, no player control
+  /** True while a cutscene plays: signs step aside so only the cutscene reads. */
+  hideSigns?: () => boolean;
   /** CSS font family for zone signs (the game's pixel body font). */
   font?: string;
 };
@@ -507,11 +509,12 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const listW = desktop ? (320 * k) / z : 0, listBottom = (360 * k) / z;
       // Signs keep one on-screen size whatever the camera zoom (about 18 px tall).
       const scale = (desktop ? 17 : 14) / (8 * z);
+      const hide = this.panning || !!o.hideSigns?.();
       for (const { text, zone: zn } of this.labels) {
         const zx = zn.x * TILE, zy = zn.y * TILE, zw = zn.w * TILE, zh = zn.h * TILE;
         const inView = zx < v.right && zx + zw > v.x && zy < v.bottom && zy + zh > v.y;
-        text.setVisible(inView && !this.panning);
-        if (!inView || this.panning) continue;
+        text.setVisible(inView && !hide);
+        if (!inView || hide) continue;
         text.setScale(scale);
         const hw = text.displayWidth / 2 + 2;
         const y = Phaser.Math.Clamp(zy - 2, v.y + top + text.displayHeight, v.bottom - 2);

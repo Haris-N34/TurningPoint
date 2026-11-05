@@ -98,30 +98,30 @@ export function SettingsForm() {
   const s = useGame((g) => g.settings);
   const set = useGame((g) => g.setSettings);
   return (
-    <div className="space-y-2 text-sm" data-testid="settings">
-      <label className="flex items-center justify-between gap-2">
+    <div className="space-y-1 text-[15px]" data-testid="settings">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Turn-based mode (no clock pressure)
-        <input type="checkbox" checked={s.turnBased} onChange={(e) => set({ turnBased: e.target.checked })} data-testid="set-turn-based" />
+        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.turnBased} onChange={(e) => set({ turnBased: e.target.checked })} data-testid="set-turn-based" />
       </label>
-      <label className="flex items-center justify-between gap-2">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         List view (no map)
-        <input type="checkbox" checked={s.view === "list"} onChange={(e) => set({ view: e.target.checked ? "list" : "map" })} data-testid="set-list-view" />
+        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.view === "list"} onChange={(e) => set({ view: e.target.checked ? "list" : "map" })} data-testid="set-list-view" />
       </label>
-      <label className="flex items-center justify-between gap-2">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Reduced motion
-        <input type="checkbox" checked={s.reducedMotion} onChange={(e) => set({ reducedMotion: e.target.checked })} data-testid="set-reduced-motion" />
+        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.reducedMotion} onChange={(e) => set({ reducedMotion: e.target.checked })} data-testid="set-reduced-motion" />
       </label>
-      <label className="flex items-center justify-between gap-2">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Sound effects
-        <input type="checkbox" checked={!s.muted} onChange={(e) => set({ muted: !e.target.checked })} />
+        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={!s.muted} onChange={(e) => set({ muted: !e.target.checked })} />
       </label>
-      <label className="flex items-center justify-between gap-2">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Music
-        <input type="checkbox" checked={s.music} onChange={(e) => set({ music: e.target.checked })} />
+        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.music} onChange={(e) => set({ music: e.target.checked })} />
       </label>
-      <label className="flex items-center justify-between gap-2">
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Text speed
-        <select value={s.textSpeed} onChange={(e) => set({ textSpeed: e.target.value as typeof s.textSpeed })} className="rounded border-2 border-[#2e222f] bg-white px-1">
+        <select value={s.textSpeed} onChange={(e) => set({ textSpeed: e.target.value as typeof s.textSpeed })} className="min-h-8 rounded-[4px] border-2 border-[#2e222f] bg-white px-1">
           <option value="slow">Slow</option>
           <option value="normal">Normal</option>
           <option value="fast">Fast</option>
@@ -276,6 +276,10 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
       <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
+      {/* The hit: a red edge flash as the money goes. */}
+      {phase === "drain" && !reduce && (
+        <motion.div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_160px_40px_rgba(196,61,34,0.85)]" initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0.25, 0.6, 0] }} transition={{ duration: 1.6, times: [0, 0.12, 0.4, 0.55, 1] }} aria-hidden />
+      )}
       {phase === "ring" ? (
         <motion.div initial={reduce ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
           <Panel tone="ink" className="flex w-[min(460px,92vw)] items-center gap-4 p-4 sm:p-5" aria-live="assertive">
@@ -310,7 +314,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
             {phase === "drain" && (
               <div className="mt-4 flex items-center justify-between gap-3 rounded-[4px] border-2 border-[#2e222f] bg-white px-3 py-2">
                 <p className="text-[13px] font-semibold uppercase tracking-wide">Budget</p>
-                <motion.p className={cn(pixelTitle.className, "text-[20px] text-[#c43d22] sm:text-[24px]")} data-testid="budget-drain">{shown}</motion.p>
+                <motion.p className={cn(pixelTitle.className, "text-[20px] text-[#c43d22] sm:text-[24px]")} animate={reduce ? {} : { x: [0, -3, 3, -2, 2, 0] }} transition={{ duration: 0.4, repeat: 4 }} data-testid="budget-drain">{shown}</motion.p>
               </div>
             )}
             <div className="mt-4 flex justify-end">
@@ -365,8 +369,8 @@ export function PauseMenu({ onResume }: { onResume: () => void }) {
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-4" role="dialog" aria-modal="true" aria-label="Paused" data-testid="pause-menu">
       <Panel className="w-[min(420px,92vw)] p-4">
-        <h2 className={cn(pixelTitle.className, "text-[14px]")}>Paused</h2>
-        <p className="mt-1 text-sm">The clock is stopped. Your progress is saved.</p>
+        <h2 className={cn(pixelTitle.className, "text-[16px]")}>Paused</h2>
+        <p className="mt-1.5 text-[14px] text-[#6a5a4a]">The clock is stopped. Your progress is saved.</p>
         <div className="mt-3"><SettingsForm /></div>
         {how && (
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">

@@ -27,6 +27,7 @@ export default function MapCanvas({ scenario, avatar, attract = false, label }: 
         avatar,
         attract,
         font,
+        hideSigns: () => useGame.getState().cutscene,
         getState: () => useGame.getState().state,
         isFrozen: () => {
           const g = useGame.getState();
