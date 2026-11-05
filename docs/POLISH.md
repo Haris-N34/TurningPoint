@@ -2,6 +2,8 @@
 
 Each item is checked against a test. Tests run in both Playwright projects: `desktop` (1440 x 900) and `phone` (375 x 812).
 
+Follow-up #54 on main `60f25f5`: the full browser suite is not green (188 passed, 21 skipped, 3 failed). Checkpoint contrast, Client Pivot keyboard settings and the phone AI-page document title need follow-up. The named witness skill group regression passes in both projects. Physical-phone, human screen-reader and first-user timing validation remain open; automated coverage below is not a WCAG certification.
+
 ## P.1 Polish
 
 - [x] **Empty states.** Recruiter inbox with no challenges ("Your inbox is empty" with next steps), admin with no challenges, inbox filters with no match, results for a card not on this device, witness list with no witnesses. Test: `tests/e2e/a11y.spec.ts` "empty states explain what to do next", `tests/e2e/results.spec.ts` "missing results have a recovery path".
@@ -13,7 +15,7 @@ Each item is checked against a test. Tests run in both Playwright projects: `des
 
 ## A1 to A5 Accessibility
 
-- [x] **axe: zero serious or critical findings** on landing, role homes, onboarding, verify, challenge link, play, checkpoint, results, card, recruiter inbox and card, admin (home, builder, AI health, impact), witness home and token page, /how-we-use-ai, and /game/launch-week title, avatar and play screens. Test: `tests/e2e/a11y.spec.ts`. Fixes: game button red darkened to `#c43d22` (4.29 to 5.2 contrast), checkpoint and turning-point labels use `text-primary`, verify note uses `text-muted-foreground`, AI health table scroller is focusable.
+- [ ] **axe: zero serious or critical findings** on landing, role homes, onboarding, verify, challenge link, play, checkpoint, results, card, recruiter inbox and card, admin (home, builder, AI health, impact), witness home and token page, /how-we-use-ai, and /game/launch-week title, avatar and play screens. Test: `tests/e2e/a11y.spec.ts`. Fixes: game button red darkened to `#c43d22` (4.29 to 5.2 contrast), checkpoint and turning-point labels use `text-primary`, verify note uses `text-muted-foreground`, AI health table scroller is focusable.
 - [x] **A1 no camera needed.** Text mode is available at every checkpoint. Test: `tests/e2e/a11y.spec.ts` "checkpoint and challenge link", `tests/e2e/checkpoints.spec.ts`.
 - [x] **A3 keyboard and visible focus.** Skip link is the first tab stop; every tab stop shows an outline or ring. Buttons and inputs use a 2 px ring. Test: `tests/e2e/a11y.spec.ts` "keyboard". Full keyboard play: `tests/e2e/play.spec.ts`, `tests/e2e/game.spec.ts` list view.
 - [x] **A3 labels.** axe `label`, `button-name` and `link-name` rules pass on every route (same test).
