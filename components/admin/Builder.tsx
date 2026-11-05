@@ -10,7 +10,7 @@ import { getScenario, SCENARIO_IDS } from "@/content/scenarios";
 import { challengeUrl, publish, qrDataUrl, saveDraft, type Challenge } from "@/lib/challenge/challenge";
 import { preparePublishedContent } from "@/lib/ai/services/publish";
 import { tailor } from "@/lib/ai/services/tailor";
-import { diffMap, mapForTemplate, tailorMap } from "@/lib/challenge/mapTailor";
+import { diffMap, friendlyMapErrors, mapForTemplate, tailorMap } from "@/lib/challenge/mapTailor";
 import { INDUSTRIES, type Industry } from "@/lib/challenge/tailor";
 import { MapScenarioSchema, type MapScenario } from "@/lib/game/schema";
 import { ScenarioSchema, type Scenario } from "@/lib/engine/schema";
@@ -41,7 +41,8 @@ export function Builder() {
   const [customSkills, setCustomSkills] = useState<MappedSkill[]>([]);
 
   const valid = useMemo(() => (map ? MapScenarioSchema.safeParse(map) : ScenarioSchema.safeParse(scenario)), [map, scenario]);
-  const errors = valid.success ? [] : [...new Set(valid.error.issues.map((i) => i.message))];
+  // Plain-language messages for map edits (QA S3); classic scenarios keep the schema messages.
+  const errors = valid.success ? [] : map ? friendlyMapErrors(valid.error.issues, map) : [...new Set(valid.error.issues.map((i) => i.message))];
 
   const canNext = [company.name.trim() && title.trim(), skills.length >= 3 && skills.length <= 4, !!scenario, valid.success][step];
 

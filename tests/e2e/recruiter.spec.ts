@@ -215,3 +215,33 @@ test("employers never see focus-loss notes; the candidate sees them for informat
   await expect(page.getByTestId("integrity")).toContainText(/lost focus/i);
   await expect(page.getByTestId("integrity")).toContainText("For your information");
 });
+
+test("quote click on a placeholder demo video shows captions with the quote highlighted, never a blank frame", async ({ page }) => {
+  await seed(page);
+  await page.goto(CARD);
+  await page.getByTestId("jump-prioritization").click();
+  await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
+  const captions = page.getByTestId("video-captions");
+  await expect(captions).toBeVisible();
+  await expect(captions.getByTestId("caption-quote").first()).toBeVisible();
+  // The caption layer covers the whole player, so the placeholder frame never shows.
+  const c = (await captions.boundingBox())!;
+  const v = (await page.getByTestId("clip-cp2").getByTestId("clip-media").boundingBox())!;
+  expect(Math.round(c.height)).toBeGreaterThanOrEqual(Math.round(v.height) - 1);
+});
+
+test("long inbox pages by 20 with a visible count; Show more and J reveal the rest", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "keyboard paging is a laptop flow");
+  await page.goto("/recruiter");
+  await page.getByRole("button", { name: "Load 200 fictional candidates" }).click();
+  await page.goto("/recruiter?challenge=ch_impact_energy");
+  const rows = page.locator('[data-testid^="row-"]');
+  await expect(rows).toHaveCount(20);
+  await expect(page.getByTestId("inbox-pager")).toContainText(/Showing 1 to 20 of \d+/);
+  await page.getByTestId("show-more").click();
+  await expect(rows).toHaveCount(40);
+  await page.goto("/recruiter?challenge=ch_impact_energy");
+  await page.locator("body").click({ position: { x: 5, y: 5 } });
+  for (let i = 0; i < 21; i++) await page.keyboard.press("j");
+  expect(await rows.count()).toBeGreaterThan(20);
+});

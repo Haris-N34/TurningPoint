@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { media } from "@/lib/store/media";
+import { cn } from "@/lib/utils";
 
 export type ClipHandle = { seek: (seconds: number) => void };
 
@@ -41,6 +42,9 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
   const [activeWord, setActiveWord] = useState(-1);
   // Video answers show a calm cover until they start, so an unplayed clip never looks like an empty box.
   const [started, setStarted] = useState(false);
+  // Last word reached by the playhead, for captions (stays put between words instead of flickering).
+  const [captionAt, setCaptionAt] = useState(0);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     let url: string | undefined;
@@ -69,6 +73,9 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
   const seek = (t: number) => {
     setRevealed(true);
     setStarted(true);
+    let at = 0;
+    checkpoint.transcript.words.forEach((w, i) => w.start <= t + 0.05 && (at = i));
+    setCaptionAt(at);
     const v = el.current;
     if (!v) return;
     v.currentTime = t;
@@ -78,18 +85,56 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
 
   const onTime = () => {
     const t = el.current?.currentTime ?? 0;
-    setActiveWord(checkpoint.transcript.words.findIndex((w) => t >= w.start && t <= w.end + 0.15));
+    const words = checkpoint.transcript.words;
+    setActiveWord(words.findIndex((w) => t >= w.start && t <= w.end + 0.15));
+    let last = 0;
+    for (let i = 0; i < words.length; i++) if (words[i].start <= t + 0.05) last = i;
+    setCaptionAt(last);
   };
 
   const marked = quoteWords(checkpoint.transcript.words, highlight);
   const isVideo = checkpoint.mode === "video";
+  // Demo seed clips are silent placeholders with no real picture: play them as captions over a calm cover,
+  // never as a blank frame. Candidate recordings play as normal video.
+  const captionsOnly = isVideo && !!checkpoint.media?.startsWith("demo/") && checkpoint.transcript.words.length > 0;
+  const words = checkpoint.transcript.words;
+  const from = Math.max(0, captionAt - 5);
+  const capWords = words.slice(from, from + 14);
   return (
     <div className="space-y-2" data-testid={`clip-${checkpoint.id}`}>
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
             <div className="relative">
-              <video ref={el} src={src} poster={VIDEO_POSTER} controls playsInline preload="metadata" onTimeUpdate={onTime} onPlay={() => setStarted(true)} className="aspect-video max-h-44 w-full rounded-xl bg-[#2b2620] object-contain" data-testid="clip-media" />
+              <video ref={el} src={src} poster={VIDEO_POSTER} controls playsInline preload="metadata" onTimeUpdate={onTime} onPlay={() => { setStarted(true); setPlaying(true); }} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} className="aspect-video max-h-44 w-full rounded-xl bg-[#2b2620] object-contain" data-testid="clip-media" />
+              {captionsOnly && started && (
+                <button
+                  type="button"
+                  aria-label={playing ? "Pause answer" : "Play answer"}
+                  onClick={() => {
+                    const v = el.current;
+                    if (!v) return;
+                    if (v.paused) v.play().catch(() => {});
+                    else v.pause();
+                  }}
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-[#2b2620] px-6 text-center text-[#f1ede5]"
+                  data-testid="video-captions"
+                >
+                  <span className="text-[11px] font-medium uppercase tracking-widest text-[#bcb4a7]">Captions · video answer · {playing ? "tap to pause" : "tap to play"}</span>
+                  <span className="text-[15px] leading-snug" aria-live="off">
+                    {capWords.map((w, k) => {
+                      const i = from + k;
+                      const joined = k > 0 && marked.has(i) && marked.has(i - 1);
+                      return [
+                        k > 0 ? <span key={`s${i}`} className={joined ? "bg-[#a63e20]" : undefined}>{" "}</span> : null,
+                        <span key={i} className={cn(i === captionAt && "underline decoration-2 underline-offset-4", marked.has(i) ? "bg-[#a63e20] text-white" : i > captionAt && "text-[#bcb4a7]")} data-testid={marked.has(i) ? "caption-quote" : undefined}>
+                          {w.w}
+                        </span>,
+                      ];
+                    })}
+                  </span>
+                </button>
+              )}
               {!started && (
                 <button
                   type="button"
