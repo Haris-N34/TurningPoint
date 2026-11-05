@@ -55,3 +55,7 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - Round 4 (merged integration branch, production build): crawl of every route x 4 viewports x light/dark clean again (no console errors, hydration warnings, 404 assets or overflow). Click-everything pass found #21 only.
 - Slow network (375x812, 400 ms latency, 500 kbit/s, production): landing 6.5 s, game title ready 4.0 s, game playable 7.9 s, recruiter card 1.6 s, results 1.4 s, challenge link loads. No console errors. Skip links resolve on every route.
 - No IndexedDB (private mode): recording saves retry then fall back; delete and reset swallow the error. OK.
+- Back/forward: landing → game → back → forward returns to the title with Continue; recruiter inbox ↔ card back/forward fine; no page errors. A walk in progress (map view) is not saved, by design.
+- Refresh mid-conversation and after a choice (list view, turn-based): clock, open dialogue and event log restore exactly.
+- CI-style full e2e on the merged code (prod build + hooks, 3 workers): 229 passed, 1 flaky (#29, now hardened), 3 failed (#18).
+
