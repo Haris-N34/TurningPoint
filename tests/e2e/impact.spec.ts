@@ -5,11 +5,25 @@ test("impact report separates synthetic data, filters employers and shows measur
   await page.goto("/admin/impact");
   await expect(page.getByTestId("impact-started")).toHaveText("0");
   await expect(page.getByText("Recruiter minutes per candidate", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("impact-review-minutes")).toHaveText("No data");
   await page.getByRole("button", { name: "Load 200 fictional candidates" }).click();
   await expect(page.getByTestId("impact-started")).toHaveText("200");
   await expect(page.getByTestId("impact-finished")).toHaveText("160");
   await expect(page.getByRole("status")).toContainText("Fictional cohort loaded");
   await expect(page.getByText("Review: below four-fifths").first()).toBeVisible();
+  // G.1: every Part G metric with data shows a number, labelled synthetic. Only the gold set still waits.
+  await expect(page.getByTestId("impact-review-minutes")).toHaveText(/^\d+(\.\d)? min$/);
+  await expect(page.getByTestId("impact-second-look")).toHaveText(/^[1-9]\d*$/);
+  await expect(page.getByTestId("impact-resume-backed")).toHaveText(/^\d+%$/);
+  await expect(page.getByTestId("impact-survey")).toHaveText(/^[1-5](\.\d)?$/);
+  await expect(page.getByTestId("impact-coach")).toHaveText(/^\d+%$/);
+  await expect(page.getByTestId("impact-hallucination")).toHaveText(/^(19|20) \/ 20$/);
+  await expect(page.getByTestId("impact-ai-calls")).toBeVisible();
+  await expect(page.getByText("Said vs did · Context").locator("xpath=..")).not.toContainText("No data");
+  for (const label of ["Recruiter minutes", "Second Look", "Resume claims", "Coach usage", "Learning survey"]) {
+    await expect(page.locator("p", { hasText: /^Awaiting data$/ }).locator("xpath=..").filter({ hasText: label })).toHaveCount(0);
+  }
+  await expect(page.getByText(/Synthetic reading times/)).toBeVisible();
   await page.getByLabel("Employer challenge").selectOption("ch_impact_energy");
   await expect(page.getByTestId("impact-started")).toHaveText("67");
   await page.getByLabel("Employer challenge").selectOption("");

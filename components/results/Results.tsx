@@ -10,6 +10,7 @@ import { store } from "@/lib/store/store";
 import { BadgeExport } from "./BadgeExport";
 import { CandidateActions } from "./CandidateActions";
 import { ResumeIntake } from "./ResumeIntake";
+import { LearningSurvey } from "./LearningSurvey";
 import { PracticeResults } from "@/components/practice/PracticeResults";
 import { isPracticeChallenge } from "@/lib/practice/practice";
 
@@ -58,6 +59,7 @@ export function Results({ attemptId }: { attemptId: string }) {
       />
       <ResumeIntake card={card} onChange={setCard} />
       <BadgeExport card={card} />
+      <LearningSurvey attemptId={card.attemptId} />
       <CandidateActions card={card} onChange={setCard} />
     </main>
   );

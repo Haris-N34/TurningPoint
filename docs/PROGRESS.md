@@ -184,7 +184,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
 - [x] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script (Ctrl+Shift+D panel: roles, seed, reset, jumps; /demo/reset and `pnpm demo:reset`; lib/demo/reset.test.ts, tests/e2e/demo.spec.ts)
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
-- [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
+- [x] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics (lib/impact/partG.test.ts, tests/e2e/impact.spec.ts). AI vs human agreement shows "No labels yet" until B.10 gold labels land; it is computed live once they do.
 - [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts passes with --repeat-each=2; Second Look, Resume vs Evidence and the demo panel steps skipped until merged)
 - [x] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario (recruiter one-click request on a reused card, 5-minute text mini-scenario for only the missing skills, evidence levels only; lib/addon/addon.test.ts, tests/e2e/addon.spec.ts)
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
@@ -193,7 +193,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - #44 portraits and map wording are merged (#48, #49). The game shell now integrates the portraits; A.5 is accepted in main. #46 independent Codex label proposals await human review in #50.
 
-- #47 dashboard implementation awaits review in #51. It separates local/demo data, includes 200 synthetic attempts across three employers, and shows evidence/funnel/witness/fairness summaries. Current main now supplies persisted consistency context; the dashboard consumes it. G.1 remains open for the remaining telemetry/integration contracts. I.1's two rehearsals still need the complete v2 flow; see `docs/demo/V2_SCRIPT.md`.
+- #47 dashboard implementation awaits review in #51. It separates local/demo data, includes 200 synthetic attempts across three employers, and shows evidence/funnel/witness/fairness summaries. Current main now supplies persisted consistency context; the dashboard consumes it. G.1 is now wired: recruiter minutes, Second Look, resume claims, AI evals and telemetry, survey and Coach usage all read local data (see docs/IMPACT_DATA.md). I.1's two rehearsals still need the complete v2 flow; see `docs/demo/V2_SCRIPT.md`.
 
 - M0.8 Vercel: Div imports the repo at vercel.com/new. If TurningPoint is not listed, Haris grants the Vercel GitHub app access to it.
 

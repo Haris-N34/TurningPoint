@@ -8,4 +8,22 @@ Participation metadata may live in a saved run's `extra.impactParticipation`: `{
 
 Fairness tables show completion rate (finished / started) and shortlist rate (shortlisted / finished). Shortlist comparison requires ten completed candidates per group. A rate strictly below 80% of the highest eligible rate in the same table prompts review. No protected trait is inferred, no causal claim is made and no candidate can be filtered or rejected by the report.
 
-Awaiting data: actual recruiter minutes (needs review-open/close events, not card-finish and decision timestamps), Second Look rescue events, independently accepted gold-set eval results, resume claim links, learning survey responses and Coach usage. Current main now persists `kpis` and `consistency` on cards. The consistency tile reads recorded checks and shows consistent checks / all recorded checks, with the denominator and a context-only label. Missing notes contribute nothing to the denominator. It is never a penalty or a measure of a person's truthfulness. Add further adapters as their contracts land. G.1 and I.1 stay unchecked.
+## Part G sources (G.1)
+
+All computed by pure functions in `lib/impact` (metrics.ts, partG.ts), unit tested in `lib/impact/partG.test.ts`.
+
+| Metric | Source | Demo cohort |
+| --- | --- | --- |
+| Recruiter minutes per candidate | `x:review_sessions`: visible time on `/recruiter/card`, paused when hidden, capped at 30 min per view, bounces under 1 s dropped. Median of per-candidate totals. | Synthetic reading times |
+| Second Look rescues | Live: integration server `GET second-look`. Demo: `x:impact_demo_second_look`. | Synthetic ATS rejects; the Strong-in-2 rule runs on the stored cards |
+| Said vs did | `card.consistency` | Synthetic order checks |
+| Resume claims backed | `card.resume.claims[].backed` | Fictional resumes through the real analyzer |
+| AI vs human agreement | `evaluateGold` on `lib/ai/evals/gold` | Same. Shows "No labels yet" until B.10 labels exist; import label files in `aiEvalImpact` |
+| No invented evidence | Hallucination eval, run live with the local scanner | Same |
+| AI calls passing checks | `x:ai_calls` telemetry on this device | Device only, not the cohort |
+| Learning survey (1 to 5) | `x:learning_survey`, optional question on the results page, never shown to employers | Synthetic answers |
+| Coach usage | Live: Candidate Coach calls in telemetry plus practice runs on the device. Demo: `run.extra.impactDemo.practicedFirst` | Synthetic |
+
+Review sessions, survey answers and demo Second Look entries are removed by delete-attempt and delete-all. Synthetic extras use a second PRNG stream, so the original cohort (modes, groups, decisions) is unchanged.
+
+Limits shown on the dashboard: reading time outside Turning Point is not seen; live Second Look resets with the server; Coach calls are not linked to a later attempt; the survey is self-report.

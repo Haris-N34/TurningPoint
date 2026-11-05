@@ -1,9 +1,13 @@
+import { z } from "zod";
 import fixture from "@/fixtures/attempt.json";
 import { CardSchema, PASS_REASONS, type Card } from "@/lib/card/types";
 import { getScenario } from "@/content/scenarios";
 import { getChallenge, saveDraft, publish } from "@/lib/challenge/challenge";
 import type { Store } from "@/lib/store/store";
+import { analyzeResume } from "@/lib/integrations/resume";
+import type { SecondLookEntry } from "@/lib/integrations/store";
 import { DEMO_PREFIX } from "./metrics";
+import { listReviewSessions, listSurveyResponses, MAX_SESSION_MS, REVIEW_SESSIONS_KEY, SURVEY_KEY, type ReviewSession, type SurveyResponse } from "./events";
 
 // E7.4: 200 synthetic candidates across 3 fictional employers. Feeds the recruiter inbox,
 // the fairness analytics and /admin/impact. Deterministic: the same seed gives the same cohort.
@@ -48,7 +52,35 @@ export type SyntheticCandidate = {
   levels: Card["evidence"][number]["level"][];
   decision?: "shortlist" | "hold" | "pass";
   date: string;
+  /** Synthetic Part G events (G.1). Drawn from a second PRNG stream so the cohort above never shifts. */
+  reviewMinutes?: number;
+  survey?: number;
+  practicedFirst: boolean;
+  resumeIndex?: number;
+  atsRejectedAtResume: boolean;
+  secondLook: "restored" | "confirmed_pass" | "queued";
+  /** Said vs did: does the stated order match the played order? Context only, never a penalty. */
+  saidMatchesDid?: boolean;
 };
+
+/** Fictional resume text for the synthetic cohort. No real people, schools or employers. */
+export const SYNTHETIC_RESUMES = [
+  `Experience
+Volunteer Coordinator at Fictional Food Bank (2025)
+- Led a team of 40 volunteers and kept everyone informed when the schedule changed
+- Cut the second weekend to protect the main event when the budget dropped
+- Designed a new sign-up sheet in a spreadsheet`,
+  `Experience
+Shift Lead, Fictional Cafe (2024)
+- Scheduled six coworkers around exam deadlines
+- Wrote weekly updates for the owner
+- Researched new suppliers for oat milk`,
+  `Experience
+Treasurer at Fictional Debate Club (2025)
+- Tracked club spending in a spreadsheet and forecast the year's budget
+- Negotiated a room discount, saving $300
+- Mentored two first-year members`,
+] as const;
 
 /**
  * Pure cohort generator. Shortlist decisions stand in for human reviewers. A shortlist gap for
@@ -59,6 +91,7 @@ export function syntheticCohort(seed = 2026): SyntheticCandidate[] {
   const rnd = prng(seed);
   const out: SyntheticCandidate[] = [];
   const quota = new Map<string, number>();
+  const rx = prng(seed ^ 0x9e3779b9);
   for (let i = 0; i < IMPACT_COHORT_SIZE; i++) {
     const r = Array.from({ length: 12 }, rnd);
     const mode: Mode = r[0] < 0.45 ? "text" : r[0] < 0.75 ? "voice" : "video";
@@ -76,6 +109,7 @@ export function syntheticCohort(seed = 2026): SyntheticCandidate[] {
       quota.set(key, acc >= 1 ? acc - 1 : acc);
       decision = acc >= 1 ? "shortlist" : r[10] < 0.6 ? "hold" : "pass";
     }
+    const x = Array.from({ length: 10 }, rx);
     out.push({
       i,
       attemptId: impactAttemptId(i),
@@ -89,6 +123,15 @@ export function syntheticCohort(seed = 2026): SyntheticCandidate[] {
       levels,
       decision,
       date: new Date(Date.UTC(2026, 9, 1 + (i % 28), 9 + (i % 9), (i * 7) % 60)).toISOString(),
+      // Simulated reviewers spend 1.5 to 7 visible minutes on a card they decide on.
+      reviewMinutes: decision ? Math.round((1.5 + x[0] * x[1] * 5.5) * 10) / 10 : undefined,
+      // About 70% of finishers answer the optional survey; answers lean 3 to 5.
+      survey: finished && x[2] < 0.7 ? 1 + Math.min(4, Math.floor(1 + x[3] * 3.4 + x[4])) : undefined,
+      practicedFirst: x[5] < 0.35,
+      resumeIndex: finished && x[6] < 0.6 ? Math.floor(x[7] * SYNTHETIC_RESUMES.length) : undefined,
+      atsRejectedAtResume: finished && x[6] > 0.75,
+      secondLook: x[1] < 0.6 ? "restored" : x[1] < 0.85 ? "confirmed_pass" : "queued",
+      saidMatchesDid: finished && x[8] < 0.8 ? x[9] < 0.85 : undefined,
     });
   }
   return out;
@@ -102,11 +145,14 @@ export function seedImpactDemo(s: Store) {
     saveDraft(s, { id: employer.id, company: { name: employer.company, colour: employer.colour }, title: employer.title, templateId: "launch-week", industry: "Non-profit", targetSkills: base.targetSkills, scenario: getScenario("launch-week")! });
     publish(s, employer.id);
   }
+  const sessions: ReviewSession[] = [];
+  const surveys: SurveyResponse[] = [];
+  const rescues: SecondLookEntry[] = [];
   for (const c of syntheticCohort()) {
     if (s.getRun(c.attemptId) || s.getCard(c.attemptId)) continue;
     const employer = IMPACT_EMPLOYERS.find((e) => e.id === c.employerId)!;
     // Opt-in demographics live only on the run, for aggregate fairness checks. Never on the card.
-    s.saveRun({ attemptId: c.attemptId, challengeId: employer.id, scenarioId: "launch-week", seed: c.attemptId, state: {}, status: c.finished ? "finished" : "playing", startedAt: c.date, practice: false, extra: { impactParticipation: { mode: c.mode, adjustedTiming: c.adjustedTiming, ...(c.optInGroup ? { optInGroup: c.optInGroup } : {}) } } });
+    s.saveRun({ attemptId: c.attemptId, challengeId: employer.id, scenarioId: "launch-week", seed: c.attemptId, state: {}, status: c.finished ? "finished" : "playing", startedAt: c.date, practice: false, extra: { impactParticipation: { mode: c.mode, adjustedTiming: c.adjustedTiming, ...(c.optInGroup ? { optInGroup: c.optInGroup } : {}) }, impactDemo: { synthetic: true, practicedFirst: c.practicedFirst } } });
     if (!c.finished) continue;
     const evidence = base.evidence.map((e, j) => (c.levels[j] === "not_observed" ? { skill: e.skill, level: c.levels[j] } : { ...e, level: c.levels[j] }));
     const n = String(c.i + 1).padStart(3, "0");
@@ -124,8 +170,26 @@ export function seedImpactDemo(s: Store) {
       realStory: base.realStory ? { ...base.realStory, title: "Illustrative story from the demo fixture", witnesses: c.witnessConfirmed ? [{ id: `demo-w-${c.i}`, relationship: "peer", status: "confirmed", skillsSeen: ["collaboration"] }] : [] } : undefined,
       review: undefined,
     });
+    if (c.saidMatchesDid !== undefined) card.consistency = [{ kind: "order", said: "Vendor first, then the permit (synthetic)", did: c.saidMatchesDid ? "Vendor first, then the permit" : "Permit first, then the vendor", consistent: c.saidMatchesDid }];
+    if (c.resumeIndex !== undefined) card.resume = analyzeResume(SYNTHETIC_RESUMES[c.resumeIndex], card, { source: "upload", now: c.date });
     s.saveCard(card);
+    const at = (min: number) => new Date(Date.parse(c.date) + min * 60_000).toISOString();
+    if (c.reviewMinutes !== undefined) sessions.push({ attemptId: c.attemptId, challengeId: employer.id, ms: Math.min(c.reviewMinutes * 60_000, MAX_SESSION_MS), at: at(60 * 24) });
+    if (c.survey !== undefined) surveys.push({ attemptId: c.attemptId, rating: c.survey, at: at(5) });
+    // Second Look runs its real rule on the stored card: rejected at the resume screen and Strong in 2+ targets.
+    const strong = card.targetSkills.filter((k) => card.evidence.some((e) => e.skill === k && e.level === "strong"));
+    if (c.atsRejectedAtResume && strong.length >= 2) {
+      const decided = c.secondLook !== "queued";
+      rescues.push({ id: `sl_demo_${n}`, provider: "greenhouse", applicantId: `demo_applicant_${n}`, attemptId: c.attemptId, challengeId: employer.id, reason: "Rejected at resume screen (synthetic)", strongSkills: strong, trigger: "rejected_at_resume", status: c.secondLook, createdAt: at(60), ...(decided ? { openedAt: at(60 * 48), decidedAt: at(60 * 48 + (c.reviewMinutes ?? 3)), decisionReason: c.secondLook === "confirmed_pass" ? PASS_REASONS[0] : undefined } : {}) });
+    }
     s.share(c.attemptId, employer.id, false);
     if (c.decision) s.review({ attemptId: c.attemptId, challengeId: employer.id, decision: c.decision, ...(c.decision === "pass" ? { reason: PASS_REASONS[0] } : {}) });
   }
+  if (sessions.length) s.setJSON(REVIEW_SESSIONS_KEY, [...listReviewSessions(s), ...sessions]);
+  if (surveys.length) s.setJSON(SURVEY_KEY, [...listSurveyResponses(s), ...surveys]);
+  if (rescues.length) s.setJSON(DEMO_SECOND_LOOK_KEY, [...listDemoSecondLook(s), ...rescues]);
 }
+
+/** Synthetic Second Look entries live in the browser; live ones live in the integration server. */
+export const DEMO_SECOND_LOOK_KEY = "impact_demo_second_look";
+export const listDemoSecondLook = (s: Store): SecondLookEntry[] => s.getJSON(DEMO_SECOND_LOOK_KEY, z.array(z.custom<SecondLookEntry>((v) => !!v && typeof v === "object" && "attemptId" in v && "status" in v))) ?? [];
