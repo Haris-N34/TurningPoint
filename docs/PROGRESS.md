@@ -138,7 +138,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
 - [x] C6.1 [H] Add up to 2 witnesses with relationship: slot count, list with relationship and status in words (tests/e2e/witness.spec.ts, desktop and phone)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
-- [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
+- [x] C6.3 [H] Witness page, no account, phone, under 30 s: names the relationship, skill counter, headed done/used/invalid/expired states (tests/e2e/witness.spec.ts, tests/e2e/a11y.spec.ts on phone)
 - [x] C6.4 [D] Card shows "Confirmed by ..." never the witness email
 - [x] C6.5 [D] Reject witness email matching candidate email or domain alias
 - [x] C7.1 [D] Candidate sees own card exactly as a recruiter would
