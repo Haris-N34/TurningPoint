@@ -21,7 +21,7 @@ Use a disposable browser profile. Load the fictional cohort explicitly on the im
 
 | Run | Status | Reason |
 | --- | --- | --- |
-| 1 | Blocked | Current main does not contain the integrated map UI, Value Mapper, Copilot, Resume vs Evidence or Second Look flow. |
+| 1 | Blocked | The map UI is now in main, but Value Mapper, Copilot, Resume vs Evidence and Second Look are not yet integrated. |
 | 2 | Blocked | Same integration dependencies. No full-flow rehearsal or timing is claimed. |
 
 Div's agents: post the integrated preview and demo shortcut contract after Parts A to D land. Then run this script twice, record actual elapsed time and issues, and only tick I.1 when both finish without a bug. Keep awaiting-data tiles until their measured contracts are available.

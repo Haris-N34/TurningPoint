@@ -15,6 +15,13 @@ describe("impact reporting", () => {
     expect(report.reviewMinutes).toBeNull();
     expect(report.groups).toEqual([]);
   });
+  it("uses persisted consistency context without treating absent notes as a mismatch", () => {
+    const s = fresh();
+    const base = CardSchema.parse(fixture);
+    s.saveCard({ ...base, consistency: [{kind:"order", said:"permit first", did:"permit first", consistent:true}, {kind:"order", said:"vendor first", did:"permit first", consistent:false}] });
+    s.saveCard({ ...base, attemptId:"without-notes" });
+    expect(impactReport(s)).toMatchObject({ consistencyChecks:2, consistencyRate:0.5 });
+  });
   it("counts cards once, deduplicates completed runs, and respects employer scope", () => {
     const s = fresh();
     const card = CardSchema.parse(fixture);

@@ -45,6 +45,7 @@ export function impactReport(s: Store, challengeId?: string, source: Source = "a
     for (const g of out) g.warning = g.rate !== null && best > 0 && g.rate / best < 0.8;
     return out.sort((a,b) => a.label.localeCompare(b.label));
   };
+  const consistency = cards.flatMap((c) => c.consistency ?? []);
   const strong = cards.filter((c) => c.evidence.some((e) => e.level === "strong")).length;
   const stories = cards.filter((c) => c.realStory);
   const confirmed = stories.filter((c) => c.realStory!.witnesses.some((w) => w.status === "confirmed")).length;
@@ -54,6 +55,7 @@ export function impactReport(s: Store, challengeId?: string, source: Source = "a
     employers: new Set([...cards.map((c) => c.challenge.id), ...runs.map((r) => r.challengeId)]).size,
     strongRate: fraction(strong, cards.length), reviewedRate: fraction(reviewMap.size, cards.length), witnessRate: fraction(confirmed, stories.length), stories: stories.length,
     reviewMinutes: null,
+    consistencyChecks: consistency.length, consistencyRate: fraction(consistency.filter((note) => note.consistent).length, consistency.length),
     skills: SKILLS.map((skill) => ({ ...skill, strong: cards.filter((c) => c.evidence.some((e) => e.skill === skill.slug && e.level === "strong")).length, some: cards.filter((c) => c.evidence.some((e) => e.skill === skill.slug && e.level === "some")).length, total: cards.filter((c) => c.targetSkills.includes(skill.slug)).length })),
     groups: groups("mode"), timing: groups("timing"), demographics: groups("demographic"),
   };
