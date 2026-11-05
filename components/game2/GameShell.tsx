@@ -291,6 +291,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
 
   const talk = useCallback(
     (issue: Issue) => {
+      // Never start a conversation while a checkpoint is waiting (QA #30).
+      if ((useGame.getState().state?.checkpointsDue.length ?? 0) > 0) return;
       sfx.click();
       dispatch({ type: "talk", issue: issue.id });
     },
@@ -429,7 +431,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           ) : (
             <ListView scenario={scenario} state={state} onTalk={talk} onMove={(z) => dispatch({ type: "move", zone: z })} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} />
           )}
-          <AnimatePresence>{screen === "loading" && <LoadingScreen key="loading" ready={ready} onDone={() => setScreen(state.ended ? "results" : "play")} />}</AnimatePresence>
+          {screen === "loading" && <LoadingScreen ready={ready} onDone={() => setScreen(state.ended ? "results" : "play")} />}
         </>
       )}
       {screen === "play" && state && (
@@ -483,7 +485,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
             )}
           </AnimatePresence>
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
-          {node && !reaction && !cutscene && recapDay === undefined && (
+          {/* The dialogue steps aside while a checkpoint is due, so only one dialog is ever on screen. */}
+          {node && !due && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
           {reaction?.line && <ReactionBox scenario={scenario} {...reaction} />}
