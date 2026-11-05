@@ -138,6 +138,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
           reused={share?.reused ? { covers } : undefined}
           actions={actions}
           seekTo={seekTo}
+          footer={<p className="pt-1 text-center text-xs text-muted-foreground" data-testid="pitch-line">Turning Point tests how you handle it when the plan breaks.</p>}
         />
       </div>
       {share?.reused && challenge && <AddonRequest attemptId={attemptId} challengeId={challengeId} employerSkills={challenge.targetSkills as SkillSlug[]} cardSkills={view.card.targetSkills} />}

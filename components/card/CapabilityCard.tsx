@@ -32,6 +32,8 @@ const LEVEL_STYLE: Record<Evidence["level"], string> = {
 const LEVEL_MARK: Record<Evidence["level"], string> = { strong: "●●", some: "●○", not_observed: "○○", needs_review: "?" };
 
 export const skillName = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
+/** "start" reads better than 0:00, which looks like a missing value. */
+const atLabel = (t: number) => (t < 1 ? "start" : mmss(t));
 const mmss = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
 const KIND_LABEL = { decision: "Checkpoint", real_life: "Real life", follow_up: "Follow-up" } as const;
 const CONSISTENCY_LABEL = { order: "Order plan", explanation: "Explanation vs choice", story: "Real story vs follow-up" } as const;
@@ -58,6 +60,7 @@ export function CapabilityCard({
   resumeWeight,
   showFinalScore = true,
   audience = "employer",
+  footer,
 }: {
   card: Card;
   identity: CardIdentity;
@@ -73,6 +76,8 @@ export function CapabilityCard({
   showFinalScore?: boolean;
   /** Employers never see focus-loss or transcript-edit notes (it would read as proctoring); the candidate sees all. */
   audience?: "employer" | "candidate";
+  /** Extra content at the end of the right column (the recruiter's pitch line). */
+  footer?: React.ReactNode;
 }) {
   // Never render evidence that has not passed the quote check (G1, E3.8).
   const evidence = useMemo(() => verifyEvidence(card).evidence, [card]);
@@ -196,7 +201,7 @@ export function CapabilityCard({
                         <span aria-hidden className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[9px] text-primary-foreground transition-transform group-hover:scale-110">▶</span>
                         <span className="min-w-0 flex-1 text-foreground">
                           <span className="sr-only">Play </span>“{e.source.quote}”
-                          <span className="ml-1.5 font-mono text-xs text-muted-foreground">{mmss(e.source.startS)}</span>
+                          <span className="ml-1.5 font-mono text-xs text-muted-foreground">{atLabel(e.source.startS)}</span>
                         </span>
                       </button>
                     ) : (
@@ -217,13 +222,19 @@ export function CapabilityCard({
           <section aria-labelledby="rl-h" className="rounded-xl bg-story px-4 py-3" data-testid="real-story">
             <h2 id="rl-h" className="text-xs font-medium uppercase tracking-widest text-primary">Real turning point</h2>
             <p className="mt-1 font-display text-lg leading-snug">“{card.realStory.title}”</p>
-            {realLife?.transcript.text && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{realLife.transcript.text}</p>}
-            {followUp && (
-              <p className="mt-1 line-clamp-1 text-sm">
-                <span className="font-medium">{followUp.question}</span>{" "}
-                <span className="text-muted-foreground">{followUp.transcript.text}</span>
-              </p>
-            )}
+            {realLife?.transcript.text && <p className={cn("mt-1 text-sm text-muted-foreground", audience === "employer" && "line-clamp-2")} data-testid="real-story-answer">{realLife.transcript.text}</p>}
+            {followUp &&
+              (audience === "candidate" ? (
+                <div className="mt-2 text-sm" data-testid="real-story-follow-up">
+                  <p className="font-medium">{followUp.question}</p>
+                  <p className="text-muted-foreground">{followUp.transcript.text}</p>
+                </div>
+              ) : (
+                // The recruiter's card keeps this to one line so the whole card fits a laptop screen.
+                <p className="mt-1 line-clamp-1 text-sm" data-testid="real-story-follow-up">
+                  <span className="font-medium">{followUp.question}</span> <span className="text-muted-foreground">{followUp.transcript.text}</span>
+                </p>
+              ))}
             <p className="mt-1 text-sm font-medium" data-testid="witness-line">
               {confirmed ?? "No witness confirmation yet"}
             </p>
@@ -240,7 +251,7 @@ export function CapabilityCard({
               <h2 id="clips-h" className="text-sm font-semibold">Answers</h2>
               {lastJump?.skill && (
                 <p key={lastJump.n} className="tp-pop rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground" role="status" data-testid="jump-banner">
-                  ▶ {skillName(lastJump.skill)} quote at {mmss(lastJump.t)}
+                  ▶ {skillName(lastJump.skill)} quote at {atLabel(lastJump.t)}
                 </p>
               )}
             </div>
@@ -371,6 +382,7 @@ export function CapabilityCard({
             </ul>
           </section>
         )}
+        {footer}
       </div>
 
       <ResumeEvidence card={{ ...card, evidence }} onJump={jump} />

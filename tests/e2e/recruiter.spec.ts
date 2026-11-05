@@ -245,3 +245,20 @@ test("long inbox pages by 20 with a visible count; Show more and J reveal the re
   for (let i = 0; i < 21; i++) await page.keyboard.press("j");
   expect(await rows.count()).toBeGreaterThan(20);
 });
+
+test("card: pitch line in the footer, a quote at 0 s reads 'start', real story shows question and answer on their own lines", async ({ page }) => {
+  await seed(page);
+  await page.goto(CARD);
+  await expect(page.getByTestId("pitch-line")).toHaveText("Turning Point tests how you handle it when the plan breaks.");
+  const ev = page.getByTestId("evidence");
+  await expect(ev).not.toContainText(/\b0:00\b/);
+  const starts = await page.locator('[data-testid^="jump-"]').allInnerTexts();
+  if (starts.some((t) => /start$/.test(t.trim()))) expect(starts.join(" ")).toMatch(/start/);
+  // On the candidate's own results the real-life answer and the follow-up are never clipped.
+  await page.goto(`/results/${MAYA}`);
+  const fu = page.getByTestId("real-story-follow-up");
+  await expect(fu.locator("p").first()).toHaveClass(/font-medium/);
+  const answer = page.getByTestId("real-story-answer");
+  await expect(answer).not.toHaveClass(/line-clamp/);
+  await expect(fu.locator("p").nth(1)).not.toHaveClass(/line-clamp/);
+});

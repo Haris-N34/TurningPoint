@@ -81,3 +81,8 @@ test("landing preview does not move under reduced motion", async ({ page }) => {
   await page.waitForTimeout(3500);
   await expect(frame).toHaveAttribute("alt", /title screen/);
 });
+
+test("landing states the pitch line under the headline", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("pitch-line")).toHaveText("Turning Point tests how you handle it when the plan breaks.");
+});

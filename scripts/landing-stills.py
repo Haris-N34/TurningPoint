@@ -8,7 +8,12 @@ dst = Path("public/landing")
 dst.mkdir(parents=True, exist_ok=True)
 total = 0
 for p in sorted(src.glob("*.png")):
-    im = Image.open(p).convert("RGB").resize((800, 450), Image.LANCZOS)
+    im = Image.open(p).convert("RGB")
+    # The title screen's small pixel text is unreadable when scaled down; crop to the centre first.
+    if p.stem.startswith("1-title"):
+        w, h = im.size
+        im = im.crop((w // 4, h // 6, w * 3 // 4, h // 6 + h // 2))
+    im = im.resize((800, 450), Image.LANCZOS)
     out = dst / (p.stem + ".webp")
     im.save(out, "WEBP", quality=72, method=6)
     total += out.stat().st_size

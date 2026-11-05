@@ -75,7 +75,7 @@ export function HeroPreview() {
       </div>
       <figcaption className="mt-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">See it in 10 seconds</p>
-        <ol className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4">
+        <ol className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-[repeat(3,auto)_1fr]">
           {FRAMES.map((f, k) => (
             <li key={f.src}>
               <button
@@ -84,6 +84,7 @@ export function HeroPreview() {
                 aria-current={k === i ? "step" : undefined}
                 className={cn(
                   "flex w-full items-start gap-2 border-t-2 pt-2 text-left text-sm transition-colors",
+                  k < 3 && "sm:whitespace-nowrap",
                   k === i ? "border-primary text-foreground" : "border-border text-muted-foreground hover:text-foreground",
                 )}
               >

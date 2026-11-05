@@ -15,7 +15,8 @@ export default function Home() {
         <div>
           <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"><span className="h-px w-8 bg-primary" aria-hidden />Beyond the résumé</p>
           <h1 className="mt-6 max-w-2xl font-display text-[2.75rem] leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.25rem]">The plan breaks. <span className="text-primary">Your capability shows.</span></h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">A short story game where the plan falls apart. Candidates explain the calls they just made. Recruiters get evidence, not polished claims.</p>
+          <p className="mt-4 text-base font-medium text-foreground/80" data-testid="pitch-line">Turning Point tests how you handle it when the plan breaks.</p>
+          <p className="mt-4 max-w-lg text-lg leading-relaxed text-muted-foreground">A short story game where the plan falls apart. Candidates explain the calls they just made. Recruiters get evidence, not polished claims.</p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild size="lg"><Link href="/game/launch-week" data-testid="play-game">Play the game <span aria-hidden>→</span></Link></Button>
             <Button asChild size="lg" variant="outline"><Link href="/candidate">Try the demo</Link></Button>
