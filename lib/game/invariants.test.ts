@@ -139,3 +139,10 @@ describe("The Client Pivot discoveries are reachable", () => {
     for (const { o } of unlocked) expect(o.requires.every((r) => st.discoveries.includes(r))).toBe(true);
   });
 });
+
+describe("dialogue fits the A to D grid", () => {
+  it.each(MAP_IDS)("every option label on %s is at most 70 characters", (mapId) => {
+    const long = getMapScenario(mapId)!.nodes.flatMap((n) => n.options.filter((o) => o.label.length > 70).map((o) => `${n.id}/${o.id}`));
+    expect(long).toEqual([]);
+  });
+});
