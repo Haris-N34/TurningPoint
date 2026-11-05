@@ -1,9 +1,10 @@
+import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { SKILL_SLUGS } from "@/lib/engine/skills";
 import { adapterFor } from "./ats/adapters";
 import { handleMockAts } from "./ats/mockServer";
 import { createApiKey, revokeApiKey } from "./api";
-import { randomToken } from "./crypto";
+import { randomToken, sha256hex } from "./crypto";
 import { reportAttempt, resend } from "./outbound";
 import { decideSecondLook, markOpened, SecondLookError, secondLookStats, sweepNeverReviewed } from "./secondLook";
 import { company, createCompany, nowIso, PROVIDER_LABEL, PROVIDERS, type Company, type Provider } from "./store";
@@ -45,7 +46,23 @@ export async function consoleState(c: Company) {
   };
 }
 
-export async function handleIntegrations(method: string, path: string[], query: URLSearchParams, body: unknown, origin: string): Promise<Out> {
+/** Routes a candidate's browser calls (report a finished attempt, look up an invite). Never behind the console secret. */
+const CANDIDATE_ROUTES = (method: string, path: string[]) => (method === "POST" && path.join("/") === "attempts") || (method === "GET" && path[0] === "invites" && !!path[1]);
+
+/**
+ * Optional console lock (QA night): with TP_CONSOLE_SECRET set (a public deploy), every console route needs the
+ * same value in the x-tp-console-secret header. Unset (the local demo), the console stays open.
+ */
+export function consoleAllowed(method: string, path: string[], given: string | null | undefined, secret = process.env.TP_CONSOLE_SECRET): boolean {
+  if (!secret || CANDIDATE_ROUTES(method, path)) return true;
+  if (!given) return false;
+  const a = Buffer.from(sha256hex(given), "hex");
+  const b = Buffer.from(sha256hex(secret), "hex");
+  return timingSafeEqual(a, b);
+}
+
+export async function handleIntegrations(method: string, path: string[], query: URLSearchParams, body: unknown, origin: string, consoleSecret?: string | null): Promise<Out> {
+  if (!consoleAllowed(method, path, consoleSecret)) return bad(401, "Console secret required");
   const route = `${method} ${path.join("/")}`;
   const b = (body ?? {}) as Record<string, unknown>;
   if (route === "POST companies") {

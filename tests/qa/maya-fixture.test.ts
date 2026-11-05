@@ -6,7 +6,7 @@ import fixture from "@/fixtures/attempt.json";
 import { mapCheckpointQuestion } from "@/lib/ai/questions";
 import { buildMapCard } from "@/lib/card/buildMap";
 import { CardSchema, type Card, type CardCheckpoint } from "@/lib/card/types";
-import { fromChunks } from "@/lib/checkpoint/transcript";
+import { fromChunks, fromTyping } from "@/lib/checkpoint/transcript";
 import { availableOptions, newGame, openIssues, step, type GameState } from "@/lib/game/engine";
 import { parseMapScenario } from "@/lib/game/schema";
 import { dayOf } from "@/lib/game/time";
@@ -37,6 +37,9 @@ const CP1_TEXT =
   "I asked who was free when, because nobody wanted deliveries or set-up. I paired Ari, who has run markets, with a new volunteer on logistics, so nobody was stuck alone. It cost us fifteen minutes, but I'd rather lose time than a volunteer.";
 const CP2_TEXT =
   "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage. Losing a day would hurt the vendors more than the bands. I told both bands myself that morning and offered them a slot next year.";
+
+const FU_TEXT =
+  "I wrote to every volunteer myself before the group chat found out, so nobody heard it secondhand. A few people left. We kept going on half the money, and I learned to share bad news the same day.";
 
 const words = (t: string) => t.split(/\s+/).length;
 const secs = (t: string) => Math.round((words(t) / 2.6) * 100) / 100;
@@ -84,17 +87,16 @@ export function buildMaya(): Card {
     { id: "cp1", nodeId: "roles", kind: "decision", question: cp1Q.question, questionSource: cp1Q.source, mode: "voice", media: "demo/cp1.webm", durationS: secs(CP1_TEXT), transcript: fromChunks([{ text: CP1_TEXT, startS: 0, endS: secs(CP1_TEXT) }]), retakeUsed: false, hidden: false },
     { id: "cp2", nodeId: "recovery-plan", kind: "decision", question: cp2Q.question, questionSource: cp2Q.source, mode: "video", media: "demo/cp2.webm", durationS: secs(CP2_TEXT), transcript: fromChunks([{ text: CP2_TEXT, startS: 0, endS: secs(CP2_TEXT) }]), retakeUsed: true, hidden: false },
     keep("rl"),
-    keep("fu"),
+    // Text answer: a real setback and what changed after it, so Resilience is backed by failing forward.
+    { ...keep("fu"), durationS: 41, transcript: fromTyping(FU_TEXT, FU_TEXT.split(/\s+/).map((_, i) => +(1 + i * 0.6).toFixed(2))) },
   ];
   const card = buildMapCard({
     attemptId: old.attemptId,
     scenario: s,
     state: st,
     answers,
-    integrity: [
-      { checkpointId: "cp2", kind: "retake_used", detail: "Retake used on checkpoint 2" },
-      { checkpointId: "cp1", kind: "focus_lost", detail: "Window lost focus for 3 seconds during the answer" },
-    ],
+    // Focus-loss notes are candidate-only (never shown to employers), so the demo card carries none.
+    integrity: [{ checkpointId: "cp2", kind: "retake_used", detail: "Retake used on checkpoint 2" }],
     realStory: { title: old.realStory!.title, checkpointId: "rl", followUpCheckpointId: "fu" },
     challenge: { ...old.challenge, targetSkills: old.targetSkills },
     candidate: old.candidate,

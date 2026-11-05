@@ -29,23 +29,37 @@ async function clearOverlay(page: Page): Promise<boolean> {
   }
   if (await page.getByTestId("checkpoint").isVisible()) {
     const cp = page.getByTestId("checkpoint");
-    // In-game checkpoints default to video with a camera check; pick text with the keyboard (retry: a camera
-    // fallback can land just after the first pick).
     const text = cp.locator('input[value="text"]');
+    const start = cp.getByRole("button", { name: /start answering/i });
+    const done = cp.getByRole("button", { name: "Done" });
+    const submit = cp.getByRole("button", { name: "Submit" });
+    // Drive whatever phase the checkpoint is in, keyboard only. Under load the 15 s think timer can run out
+    // first (by design the answer then starts in the default mode), and a key press can land before a button
+    // is ready, so each step is retried until the checkpoint closes.
     await expect(async () => {
-      await text.focus();
-      await page.keyboard.press("Space");
-      await page.waitForTimeout(250);
-      await expect(text).toBeChecked({ timeout: 500 });
-    }).toPass({ timeout: 10_000 });
-    await cp.getByRole("button", { name: /start answering/i }).focus();
-    await page.keyboard.press("Enter");
-    await cp.getByTestId("answer-text").focus();
-    await page.keyboard.type("I picked this because the client needed an answer first, and it cost me time with the team.");
-    await cp.getByRole("button", { name: "Done" }).focus();
-    await page.keyboard.press("Enter");
-    await cp.getByRole("button", { name: "Submit" }).focus();
-    await page.keyboard.press("Enter");
+      if (!(await cp.isVisible())) return;
+      // Any empty answer box (typing, or "What we heard" after a silent recording) gets the answer first.
+      const box = cp.getByRole("textbox").first();
+      if ((await box.isVisible()) && !(await box.inputValue())) {
+        await box.focus();
+        await page.keyboard.type("I picked this because the client needed an answer first, and it cost me time with the team.");
+      }
+      if ((await submit.isVisible()) && (await submit.isEnabled())) {
+        await submit.focus();
+        await page.keyboard.press("Enter");
+      } else if (await start.isVisible()) {
+        if (!(await text.isChecked())) {
+          await text.focus();
+          await page.keyboard.press("Space");
+        }
+        await start.focus();
+        await page.keyboard.press("Enter");
+      } else if ((await done.isVisible()) && (await done.isEnabled())) {
+        await done.focus();
+        await page.keyboard.press("Enter");
+      }
+      await expect(cp).toBeHidden({ timeout: 700 });
+    }).toPass({ timeout: 90_000 });
     await expect(cp).toBeHidden({ timeout: 10_000 }).catch(() => {});
     return true;
   }
@@ -55,8 +69,17 @@ async function clearOverlay(page: Page): Promise<boolean> {
       await page.waitForTimeout(60);
     }
     await page.waitForTimeout(400);
-    await page.keyboard.press("Enter"); // first choice is focused
-    await expect(page.getByTestId("dialogue")).toBeHidden();
+    // The first choice is focused. Under load the pick can land inside the 350 ms anti-mash window and be
+    // ignored, so press again until the box closes. A second Enter during the 180 ms pick flash is ignored by
+    // the app (one pick per prompt), so retrying never picks twice.
+    // Retry only while the choices still have focus: once the pick lands, a checkpoint can open on top and take
+    // focus, and an Enter there would start a video answer.
+    await expect(async () => {
+      const inChoices = await page.evaluate(() => !!document.activeElement?.closest('[data-testid="dialogue"]') && !document.querySelector('[data-testid="checkpoint"]'));
+      if (inChoices && (await page.getByTestId("choice-a").isVisible())) await page.keyboard.press("Enter");
+      await expect(page.getByTestId("choice-a").or(page.getByTestId("checkpoint")).first()).toBeVisible({ timeout: 100 }).catch(() => {});
+      expect((await page.getByTestId("choice-a").isHidden()) || (await page.getByTestId("checkpoint").isVisible())).toBe(true);
+    }).toPass({ timeout: 15_000 });
     return true;
   }
   if (await page.getByTestId("reaction").isVisible()) {
