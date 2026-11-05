@@ -69,4 +69,4 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - Refresh mid-conversation and after a choice (list view, turn-based): clock, open dialogue and event log restore exactly.
 - CI-style full e2e on the merged code (prod build + hooks, 3 workers): 229 passed, 1 flaky (#29, now hardened), 3 failed (#18).
 - Re-verify at 12:05 on the integration branch (production build + hooks): every tests/qa spec green (13 passed, 3 phone skips by design); integrations, demo-script, recruiter, ai and demo-60s specs 59/59.
-
+- Full CI-style e2e on the merged integration code (production build + hooks, 3 workers): 243 passed, 0 failed, 0 flaky (59 skips are phone/desktop-only by design).
