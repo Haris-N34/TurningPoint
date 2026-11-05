@@ -12,6 +12,7 @@ import type { CardCheckpoint } from "@/lib/card/types";
 import { bus } from "@/lib/game/bus";
 import { GAME } from "@/lib/game/config";
 import { openIssues, replay, type Action, type CheckpointDue, type GameState } from "@/lib/game/engine";
+import { DEMO_JUMP_SEED, playToTurningPoint } from "@/lib/game/demoJump";
 import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
@@ -105,11 +106,18 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const begin = useCallback(() => {
     const id = newAttemptId();
     setAttemptId(id);
-    // The demo jump uses a fixed seed so the stage demo always gets the same disruption (sponsor pulls out).
-    init(scenario, jump ? "demo-tp" : id, { turnBased: settings.turnBased, view: settings.view });
+    init(scenario, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view });
+    if (jump) {
+      // Demo jump (P.2): a scripted sensible player runs Monday and Tuesday on the fixed seed (sponsor pulls out).
+      // Its recaps, checkpoints and toasts stay silent; only the turning point itself is new, so the cutscene plays.
+      const j = playToTurningPoint(scenario, DEMO_JUMP_SEED, { turnBased: settings.turnBased });
+      prev.current = { ...j.state, events: j.state.events.slice(0, j.tpIndex) };
+      shownTp.current = false;
+      restore(scenario, j.state, j.log);
+    }
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [init, scenario, settings.turnBased, settings.view, setScreen, jump]);
+  }, [init, restore, scenario, settings.turnBased, settings.view, setScreen, jump]);
 
   const resume = useCallback(() => {
     if (!resumable) return;
@@ -125,21 +133,6 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setReady(settings.view === "list");
     setScreen("loading");
   }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
-
-  // Demo jump (P.2): /game/<map>?jump=turning-point fast-forwards a fresh run to the turning point. Never saved.
-  const jumped = useRef(false);
-  useEffect(() => {
-    if (!jump || jumped.current || screen !== "play" || !state) return;
-    jumped.current = true;
-    for (let i = 0; i < 80; i++) {
-      const st = useGame.getState().state;
-      if (!st || st.ended || st.tp.fired) break;
-      for (const c of st.checkpointsDue) dispatch(c.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: c.id });
-      if (useGame.getState().state?.dialogue) dispatch({ type: "leave" });
-      dispatch({ type: "wait" });
-    }
-    setRecapDay(undefined);
-  }, [jump, screen, state, dispatch, setRecapDay]);
 
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
