@@ -24,5 +24,5 @@ test("impact report separates synthetic data, filters employers and shows measur
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const axe = await new AxeBuilder({page}).analyze();
   expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
-  await page.screenshot({ path: `/private/tmp/tp-impact-${test.info().project.name}.png`, fullPage: true });
+  await page.screenshot({ path: test.info().outputPath("tp-impact.png"), fullPage: true });
 });
