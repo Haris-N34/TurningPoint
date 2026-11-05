@@ -39,6 +39,8 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
   const [src, setSrc] = useState<string>();
   const [revealed, setRevealed] = useState(!transcriptFirst);
   const [activeWord, setActiveWord] = useState(-1);
+  // Video answers show a calm cover until they start, so an unplayed clip never looks like an empty box.
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     let url: string | undefined;
@@ -66,6 +68,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
 
   const seek = (t: number) => {
     setRevealed(true);
+    setStarted(true);
     const v = el.current;
     if (!v) return;
     v.currentTime = t;
@@ -85,7 +88,23 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} poster={VIDEO_POSTER} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-44 w-full rounded-xl bg-foreground/90 object-contain" data-testid="clip-media" />
+            <div className="relative">
+              <video ref={el} src={src} poster={VIDEO_POSTER} controls playsInline preload="metadata" onTimeUpdate={onTime} onPlay={() => setStarted(true)} className="aspect-video max-h-44 w-full rounded-xl bg-[#2b2620] object-contain" data-testid="clip-media" />
+              {!started && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStarted(true);
+                    el.current?.play().catch(() => {});
+                  }}
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-[#2b2620] text-[#f1ede5]"
+                  data-testid="video-cover"
+                >
+                  <span aria-hidden className="flex size-12 items-center justify-center rounded-full bg-[#a63e20] text-lg text-white shadow-lg">▶</span>
+                  <span className="text-sm font-medium">Play video answer</span>
+                </button>
+              )}
+            </div>
           ) : (
             <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}

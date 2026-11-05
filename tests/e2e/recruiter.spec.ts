@@ -192,3 +192,22 @@ test("decision path keeps the turning point in view, with arrows when the path s
     }
   }
 });
+
+test("employers never see focus-loss notes; the candidate sees them for information", async ({ page }) => {
+  await seed(page);
+  // Make sure the card carries a focus-loss note, whatever the fixture holds.
+  await page.evaluate((id) => {
+    const key = `tp:card:${id}`;
+    const card = JSON.parse(localStorage.getItem(key)!);
+    card.integrity = [...card.integrity.filter((n: { kind: string }) => n.kind !== "focus_lost"), { checkpointId: "cp2", kind: "focus_lost", detail: "Window lost focus for 3 seconds during the answer" }];
+    localStorage.setItem(key, JSON.stringify(card));
+  }, MAYA);
+  await page.goto(CARD);
+  await expect(page.getByTestId("capability-card")).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(/lost focus/i);
+  await page.goto(`/recruiter/compare?challenge=ch_demo_energy&ids=${MAYA},att_demo_peer_01`);
+  await expect(page.getByTestId("compare")).not.toContainText(/lost focus/i);
+  await page.goto(`/results/${MAYA}`);
+  await expect(page.getByTestId("integrity")).toContainText(/lost focus/i);
+  await expect(page.getByTestId("integrity")).toContainText("For your information");
+});

@@ -11,6 +11,7 @@ import { scoreCard } from "@/lib/scoring/score";
 import { ClipPlayer, type ClipHandle } from "./ClipPlayer";
 import { FinalScoreBox } from "./FinalScoreBox";
 import { ResumeEvidence } from "./ResumeEvidence";
+import { DEMO_PREFIX } from "@/lib/impact/metrics";
 
 // The Capability Card (E3). One component for the recruiter and for the candidate's own preview (C7.1).
 // It fits a laptop screen: evidence on the left, decision path and clips on the right.
@@ -56,6 +57,7 @@ export function CapabilityCard({
   seekTo,
   resumeWeight,
   showFinalScore = true,
+  audience = "employer",
 }: {
   card: Card;
   identity: CardIdentity;
@@ -69,11 +71,14 @@ export function CapabilityCard({
   resumeWeight?: number;
   /** The Final score depends on each employer's weights, so the candidate preview leaves it out. */
   showFinalScore?: boolean;
+  /** Employers never see focus-loss or transcript-edit notes (it would read as proctoring); the candidate sees all. */
+  audience?: "employer" | "candidate";
 }) {
   // Never render evidence that has not passed the quote check (G1, E3.8).
   const evidence = useMemo(() => verifyEvidence(card).evidence, [card]);
   // Final score (Part D): sorts only, shown top right with its breakdown; evidence still leads.
   const final = useMemo(() => scoreCard(card, card.resume ? { claims: card.resume.claims, resumeWeight } : {}), [card, resumeWeight]);
+  const notes = audience === "candidate" ? card.integrity : card.integrity.filter((n) => n.kind === "retake_used");
   const decisionClips = card.checkpoints.filter((c) => c.kind === "decision").slice(0, 3);
   const realLife = card.checkpoints.find((c) => c.id === card.realStory?.checkpointId);
   const followUp = card.checkpoints.find((c) => c.id === card.realStory?.followUpCheckpointId);
@@ -135,6 +140,9 @@ export function CapabilityCard({
             <h1 className="font-display text-3xl leading-tight tracking-tight" data-testid="card-name">
               {identity.displayName}
             </h1>
+            {(card.attemptId.startsWith("att_demo_peer_") || card.attemptId.startsWith(DEMO_PREFIX)) && (
+              <Badge variant="outline" className="border-dashed uppercase tracking-wide text-muted-foreground" data-testid="synthetic-badge">Synthetic</Badge>
+            )}
             {card.candidate.verified && <Badge variant="secondary">Verified student</Badge>}
             {identity.anonymous && <Badge variant="outline">Anonymous review</Badge>}
             {reused && (
@@ -352,11 +360,11 @@ export function CapabilityCard({
           </details>
         )}
 
-        {card.integrity.length > 0 && (
+        {notes.length > 0 && (
           <section aria-labelledby="int-h" className="rounded-xl bg-muted px-4 py-3 text-xs text-muted-foreground" data-testid="integrity">
-            <h2 id="int-h" className="font-medium">Integrity notes · For context, not scored</h2>
+            <h2 id="int-h" className="font-medium">{audience === "candidate" ? "For your information · Employers only see retakes" : "Notes · For context, not scored"}</h2>
             <ul className="mt-1 list-disc pl-4">
-              {card.integrity.map((n, i) => (
+              {notes.map((n, i) => (
                 <li key={i}>{integrityText(n)}</li>
               ))}
             </ul>
