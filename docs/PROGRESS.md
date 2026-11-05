@@ -115,7 +115,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 ## M3.5. AI Engine (v2 Part B)
 
-- [ ] B.1 [D] All model calls go through lib/ai with a provider interface; the mock provider passes the full e2e suite offline
+- [ ] B.1 [D] All model calls go through lib/ai with a provider interface; the mock provider passes the full e2e suite offline. Provider interface done and tested (lib/ai/providers.test.ts). Blocked on the full suite: 9 game.spec tests already fail on ba1ddfc (game WIP, #43), and "evening recap" (desktop) runs at the 60 s edge under load (passes alone in 59 s). All other 90 e2e pass offline in off and cached builds.
 - [x] B.2 [D] Every B2 service exists with a Zod schema, fixtures and a fallback (lib/ai/services, registry in lib/ai/prompts/registry.ts, lib/ai/services.test.ts)
 - [x] B.3 [D] Scenario Tailor and Dialogue Variants run at publish time and are cached; no live generation of game content (lib/ai/services/publish.ts, lib/ai/publish.test.ts)
 - [x] B.4 [D] Consistency Checker output on the card under "Said vs did", labelled as context (lib/ai/consistency.test.ts, tests/e2e/ai.spec.ts)
@@ -123,7 +123,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] B.6 [D] Recruiter Copilot answers only with citations; refuses protected-trait and hire/no-hire questions (tests: lib/ai/copilot.test.ts, tests/e2e/ai.spec.ts)
 - [x] B.7 [D] Counterfactual bias test, hallucination eval and gold-set accuracy eval run in CI and block merge on failure (lib/ai/bias.test.ts, lib/ai/evals; `pnpm evals` step in CI; gold accuracy skips with a message until B.10 labels exist; merge blocking also needs branch protection on main)
 - [x] B.8 [D] ai_calls telemetry on an admin "AI health" page: calls, latency p50/p95, cost, validation failures (/admin/ai-health, lib/ai/telemetry.ts)
-- [ ] B.9 [D] AI_MODE=cached lets the whole demo run without network access to the model provider
+- [x] B.9 [D] AI_MODE=cached lets the whole demo run without network access to the model provider (lib/ai/cached.test.ts with fetch disabled, `pnpm ai:record`, e2e "B.9" in tests/e2e/ai.spec.ts; full suite in a cached build has only the game.spec failures already on ba1ddfc)
 - [ ] B.10 [D+H] Gold set of 40+ hand-scored answers (both team members); kappa in docs/EVALS.md
 - Done when: all B items pass in CI.
 
