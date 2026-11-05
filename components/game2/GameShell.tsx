@@ -440,7 +440,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       {screen === "results" && state && phase === "real-life" && profile && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/85 p-3">
           <Panel className="w-[min(640px,96vw)] p-4">
-            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} onModeChange={() => {}} onDone={finish} />
+            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} variant="game" onModeChange={() => {}} onDone={finish} />
           </Panel>
         </div>
       )}

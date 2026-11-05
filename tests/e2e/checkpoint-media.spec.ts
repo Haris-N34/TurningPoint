@@ -189,7 +189,7 @@ test("game: the checkpoint pops up as a video interview with the camera on by de
   await expect.poll(async () => Number(await cp.getByTestId("mic-meter").getAttribute("data-level")), { timeout: 10_000, intervals: [100] }).toBeGreaterThan(0);
   // Text is always one click away (hard rule: no camera needed).
   await expect(cp.locator('input[value="text"]')).toBeEnabled();
-  await expect(cp.getByTestId("switch-text")).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) >= 640) await expect(cp.getByTestId("switch-text")).toBeVisible();
 
   const results = await new AxeBuilder({ page }).include('[data-testid="checkpoint"]').analyze();
   expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);

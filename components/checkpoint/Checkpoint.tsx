@@ -314,7 +314,7 @@ export function Checkpoint(p: Props) {
             ? `Starting your ${mode === "video" ? "camera" : "microphone"}. The timer starts once it's on.`
             : firstCheck && mode === "video"
               ? "Camera check: this is how you'll appear. Only your words are scored, never your face or voice."
-              : "You"}
+              : mode === "video" ? "Your camera" : "Your microphone"}
         </p>
       )}
       {mode === "video" && (
@@ -338,7 +338,8 @@ export function Checkpoint(p: Props) {
       )}
       {mode !== "text" && <MicMeter level={r.level} pixel={game} />}
       {phase === "think" && game && mode === "video" && (
-        <div className="flex flex-wrap gap-2">
+        // Phones: the "Answer by" choices right below already do this; skip the duplicate row to save height.
+        <div className="hidden flex-wrap gap-2 sm:flex">
           <span className="self-center text-xs">Rather not be on camera?</span>
           <button className={cn(s.plain, "min-h-8 px-2 py-0 text-sm")} onClick={() => (setDeviceMsg(null), setMode("voice"))} data-testid="switch-voice">
             Voice instead
@@ -368,7 +369,7 @@ export function Checkpoint(p: Props) {
       </div>
       <div className="min-w-0">
         <p className="text-sm font-semibold">{p.interviewer?.name ?? "Hiring panel"}</p>
-        <p className="text-xs opacity-80">{p.interviewer?.role ?? "Asking about the choice you just made"}</p>
+        <p className="text-xs opacity-80">{p.interviewer?.role ?? (p.kind === "real_life" ? "Last question: something real" : p.kind === "follow_up" ? "One follow-up on what you said" : "Asking about the choice you just made")}</p>
       </div>
     </div>
   );
