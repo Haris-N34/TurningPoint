@@ -19,7 +19,11 @@ export function TitleScreen({ scenario, onStart, canResume, onResume }: { scenar
   const [showSettings, setShowSettings] = useState(false);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && !showSettings && (e.target as HTMLElement).tagName !== "BUTTON") onStart();
+      if (e.key === "Enter" && !showSettings && (e.target as HTMLElement).tagName !== "BUTTON") {
+        // Stop the same keypress from activating the next screen's focused button.
+        e.preventDefault();
+        onStart();
+      }
     };
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);

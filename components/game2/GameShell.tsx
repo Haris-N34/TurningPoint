@@ -60,6 +60,10 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
   const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean } | null>(null);
   const prev = useRef<GameState | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
+  const [sawLoading, setSawLoading] = useState(false);
+  useEffect(() => {
+    if (screen === "loading") setSawLoading(true);
+  }, [screen]);
   const shownTp = useRef(false);
 
   // Profile, accommodations and any unfinished run on this device.
@@ -289,6 +293,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
     w.__tp = {
       getState: () => useGame.getState().state,
       log: () => useGame.getState().log,
+      error: () => useGame.getState().error,
       moveTo: (zone: string) => dispatch({ type: "move", zone }),
       talk: (npc: string) => bus.emit("interact", { npc }),
       act: (issue: string, action: "talk" | "delegate" | "defer", arg?: string) =>
@@ -316,7 +321,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
   const node = state?.dialogue ? scenario.nodes.find((n) => n.id === state.dialogue!.node) : undefined;
 
   return (
-    <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"}>
+    <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"}>
       {(screen === "title" || screen === "avatar") && <MapCanvas scenario={scenario} avatar={avatar.look} attract label="The market at Launch Week, seen from above" />}
       {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}
@@ -352,7 +357,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
           </div>
           <Toasts />
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
-          {node && !reaction && (
+          {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />
           )}
           {reaction && <ReactionBox scenario={scenario} {...reaction} />}

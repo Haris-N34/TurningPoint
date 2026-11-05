@@ -28,6 +28,16 @@ async function startGame(page: Page, opts: { list?: boolean; turnBased?: boolean
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
 }
 
+/** Skip and advance dialogue text with Enter until the A-D choices show. */
+async function toChoices(page: Page) {
+  for (let i = 0; i < 10; i++) {
+    if (await page.getByTestId("choice-a").isVisible()) return;
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(120);
+  }
+  await expect(page.getByTestId("choice-a")).toBeVisible();
+}
+
 /** Clear whatever overlay is up, with the keyboard where possible. Returns false when nothing was open. */
 async function clearOverlay(page: Page): Promise<boolean> {
   for (const [id, key] of [["cutscene-next", "click"], ["cutscene-done", "click"], ["recap-next", "click"], ["pause-resume", "click"]] as const) {
@@ -57,12 +67,13 @@ async function clearOverlay(page: Page): Promise<boolean> {
   }
   if (await page.getByTestId("dialogue").isVisible()) {
     // Keyboard: Enter skips the typewriter and advances lines; then Enter picks the focused choice.
-    for (let i = 0; i < 8 && !(await page.getByTestId("choice-a").isVisible()); i++) {
-      await page.keyboard.press("Enter");
-      await page.waitForTimeout(60);
-    }
+    await toChoices(page);
     await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("Enter");
+    // Choices ignore Enter for a moment after appearing (anti-mash guard); retry on slow machines.
+    for (let i = 0; i < 4 && (await page.getByTestId("dialogue").isVisible()); i++) {
+      await page.waitForTimeout(400);
+      if (await page.getByTestId("dialogue").isVisible()) await page.keyboard.press("Enter");
+    }
     await expect(page.getByTestId("dialogue")).toBeHidden();
     return true;
   }
@@ -80,15 +91,13 @@ test("title screen, avatar creator and HUD look like a game (A0, A.4)", async ({
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await expect(page.getByTestId("title-map")).toBeVisible();
   await expect(page.getByTestId("title-screen")).toContainText("PRESS ENTER");
-  await expect(async () => {
-    await page.keyboard.press("Enter");
-    await expect(page.getByTestId("avatar-creator")).toBeVisible({ timeout: 1000 });
-  }).toPass({ timeout: 10_000 });
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("avatar-creator")).toBeVisible({ timeout: 10_000 });
   await page.getByRole("button", { name: "Skin #4a2f22" }).click();
   await page.getByRole("button", { name: "curly" }).click();
   await page.getByTestId("avatar-name").fill("Sam");
   await page.getByTestId("avatar-done").click();
-  await expect(page.getByTestId("loading-screen")).toBeVisible();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-saw-loading", "1");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
   for (const id of ["resources", "clock", "issue-tracker", "map-canvas"]) await expect(page.getByTestId(id).first()).toBeVisible();
   await expect(page.getByTestId("clock-time")).toHaveText(/^Mon 09:/);
@@ -134,10 +143,8 @@ test("talking: portrait, typewriter, A-D choices by keyboard, reaction and juice
   const box = page.getByTestId("dialogue");
   await expect(box).toBeVisible({ timeout: 15_000 });
   await expect(box.locator("img[data-expression]")).toBeVisible();
-  await page.keyboard.press("Enter"); // skip typewriter
-  await page.keyboard.press("Enter"); // next line
-  await page.keyboard.press("Enter");
-  await expect(page.getByTestId("choice-a")).toBeVisible();
+  await toChoices(page); // Enter skips the typewriter and advances lines
+  await page.waitForTimeout(400);
   await expect(page.getByTestId("choice-a")).toContainText("A");
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("choice-b")).toBeFocused();
@@ -153,8 +160,9 @@ test("delegate and defer from the issue tracker (A.13)", async ({ page }) => {
   await page.getByTestId("delegate-roles").click();
   await page.getByTestId("delegate-to-priya").click();
   await expect.poll(() => tp(page, (x) => x.getState().issues.roles.status)).toBe("delegated");
+  while (await clearOverlay(page)); // a seeded checkpoint may follow the delegation
   await page.getByTestId("wait").click(); // vendor mix spawns at 10:00
-  await clearOverlay(page);
+  while (await clearOverlay(page));
   await page.getByTestId("defer-vendor-mix").click();
   await page.getByTestId("defer-reason").first().click();
   await expect.poll(() => tp(page, (x) => x.getState().issues["vendor-mix"].status)).toBe("deferred");
@@ -164,7 +172,8 @@ test("choice-triggered video checkpoint quotes the option picked (A.7)", async (
   await startGame(page, { turnBased: true });
   await page.getByTestId("go-roles").click();
   await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
-  for (let i = 0; i < 6 && !(await page.getByTestId("choice-c").isVisible()); i++) await page.keyboard.press("Enter");
+  await toChoices(page);
+  await page.waitForTimeout(400);
   await page.getByTestId("choice-c").click();
   await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", "You chose C, to take logistics myself so the team stays happy. Walk us through why.");

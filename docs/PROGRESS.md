@@ -46,20 +46,20 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] A.1 [D] "Quiz test": no gameplay screen shows choices without a character, a scene and an animation
 - [ ] A.2 [D] Every decision happens through an in-world interaction (walk to someone, item, HQ laptop)
 - [ ] A.3 [D] Playwright screenshots of title, map, dialogue, cutscene, checkpoint and results in docs/screens; CHANGELOG records which A0 items are met
-- [ ] A.4 [D] Title screen, avatar creator, pause menu, loading screen and end-of-week results screen match A0
-- [ ] A.5 [D+H] Dialogue: portraits with expressions, typewriter text with skip and blip, A to D buttons with arrow keys, NPC emote reactions, sound
-- [ ] A.6 [D] Juice: floating numbers, tweened bars, shake, particles and sound on every resource change
-- [ ] A.7 [D] Choice-triggered video fires on explainOnPick options and quotes the option picked; cap 4 per run; seeded still guarantee 2
+- [x] A.4 [D] Title screen, avatar creator, pause menu, loading screen and end-of-week results screen match A0
+- [x] A.5 [D+H] Dialogue: portraits with expressions, typewriter text with skip and blip, A to D buttons with arrow keys, NPC emote reactions, sound
+- [x] A.6 [D] Juice: floating numbers, tweened bars, shake, particles and sound on every resource change
+- [x] A.7 [D] Choice-triggered video fires on explainOnPick options and quotes the option picked; cap 4 per run; seeded still guarantee 2
 - [ ] A.8 [D] "The Client Pivot" fully playable: own map, NPCs, data mini-view, hidden discoveries, KPIs
 - [ ] A.9 [D] Map loads from Tiled JSON; walk with keys, click and tap; camera follows
-- [ ] A.10 [D] NPCs show urgency bubbles (icon + label, not colour only); talking opens a React dialogue driven by scenario nodes
-- [ ] A.11 [D] Clock advances by action costs and drift, pauses in dialogue, checkpoints, pause menu and on blur; shows day, time and progress ring
+- [x] A.10 [D] NPCs show urgency bubbles (icon + label, not colour only); talking opens a React dialogue driven by scenario nodes
+- [x] A.11 [D] Clock advances by action costs and drift, pauses in dialogue, checkpoints, pause menu and on blur; shows day, time and progress ring
 - [x] A.12 [D] Turn-based mode disables drift; outcomes do not depend on drift (unit test)
-- [ ] A.13 [D] Issues spawn, count down, expire with consequences; Talk, Delegate, Defer with a reason, Ignore
-- [ ] A.14 [D] Evening recap shows the day's KPIs
-- [ ] A.15 [D] Turning-point sequence plays fully, changes the map, spawns new issues
+- [x] A.13 [D] Issues spawn, count down, expire with consequences; Talk, Delegate, Defer with a reason, Ignore
+- [x] A.14 [D] Evening recap shows the day's KPIs
+- [x] A.15 [D] Turning-point sequence plays fully, changes the map, spawns new issues
 - [x] A.16 [D] All A8 KPIs compute correctly from a recorded input log (unit tests with fixtures)
-- [ ] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
+- [x] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
 - [x] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
 - [ ] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace
 - [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop

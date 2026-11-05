@@ -13,19 +13,30 @@ const SPEED = { slow: 45, normal: 25, fast: 10, instant: 0 } as const;
 /** Typewriter text with a voice blip per character; Space/Enter or a click skips to the end (A0). */
 export function useTypewriter(text: string, speed: keyof typeof SPEED, pitch: number) {
   const [n, setN] = useState(speed === "instant" ? text.length : 0);
+  const pos = useRef(0);
+  const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   useEffect(() => {
-    if (speed === "instant") return setN(text.length);
+    pos.current = 0;
+    if (speed === "instant") {
+      setN(text.length);
+      return;
+    }
     setN(0);
-    let i = 0;
-    const t = setInterval(() => {
-      i++;
-      setN(i);
-      if (i % 2 === 0 && text[i] && text[i] !== " ") sfx.blip(pitch);
-      if (i >= text.length) clearInterval(t);
+    timer.current = setInterval(() => {
+      pos.current++;
+      setN(pos.current);
+      if (pos.current % 2 === 0 && text[pos.current] && text[pos.current] !== " ") sfx.blip(pitch);
+      if (pos.current >= text.length) clearInterval(timer.current);
     }, SPEED[speed]);
-    return () => clearInterval(t);
+    return () => clearInterval(timer.current);
   }, [text, speed, pitch]);
-  return { shown: text.slice(0, n), done: n >= text.length, skip: () => setN(text.length) };
+  const skip = () => {
+    // Stop the ticker so it can't overwrite the skip on its next tick.
+    clearInterval(timer.current);
+    pos.current = text.length;
+    setN(text.length);
+  };
+  return { shown: text.slice(0, n), done: n >= text.length, skip };
 }
 
 const pitchOf = (id: string) => 300 + ([...id].reduce((a, c) => a + c.charCodeAt(0), 0) % 6) * 70;
@@ -55,9 +66,18 @@ export function DialogueBox({
   const btns = useRef<(HTMLButtonElement | null)[]>([]);
   const [focus, setFocus] = useState(0);
 
+  // Players mash Enter to skip text; ignore choice activation briefly after the choices appear.
+  const shownAt = useRef(0);
   useEffect(() => {
-    if (isPrompt && tw.done) btns.current[0]?.focus();
+    if (isPrompt && tw.done) {
+      shownAt.current = performance.now();
+      btns.current[0]?.focus();
+    }
   }, [isPrompt, tw.done]);
+  const pick = (id: "a" | "b" | "c" | "d") => {
+    if (performance.now() - shownAt.current < 350) return;
+    onChoose(id);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -84,12 +104,13 @@ export function DialogueBox({
         else if (e.key === "ArrowLeft") move(-1);
         else if (e.key === "ArrowDown") move(cols);
         else if (e.key === "ArrowUp") move(-cols);
-        else if (/^[a-d]$/i.test(e.key) && opts.some((o) => o.id === e.key.toLowerCase())) onChoose(e.key.toLowerCase() as "a");
+        else if (/^[a-d]$/i.test(e.key) && opts.some((o) => o.id === e.key.toLowerCase())) pick(e.key.toLowerCase() as "a");
         else if (e.key === "Escape") onLeave();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tw, isPrompt, opts, focus, onChoose, onLeave]);
 
   const portraitId = speaker?.portrait ?? scenario.npcs.find((n) => n.id === node.npc)?.portrait ?? "laptop";
@@ -98,9 +119,9 @@ export function DialogueBox({
   return (
     <div className="pointer-events-auto absolute inset-x-2 bottom-2 z-40 sm:inset-x-auto sm:left-1/2 sm:w-[min(760px,94vw)] sm:-translate-x-1/2" role="dialog" aria-label={`Talking with ${speaker?.name ?? "yourself"}`} data-testid="dialogue">
       <Panel className="flex gap-3 p-3 sm:p-4">
-        <div className="hidden shrink-0 flex-col items-center sm:flex">
-          <Portrait id={portraitId} expression={expression} className="size-24 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45]" />
-          <span className="mt-1 rounded-[3px] bg-[#2e222f] px-2 text-xs font-semibold text-[#fff8e7]">{speaker?.name ?? (cur.who === "you" ? "You" : "")}</span>
+        <div className="flex shrink-0 flex-col items-center">
+          <Portrait id={portraitId} expression={expression} className="size-14 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45] sm:size-24" />
+          <span className="mt-1 hidden rounded-[3px] bg-[#2e222f] px-2 text-xs font-semibold text-[#fff8e7] sm:block">{speaker?.name ?? (cur.who === "you" ? "You" : "")}</span>
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#9c2c18] sm:hidden">{speaker?.name ?? "You"}</p>
@@ -138,7 +159,7 @@ export function DialogueBox({
                   ref={(el) => {
                     btns.current[i] = el;
                   }}
-                  onClick={() => onChoose(o.id)}
+                  onClick={() => pick(o.id)}
                   onFocus={() => setFocus(i)}
                   data-testid={`choice-${o.id}`}
                   className={cn(
