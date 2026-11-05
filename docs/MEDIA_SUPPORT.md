@@ -22,7 +22,7 @@ The demo has no API keys, so speech to text uses the browser's built-in `SpeechR
 | Safari (macOS 14.1+, iOS 17+) | Yes | Partly. Works, but can stop early or miss words, and iOS may hand the mic to one or the other. | Captions when it works. Restarts happen by themselves. Any gaps get fixed in the editable transcript. |
 | Firefox | Yes | No | Before answering: "This browser can't turn speech into text. We'll still record your answer, and you type what you said before you submit. Chrome and Edge transcribe live." The recording is kept; the transcript box starts empty. |
 | Brave, privacy builds of Chromium | Yes | Often blocked (`not-allowed` or `network`) | "Your browser blocked speech to text..." and they type the words. |
-| Any browser, camera or mic blocked | Camera blocked: falls back to voice. Mic blocked: falls back to text. | n/a | A calm note, for example "The browser didn't allow the camera. This one is set to voice, which counts exactly the same. You can switch any time." Never an error tone. |
+| Any browser, camera or mic blocked | Camera blocked: voice or text. Mic blocked too: text. | n/a | One calm line, for example "The browser didn't allow the camera. Answer by voice or text instead; it counts exactly the same. The timer waits for you." plus one-tap "Answer by voice" and "Answer in text" buttons. The think timer does not run until they tap (or pick a mode). Never an error tone. |
 
 ## Errors in plain words
 

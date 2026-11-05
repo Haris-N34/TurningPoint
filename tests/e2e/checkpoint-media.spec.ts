@@ -242,6 +242,7 @@ test("game: no camera means a calm switch to voice, and no mic means text", asyn
   const note = cp.getByTestId("device-note");
   await expect(note).toContainText("didn't allow the camera");
   await expect(note).toContainText("counts exactly the same");
+  await expect(note).toContainText("The timer waits for you.");
   // Calm tone: the note uses the normal text colour, not a warning colour.
   const color = await note.evaluate((el) => getComputedStyle(el).color);
   const body = await cp.evaluate((el) => getComputedStyle(el.firstElementChild!).color);
@@ -328,14 +329,53 @@ test("demo path: camera and mic refused, the first checkpoint opens calmly in te
   });
   const cp = await toDemoCheckpoint(page);
   await expect(cp).toHaveAttribute("data-mode", "text", { timeout: 5000 });
-  await expect(cp.getByTestId("device-note")).toHaveText("The browser didn't allow the camera and microphone. This one is set to text, which counts exactly the same. You can switch any time.");
+  await expect(cp.getByTestId("device-note")).toHaveText(
+    "The browser didn't allow the camera and microphone. Answer in text instead; it counts exactly the same. The timer waits for you.",
+  );
   await expect(cp).not.toContainText(/couldn't|error/i);
+  await expect(cp.getByTestId("fallback-voice")).toHaveCount(0);
+  // The timer holds until the candidate taps.
+  await page.waitForTimeout(2000);
+  expect(await thinkLeft(page)).toBe(15);
+  await cp.getByTestId("fallback-text").click();
   await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
   await cp.getByRole("button", { name: /start answering/i }).click();
   await cp.getByTestId("answer-text").fill("Saturday and Sunday are the market. Promotion can wait.");
   await cp.getByRole("button", { name: "Done" }).click();
   await cp.getByRole("button", { name: "Submit" }).click();
   await expect(cp).toBeHidden({ timeout: 10_000 });
+});
+
+// Judge check: the stage laptop denies only the camera. One calm line, one tap to voice or text,
+// no red error, and the think timer waits while they choose. Runs at 1280x720 (desktop) and 375 (phone).
+test("demo path: camera denied, calm one-line note, one tap to voice or text, timer waits", async ({ page }, info) => {
+  test.setTimeout(90_000);
+  if (info.project.name === "desktop") await page.setViewportSize({ width: 1280, height: 720 });
+  await page.addInitScript(() => {
+    const md = navigator.mediaDevices;
+    const real = md.getUserMedia.bind(md);
+    md.getUserMedia = (c?: MediaStreamConstraints) => (c?.video ? Promise.reject(new DOMException("denied", "NotAllowedError")) : real(c));
+  });
+  const cp = await toDemoCheckpoint(page);
+  const note = cp.getByTestId("device-note");
+  await expect(note).toHaveText("The browser didn't allow the camera. Answer by voice or text instead; it counts exactly the same. The timer waits for you.", { timeout: 10_000 });
+  // Calm: normal text colour, no alert role, no error words.
+  expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe(await cp.evaluate((el) => getComputedStyle(el.firstElementChild!).color));
+  await expect(cp.getByRole("alert")).toHaveCount(0);
+  await expect(cp).not.toContainText(/couldn't|error|failed/i);
+  // One tap each way, and the timer is not running while they choose.
+  await expect(cp.getByTestId("fallback-voice")).toBeVisible();
+  await expect(cp.getByTestId("fallback-text")).toBeVisible();
+  await expect(cp.getByTestId("fallback-voice")).toBeInViewport();
+  await page.waitForTimeout(2000);
+  expect(await thinkLeft(page)).toBe(15);
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: `docs/screens/night/checkpoint/${info.project.name}-5-camera-denied.png`, style: "nextjs-portal{display:none!important}" });
+
+  await cp.getByTestId("fallback-voice").click();
+  await expect(cp).toHaveAttribute("data-mode", "voice");
+  await expect(cp.getByTestId("device-choice")).toHaveCount(0);
+  await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
 });
 
 test("real life: a one-line, off-topic answer gets a kind 'tell us more' follow-up", async ({ page }, info) => {
