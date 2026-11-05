@@ -84,7 +84,8 @@ export function followUpQuestion(transcript: string): GeneratedQuestion {
 export function redactName(text: string, displayName: string): string {
   const parts = displayName.split(/\s+/).filter((p) => p.length >= 2);
   let out = text;
-  for (const p of parts) out = out.replace(new RegExp(`\\b${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), "[name]");
+  // Unicode-aware word edges: `\b` treats accented letters as non-word, so José or Zoë would slip through.
+  for (const p of parts) out = out.replace(new RegExp(`(?<![\\p{L}\\p{N}_])${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}_])`, "giu"), "[name]");
   return out;
 }
 

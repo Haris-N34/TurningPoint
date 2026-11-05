@@ -48,6 +48,8 @@ export function challengeMap(c: Pick<Challenge, "templateId" | "mapOverrides">):
 
 export function slugify(text: string) {
   const s = text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "") // Café -> Cafe, not caf-
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
@@ -69,7 +71,8 @@ function code(seed: string, n: number) {
 }
 
 /** The public link slug a challenge gets on publish. Deterministic, so the server can rebuild it. */
-export const publicSlugFor = (id: string, companyName: string, title: string) => `${slugify(`${companyName} ${title}`)}-${code(id, 4).toLowerCase()}`;
+export const publicSlugFor = (id: string, companyName: string, title: string) =>
+  [slugify(`${companyName} ${title}`), code(id, 4).toLowerCase()].filter(Boolean).join("-");
 
 /** Map edits must keep the map valid (at least 3 checkpoint-eligible issues, and so on). */
 function validateMap(c: Pick<Challenge, "templateId" | "mapOverrides">) {

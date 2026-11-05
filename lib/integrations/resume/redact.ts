@@ -1,3 +1,5 @@
+import { SCHOOL_SHORT } from "@/lib/ai/guards/pii";
+
 // Resume redaction (PRD v2 C4, C.5). Runs BEFORE any analysis or model call.
 // Strips identity and prestige: names, contact, photo references, addresses, graduation years.
 // Schools become "University"; companies become "Company A", "Company B" in order of first appearance.
@@ -73,10 +75,12 @@ export function redactResume(raw: string, opts: { knownNames?: string[]; knownSc
   const W = `[A-Z][\\p{L}.'&-]*`;
   text = sub(
     text,
-    new RegExp(`(?:${W}\\s+){0,4}(?:University|College|Polytechnic|Institute of Technology|Institute|School of ${W})(?:\\s+of\\s+${W}(?:\\s+${W}){0,3})?`, "gu"),
+    new RegExp(`(?:${W}\\s+){0,4}(?:University|College|Polytechnic|Institute of Technology|Institute|(?:Business|Law|Medical|Graduate) School|School of ${W})(?:\\s+of\\s+${W}(?:\\s+${W}){0,3})?`, "gu"),
     "school",
     "University",
   );
+  // Short names and nicknames (UCalgary, McGill, SAIT, U of T): the same list the AI guard strips.
+  text = sub(text, new RegExp(SCHOOL_SHORT.source, "g"), "school", "University");
 
   // Companies: organizations on role lines, then every other mention of them.
   const orgs: string[] = [];

@@ -289,7 +289,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
+          "text": "Two volunteers want social media. Nobody's on deliveries or set-up, and both need cover by Saturday.",
           "expression": "worried"
         }
       ],
@@ -316,7 +316,7 @@
           "reaction": {
             "emote": "heart",
             "expression": "happy",
-            "line": "I can pair an experienced volunteer with someone new. That gives us cover."
+            "line": "I'll pair someone experienced with someone new. That's cover."
           },
           "minutes": 15
         },
@@ -343,7 +343,7 @@
       "lines": [
         {
           "who": "rosa",
-          "text": "We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
+          "text": "I need the fee by tomorrow. Trucks pay more, but small stalls bring the neighbours.",
           "expression": "neutral"
         }
       ],
@@ -451,7 +451,7 @@
       "lines": [
         {
           "who": "okafor",
-          "text": "Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
+          "text": "Our board wants the logo on every table, banner and bag. That was the deal.",
           "expression": "neutral"
         }
       ],
@@ -504,7 +504,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
+          "text": "Ari and Jess are both on Saturday set-up. Clean-up has nobody, and Jess leaves at noon.",
           "expression": "worried"
         }
       ],
@@ -524,7 +524,7 @@
         },
         {
           "id": "b",
-          "label": "Ask who can swap into clean-up, then confirm the revised shifts",
+          "label": "Ask who can swap to clean-up, then confirm the new shifts",
           "effects": {
             "morale": 6
           },
@@ -554,7 +554,7 @@
       "lines": [
         {
           "who": "kenji",
-          "text": "I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
+          "text": "Another festival offered me more for the same weekend. I need $400 extra to stay.",
           "expression": "angry"
         }
       ],
@@ -662,7 +662,7 @@
           "reaction": {
             "emote": "note",
             "expression": "happy",
-            "line": "I'll ask what they can share. We need to get them the details today."
+            "line": "I'll ask what they can share. They need the details today."
           }
         }
       ]
@@ -725,7 +725,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
+          "text": "The sponsor's gone, and most of the budget with it. I need a plan that fits what's left.",
           "expression": "worried"
         }
       ],
@@ -779,7 +779,7 @@
         },
         {
           "id": "d",
-          "label": "Keep the full programme while seeking replacement funding",
+          "label": "Keep the full programme and chase replacement funding",
           "effects": {
             "morale": 2
           },
@@ -799,7 +799,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
+          "text": "We lost the site and the backup costs more. Everyone needs to know where to go.",
           "expression": "worried"
         }
       ],
@@ -883,7 +883,7 @@
         },
         {
           "id": "b",
-          "label": "Share her shifts across the team and drop the late clean-up shift",
+          "label": "Share her shifts across the team; drop the late clean-up",
           "effects": {
             "morale": -4
           },
@@ -928,7 +928,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Call everyone in today, explain the new plan and what stays",
+          "label": "Call everyone in today: the new plan and what stays",
           "effects": {
             "morale": 12
           },
@@ -990,7 +990,7 @@
         },
         {
           "id": "b",
-          "label": "Walk the new site with the vendors before giving out spots",
+          "label": "Walk the new site with vendors before handing out spots",
           "effects": {
             "trust.vendors": 6,
             "trust.community": 2
@@ -1022,7 +1022,7 @@
       "lines": [
         {
           "who": "priya",
-          "text": "Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float.",
+          "text": "Before I go, I want to hand over properly: the rota, the vendor contacts, the gate float.",
           "expression": "neutral"
         }
       ],
@@ -1073,7 +1073,7 @@
       "lines": [
         {
           "who": "theo",
-          "text": "Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
+          "text": "Everyone liked working with Priya. The new ones are asking who they report to now.",
           "expression": "worried"
         }
       ],
@@ -1124,7 +1124,7 @@
       "lines": [
         {
           "who": "rosa",
-          "text": "Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier.",
+          "text": "Is the market still on? I've ordered flour for two days. What do I tell my supplier?",
           "expression": "worried"
         }
       ],
@@ -1132,7 +1132,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Tell them the truth today, with what changes and what doesn't",
+          "label": "Tell them the truth today: what changes and what doesn't",
           "effects": {
             "trust.vendors": 10
           },
@@ -1151,7 +1151,7 @@
           "reaction": {
             "emote": "question",
             "expression": "worried",
-            "line": "I still need dates and stall details before I can plan."
+            "line": "I still need dates and stall details to plan."
           },
           "explainOnPick": true
         },
@@ -1175,7 +1175,7 @@
       "lines": [
         {
           "who": "dana",
-          "text": "The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
+          "text": "The credit union offers $800 if you pitch this afternoon, or $500 for a written plan. They want an answer today.",
           "expression": "happy"
         }
       ],
@@ -1224,7 +1224,7 @@
       "lines": [
         {
           "who": "dana",
-          "text": "Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?",
+          "text": "Families want an activity they can join without buying anything. I still don't see one. Can we make room?",
           "expression": "angry"
         }
       ],
@@ -1232,7 +1232,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Ask which change matters most, then add a free children's activity",
+          "label": "Ask what matters most, then add a free kids' activity",
           "effects": {
             "trust.partner": 10,
             "trust.community": 6
@@ -1248,7 +1248,7 @@
         },
         {
           "id": "b",
-          "label": "Defend the existing plan and keep the programme unchanged",
+          "label": "Defend the plan and keep the programme as it is",
           "effects": {
             "trust.partner": -4
           },
@@ -1332,7 +1332,7 @@
       "lines": [
         {
           "who": "theo",
-          "text": "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
+          "text": "40% chance of rain Saturday morning. The gym is free, but it has less stall space.",
           "expression": "worried"
         }
       ],
@@ -1445,7 +1445,7 @@
         },
         {
           "id": "b",
-          "label": "Ask Dana to arrange an urgent filing through the non-profit",
+          "label": "Ask Dana to rush the filing through the non-profit",
           "effects": {
             "trust.partner": -4
           },
@@ -2055,7 +2055,7 @@
         "id": "venue-cancels",
         "title": "The venue cancels",
         "caller": "dana",
-        "text": "The site owner has cancelled our booking. The replacement venue costs more, so we have less money for the programme. We need to rework the weekend.",
+        "text": "The site owner cancelled our booking. The replacement costs more, so there's less for the programme. We need to rework the weekend.",
         "budgetCut": 0.3,
         "effects": {
           "morale": -12,
@@ -2071,7 +2071,7 @@
         "id": "lead-volunteer-quits",
         "title": "Your lead volunteer leaves",
         "caller": "priya",
-        "text": "I got the paid internship and start Thursday. I need to hand over my shifts. Paid cover will take part of the budget, but I can brief someone today.",
+        "text": "I got the paid internship. I start Thursday. Paid cover will cost us, but I can brief someone today.",
         "budgetCut": 0.2,
         "effects": {
           "morale": -25

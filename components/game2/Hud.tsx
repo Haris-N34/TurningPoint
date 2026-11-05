@@ -11,9 +11,9 @@ import { pixelTitle } from "./fonts";
 import { Panel, PixelButton } from "./ui";
 
 const SEV = {
-  high: { label: "Urgent", icon: "!!", cls: "bg-[#c43d22] text-white" },
-  medium: { label: "Soon", icon: "!", cls: "bg-[#e0a32e] text-[#2e222f]" },
-  low: { label: "Minor", icon: "·", cls: "bg-[#4f9d69] text-white" },
+  high: { label: "Urgent", bar: "bg-[#c43d22]" },
+  medium: { label: "Soon", bar: "bg-[#e0a32e]" },
+  low: { label: "Minor", bar: "bg-[#4f9d69]" },
 } as const;
 
 function Bar({ label, value, max, colour, testid, display }: { label: string; value: number; max: number; colour: string; testid: string; display: string }) {
@@ -51,33 +51,29 @@ function Bar({ label, value, max, colour, testid, display }: { label: string; va
 
 export function Resources({ scenario, state }: { scenario: MapScenario; state: GameState }) {
   const trustAvg = Math.round(Object.values(state.trust).reduce((a, b) => a + b, 0) / Object.values(state.trust).length);
-  const daysLeft = Math.max(0, 5 - Math.floor(state.t / 1440));
   const start = state.tp.budgetBefore ?? scenario.resources.budget.start;
   return (
-    <Panel className="w-[min(230px,46vw)] space-y-1.5 p-2" data-testid="resources">
+    <Panel className="w-[min(220px,40vw)] space-y-1 px-2 py-1.5" data-testid="resources">
       <Bar label="Budget" value={state.budget} max={Math.max(start, 1)} colour="#e0a32e" testid="res-budget" display={`$${state.budget.toLocaleString("en-CA")}`} />
-      <Bar label="Team morale" value={state.morale} max={100} colour="#4f9d69" testid="res-morale" display={String(state.morale)} />
-      <Bar label="Community trust" value={trustAvg} max={100} colour="#4a6fb0" testid="res-trust" display={String(trustAvg)} />
-      <p className="text-[11px] font-semibold uppercase tracking-wide">
-        Days left <span className={cn(pixelTitle.className, "text-[10px]")}>{daysLeft}</span>
-      </p>
+      <Bar label="Morale" value={state.morale} max={100} colour="#4f9d69" testid="res-morale" display={String(state.morale)} />
+      <Bar label="Trust" value={trustAvg} max={100} colour="#4a6fb0" testid="res-trust" display={String(trustAvg)} />
     </Panel>
   );
 }
 
 export function Clock({ state, turnBased }: { state: GameState; turnBased: boolean }) {
   const p = dayProgress(state.t);
-  const r = 15, c = 2 * Math.PI * r;
+  const daysLeft = Math.max(0, 5 - Math.floor(state.t / 1440));
   return (
-    <Panel className="flex items-center gap-2 px-3 py-1.5" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}`}>
-      <svg viewBox="0 0 36 36" className="size-9 -rotate-90" aria-hidden>
-        <circle cx="18" cy="18" r={r} fill="none" stroke="#e8d9b5" strokeWidth="5" />
-        <circle cx="18" cy="18" r={r} fill="none" stroke={p > 0.75 ? "#c43d22" : "#e0a32e"} strokeWidth="5" strokeDasharray={c} strokeDashoffset={c * (1 - p)} />
-      </svg>
-      <div>
-        <p className={cn(pixelTitle.className, "text-[13px]")} data-testid="clock-time">{formatTime(state.t)}</p>
-        {turnBased && <p className="text-[10px] font-semibold uppercase tracking-wide text-[#4a6fb0]" data-testid="turn-based">Turn-based mode</p>}
+    <Panel className="px-2 py-1.5 text-center sm:px-3" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}, ${daysLeft} days left`}>
+      <p className={cn(pixelTitle.className, "whitespace-nowrap text-[12px] leading-none sm:text-[13px]")} data-testid="clock-time">{formatTime(state.t)}</p>
+      {/* Day progress as a pixel bar: gold through the day, red in the evening. */}
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-[1px] bg-[#e8d9b5]" aria-hidden>
+        <div className="h-full" style={{ width: `${Math.round(p * 100)}%`, backgroundColor: p > 0.75 ? "#c43d22" : "#e0a32e" }} />
       </div>
+      <p className="mt-1 whitespace-nowrap text-[11px] font-semibold uppercase leading-none tracking-wide text-[#6a5a4a]">
+        {daysLeft} days left{turnBased && <span className="text-[#4a6fb0]" data-testid="turn-based"> · Turn-based</span>}
+      </p>
     </Panel>
   );
 }
@@ -85,11 +81,14 @@ export function Clock({ state, turnBased }: { state: GameState; turnBased: boole
 export function Toasts() {
   const toasts = useGame((g) => g.toasts);
   return (
-    <div className="pointer-events-none absolute left-1/2 top-20 z-30 flex w-[min(360px,90vw)] -translate-x-1/2 flex-col gap-1" aria-live="polite">
+    <div className="pointer-events-none absolute left-1/2 top-[4.75rem] z-30 flex w-[min(380px,64vw)] -translate-x-1/2 flex-col items-center gap-1 max-sm:top-[7.5rem] max-sm:w-[92vw]" aria-live="polite">
       <AnimatePresence>
-        {toasts.map((t) => (
-          <motion.div key={t.id} initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }}>
-            <Panel className="px-3 py-1.5 text-sm font-semibold" data-testid="toast">{t.text}</Panel>
+        {toasts.slice(-2).map((t) => (
+          <motion.div key={t.id} layout initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}>
+            <Panel tone="ink" className="flex items-center gap-2 px-2.5 py-1 text-[14px] font-semibold" data-testid="toast">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-[3px] bg-[#ffd166] text-[12px] font-bold text-[#2e222f]" aria-hidden>!</span>
+              {t.text}
+            </Panel>
           </motion.div>
         ))}
       </AnimatePresence>
@@ -116,74 +115,81 @@ export function IssueTracker({
   const [menu, setMenu] = useState<{ id: string; kind: "delegate" | "defer" } | null>(null);
   const issues = openIssues(scenario, state).sort((a, b) => (state.issues[a.id].deadline ?? 0) - (state.issues[b.id].deadline ?? 0));
   const volunteers = scenario.npcs.filter((n) => n.volunteer);
+  const urgent = issues.filter((i) => i.severity === "high").length;
   return (
-    <Panel className="w-[min(300px,92vw)] p-2" data-testid="issue-tracker">
-      <button className="flex w-full items-center justify-between text-left text-sm font-bold" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span>Issues ({issues.length})</span>
-        <span aria-hidden>{open ? "▾" : "▸"}</span>
-      </button>
+    <Panel className="w-full p-1.5 sm:w-[300px]" data-testid="issue-tracker">
+      <div className="flex items-center gap-1.5">
+        <button className="flex min-h-8 flex-1 items-center gap-2 rounded-[3px] px-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c43d22]" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+          <span className={cn(pixelTitle.className, "text-[10px] uppercase")}>Issues</span>
+          <span className="rounded-[3px] bg-[#2e222f] px-1.5 text-[12px] font-bold text-[#ffd166]">{issues.length}</span>
+          {urgent > 0 && <span className="text-[12px] font-semibold text-[#c43d22]">{urgent} urgent</span>}
+          <span className="ml-auto text-[12px]" aria-hidden>{open ? "▾" : "▸"}</span>
+        </button>
+        <PixelButton tone="plain" size="sm" className="shrink-0" onClick={onWait} data-testid="wait" title="Let time pass until something happens">
+          Wait ▸▸
+        </PixelButton>
+      </div>
       {open && (
-        <ul className="mt-1 max-h-[42vh] space-y-1.5 overflow-y-auto pr-1">
+        <ul className="mt-1.5 max-h-[30svh] space-y-1.5 overflow-y-auto overscroll-contain sm:max-h-[calc(100svh-19rem)]">
           {issues.map((i) => {
             const st = state.issues[i.id];
             const left = (st.deadline ?? state.t) - state.t;
-            const zone = scenario.zones.find((z) => z.id === i.zone)!;
             const npc = scenario.npcs.find((n) => n.id === i.npc)!;
             const sev = SEV[i.severity];
             const tried = (st.delegate ?? []).map((d) => d.to);
             return (
-              <li key={i.id} className="rounded-[4px] border-2 border-[#2e222f] bg-white p-1.5" data-testid={`issue-${i.id}`}>
-                <div className="flex items-start gap-1.5">
-                  <span className={cn("mt-0.5 shrink-0 rounded-[3px] px-1 text-[10px] font-bold", sev.cls)} aria-label={sev.label}>
-                    {sev.icon} {sev.label}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold leading-tight">{i.title}</p>
-                    <p className="text-[11px] text-[#6a5a4a]">
-                      {npc.name} · {zone.name} · <span data-testid="countdown" className={cn(left < 120 && "font-bold text-[#c43d22]")}>{formatDuration(left)} left</span>
+              <li key={i.id} className="overflow-hidden rounded-[4px] border-2 border-[#2e222f] bg-white" data-testid={`issue-${i.id}`}>
+                <div className="flex items-stretch">
+                  <span className={cn("w-1.5 shrink-0", sev.bar)} aria-hidden />
+                  <div className="min-w-0 flex-1 px-2 py-1">
+                    <p className="text-[14px] font-semibold leading-tight">
+                      <span className="sr-only">{sev.label}: </span>
+                      {i.title}
                     </p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] leading-tight text-[#6a5a4a]">
+                      <span>{npc.name}</span>
+                      <span data-testid="countdown" className={cn(left < 120 ? "font-bold text-[#c43d22]" : "")}>{formatDuration(left)} left</span>
+                      <span className="ml-auto flex gap-2">
+                        {i.delegable && (
+                          <button className="underline underline-offset-2 hover:text-[#2e222f]" aria-expanded={menu?.id === i.id && menu.kind === "delegate"} onClick={() => setMenu(menu?.id === i.id && menu.kind === "delegate" ? null : { id: i.id, kind: "delegate" })} data-testid={`delegate-${i.id}`}>
+                            Delegate
+                          </button>
+                        )}
+                        <button className="underline underline-offset-2 hover:text-[#2e222f]" aria-expanded={menu?.id === i.id && menu.kind === "defer"} onClick={() => setMenu(menu?.id === i.id && menu.kind === "defer" ? null : { id: i.id, kind: "defer" })} data-testid={`defer-${i.id}`}>
+                          Defer
+                        </button>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  <button className="rounded-[3px] border-2 border-[#2e222f] bg-[#c43d22] px-2 text-[12px] font-bold text-white" onClick={() => onGo(i)} data-testid={`go-${i.id}`}>
+                  <button className="m-1 flex min-w-12 items-center justify-center rounded-[4px] border-2 border-[#2e222f] bg-[#c43d22] px-2 text-[14px] font-bold text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#d4492c] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166]" onClick={() => onGo(i)} data-testid={`go-${i.id}`} aria-label={`Go: ${i.title}`}>
                     Go
-                  </button>
-                  {i.delegable && (
-                    <button className="rounded-[3px] border-2 border-[#2e222f] bg-white px-2 text-[12px]" onClick={() => setMenu(menu?.id === i.id && menu.kind === "delegate" ? null : { id: i.id, kind: "delegate" })} data-testid={`delegate-${i.id}`}>
-                      Delegate
-                    </button>
-                  )}
-                  <button className="rounded-[3px] border-2 border-[#2e222f] bg-white px-2 text-[12px]" onClick={() => setMenu(menu?.id === i.id && menu.kind === "defer" ? null : { id: i.id, kind: "defer" })} data-testid={`defer-${i.id}`}>
-                    Defer
                   </button>
                 </div>
                 {menu?.id === i.id && menu.kind === "delegate" && (
-                  <div className="mt-1 flex flex-wrap gap-1" role="group" aria-label="Delegate to">
+                  <div className="flex flex-wrap items-center justify-end gap-1 border-t-2 border-[#2e222f] bg-[#fff8e7] p-1.5" role="group" aria-label="Delegate to">
+                    <span className="mr-auto text-[12px] font-semibold">Hand to:</span>
                     {volunteers.map((v) => (
-                      <button key={v.id} disabled={tried.includes(v.id)} className="rounded-[3px] bg-[#e8d9b5] px-2 text-[12px] disabled:opacity-40" onClick={() => { setMenu(null); onDelegate(i, v.id); }} data-testid={`delegate-to-${v.id}`}>
+                      <PixelButton key={v.id} tone="plain" size="sm" disabled={tried.includes(v.id)} onClick={() => { setMenu(null); onDelegate(i, v.id); }} data-testid={`delegate-to-${v.id}`}>
                         {v.name}
-                      </button>
+                      </PixelButton>
                     ))}
                   </div>
                 )}
                 {menu?.id === i.id && menu.kind === "defer" && (
-                  <div className="mt-1 flex flex-col gap-1" role="group" aria-label="Reason to defer">
+                  <div className="flex flex-col gap-1 border-t-2 border-[#2e222f] bg-[#fff8e7] p-1.5" role="group" aria-label="Reason to defer">
                     {scenario.deferReasons.map((r) => (
-                      <button key={r} className="rounded-[3px] bg-[#e8d9b5] px-2 text-left text-[12px]" onClick={() => { setMenu(null); onDefer(i, r); }} data-testid="defer-reason">
+                      <PixelButton key={r} tone="plain" size="sm" className="justify-start text-left" onClick={() => { setMenu(null); onDefer(i, r); }} data-testid="defer-reason">
                         {r}
-                      </button>
+                      </PixelButton>
                     ))}
                   </div>
                 )}
               </li>
             );
           })}
-          {!issues.length && <li className="text-[12px] text-[#6a5a4a]">All quiet. Walk around, or wait for news.</li>}
+          {!issues.length && <li className="px-1 py-2 text-[13px] text-[#6a5a4a]">All quiet. Walk around, or wait for news.</li>}
         </ul>
       )}
-      <PixelButton tone="plain" className="mt-2 min-h-9 w-full py-0.5 text-[13px]" onClick={onWait} data-testid="wait">
-        Wait for news
-      </PixelButton>
     </Panel>
   );
 }
