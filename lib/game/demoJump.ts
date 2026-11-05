@@ -51,6 +51,9 @@ export function playToTurningPoint(base: MapScenario, seed = DEMO_JUMP_SEED, opt
     act(canWait ? { type: "wait" } : { type: "talk", issue: open[0].id });
   }
 
+  // If the order question only came up with the turning point's new issues, answer it here too: the presenter
+  // goes straight from the cutscene to the recovery issue.
+  for (const c of [...st.checkpointsDue]) act(c.kind === "order" ? { type: "orderAnswer", ranking: openIssues(s, st).map((i) => i.id) } : { type: "checkpointDone", id: c.id });
   const tpIndex = st.events.findIndex((e) => e.kind === "turning_point");
   return { state: st, log, tpIndex };
 }

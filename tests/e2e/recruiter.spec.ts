@@ -172,3 +172,23 @@ test("employers never see accommodation status: card, inbox and compare (privacy
   await expect(page.getByTestId("compare")).toBeVisible();
   await expect(page.getByTestId("compare")).not.toContainText(hidden);
 });
+
+test("decision path keeps the turning point in view, with arrows when the path scrolls", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "checked at laptop sizes");
+  await seed(page);
+  for (const viewport of [{ width: 1280, height: 720 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto(CARD);
+    const path = page.getByTestId("decision-path");
+    await expect(page.getByTestId("turning-point-marker")).toBeVisible();
+    const m = (await page.getByTestId("turning-point-marker").boundingBox())!;
+    const p = (await path.boundingBox())!;
+    expect(m.x).toBeGreaterThanOrEqual(p.x);
+    expect(m.x + m.width).toBeLessThanOrEqual(p.x + p.width);
+    if (await path.evaluate((el) => el.scrollWidth > el.clientWidth)) {
+      await expect(page.getByTestId("path-right")).toBeVisible();
+      await page.getByTestId("path-right").click();
+      await expect.poll(() => path.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+    }
+  }
+});

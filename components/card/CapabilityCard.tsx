@@ -83,6 +83,25 @@ export function CapabilityCard({
   const confirmed = card.realStory ? confirmationLine(card.realStory.witnesses) : undefined;
   const witnessSentence = card.realStory?.witnesses.find((w) => w.status === "confirmed" && w.sentence)?.sentence;
 
+  // Decision path: long runs scroll sideways. Centre the turning point on load and show which way there is more.
+  const pathRef = useRef<HTMLOListElement | null>(null);
+  const [pathEdge, setPathEdge] = useState({ left: false, right: false });
+  const updatePathEdge = () => {
+    const el = pathRef.current;
+    if (!el) return;
+    setPathEdge({ left: el.scrollLeft > 2, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+  };
+  const scrollPath = (dir: -1 | 1) => pathRef.current?.scrollBy({ left: dir * pathRef.current.clientWidth * 0.6, behavior: "smooth" });
+  useEffect(() => {
+    const el = pathRef.current;
+    if (!el) return;
+    const marker = el.querySelector<HTMLElement>('[data-testid="turning-point-marker"]');
+    if (marker && el.scrollWidth > el.clientWidth) el.scrollLeft = marker.offsetLeft + marker.offsetWidth / 2 - el.clientWidth / 2;
+    updatePathEdge();
+    const ro = new ResizeObserver(updatePathEdge);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [card.attemptId]);
   const answersRef = useRef<HTMLElement | null>(null);
   const [lastJump, setLastJump] = useState<{ skill?: string; quote?: string; checkpointId: string; t: number; n: number }>();
   const jump = (checkpointId: string, t: number, from?: { skill: string; quote: string }) => {
@@ -244,20 +263,33 @@ export function CapabilityCard({
                     players.current[c.id] = h;
                   }}
                 />
-                {c.retakeUsed && <p className="text-xs text-muted-foreground">Retake used</p>}
+                {c.retakeUsed && <p className="text-xs text-muted-foreground">Answered on the second take</p>}
               </div>
             ))}
           </section>
         )}
 
         <section aria-labelledby="dp-h" className="rounded-xl border bg-card p-4 shadow-card">
-          <h2 id="dp-h" className="text-sm font-semibold">Decision path</h2>
-          <ol className="relative mt-4 flex items-start overflow-x-auto pb-2" data-testid="decision-path">
+          <div className="flex items-center justify-between gap-2">
+            <h2 id="dp-h" className="text-sm font-semibold">
+              Decision path <span className="font-normal text-muted-foreground">· {card.decisionPath.length} choices</span>
+            </h2>
+            {(pathEdge.left || pathEdge.right) && (
+              <div className="flex gap-1">
+                <button type="button" aria-label="Scroll the decision path left" disabled={!pathEdge.left} onClick={() => scrollPath(-1)} className="inline-flex size-8 items-center justify-center rounded-full border bg-card text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40" data-testid="path-left">‹</button>
+                <button type="button" aria-label="Scroll the decision path right" disabled={!pathEdge.right} onClick={() => scrollPath(1)} className="inline-flex size-8 items-center justify-center rounded-full border bg-card text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40" data-testid="path-right">›</button>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+          {pathEdge.left && <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-card to-transparent" />}
+          {pathEdge.right && <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-card to-transparent" />}
+          <ol ref={pathRef} onScroll={updatePathEdge} className="relative mt-3 flex items-start overflow-x-auto pb-2 [scrollbar-width:thin]" data-testid="decision-path">
             {card.decisionPath.map((d, i) => {
               const cp = d.checkpointId;
               return (
                 <li key={`${d.nodeId}-${i}`} className={cn("flex items-start", i < card.decisionPath.length - 1 && "flex-1")}>
-                  <div className="flex w-16 shrink-0 flex-col items-center text-center">
+                  <div className="flex w-20 shrink-0 flex-col items-center text-center">
                     <button
                       type="button"
                       title={`${d.prompt}\nChoice: ${d.optionLabel}`}
@@ -285,6 +317,7 @@ export function CapabilityCard({
               );
             })}
           </ol>
+          </div>
         </section>
 
         {!!card.consistency?.length && (
@@ -324,7 +357,7 @@ export function CapabilityCard({
             <h2 id="int-h" className="font-medium">Integrity notes · For context, not scored</h2>
             <ul className="mt-1 list-disc pl-4">
               {card.integrity.map((n, i) => (
-                <li key={i}>{n.detail}</li>
+                <li key={i}>{integrityText(n)}</li>
               ))}
             </ul>
           </section>
@@ -334,4 +367,11 @@ export function CapabilityCard({
       <ResumeEvidence card={{ ...card, evidence }} onJump={jump} />
     </article>
   );
+}
+
+/** Neutral wording for integrity notes (older saved cards say "Retake used", which reads as a penalty). */
+export function integrityText(n: { kind: string; detail: string }) {
+  if (n.kind !== "retake_used") return n.detail;
+  const cp = /checkpoint (\d+)/i.exec(n.detail)?.[1];
+  return `Answered on the second take${cp ? ` (checkpoint ${cp})` : ""}`;
 }

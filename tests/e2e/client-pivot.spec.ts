@@ -29,8 +29,15 @@ async function clearOverlay(page: Page): Promise<boolean> {
   }
   if (await page.getByTestId("checkpoint").isVisible()) {
     const cp = page.getByTestId("checkpoint");
-    await cp.locator('input[value="text"]').focus();
-    await page.keyboard.press("Space");
+    // In-game checkpoints default to video with a camera check; pick text with the keyboard (retry: a camera
+    // fallback can land just after the first pick).
+    const text = cp.locator('input[value="text"]');
+    await expect(async () => {
+      await text.focus();
+      await page.keyboard.press("Space");
+      await page.waitForTimeout(250);
+      await expect(text).toBeChecked({ timeout: 500 });
+    }).toPass({ timeout: 10_000 });
     await cp.getByRole("button", { name: /start answering/i }).focus();
     await page.keyboard.press("Enter");
     await cp.getByTestId("answer-text").focus();

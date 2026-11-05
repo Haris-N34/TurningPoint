@@ -119,3 +119,13 @@ describe("Quick mode results and card", () => {
     expect((card.consistency ?? []).filter((c) => c.kind === "order")).toEqual([]);
   });
 });
+
+describe("days left for the HUD", () => {
+  it("counts this run's working days: 3 on Quick Monday, 2 after the Tuesday turning point, 5 on full-week Monday", async () => {
+    const { daysLeft } = await import("./engine");
+    const s = getMapScenario("launch-week")!;
+    expect(daysLeft(newGame(s, "x", { length: "quick" }))).toBe(3);
+    expect(daysLeft(playToTurningPoint(s, DEMO_JUMP_SEED, { length: "quick" }).state)).toBe(2);
+    expect(daysLeft(newGame(s, "x"))).toBe(5);
+  });
+});
