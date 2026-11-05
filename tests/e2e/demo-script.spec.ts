@@ -1,4 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
+import mayaFixture from "../../fixtures/attempt.json";
+
+// Maya's anonymous ID comes from the demo fixture, so a fixture rebuild never breaks the check.
+const MAYA_ANON = mayaFixture.anonId;
 
 // I.1 (start): plays docs/pitch/demo-script.md step by step against the app.
 // Run twice in a row: pnpm e2e tests/e2e/demo-script.spec.ts --repeat-each=2
@@ -251,7 +255,7 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await seed(page);
     await page.goto("/recruiter");
     const row = page.getByTestId("row-att_demo_maya");
-    await expect(row).toContainText("Candidate 4F7K");
+    await expect(row).toContainText(MAYA_ANON);
     await expect(row).not.toContainText("Maya");
     await row.getByRole("link").first().click();
     await expect(page).toHaveURL(/\/recruiter\/card\/att_demo_maya/);
