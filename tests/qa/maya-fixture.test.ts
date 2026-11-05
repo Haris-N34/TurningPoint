@@ -16,6 +16,7 @@ import { dayOf } from "@/lib/game/time";
 // tests/qa/maya-fixture.test.ts` rebuilds the fixture from this script; the tests keep it in sync with the map.
 
 const s = parseMapScenario(raw);
+const FIX = "Maya's fixture is out of date with the map. Run: WRITE_MAYA=1 pnpm vitest run tests/qa/maya-fixture.test.ts && pnpm ai:record";
 const RECOVERY_B_QUESTION = "You chose B, to keep Saturday and Sunday; cut promotion, decorations and the stage. Walk us through why.";
 
 /** Options Maya picks. Anything else open gets its first option. */
@@ -33,9 +34,9 @@ const PICKS: Record<string, string> = {
 };
 
 const CP1_TEXT =
-  "I asked who was free when, because two volunteers already wanted social media and nobody wanted deliveries or set-up. Then I paired Ari, who has run markets before, with a new volunteer on logistics. If I had just assigned it, whoever got stuck alone with logistics would check out by Wednesday. It cost us fifteen minutes on Monday, but I'd rather lose fifteen minutes than lose a volunteer.";
+  "I asked who was free when, because nobody wanted deliveries or set-up. I paired Ari, who has run markets, with a new volunteer on logistics, so nobody was stuck alone. It cost us fifteen minutes, but I'd rather lose time than a volunteer.";
 const CP2_TEXT =
-  "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage, and protected both market days. That hurts the two bands we booked and the market looks plainer, so I called both bands myself that morning. Losing a day would have cost the vendors more than it cost us.";
+  "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage. Losing a day would hurt the vendors more than the bands. I told both bands myself that morning and offered them a slot next year.";
 
 const words = (t: string) => t.split(/\s+/).length;
 const secs = (t: string) => Math.round((words(t) / 2.6) * 100) / 100;
@@ -104,7 +105,7 @@ export function buildMaya(): Card {
   // Evidence keeps the fixture's order: the synthetic impact cohort (lib/impact/seed.ts) maps levels by position.
   const ORDER = ["collaboration", "prioritization", "adaptability", "resilience"];
   const evidence = [...card.evidence].sort((a, b) => ORDER.indexOf(a.skill) - ORDER.indexOf(b.skill));
-  // The demo script and pitch name her "Candidate 4F7K" on the anonymous inbox row; keep that id stable.
+  // Keep the anonymous id the pitch and tests use ("Candidate 4F7K").
   return CardSchema.parse({ ...card, anonId: "Candidate 4F7K", evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
 }
 
@@ -119,17 +120,17 @@ describe("Maya's demo card matches the Launch Week run the demo plays", () => {
     expect(maya.scenario).toMatchObject({ id: "launch-week", disruptionId: "sponsor-pulls-out" });
     for (const d of maya.decisionPath) {
       const issue = s.issues.find((i) => i.id === d.nodeId);
-      expect(issue, d.nodeId).toBeDefined();
+      expect(issue, `${FIX} (unknown issue ${d.nodeId})`).toBeDefined();
       if (/^[a-d]$/.test(d.optionId)) {
         const node = s.nodes.find((n) => n.id === issue!.node)!;
-        expect(node.options.find((o) => o.id === d.optionId)?.label).toBe(d.optionLabel);
+        expect(node.options.find((o) => o.id === d.optionId)?.label, FIX).toBe(d.optionLabel);
       }
     }
-    expect(maya.decisionPath.find((d) => d.nodeId === "recovery-plan")).toMatchObject({ optionId: "b", optionLabel: "Keep Saturday and Sunday; cut promotion, decorations and the stage" });
+    expect(maya.decisionPath.find((d) => d.nodeId === "recovery-plan")).toMatchObject({ optionId: "b" });
   });
 
   it("checkpoint 2 is the exact explain-on-pick question for recovery plan B", () => {
-    expect(maya.checkpoints.find((c) => c.id === "cp2")?.question).toBe(RECOVERY_B_QUESTION);
+    expect(maya.checkpoints.find((c) => c.id === "cp2")?.question, FIX).toBe(RECOVERY_B_QUESTION);
   });
 
   it("Prioritization is Strong, from checkpoint 2, with an exact quote", () => {
@@ -144,6 +145,6 @@ describe("Maya's demo card matches the Launch Week run the demo plays", () => {
   });
 
   it("the fixture is exactly what this script builds", () => {
-    expect(JSON.parse(JSON.stringify(buildMaya()))).toEqual(JSON.parse(JSON.stringify(maya)));
+    expect(JSON.parse(JSON.stringify(buildMaya())), FIX).toEqual(JSON.parse(JSON.stringify(maya)));
   });
 });

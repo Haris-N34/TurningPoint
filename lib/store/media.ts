@@ -57,3 +57,28 @@ export const media = {
     return b ? URL.createObjectURL(b) : undefined;
   },
 };
+
+export type AnswerMode = "video" | "voice" | "text";
+
+/**
+ * In-game camera check (A.7): asked once per run, before the first checkpoint. Remembers how the
+ * candidate chose to answer for the rest of that run. Stored locally only.
+ */
+export const cameraCheck = {
+  key: (attemptId: string) => `tp:camera-check:${attemptId}`,
+  get(attemptId: string): AnswerMode | undefined {
+    try {
+      const v = localStorage.getItem(cameraCheck.key(attemptId));
+      return v === "video" || v === "voice" || v === "text" ? v : undefined;
+    } catch {
+      return undefined;
+    }
+  },
+  set(attemptId: string, mode: AnswerMode) {
+    try {
+      localStorage.setItem(cameraCheck.key(attemptId), mode);
+    } catch {
+      // Private mode: the check just shows again next checkpoint.
+    }
+  },
+};
