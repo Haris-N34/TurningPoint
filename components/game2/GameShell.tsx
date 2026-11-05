@@ -100,13 +100,16 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setScreen("avatar");
   }, [setScreen]);
 
+  const [jump, setJump] = useState(false);
+  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
   const begin = useCallback(() => {
     const id = newAttemptId();
     setAttemptId(id);
-    init(scenario, id, { turnBased: settings.turnBased, view: settings.view });
+    // The demo jump uses a fixed seed so the stage demo always gets the same disruption (sponsor pulls out).
+    init(scenario, jump ? "demo-tp" : id, { turnBased: settings.turnBased, view: settings.view });
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [init, scenario, settings.turnBased, settings.view, setScreen]);
+  }, [init, scenario, settings.turnBased, settings.view, setScreen, jump]);
 
   const resume = useCallback(() => {
     if (!resumable) return;
@@ -124,8 +127,6 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
 
   // Demo jump (P.2): /game/<map>?jump=turning-point fast-forwards a fresh run to the turning point. Never saved.
-  const [jump, setJump] = useState(false);
-  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
   const jumped = useRef(false);
   useEffect(() => {
     if (!jump || jumped.current || screen !== "play" || !state) return;

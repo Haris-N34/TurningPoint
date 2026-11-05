@@ -42,3 +42,13 @@ for (const colorScheme of ["light", "dark"] as const) {
     expect(errors).toEqual([]);
   });
 }
+
+test("landing and candidate pages link straight to the game", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("play-game").click();
+  await expect(page).toHaveURL(/\/game\/launch-week$/);
+  await expect(page.getByTestId("title-screen")).toBeVisible();
+  await page.goto("/candidate");
+  await expect(page.getByTestId("play-game")).toHaveAttribute("href", "/game/launch-week");
+  await expect(page.getByRole("link", { name: /Play the game: The Client Pivot/ })).toHaveAttribute("href", "/game/client-pivot");
+});

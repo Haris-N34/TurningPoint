@@ -17,7 +17,8 @@ export default function Home() {
           <h1 className="mt-7 max-w-2xl font-display text-5xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">The plan breaks. <span className="text-primary">Your capability shows.</span></h1>
           <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">A story-based challenge that shows how you think, adapt and bring people along when things change.</p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <Button asChild size="lg"><Link href="/candidate">Try the demo <span aria-hidden>↗</span></Link></Button>
+            <Button asChild size="lg"><Link href="/game/launch-week" data-testid="play-game">Play the game <span aria-hidden>↗</span></Link></Button>
+            <Button asChild size="lg" variant="outline"><Link href="/candidate">Try the demo <span aria-hidden>↗</span></Link></Button>
             <Button asChild size="lg" variant="outline"><Link href="/admin">For employers</Link></Button>
           </div>
           <p className="mt-5 text-sm text-muted-foreground">Free for candidates. Video, voice or text. Always a human decision.</p>

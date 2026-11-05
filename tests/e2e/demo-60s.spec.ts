@@ -1,0 +1,41 @@
+import { expect, test } from "@playwright/test";
+
+// The one-minute stage demo (docs/pitch/demo-60s.md), exactly as presented: two prepared tabs.
+test("one-minute demo: turning point, the checkpoint quotes the pick, the recruiter card", async ({ page, context }, info) => {
+  test.skip(info.project.name !== "desktop", "stage demo runs on a laptop");
+  // Landing has a direct way into the game.
+  await page.goto("/");
+  await expect(page.getByTestId("play-game")).toHaveAttribute("href", "/game/launch-week");
+  await page.goto("/demo/seed");
+  await expect(page.getByTestId("seeded")).toBeVisible();
+
+  // Tab 1: the game, prepared with the turning-point jump (fixed seed: the sponsor pulls out).
+  await page.goto("/game/launch-week?jump=turning-point");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId("cutscene")).toContainText(/sponsor/i);
+  await page.getByTestId("cutscene-next").click();
+  await expect(page.getByTestId("budget-drain")).toBeVisible();
+  await page.getByTestId("cutscene-done").click();
+  await page.getByTestId("go-recovery-plan").click();
+  await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
+  for (let i = 0; i < 10 && !(await page.getByTestId("choice-b").isVisible()); i++) {
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(120);
+  }
+  await page.waitForTimeout(400);
+  await page.getByTestId("choice-b").click();
+  await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose B, to keep Saturday and Sunday/);
+
+  // Tab 2: the recruiter card.
+  const card = await context.newPage();
+  await card.goto("/recruiter/card/att_demo_maya?challenge=ch_demo_energy");
+  await expect(card.getByTestId("capability-card")).toContainText("Sorts only");
+  await card.getByTestId("jump-prioritization").click();
+  await expect(card.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
+  await card.getByRole("button", { name: "Shortlist" }).click();
+  await expect(card.getByTestId("card-name")).toHaveText("Maya Chen");
+});
