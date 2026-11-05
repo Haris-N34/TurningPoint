@@ -11,7 +11,7 @@ const STREET = /\b\d{1,5}\s+(?:[A-Z][a-z]+\s+){1,3}(?:Street|St|Avenue|Ave|Road|
 const POSTCODE = /\b[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d\b/g;
 const ZIP = /\b\d{5}(?:-\d{4})\b/g;
 const SCHOOL_NAMED = /\b(?:University of (?:the )?[A-Z][\w'-]*(?:\s+[A-Z][\w'-]*)*|(?:[A-Z][\w'-]*\s+){1,3}(?:University|College|Polytechnic|Institute of Technology))\b/g;
-const SCHOOL_SHORT = /\b(?:U\s?of\s?[A-Z]|UCalgary|UBC|UofT|UAlberta|McGill|Queen'?s|Waterloo|Western|SAIT|NAIT|MRU|MIT|Stanford|Harvard|Yale|Princeton|Oxford|Cambridge|Haskayne|Rotman|Ivey|Sauder)\b/g;
+export const SCHOOL_SHORT = /\b(?:U\s?of\s?[A-Z]|UCalgary|UBC|UofT|UAlberta|McGill|Queen'?s|Waterloo|Western|SAIT|NAIT|MRU|MIT|Stanford|Harvard|Yale|Princeton|Oxford|Cambridge|Haskayne|Rotman|Ivey|Sauder)\b/g;
 
 export function stripPii(text: string, known: Known = {}): string {
   let out = text;

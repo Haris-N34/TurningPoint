@@ -11,8 +11,23 @@ export type ClipHandle = { seek: (seconds: number) => void };
  * "Transcript first" hides the video until the reviewer chooses to reveal it (E6.2).
  * Text answers have no media; the transcript is the answer.
  */
-export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; transcriptFirst?: boolean }>(function ClipPlayer(
-  { checkpoint, transcriptFirst = false },
+type Highlight = { t: number; quote: string; n: number };
+
+/** Indexes of the transcript words that make up a quote starting near second `t`. */
+function quoteWords(words: CardCheckpoint["transcript"]["words"], h?: Highlight): Set<number> {
+  if (!h) return new Set();
+  const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9']/g, "");
+  const q = h.quote.split(/\s+/).map(norm).filter(Boolean);
+  if (!q.length) return new Set();
+  let best = -1;
+  for (let i = 0; i + q.length <= words.length; i++) {
+    if (q.every((x, k) => norm(words[i + k].w) === x) && (best < 0 || Math.abs(words[i].start - h.t) < Math.abs(words[best].start - h.t))) best = i;
+  }
+  return best < 0 ? new Set() : new Set(q.map((_, k) => best + k));
+}
+
+export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; transcriptFirst?: boolean; highlight?: Highlight }>(function ClipPlayer(
+  { checkpoint, transcriptFirst = false, highlight },
   ref,
 ) {
   const el = useRef<HTMLVideoElement | null>(null);
@@ -58,13 +73,14 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
     setActiveWord(checkpoint.transcript.words.findIndex((w) => t >= w.start && t <= w.end + 0.15));
   };
 
+  const marked = quoteWords(checkpoint.transcript.words, highlight);
   const isVideo = checkpoint.mode === "video";
   return (
     <div className="space-y-2" data-testid={`clip-${checkpoint.id}`}>
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video w-full rounded-xl bg-black" data-testid="clip-media" />
+            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-56 w-full rounded-xl bg-black object-contain" data-testid="clip-media" />
           ) : (
             <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}
@@ -75,7 +91,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
           Reveal video
         </button>
       )}
-      <p className="max-h-32 overflow-y-auto text-sm leading-relaxed" tabIndex={0} aria-label="Transcript">
+      <p className="max-h-32 overflow-y-auto text-sm leading-relaxed" tabIndex={0} aria-label="Transcript" data-testid="transcript-words">
         {checkpoint.transcript.words.length
           ? checkpoint.transcript.words.map((w, i) => [
               i > 0 ? " " : null,
@@ -83,7 +99,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
                 key={i}
                 type="button"
                 onClick={() => seek(w.start)}
-                className={`rounded px-0.5 hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : ""}`}
+                className={`rounded px-px hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "bg-accent text-accent-foreground" : ""}`}
                 aria-label={`${w.w}, jump to ${Math.floor(w.start)} seconds`}
               >
                 {w.w}

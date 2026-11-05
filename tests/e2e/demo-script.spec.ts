@@ -219,7 +219,9 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByTestId("start").click();
     await page.getByTestId("avatar-done").click();
     await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
-    // Quick mode (the default): the jump lands Tuesday morning.
+    // The HUD hides during the cutscene; the clock shows Tuesday morning (Quick mode, the default) once it closes.
+    await page.getByTestId("cutscene-next").click();
+    await page.getByTestId("cutscene-done").click();
     await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
     // A jumped run is never saved.
     expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("tp:run:")).length)).toBe(0);

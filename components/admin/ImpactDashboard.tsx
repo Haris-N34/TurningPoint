@@ -94,11 +94,11 @@ export function ImpactDashboard() {
   const sl = secondLookImpact(source === "demo" ? demoSecondLook : liveSecondLook ?? [], source, employer || undefined);
   const ai = telemetryImpact(calls);
   if (!report) return <main className="mx-auto max-w-6xl p-8" aria-busy="true">Loading local impact report…</main>;
-  return <main className="mx-auto max-w-6xl px-5 py-10 sm:px-10" data-testid="impact-dashboard">
-    <Link href="/admin" className="text-sm underline underline-offset-4">Employer home</Link>
-    <header className="mt-8 grid gap-6 border-b pb-8 md:grid-cols-[1fr_auto]">
-      <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Turning Point / Impact observatory</p><h1 className="mt-3 font-display text-4xl sm:text-6xl">Evidence of impact.</h1><p className="mt-4 max-w-xl text-muted-foreground">See who gets a chance to show their capability, where review happens, and what needs a closer look.</p></div>
-      <div className="self-end"><Button variant="outline" onClick={() => { try { seedImpactDemo(store()); setSource("demo"); setEmployer(""); refresh(); setMessage("Fictional cohort loaded: 200 candidates, 3 employers. Existing local data was preserved."); setError(""); } catch { setError("The demo cohort could not be saved. Check browser storage and try again."); } }}>Load 200 fictional candidates</Button></div>
+  return <main className="mx-auto max-w-6xl px-4 pb-12 pt-3 sm:px-10" data-testid="impact-dashboard">
+    <Button asChild variant="ghost" size="sm" className="-ml-3.5"><Link href="/admin">← Employer home</Link></Button>
+    <header className="mt-2 grid gap-4 border-b border-border/70 pb-6 md:grid-cols-[1fr_auto]">
+      <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Impact observatory</p><h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl">Evidence of impact.</h1><p className="mt-2 max-w-xl text-sm text-muted-foreground">See who gets a chance to show their capability, where review happens, and what needs a closer look.</p></div>
+      <div className="self-end"><Button variant="outline" size="sm" onClick={() => { try { seedImpactDemo(store()); setSource("demo"); setEmployer(""); refresh(); setMessage("Fictional cohort loaded: 200 candidates, 3 employers. Existing local data was preserved."); setError(""); } catch { setError("The demo cohort could not be saved. Check browser storage and try again."); } }}>Load 200 fictional candidates</Button></div>
     </header>
     <p role="status" className="mt-4 text-sm">{message}</p>{error ? <p role="alert" className="mt-2 text-sm text-destructive">{error}</p> : null}
     <div className="my-6 flex flex-wrap items-end gap-5">
