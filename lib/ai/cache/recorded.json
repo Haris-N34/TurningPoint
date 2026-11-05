@@ -21,16 +21,16 @@
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:884b9100a8100c16": {
+ "checkpoint-question@1.0.0:f52aad86892e3947": {
   "output": {
-   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
+   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
    "source": "generated"
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:89e8023db197c554": {
+ "checkpoint-question@1.0.0:f5722ffd75c35d6d": {
   "output": {
-   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
    "source": "generated"
   },
   "model": "local-rules"
@@ -67,15 +67,15 @@
   },
   "model": "local-rules"
  },
- "dialogue-variants@1.0.1:9637040b7e314866": {
+ "dialogue-variants@1.0.1:415eb3a13b01f8b3": {
   "output": {
    "variants": [
     {
      "key": "n-roles:0",
      "texts": [
-      "Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks.",
-      "Two volunteers want to run social media. Nobody wants logistics, and that is where Saturday breaks.",
-      "Quick one. Two volunteers want to run social media. Nobody wants logistics, and that's where Saturday breaks."
+      "Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
+      "Look. Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
+      "Quick one. Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday."
      ]
     },
     {
@@ -105,17 +105,17 @@
     {
      "key": "n-schedule:0",
      "texts": [
-      "Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
-      "Look. Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up.",
-      "Quick one. Ari and Jess are both booked on Saturday's set-up and nobody is on clean-up."
+      "Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
+      "Look. Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
+      "Quick one. Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon."
      ]
     },
     {
      "key": "n-vendor-cut:0",
      "texts": [
-      "I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
-      "I will do the whole week, but I want 20% more of the take. Otherwise I might skip it.",
-      "Listen. I'll do the whole week, but I want 20% more of the take. Otherwise I might skip it."
+      "I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
+      "Look. I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
+      "Listen. I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay."
      ]
     },
     {
@@ -137,9 +137,9 @@
     {
      "key": "n-recovery:0",
      "texts": [
-      "The sponsor money is gone. The plan on the screen doesn't add up any more.",
-      "The sponsor money is gone. The plan on the screen does not add up any more.",
-      "Quick one. The sponsor money is gone. The plan on the screen doesn't add up any more."
+      "The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left.",
+      "The disruption has cut our budget and unsettled the team. I need a plan that fits what we've left.",
+      "Quick one. The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left."
      ]
     },
     {
@@ -153,25 +153,25 @@
     {
      "key": "n-vendors-worried:0",
      "texts": [
-      "Is the market still on? I've ordered flour for two days.",
-      "Is the market still on? I have ordered flour for two days.",
-      "Listen. Is the market still on? I've ordered flour for two days."
+      "Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier.",
+      "Is the market still on this weekend? I have ordered flour for two days and need to know what to tell my supplier.",
+      "Listen. Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier."
      ]
     },
     {
      "key": "n-new-partner:0",
      "texts": [
-      "The credit union down the street might put in $800, if we pitch it this afternoon.",
-      "Alright. The credit union down the street might put in $800, if we pitch it this afternoon.",
-      "Right. The credit union down the street might put in $800, if we pitch it this afternoon."
+      "The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
+      "Alright. The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
+      "Right. The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today."
      ]
     },
     {
      "key": "n-feedback:0",
      "texts": [
-      "Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it.",
-      "Honestly? The plan is all vendors and no community. The families we serve will not see themselves in it.",
-      "Right. Honestly? The plan is all vendors and no community. The families we serve won't see themselves in it."
+      "Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?",
+      "Families asked for an activity they can join without buying anything. I still can't see one in the plan. Can we make room?",
+      "Right. Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?"
      ]
     },
     {
@@ -185,9 +185,9 @@
     {
      "key": "n-weather:0",
      "texts": [
-      "Rain is forecast for Saturday morning. Forty percent.",
-      "Look. Rain is forecast for Saturday morning. Forty percent.",
-      "Quick one. Rain is forecast for Saturday morning. Forty percent."
+      "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
+      "There's a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
+      "Quick one. There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space."
      ]
     },
     {

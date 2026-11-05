@@ -1,16 +1,294 @@
 {
-  "items": [
-    { "id": "g01", "skill": "prioritization", "nodeSkills": ["prioritization"], "transcript": "When the sponsor pulled out I cut the second weekend instead of cutting vendor spots, because the vendors had already paid for stock and the team agreed.", "labels": { "div": null, "haris": null } },
-    { "id": "g02", "skill": "prioritization", "nodeSkills": ["prioritization"], "transcript": "I went to the vendor first because their deadline was the earliest.", "labels": { "div": null, "haris": null } },
-    { "id": "g03", "skill": "prioritization", "nodeSkills": [], "transcript": "I picked the second option. It looked fine.", "labels": { "div": null, "haris": null } },
-    { "id": "g04", "skill": "collaboration", "nodeSkills": ["collaboration"], "transcript": "I let the team vote rather than assigning roles myself, because people who choose their job stick with it. It cost us a day, but nobody checked out.", "labels": { "div": null, "haris": null } },
-    { "id": "g05", "skill": "collaboration", "nodeSkills": [], "transcript": "I did the whole budget myself so it would be done faster.", "labels": { "div": null, "haris": null } },
-    { "id": "g06", "skill": "communication", "nodeSkills": ["communication"], "transcript": "I told everyone the same day so nobody heard it secondhand, and I explained what we were keeping instead of what we lost.", "labels": { "div": null, "haris": null } },
-    { "id": "g07", "skill": "adaptability", "nodeSkills": ["adaptability"], "transcript": "Once the budget dropped I switched to the smaller venue instead of keeping the hall, since the hall would have eaten everything and the volunteers would have had nothing to work with.", "labels": { "div": null, "haris": null } },
-    { "id": "g08", "skill": "adaptability", "nodeSkills": [], "transcript": "I kept the plan exactly as it was. I liked the plan.", "labels": { "div": null, "haris": null } },
-    { "id": "g09", "skill": "analytical", "nodeSkills": ["analytical"], "transcript": "The chart showed sales were flat in the north but growing in the west, so I moved the budget west rather than spreading it evenly, because that is where the trend actually was.", "labels": { "div": null, "haris": null } },
-    { "id": "g10", "skill": "curiosity", "nodeSkills": ["curiosity"], "transcript": "I asked around the office before deciding, because nobody had told me why the client was unhappy. I found out their old vendor had missed two deadlines.", "labels": { "div": null, "haris": null } },
-    { "id": "g11", "skill": "empathy", "nodeSkills": ["empathy"], "transcript": "I called the volunteer who was upset before the meeting, because I did not want her to hear about the cut in front of everyone. It slowed us down but she stayed.", "labels": { "div": null, "haris": null } },
-    { "id": "g12", "skill": "resilience", "nodeSkills": ["resilience"], "transcript": "After the first launch failed I tried again the next week since we had learned what broke.", "labels": { "div": null, "haris": null } }
+  "version": 1,
+  "instructions": "Score each answer for the named skill only, against the evidence rubric in docs/PRD.md: strong, some, or not_observed. Score independently; don't look at the other person's labels or the scanner output first. Ignore grammar, spelling and dialect.",
+  "answers": [
+    {
+      "id": "g01",
+      "skill": "problem-solving",
+      "checkpointQuestion": "You deferred the permit problem to deal with the vendor dispute first. Why that order?",
+      "answer": "I split it into two problems. The permit only needed a form filed by tomorrow, but the vendor was ready to walk today, so I fixed the vendor first and asked Theo to prep the form so I could sign it after."
+    },
+    {
+      "id": "g02",
+      "skill": "problem-solving",
+      "checkpointQuestion": "You handed the fridge problem to Theo instead of handling it yourself. Why him, and why then?",
+      "answer": "Theo knows the storage shed better than me so I gave it to him because he'd fix it faster."
+    },
+    {
+      "id": "g03",
+      "skill": "problem-solving",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "At my part-time job the till system kept crashing on Saturdays. I noticed it only happened when we ran the card reader and the receipt printer together, so we staggered them, and the crashes stopped until IT replaced the printer."
+    },
+    {
+      "id": "g04",
+      "skill": "problem-solving",
+      "checkpointQuestion": "You let the team vote on roles instead of assigning logistics yourself. Why?",
+      "answer": "I don't really know, it just felt right at the time."
+    },
+    {
+      "id": "g05",
+      "skill": "adaptability",
+      "checkpointQuestion": "The sponsor money is gone. You chose one market day instead of two. Walk us through why.",
+      "answer": "With the sponsor gone two days wasn't possible anymore. I switched to one day and kept food access and the safety stuff, instead of keeping everything thin. The vendors lose a day of sales, so I told them first."
+    },
+    {
+      "id": "g06",
+      "skill": "adaptability",
+      "checkpointQuestion": "The CFO halved the budget. You kept the two pilot stores. Why those?",
+      "answer": "I changed the plan to two pilot stores because the budget got cut in half."
+    },
+    {
+      "id": "g07",
+      "skill": "adaptability",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "When covid moved our robotics club online I had to change how we ran build sessions. We shipped kits to people's houses instead of meeting in the lab, but the kids without space at home lost out, so we kept one small in-person slot for them."
+    },
+    {
+      "id": "g08",
+      "skill": "adaptability",
+      "checkpointQuestion": "Rain is forecast at 40%. You booked the gym as a backup. Why?",
+      "answer": "I booked the gym."
+    },
+    {
+      "id": "g09",
+      "skill": "resilience",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "My first startup pitch competition I got cut in the first round. I asked the judges what was weak, rebuilt the deck around the customer instead of the tech, and the next term we made the final. It cost me a few weekends but I learned more from losing."
+    },
+    {
+      "id": "g10",
+      "skill": "resilience",
+      "checkpointQuestion": "You called the team in to explain the new plan. Why do it that way?",
+      "answer": "After the sponsor pulled out I still wanted the market to happen because the families were counting on it, so I kept going."
+    },
+    {
+      "id": "g11",
+      "skill": "resilience",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "we lost the whole garden plot when the landlord sold it. kept going anyway cuz the volunteers still wanted to grow stuff, so we moved to pots on the school roof. smaller, but everybody stayed."
+    },
+    {
+      "id": "g12",
+      "skill": "resilience",
+      "checkpointQuestion": "You picked the stockout trend as the finding that mattered. Why that one?",
+      "answer": "The data was pretty clear on that one."
+    },
+    {
+      "id": "g13",
+      "skill": "ambiguity",
+      "checkpointQuestion": "Rain is forecast at 40%. You booked the gym as a backup. Why?",
+      "answer": "Forty percent isn't enough to cancel but it's enough to plan for. I didn't know which way it'd go so I paid 150 for the gym as a backup instead of moving everyone indoors now, and I set a Friday 8pm cut-off so vendors weren't left guessing."
+    },
+    {
+      "id": "g14",
+      "skill": "ambiguity",
+      "checkpointQuestion": "You went to the café to talk to the former employee. What made you go?",
+      "answer": "I wasn't sure the report told the whole story, so I took a bet and went to find out more."
+    },
+    {
+      "id": "g15",
+      "skill": "ambiguity",
+      "checkpointQuestion": "The sponsor money is gone. You chose one market day instead of two. Walk us through why.",
+      "answer": "Honestly we didn't know if a new sponsor would come, so I made the call to plan without one rather than wait."
+    },
+    {
+      "id": "g16",
+      "skill": "ambiguity",
+      "checkpointQuestion": "You picked the mixed vendor fee over local stalls only. What did you give up?",
+      "answer": "The fee is $40 a stall."
+    },
+    {
+      "id": "g17",
+      "skill": "prioritization",
+      "checkpointQuestion": "You deferred the permit problem to deal with the vendor dispute first. Why that order?",
+      "answer": "The vendor was leaving today and the permit had until 10 tomorrow, so the vendor went first. Deferring the permit risked a fine if it slipped, but losing a vendor meant losing the families who come for her bread."
+    },
+    {
+      "id": "g18",
+      "skill": "prioritization",
+      "checkpointQuestion": "The sponsor money is gone. You chose one market day instead of two. Walk us through why.",
+      "answer": "I put food safety first because that matters most."
+    },
+    {
+      "id": "g19",
+      "skill": "prioritization",
+      "checkpointQuestion": "The CFO halved the budget. You kept the two pilot stores. Why those?",
+      "answer": "Pilot stores first, rest later. Them stores got the worst stockouts so they go first innit, the others can wait a quarter but the managers there ain't gonna love it."
+    },
+    {
+      "id": "g20",
+      "skill": "prioritization",
+      "checkpointQuestion": "You let the team vote on roles instead of assigning logistics yourself. Why?",
+      "answer": "Everyone had a job by the end of the day."
+    },
+    {
+      "id": "g21",
+      "skill": "creativity",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "We had no money for a sound system for the charity gig, so I borrowed the church's PA and swapped the stage lights for bike lights donated by a shop. It looked rough, but we spent nothing and the money went to the charity instead."
+    },
+    {
+      "id": "g22",
+      "skill": "creativity",
+      "checkpointQuestion": "The sponsor money is gone. You chose one market day instead of two. Walk us through why.",
+      "answer": "I asked the credit union and the school to lend tables instead of renting them because we had no budget left."
+    },
+    {
+      "id": "g23",
+      "skill": "creativity",
+      "checkpointQuestion": "You walked the store manager through the new screens on the floor. Why?",
+      "answer": "I found a cheaper way to train them."
+    },
+    {
+      "id": "g24",
+      "skill": "creativity",
+      "checkpointQuestion": "You picked the mixed vendor fee over local stalls only. What did you give up?",
+      "answer": "We just used the normal setup."
+    },
+    {
+      "id": "g25",
+      "skill": "collaboration",
+      "checkpointQuestion": "You let the team vote on roles instead of assigning logistics yourself. Why?",
+      "answer": "I let the team vote because if I just assigned logistics, whoever got stuck with it would check out by week two. It cost us two days of planning, but I'd rather lose two days than lose a volunteer."
+    },
+    {
+      "id": "g26",
+      "skill": "collaboration",
+      "checkpointQuestion": "You handed the fridge problem to Theo instead of handling it yourself. Why him, and why then?",
+      "answer": "I asked Theo to take it because he's good with suppliers and I trusted him."
+    },
+    {
+      "id": "g27",
+      "skill": "collaboration",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "For our group project the coder and the designer weren't speaking. I set up a 15 minute standup every morning so they each said what they needed. We lost a bit of time at the start of each day, but we shipped on time and they're still friends."
+    },
+    {
+      "id": "g28",
+      "skill": "collaboration",
+      "checkpointQuestion": "You picked the stockout trend as the finding that mattered. Why that one?",
+      "answer": "I picked the chart with the biggest drop."
+    },
+    {
+      "id": "g29",
+      "skill": "empathy",
+      "checkpointQuestion": "You called the team in to explain the new plan. Why do it that way?",
+      "answer": "People were scared they'd wasted three weeks. I called everyone in the same day and said what was staying and what was cut, because hearing it secondhand in the group chat would've felt worse. Two people still left, and I get why."
+    },
+    {
+      "id": "g30",
+      "skill": "empathy",
+      "checkpointQuestion": "Dana said the plan was all vendors and no community. How did you respond, and why?",
+      "answer": "I could tell Dana was upset so I listened to what she said."
+    },
+    {
+      "id": "g31",
+      "skill": "empathy",
+      "checkpointQuestion": "You walked the store manager through the new screens on the floor. Why?",
+      "answer": "The store manager was worried about looking stupid in front of her staff, so I showed her the screens alone on the floor first instead of in the big training session."
+    },
+    {
+      "id": "g32",
+      "skill": "empathy",
+      "checkpointQuestion": "The CFO halved the budget. You kept the two pilot stores. Why those?",
+      "answer": "The numbers didn't support keeping all six stores."
+    },
+    {
+      "id": "g33",
+      "skill": "communication",
+      "checkpointQuestion": "You explained the phased plan to the CFO in cost terms. Why frame it that way?",
+      "answer": "The CFO doesn't care about the database, she cares about cost per store. So I explained it as phase one costs this, saves this by March, instead of the technical plan, but I had to leave out risks she might ask about later."
+    },
+    {
+      "id": "g34",
+      "skill": "communication",
+      "checkpointQuestion": "You called the team in to explain the new plan. Why do it that way?",
+      "answer": "I told the team the plan in person because it's clearer that way."
+    },
+    {
+      "id": "g35",
+      "skill": "communication",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "When our fundraiser got cancelled I wrote to all 40 donors myself before it went on social media, said what happened and what we'd do with their money. A few asked for refunds, most let us keep it for the spring event."
+    },
+    {
+      "id": "g36",
+      "skill": "communication",
+      "checkpointQuestion": "You deferred the permit problem to deal with the vendor dispute first. Why that order?",
+      "answer": "Time management is important."
+    },
+    {
+      "id": "g37",
+      "skill": "feedback",
+      "checkpointQuestion": "Dana said the plan was all vendors and no community. How did you respond, and why?",
+      "answer": "Dana was right that families wouldn't see themselves in it. I asked what she'd change first, she said a kids' corner, so I cut one vendor slot to make room. The vendor wasn't happy, but next time I'd ask the partner before I lock the layout."
+    },
+    {
+      "id": "g38",
+      "skill": "feedback",
+      "checkpointQuestion": "Dana said the plan was all vendors and no community. How did you respond, and why?",
+      "answer": "I explained why the plan looked like that because there was a reason for it."
+    },
+    {
+      "id": "g39",
+      "skill": "feedback",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "my supervisor said my reports were too long nobody read them. so i started doing a 3 line summary at the top. took me a while to get used to it but now people actually reply."
+    },
+    {
+      "id": "g40",
+      "skill": "feedback",
+      "checkpointQuestion": "You explained the phased plan to the CFO in cost terms. Why frame it that way?",
+      "answer": "The CFO approved it."
+    },
+    {
+      "id": "g41",
+      "skill": "analytical",
+      "checkpointQuestion": "You picked the stockout trend as the finding that mattered. Why that one?",
+      "answer": "Two of the charts looked bad but one was just seasonal noise, it drops every January. The stockout trend held in all three stores and it was getting worse, so I compared it with sales and it lined up. I didn't pick the delivery chart because it only had two weeks of data."
+    },
+    {
+      "id": "g42",
+      "skill": "analytical",
+      "checkpointQuestion": "You picked the stockout trend as the finding that mattered. Why that one?",
+      "answer": "I looked at the numbers because something seemed off with the trend."
+    },
+    {
+      "id": "g43",
+      "skill": "analytical",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "For my stats course I noticed our survey said everyone loved the cafeteria, but the sample was only people who ate there. I re-ran it at the library too and the results flipped, so we told the dean the first result was biased."
+    },
+    {
+      "id": "g44",
+      "skill": "analytical",
+      "checkpointQuestion": "Rain is forecast at 40%. You booked the gym as a backup. Why?",
+      "answer": "Rain is annoying for markets."
+    },
+    {
+      "id": "g45",
+      "skill": "curiosity",
+      "checkpointQuestion": "You went to the café to talk to the former employee. What made you go?",
+      "answer": "The old report said the last system failed but never said why. I asked around and found the former employee at the café, she said staff had a workaround nobody wrote down. I used that to keep the workaround instead of replacing everything, even though it took an afternoon I didn't really have."
+    },
+    {
+      "id": "g46",
+      "skill": "curiosity",
+      "checkpointQuestion": "You went to the café to talk to the former employee. What made you go?",
+      "answer": "I went to the café because I wanted to find out more about the old system."
+    },
+    {
+      "id": "g47",
+      "skill": "curiosity",
+      "checkpointQuestion": "When have you faced something like this in real life? What broke, what did you decide, what changed?",
+      "answer": "I got curious why our club's sign-ups dropped every October, dug into the old emails and found we always clashed with midterms. Moved our launch to September and sign-ups doubled."
+    },
+    {
+      "id": "g48",
+      "skill": "curiosity",
+      "checkpointQuestion": "You walked the store manager through the new screens on the floor. Why?",
+      "answer": "I did the training like the plan said."
+    }
   ]
 }

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { fromChunks } from "@/lib/checkpoint/transcript";
 import { LocalProvider } from "../providers";
 import { scannerPrompt, scanEvidence } from "../services/scanner";
-import { evaluateGold, GOLD_MIN_ACCURACY, GOLD_MIN_ITEMS, GoldFileSchema, type GoldItem } from "./gold";
+import { evaluateGold, GOLD_MIN_ACCURACY, GOLD_MIN_ITEMS, joinGold, type GoldItem } from "./gold";
 import { HALLUCINATION_CASES } from "./hallucination";
 import { agreement, cohensKappa } from "./metrics";
 
@@ -13,10 +13,16 @@ import { agreement, cohensKappa } from "./metrics";
 
 const opts = { provider: new LocalProvider(), log: () => {} };
 const GOLD_DIR = path.join(process.cwd(), "lib/ai/evals/gold");
-const gold: GoldItem[] = fs
-  .readdirSync(GOLD_DIR)
-  .filter((f) => f.endsWith(".json"))
-  .flatMap((f) => GoldFileSchema.parse(JSON.parse(fs.readFileSync(path.join(GOLD_DIR, f), "utf8"))).items);
+const readJson = (f: string) => JSON.parse(fs.readFileSync(path.join(GOLD_DIR, f), "utf8"));
+const gold: GoldItem[] = joinGold(
+  readJson("answers.json"),
+  Object.fromEntries(
+    fs
+      .readdirSync(GOLD_DIR)
+      .filter((f) => /^labels\.[a-z]+\.json$/.test(f))
+      .map((f) => [f.split(".")[1], readJson(f)]),
+  ),
+);
 
 function hallucination() {
   const results = HALLUCINATION_CASES.map((c) => {
