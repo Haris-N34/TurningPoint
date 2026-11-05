@@ -18,7 +18,7 @@ export default function HowScoresWork() {
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12 sm:px-10" data-testid="how-scores-work">
       <header>
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Public · Formula version {C.version}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Public · Formula version {C.version}</p>
         <h1 className="mt-3 font-display text-4xl leading-tight">How scores work</h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           Every Capability Card leads with evidence: quotes, choices and in-game results. The Final score is a sorting aid that sits in a small box at the top
@@ -79,7 +79,7 @@ export default function HowScoresWork() {
         <h2 className="text-xl font-semibold">Guardrails</h2>
         <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
           <li>The Final score sorts. It never filters. There is no threshold, hide-below or auto-reject setting anywhere, and a test checks that.</li>
-          <li>Every Final score shows its breakdown on hover or keyboard focus.</li>
+          <li>Every Final score shows its per-skill breakdown next to it; the full table opens on hover or keyboard focus.</li>
           <li>Second Look still applies: strong evidence brings back candidates a resume screen rejected.</li>
           <li>Faces, voice tone, accent, grammar and fluency are never scored.</li>
           <li>Changing any weight bumps the formula version, and every score records the version it used.</li>

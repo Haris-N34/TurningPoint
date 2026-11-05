@@ -149,15 +149,15 @@ export function Inbox() {
             id="challenge-pick"
             value={challenge?.id}
             onChange={(e) => router.push(`/recruiter?challenge=${e.target.value}`)}
-            className="h-11 min-w-0 max-w-full flex-1 truncate rounded-lg border border-border bg-card pl-2.5 pr-7 text-sm shadow-xs transition-colors hover:border-input/70 sm:h-9 sm:max-w-72 sm:flex-none"
+            className="h-11 w-full min-w-0 truncate rounded-lg border border-border bg-card pl-2.5 pr-7 text-sm shadow-xs transition-colors hover:border-input/70 sm:h-9 sm:w-auto sm:max-w-72"
           >
             {challenges.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.company.name} · {c.title}
+                {c.title} · {c.company.name}
               </option>
             ))}
           </select>
-          <Button variant="outline" size="sm" onClick={exportAts} data-testid="send-ats">
+          <Button variant="outline" size="sm" onClick={exportAts} className="max-sm:w-full" data-testid="send-ats">
             Send shortlist to ATS
           </Button>
         </div>
@@ -217,8 +217,8 @@ export function Inbox() {
               onChange={(e) => setSort(e.target.value === "final" ? { by: "final" } : filter.skill ? { by: "skill", skill: filter.skill } : { by: "date" })}
               data-testid="sort"
             >
-              <option value="default">{filter.skill ? "Sort: Skill evidence" : "Sort: Most recent"}</option>
-              <option value="final">Sort: Final score</option>
+              <option value="default">{filter.skill ? "By skill evidence" : "Newest first"}</option>
+              <option value="final">By Final score</option>
             </select>
           </fieldset>
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -271,7 +271,7 @@ export function Inbox() {
                       />
                     )}
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-3 py-2.5 max-sm:flex-1 max-sm:basis-1/2">
                     <div className="flex items-center gap-2">
                       <Link href={`/recruiter/card/${r.attemptId}?challenge=${challenge?.id}`} className="whitespace-nowrap font-medium underline-offset-2 hover:underline">
                         {r.displayName}
@@ -308,7 +308,7 @@ export function Inbox() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-muted-foreground max-sm:order-3 max-sm:text-xs">{new Date(r.date).toLocaleDateString("en-CA")}</td>
-                  <td className="py-2.5 pl-3 pr-4 text-right max-sm:order-2 max-sm:ml-auto">
+                  <td className="py-2.5 pl-3 pr-4 text-right max-sm:order-2">
                     {!r.withdrawn &&
                       (r.status === "shortlist" ? (
                         <span className="inline-flex min-h-9 items-center gap-1 whitespace-nowrap rounded-lg px-3.5 text-[13px] font-medium text-primary">

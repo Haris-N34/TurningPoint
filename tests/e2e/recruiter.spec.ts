@@ -65,7 +65,9 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   expect(await card.getByText("AI summary").count()).toBe(4);
   await expect(page.getByTestId("turning-point-marker")).toBeVisible();
   await expect(page.getByTestId("witness-line")).toHaveText("Confirmed by 1 community partner");
-  await expect(page.getByTestId("integrity")).toContainText("For context, not scored");
+  // Employers see no integrity notes; a retake is a small neutral tag on that answer's tab.
+  await expect(page.getByTestId("integrity")).toHaveCount(0);
+  await expect(page.getByTestId("retake-cp2")).toHaveText("second take");
 
   await page.getByTestId("jump-prioritization").click();
   await expect(page.getByTestId("tab-cp2")).toHaveAttribute("aria-selected", "true");
