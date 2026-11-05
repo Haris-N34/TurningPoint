@@ -6,6 +6,8 @@ export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
   timeout: 60_000,
+  // The dev server compiles routes on first hit; under full-suite load that can pass 5 s.
+  expect: { timeout: 10_000 },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
@@ -19,7 +21,8 @@ export default defineConfig({
     { name: "phone", use: { ...devices["Pixel 7"], viewport: { width: 375, height: 812 } } },
   ],
   webServer: {
-    command: process.env.CI ? `pnpm start -p ${PORT}` : `pnpm dev -p ${PORT}`,
+    // Test hooks (window.__tp) are compiled in only when this flag is set (PRD v2, A11).
+    command: process.env.CI ? `pnpm start -p ${PORT}` : `NEXT_PUBLIC_TEST_HOOKS=1 pnpm dev -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

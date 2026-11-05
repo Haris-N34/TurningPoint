@@ -32,7 +32,8 @@ test("inbox: anonymous rows, filters, keyboard shortlist reveals the name (E2, E
   await expect(page.getByTestId("toast")).toContainText("Shortlisted");
 
   await page.getByTestId("send-ats").click();
-  await expect(page.getByTestId("toast")).toContainText("Sent 1 shortlisted candidate");
+  // The mock ATS route compiles on first use in dev, so allow it time.
+  await expect(page.getByTestId("toast")).toContainText("Sent 1 shortlisted candidate", { timeout: 30_000 });
 });
 
 test("Enter opens the selected card (E2.3)", async ({ page }) => {

@@ -19,6 +19,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+        env:
+          NEXT_PUBLIC_TEST_HOOKS: "1"
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm e2e
         env:

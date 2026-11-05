@@ -117,6 +117,12 @@ export const CardSchema = z.object({
     })
     .refine(passNeedsReason, PASS_REASON_ERROR)
     .optional(),
+  /** In-game KPIs from the map game (v2 A8). Each explains itself in one sentence. */
+  kpis: z
+    .array(z.object({ id: z.string(), label: z.string(), value: z.number().nullable(), display: z.string(), explanation: z.string(), skills: z.array(z.string()), score: z.number().nullable() }))
+    .optional(),
+  /** Said vs did (v2 B2 Consistency Checker): context for the recruiter, never a penalty. */
+  consistency: z.array(z.object({ kind: z.enum(["order", "explanation", "story"]), said: z.string(), did: z.string(), consistent: z.boolean() })).optional(),
   /** How the card was made, so it can be audited (G3). */
   audit: z.object({ extractor: z.string(), version: z.string(), createdAt: z.string() }),
 });

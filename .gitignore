@@ -47,3 +47,6 @@ next-env.d.ts
 
 # local pnpm content cache
 /.pnpm-store/
+
+# agent worktrees
+.claude/worktrees/

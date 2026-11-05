@@ -87,3 +87,38 @@ export function redactName(text: string, displayName: string): string {
   for (const p of parts) out = out.replace(new RegExp(`\\b${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), "[name]");
   return out;
 }
+
+// ---- v2 map checkpoints (PRD v2, A9): questions quote the action just taken. ----
+import type { CheckpointDue as MapDue, GameState as MapState } from "@/lib/game/engine";
+import type { MapScenario } from "@/lib/game/schema";
+
+const lc = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+
+export function mapCheckpointQuestion(s: MapScenario, st: MapState, due: MapDue): GeneratedQuestion {
+  const issue = due.issue ? s.issues.find((i) => i.id === due.issue) : undefined;
+  const others = s.issues.filter((i) => st.issues[i.id].status === "open" && !i.hidden && i.id !== due.issue);
+  const fit = (q: string, fallback: string): GeneratedQuestion => (words(q) <= MAX_QUESTION_WORDS ? { question: q, source: "generated" } : { question: fallback, source: "fallback" });
+  if (due.kind === "order") {
+    const names = others.slice(0, 3).map((i) => lc(i.title));
+    const list = names.length >= 2 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0] ?? "several problems";
+    return fit(`You've got ${others.length} open problems: ${list}. Which are you going to first, and why?`, "You've got several open problems. Which are you going to first, and why?");
+  }
+  if (!issue) return { question: "Why did you make that last call?", source: "fallback" };
+  const title = lc(issue.title);
+  if (due.kind === "explain" && due.optionLabel) {
+    return fit(`You chose ${due.optionId?.toUpperCase()}, to ${lc(strip(due.optionLabel))}. Walk us through why.`, `You chose ${due.optionId?.toUpperCase()}. Walk us through why.`);
+  }
+  switch (due.action) {
+    case "defer": {
+      const other = others[0] ? `, with ${lc(others[0].title)} still open` : "";
+      return fit(`You deferred ${title} ("${due.reason}")${other}. Why that order?`, `You deferred ${title}. Why that order?`);
+    }
+    case "delegate":
+      return fit(`You handed ${title} to ${due.to} instead of handling it yourself. Why them, and why then?`, `You handed ${title} to ${due.to}. Why?`);
+    default:
+      return fit(
+        `For ${title}, you chose "${strip(due.optionLabel ?? "")}"${others.length ? ` while ${others.length} other problem${others.length === 1 ? " was" : "s were"} waiting` : ""}. Why?`,
+        `For ${title}, you chose "${strip(due.optionLabel ?? "")}". Why?`,
+      );
+  }
+}
