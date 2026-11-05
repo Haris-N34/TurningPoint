@@ -167,6 +167,8 @@ async function toGameCheckpoint(page: Page) {
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByTestId("set-turn-based").check();
+  // Full week: the roles pick triggers a checkpoint (Quick mode only asks about the recovery pick).
+  await page.getByTestId("set-full-week").check();
   await page.getByTestId("start").click();
   await page.getByTestId("avatar-done").click();
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
@@ -257,4 +259,59 @@ test("game: timer accommodation still applies in the interview", async ({ page }
   });
   const cp = await toGameCheckpoint(page);
   await expect(cp.getByText(/Take 23 seconds to think\. You then have 90 seconds\./)).toBeVisible();
+});
+
+// The 60 s stage demo: the recovery pick is the run's first checkpoint, so the camera check happens there.
+async function toDemoCheckpoint(page: Page) {
+  await page.goto("/game/launch-week?jump=turning-point");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await page.getByTestId("cutscene-next").click({ timeout: 20_000 });
+  await page.getByTestId("cutscene-done").click();
+  await page.getByTestId("go-recovery-plan").click();
+  await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
+  for (let i = 0; i < 10 && !(await page.getByTestId("choice-b").isVisible()); i++) {
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(120);
+  }
+  await page.waitForTimeout(400);
+  await page.getByTestId("choice-b").click();
+  const cp = page.getByTestId("checkpoint");
+  await expect(cp).toBeVisible({ timeout: 10_000 });
+  return cp;
+}
+
+/** Seconds on the think ring. */
+const thinkLeft = async (page: Page) => Number(((await page.getByRole("timer").getAttribute("aria-label")) ?? "").match(/(\d+) seconds/)?.[1]);
+
+test("demo path: camera already allowed, the first checkpoint opens on camera with no extra step", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "stage demo runs on a laptop");
+  test.setTimeout(90_000);
+  const cp = await toDemoCheckpoint(page);
+  await expect(cp.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose B, to keep Saturday and Sunday/);
+  await expect(cp.getByTestId("choice-letter")).toHaveText("B");
+  await expect(cp).toHaveAttribute("data-mode", "video");
+  await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 5000 });
+  // The think timer is already running: no extra click, no waiting on a prompt.
+  await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
+  await expect(cp.getByRole("button", { name: /start answering/i })).toBeVisible();
+});
+
+test("demo path: camera and mic refused, the first checkpoint opens calmly in text", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "stage demo runs on a laptop");
+  test.setTimeout(90_000);
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+  });
+  const cp = await toDemoCheckpoint(page);
+  await expect(cp).toHaveAttribute("data-mode", "text", { timeout: 5000 });
+  await expect(cp.getByTestId("device-note")).toHaveText("The browser didn't allow the camera and microphone. This one is set to text, which counts exactly the same. You can switch any time.");
+  await expect(cp).not.toContainText(/couldn't|error/i);
+  await expect.poll(() => thinkLeft(page), { timeout: 5000 }).toBeLessThan(15);
+  await cp.getByRole("button", { name: /start answering/i }).click();
+  await cp.getByTestId("answer-text").fill("Saturday and Sunday are the market. Promotion can wait.");
+  await cp.getByRole("button", { name: "Done" }).click();
+  await cp.getByRole("button", { name: "Submit" }).click();
+  await expect(cp).toBeHidden({ timeout: 10_000 });
 });
