@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { practiceFeedback, type PracticeFeedbackOutput } from "@/lib/ai/services/coach";
 import type { Card } from "@/lib/card/types";
 import { PRACTICE_TTL_MS, practiceExpiresAt } from "@/lib/practice/practice";
 import { media } from "@/lib/store/media";
@@ -18,6 +20,9 @@ export function PracticeResults({ card }: { card: Card }) {
   const run = store().getRun(card.attemptId);
   const expires = run ? practiceExpiresAt(run) : new Date(Date.parse(card.finishedAt) + PRACTICE_TTL_MS).toISOString();
 
+  // Rule-based Candidate Coach, run on this device. Notes only: no score, no level (C8.2).
+  const byId = useMemo(() => new Map(practiceFeedback(card).map((f) => [f.checkpointId, f.feedback])), [card]);
+
   const deleteNow = async () => {
     store().deleteAttempt(card.attemptId);
     await media.deletePrefix(`${card.attemptId}/`).catch(() => {});
@@ -32,6 +37,9 @@ export function PracticeResults({ card }: { card: Card }) {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground" data-testid="practice-privacy">
           Nothing from this run was shared with any employer. It stays on this device and is deleted on {when(expires)} (24 hours after you started).
         </p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Notes cover two things only: how clear your answer is and how specific it is. There is no score. Grammar, accent and filler words make no difference.
+        </p>
       </header>
 
       <ol className="space-y-4">
@@ -39,6 +47,12 @@ export function PracticeResults({ card }: { card: Card }) {
           <li key={c.id} className="rounded-2xl border bg-card p-5" data-testid={`practice-answer-${c.id}`}>
             <p className="text-sm font-medium">{c.question}</p>
             <blockquote className="mt-2 border-l-2 pl-3 text-sm text-muted-foreground">{c.transcript.text || "No answer recorded."}</blockquote>
+            {byId.get(c.id) && (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <Area title="Clarity" testId={`clarity-${c.id}`} notes={byId.get(c.id)!.clarity} />
+                <Area title="Specificity" testId={`specificity-${c.id}`} notes={byId.get(c.id)!.specificity} />
+              </div>
+            )}
           </li>
         ))}
       </ol>
@@ -52,5 +66,30 @@ export function PracticeResults({ card }: { card: Card }) {
         </button>
       </div>
     </main>
+  );
+}
+
+function Area({ title, notes, testId }: { title: string; notes: PracticeFeedbackOutput["clarity"]; testId: string }) {
+  return (
+    <section aria-label={title} className="rounded-xl bg-muted/40 p-3 text-sm" data-testid={testId}>
+      <h3 className="font-semibold">{title}</h3>
+      {notes.strengths.length > 0 && (
+        <ul className="mt-2 space-y-1">
+          {notes.strengths.map((t) => (
+            <li key={t}><span aria-hidden>+ </span>{t}</li>
+          ))}
+        </ul>
+      )}
+      {notes.tips.length > 0 && (
+        <>
+          <p className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Try next time</p>
+          <ul className="mt-1 space-y-1">
+            {notes.tips.map((t) => (
+              <li key={t}><span aria-hidden>→ </span>{t}</li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
   );
 }

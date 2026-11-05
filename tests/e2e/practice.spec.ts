@@ -26,6 +26,13 @@ test("a practice run plays like the real thing, shares nothing and shows private
   // No employer card, no share controls, no levels.
   await expect(page.getByTestId("results")).toHaveCount(0);
   await expect(page.getByText(/share with/i)).toHaveCount(0);
+  // C8.2: notes on clarity and specificity for every answer, never a score or level.
+  const answers = page.locator('[data-testid^="practice-answer-"]');
+  await expect(answers).toHaveCount(answered);
+  await expect(page.locator('[data-testid^="clarity-"]')).toHaveCount(answered);
+  await expect(page.locator('[data-testid^="specificity-"]')).toHaveCount(answered);
+  const text = await page.getByTestId("practice-results").innerText();
+  expect(text).not.toMatch(/\b(\d+\s*\/\s*\d+|\d+%|strong|some evidence|not observed|level|rating|grade)\b/i);
 
   await page.getByTestId("practice-delete").click();
   await expect(page).toHaveURL(/\/candidate$/);
