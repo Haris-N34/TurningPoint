@@ -96,3 +96,27 @@ test("Escape opens and closes the pause menu once each, and focus stays inside i
   await page.waitForTimeout(300);
   await expect(page.getByTestId("pause-menu")).toBeHidden();
 });
+
+test("first-time coach hint points at the first Go and goes away after the first action; never in the demo jump", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "same on phone; one run is enough");
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  // Quick mode (default): the title line names Tuesday.
+  await expect(page.getByTestId("title-screen")).toContainText("On Tuesday, the plan breaks.");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  await expect(page.getByTestId("coach")).toContainText("Press Go");
+  await expect(page.locator('[data-coach="1"]')).toHaveCount(1);
+  await page.getByTestId("wait").click();
+  await expect(page.getByTestId("coach")).toHaveCount(0);
+
+  await page.goto("/game/launch-week?jump=turning-point");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await page.getByTestId("cutscene-next").click({ timeout: 20_000 });
+  await page.getByTestId("cutscene-done").click();
+  await expect(page.getByTestId("issue-tracker")).toBeVisible();
+  await expect(page.getByTestId("coach")).toHaveCount(0);
+});

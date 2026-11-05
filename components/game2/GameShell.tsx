@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, MotionConfig } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -68,7 +68,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const [integrity, setIntegrity] = useState<IntegrityNote[]>([]);
   const [phase, setPhase] = useState<"game" | "real-life">("game");
   const [orderRanking, setOrderRanking] = useState<string[] | null>(null);
-  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean; length: GameLength } | null>(null);
+  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean; length: GameLength; view?: "map" | "list"; reducedMotion?: boolean } | null>(null);
   const prev = useRef<GameState | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [sawLoading, setSawLoading] = useState(false);
@@ -89,9 +89,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setHydrated(true);
     if (!sandbox) {
       const r = s.activeRun(challenge.id);
-      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean; length?: GameLength } | undefined;
+      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean; length?: GameLength; view?: "map" | "list"; reducedMotion?: boolean } | undefined;
       if (r && extra?.map === mapId && extra.log)
-        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased, length: extra.length ?? "full" });
+        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased, length: extra.length ?? "full", view: extra.view, reducedMotion: extra.reducedMotion });
     }
     return () => music.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,7 +115,10 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     else if (q.get("week") === "quick") setSettings({ length: "quick" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // First-time coach hint: only on a fresh run (never the demo jump or a resume), gone after the first action.
+  const coach = useRef(false);
   const begin = useCallback(() => {
+    coach.current = !jump;
     const id = newAttemptId();
     setAttemptId(id);
     init(base, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view, length: settings.length });
@@ -141,8 +144,11 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setAnswers(resumable.answers);
     setIntegrity(resumable.integrity);
     if (resumable.avatar) useGame.setState({ avatar: resumable.avatar });
-    setSettings({ turnBased: resumable.turnBased, length: resumable.length });
-    setReady(settings.view === "list");
+    // The player's view and motion choices come back with the run (QA #20).
+    const view = resumable.view ?? settings.view;
+    setSettings({ turnBased: resumable.turnBased, length: resumable.length, view, ...(resumable.reducedMotion ? { reducedMotion: true } : {}) });
+    coach.current = false;
+    setReady(view === "list");
     setScreen("loading");
   }, [resumable, base, restore, setScreen, setSettings, settings.view]);
 
@@ -155,12 +161,12 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       scenarioId: `map:${mapId}`,
       seed: state.seed,
       state: { t: state.t, ended: state.ended },
-      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length },
+      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length, view: settings.view, reducedMotion: settings.reducedMotion },
       status: state.ended && phase === "real-life" ? "finished" : "playing",
       startedAt: new Date().toISOString(),
       practice: false,
     });
-  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase]);
+  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase, settings.view, settings.reducedMotion]);
 
   // Music: calm, then tense after the turning point (A0).
   useEffect(() => {
@@ -197,6 +203,13 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   }, [screen, setPaused, state?.dialogue, state?.checkpointsDue.length]);
 
   // Toasts wait while the cutscene plays, then show as one line (only the cutscene is on screen during it).
+  // Quick mode's day end: a 2-second banner that never pauses play.
+  const [dayBanner, setDayBanner] = useState<{ id: number; text: string; sub: string } | null>(null);
+  useEffect(() => {
+    if (!dayBanner) return;
+    const t = setTimeout(() => setDayBanner(null), 2000);
+    return () => clearTimeout(t);
+  }, [dayBanner]);
   const heldToasts = useRef<{ text: string; issue?: string }[]>([]);
   const note = useCallback((text: string, hold = false, issue?: string) => (hold || useGame.getState().cutscene ? heldToasts.current.push({ text, issue }) : toast(text)), [toast]);
   useEffect(() => {
@@ -254,7 +267,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       // Quick mode: no recap modal, just a short non-blocking note (bus "dayDone" for a banner).
       if (scenario.recapModal === false) {
         bus.emit("dayDone", { day });
-        note(`${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]} done`);
+        const r = state.recaps.at(-1)!;
+        setDayBanner({ id: Date.now(), text: `${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]} done`, sub: `${r.resolved + r.delegated} handled · ${r.expired} ran out` });
       } else setRecapDay(day);
     }
   }, [state, scenario, floater, note, setCutscene, setRecapDay]);
@@ -373,6 +387,8 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     };
   }, [dispatch, scenario]);
 
+  const logLen = useGame((g) => g.log.length);
+  const showCoach = screen === "play" && coach.current && logLen === 0;
   const due = state?.checkpointsDue[0];
   const showCheckpoint = !!due && !reaction && !cutscene && recapDay === undefined;
   const kpis = useMemo(() => (state?.ended ? computeKpis(scenario, state) : []), [state, scenario]);
@@ -420,15 +436,19 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           {/* One tracker: bottom sheet on phones, right-hand quest log on desktop. Out of the way while talking. */}
           {/* List view already lists every issue by place, so it only needs the Wait control. */}
           {!cutscene && !node && !reaction && settings.view === "list" && (
-            <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
-              <Panel className="p-1.5">
-                <PixelButton tone="plain" onClick={() => dispatch({ type: "wait" })} data-testid="wait">Wait for news ▸▸</PixelButton>
-              </Panel>
+            // A solid footer band: list cards scroll under it instead of being covered by a floating button.
+            <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 border-t-[3px] border-[#2e222f] bg-[#5f9a52] px-3 py-2">
+              {showCoach && !showCheckpoint && (
+                <p className="rounded-[4px] border-2 border-[#2e222f] bg-[#ffd166] px-2 py-1 text-[14px] font-semibold text-[#2e222f]" role="status" data-testid="coach">
+                  Press Talk on a problem to start. Wait for news lets time pass.
+                </p>
+              )}
+              <PixelButton tone="plain" onClick={() => dispatch({ type: "wait" })} data-testid="wait">Wait for news ▸▸</PixelButton>
             </div>
           )}
           {!cutscene && !node && !reaction && !showCheckpoint && settings.view === "map" && (
             <div className="tp-scale absolute inset-x-2 bottom-2 z-20 sm:inset-x-auto sm:bottom-auto sm:right-2 sm:top-[3.25rem]">
-              <IssueTracker scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
+              <IssueTracker coach={showCoach && !cutscene && !showCheckpoint} scenario={scenario} state={state} onGo={goTo} onDelegate={(i, to) => dispatch({ type: "delegate", issue: i.id, to })} onDefer={(i, r) => dispatch({ type: "defer", issue: i.id, reason: r })} onWait={() => dispatch({ type: "wait" })} />
             </div>
           )}
           {/* A pixel frame around the Phaser minimap (160x120, 12 px from the corner; hidden when frozen or short). */}
@@ -436,6 +456,16 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
             <div className="pointer-events-none absolute bottom-[9px] right-[9px] z-10 h-[126px] w-[166px] rounded-[4px] border-[3px] border-[#2e222f] shadow-[0_3px_0_#2e222f] [@media(max-height:479px)]:hidden" aria-hidden data-testid="minimap-frame" />
           )}
           {!cutscene && <Toasts />}
+          <AnimatePresence>
+            {dayBanner && !cutscene && (
+              <motion.div key={dayBanner.id} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="pointer-events-none absolute inset-x-0 top-[28%] z-30 flex justify-center px-3" role="status" data-testid="day-banner">
+                <Panel tone="ink" className="px-5 py-2 text-center">
+                  <p className={cn(pixelTitle.className, "text-[14px] uppercase text-[#ffd166] sm:text-[16px]")}>{dayBanner.text}</p>
+                  <p className="mt-1 text-[14px]">{dayBanner.sub}</p>
+                </Panel>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {error && <p role="alert" className="absolute bottom-40 left-1/2 z-30 -translate-x-1/2 rounded bg-white px-2 text-sm">{error}</p>}
           {node && !reaction && !cutscene && recapDay === undefined && (
             <DialogueBox key={state.dialogue!.issue} scenario={scenario} state={state} node={node} speed={settings.textSpeed} onChoose={choose} onLeave={() => dispatch({ type: "leave" })} />

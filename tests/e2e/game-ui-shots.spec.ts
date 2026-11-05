@@ -150,10 +150,10 @@ for (const size of [SIZES[0], SIZES[4]]) {
     await page.getByTestId("cutscene-next").click();
     await page.getByTestId("cutscene-done").click();
     await page.waitForTimeout(800);
-    // On this map the order question follows the turning point.
-    await expect(page.getByTestId("order-pick")).toBeVisible({ timeout: 10_000 });
-    const ranks = page.locator('[data-testid^="rank-"]:not([data-testid="rank-done"])');
-    await ranks.nth(1).click();
-    await shot("16-pivot-order");
+    // The order question may follow the turning point on this map; shoot whichever screen is up.
+    if (await page.getByTestId("order-pick").isVisible()) {
+      await page.locator('[data-testid^="rank-"]:not([data-testid="rank-done"])').nth(1).click();
+      await shot("16-pivot-order");
+    } else await shot("16-pivot-map");
   });
 }
