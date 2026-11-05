@@ -104,7 +104,8 @@ export function buildMaya(): Card {
   // Evidence keeps the fixture's order: the synthetic impact cohort (lib/impact/seed.ts) maps levels by position.
   const ORDER = ["collaboration", "prioritization", "adaptability", "resilience"];
   const evidence = [...card.evidence].sort((a, b) => ORDER.indexOf(a.skill) - ORDER.indexOf(b.skill));
-  return CardSchema.parse({ ...card, evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
+  // The demo script and pitch name her "Candidate 4F7K" on the anonymous inbox row; keep that id stable.
+  return CardSchema.parse({ ...card, anonId: "Candidate 4F7K", evidence, adjustedTiming: false, realStory: { ...card.realStory!, witnesses: old.realStory!.witnesses } });
 }
 
 describe("Maya's demo card matches the Launch Week run the demo plays", () => {

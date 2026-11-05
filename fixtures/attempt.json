@@ -1,6 +1,6 @@
 {
   "attemptId": "att_demo_maya",
-  "anonId": "Candidate Z2RJ",
+  "anonId": "Candidate 4F7K",
   "candidate": {
     "displayName": "Maya Chen",
     "university": "University of Calgary",
@@ -113,7 +113,7 @@
       "nodeId": "schedule",
       "prompt": "Tue 10:10 · Saturday rota clash",
       "optionId": "b",
-      "optionLabel": "Ask who can swap into clean-up, then confirm the revised shifts",
+      "optionLabel": "Ask who can swap to clean-up, then confirm the new shifts",
       "decidedMs": 0,
       "at": "Tue 10:10"
     },
@@ -145,7 +145,7 @@
       "nodeId": "team-shaken",
       "prompt": "Wed 09:20 · The team is shaken",
       "optionId": "a",
-      "optionLabel": "Call everyone in today, explain the new plan and what stays",
+      "optionLabel": "Call everyone in today: the new plan and what stays",
       "decidedMs": 0,
       "at": "Wed 09:20"
     },
@@ -153,7 +153,7 @@
       "nodeId": "vendors-worried",
       "prompt": "Wed 10:20 · Vendors ask if it's still on",
       "optionId": "a",
-      "optionLabel": "Tell them the truth today, with what changes and what doesn't",
+      "optionLabel": "Tell them the truth today: what changes and what doesn't",
       "decidedMs": 0,
       "at": "Wed 10:20"
     },
@@ -178,7 +178,7 @@
       "nodeId": "feedback",
       "prompt": "Thu 11:20 · Dana's critical feedback",
       "optionId": "a",
-      "optionLabel": "Ask which change matters most, then add a free children's activity",
+      "optionLabel": "Ask what matters most, then add a free kids' activity",
       "decidedMs": 0,
       "at": "Thu 11:20"
     },
