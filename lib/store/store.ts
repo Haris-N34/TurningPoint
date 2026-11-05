@@ -24,6 +24,52 @@ export class MemoryKV implements KV {
 
 const PREFIX = "tp:";
 
+/**
+ * Writes that never throw (QA night #22). A full disk (Safari stops at about 5 MB; the 200-candidate demo cohort
+ * uses most of it) used to throw QuotaExceededError out of every save and crash the game. A failed write is kept
+ * in memory for this session instead, reads see it, and `onFull` tells the app so it can warn.
+ */
+export function safeKV(inner: KV, onFull: (key: string) => void = () => {}): KV {
+  const overlay = new Map<string, string>();
+  const all = () => {
+    const ks = new Set<string>(overlay.keys());
+    for (let i = 0; i < inner.length; i++) {
+      const k = inner.key(i);
+      if (k != null) ks.add(k);
+    }
+    return [...ks];
+  };
+  return {
+    getItem: (k) => (overlay.has(k) ? overlay.get(k)! : inner.getItem(k)),
+    setItem(k, v) {
+      try {
+        inner.setItem(k, v);
+        overlay.delete(k);
+      } catch {
+        overlay.set(k, v);
+        onFull(k);
+      }
+    },
+    removeItem(k) {
+      overlay.delete(k);
+      try {
+        inner.removeItem(k);
+      } catch {
+        // Nothing stored there to remove.
+      }
+    },
+    // Fast path: with nothing held in memory, iterate the real storage directly.
+    key: (i) => (overlay.size ? all()[i] ?? null : inner.key(i)),
+    get length() {
+      return overlay.size ? all().length : inner.length;
+    },
+  };
+}
+
+const warnFull = () => {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("tp:storage-full"));
+};
+
 export const Role = z.enum(["candidate", "recruiter", "admin", "witness"]);
 export type Role = z.infer<typeof Role>;
 
@@ -109,7 +155,8 @@ function keys(kv: KV, prefix: string): string[] {
   return out;
 }
 
-export function makeStore(kv: KV, now: () => Date = () => new Date()) {
+export function makeStore(raw: KV, now: () => Date = () => new Date(), opts: { onFull?: (key: string) => void } = {}) {
+  const kv = safeKV(raw, opts.onFull ?? warnFull);
   const iso = () => now().toISOString();
   return {
     // Role
