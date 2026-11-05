@@ -70,3 +70,4 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - CI-style full e2e on the merged code (prod build + hooks, 3 workers): 229 passed, 1 flaky (#29, now hardened), 3 failed (#18).
 - Re-verify at 12:05 on the integration branch (production build + hooks): every tests/qa spec green (13 passed, 3 phone skips by design); integrations, demo-script, recruiter, ai and demo-60s specs 59/59.
 - Full CI-style e2e on the merged integration code (production build + hooks, 3 workers): 243 passed, 0 failed, 0 flaky (59 skips are phone/desktop-only by design).
+- Stage path on a plain production build (no test hooks, as Vercel serves it), 10 in a row: sponsor cutscene, recovery B, exact checkpoint question, card Prioritization jump to cp2, hover Final score then Shortlist reveals Maya Chen, no page errors: 10/10 (11 to 12 s each).
