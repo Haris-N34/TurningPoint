@@ -315,7 +315,8 @@ test("recruiter card words a retake neutrally", async ({ page }, info) => {
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();
   await page.goto("/recruiter/card/att_demo_maya?challenge=ch_demo_energy");
-  await expect(page.getByTestId("integrity")).toContainText("Answered on the second take");
+  await expect(page.getByTestId("retake-cp2")).toHaveText("second take");
+  await expect(page.getByTestId("capability-card")).toContainText("second take", { useInnerText: true });
   await expect(page.getByTestId("capability-card")).not.toContainText("Retake used");
 });
 

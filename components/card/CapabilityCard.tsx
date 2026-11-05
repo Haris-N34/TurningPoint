@@ -78,7 +78,8 @@ export function CapabilityCard({
   const evidence = useMemo(() => verifyEvidence(card).evidence, [card]);
   // Final score (Part D): sorts only, shown top right with its breakdown; evidence still leads.
   const final = useMemo(() => scoreCard(card, card.resume ? { claims: card.resume.claims, resumeWeight } : {}), [card, resumeWeight]);
-  const notes = audience === "candidate" ? card.integrity : card.integrity.filter((n) => n.kind === "retake_used");
+  // Employers see no integrity notes; a retake shows once, as a tag on that answer's tab.
+  const notes = audience === "candidate" ? card.integrity : [];
   const decisionClips = card.checkpoints.filter((c) => c.kind === "decision").slice(0, 3);
   const realLife = card.checkpoints.find((c) => c.id === card.realStory?.checkpointId);
   const followUp = card.checkpoints.find((c) => c.id === card.realStory?.followUpCheckpointId);
@@ -256,6 +257,7 @@ export function CapabilityCard({
                   data-testid={`tab-${c.id}`}
                 >
                   {c.kind === "decision" ? `${KIND_LABEL.decision} ${i + 1}` : KIND_LABEL[c.kind]} · {c.mode}
+                  {c.retakeUsed && <span className="ml-1.5 rounded-full border border-current/40 px-1.5 py-px text-[10px] font-normal" data-testid={`retake-${c.id}`}>second take</span>}
                 </button>
               ))}
             </div>
@@ -271,7 +273,6 @@ export function CapabilityCard({
                     players.current[c.id] = h;
                   }}
                 />
-                {c.retakeUsed && <p className="text-xs text-muted-foreground">Answered on the second take</p>}
               </div>
             ))}
           </section>
