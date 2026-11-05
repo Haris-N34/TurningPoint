@@ -11,7 +11,7 @@ import { pixelTitle } from "./fonts";
 import { Panel, PixelButton } from "./ui";
 
 const SEV = {
-  high: { label: "Urgent", icon: "!!", cls: "bg-[#d9472b] text-white" },
+  high: { label: "Urgent", icon: "!!", cls: "bg-[#c43d22] text-white" },
   medium: { label: "Soon", icon: "!", cls: "bg-[#e0a32e] text-[#2e222f]" },
   low: { label: "Minor", icon: "·", cls: "bg-[#4f9d69] text-white" },
 } as const;
@@ -23,7 +23,7 @@ function Bar({ label, value, max, colour, testid, display }: { label: string; va
     <div className="relative" data-testid={testid}>
       <div className="flex items-baseline justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide">
         <span>{label}</span>
-        <motion.span key={display} initial={{ scale: 1.4, color: "#d9472b" }} animate={{ scale: 1, color: "#2e222f" }} className={cn(pixelTitle.className, "text-[10px]")}>
+        <motion.span key={display} initial={{ scale: 1.4, color: "#c43d22" }} animate={{ scale: 1, color: "#2e222f" }} className={cn(pixelTitle.className, "text-[10px]")}>
           {display}
         </motion.span>
       </div>
@@ -38,7 +38,7 @@ function Bar({ label, value, max, colour, testid, display }: { label: string; va
             animate={{ opacity: 1, y: -18 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.9 }}
-            className={cn("absolute right-0 top-0 rounded-[3px] px-1 text-xs font-bold", f.tone === "good" ? "bg-[#4f9d69] text-white" : f.tone === "bad" ? "bg-[#d9472b] text-white" : "bg-white")}
+            className={cn("absolute right-0 top-0 rounded-[3px] px-1 text-xs font-bold", f.tone === "good" ? "bg-[#4f9d69] text-white" : f.tone === "bad" ? "bg-[#c43d22] text-white" : "bg-white")}
             data-testid="floater"
           >
             {f.text}
@@ -72,7 +72,7 @@ export function Clock({ state, turnBased }: { state: GameState; turnBased: boole
     <Panel className="flex items-center gap-2 px-3 py-1.5" data-testid="clock" aria-live="polite" aria-label={`Game time ${formatTime(state.t)}`}>
       <svg viewBox="0 0 36 36" className="size-9 -rotate-90" aria-hidden>
         <circle cx="18" cy="18" r={r} fill="none" stroke="#e8d9b5" strokeWidth="5" />
-        <circle cx="18" cy="18" r={r} fill="none" stroke={p > 0.75 ? "#d9472b" : "#e0a32e"} strokeWidth="5" strokeDasharray={c} strokeDashoffset={c * (1 - p)} />
+        <circle cx="18" cy="18" r={r} fill="none" stroke={p > 0.75 ? "#c43d22" : "#e0a32e"} strokeWidth="5" strokeDasharray={c} strokeDashoffset={c * (1 - p)} />
       </svg>
       <div>
         <p className={cn(pixelTitle.className, "text-[13px]")} data-testid="clock-time">{formatTime(state.t)}</p>
@@ -140,12 +140,12 @@ export function IssueTracker({
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold leading-tight">{i.title}</p>
                     <p className="text-[11px] text-[#6a5a4a]">
-                      {npc.name} · {zone.name} · <span data-testid="countdown" className={cn(left < 120 && "font-bold text-[#d9472b]")}>{formatDuration(left)} left</span>
+                      {npc.name} · {zone.name} · <span data-testid="countdown" className={cn(left < 120 && "font-bold text-[#c43d22]")}>{formatDuration(left)} left</span>
                     </p>
                   </div>
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  <button className="rounded-[3px] border-2 border-[#2e222f] bg-[#d9472b] px-2 text-[12px] font-bold text-white" onClick={() => onGo(i)} data-testid={`go-${i.id}`}>
+                  <button className="rounded-[3px] border-2 border-[#2e222f] bg-[#c43d22] px-2 text-[12px] font-bold text-white" onClick={() => onGo(i)} data-testid={`go-${i.id}`}>
                     Go
                   </button>
                   {i.delegable && (

@@ -40,7 +40,7 @@ export function RealLife(p: {
   if (step === "intro") {
     return (
       <div className="rounded-2xl border p-5" data-testid="real-life-intro">
-        <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Last checkpoint</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Last checkpoint</p>
         <p className="mt-2 text-lg font-medium">Now link it to something real.</p>
         <p className="mt-1 text-sm opacity-80">
           You&apos;ll get 30 seconds to think and up to 2 minutes to answer, then one short follow-up. Any format works.
@@ -111,7 +111,7 @@ export function RealLife(p: {
         className="mt-3 w-full rounded-xl border px-3 py-2"
         autoFocus
       />
-      <p className="mt-1 text-xs opacity-60">{words} words</p>
+      <p className="mt-1 text-xs text-muted-foreground">{words} words</p>
       <button type="submit" disabled={!title.trim()} className="mt-3 rounded-full bg-foreground px-5 py-2.5 font-medium text-background disabled:opacity-50">
         Finish
       </button>

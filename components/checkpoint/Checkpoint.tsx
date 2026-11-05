@@ -246,7 +246,7 @@ export function Checkpoint(p: Props) {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">{label}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{label}</p>
             <div className="mt-2">
               <TypedQuestion text={p.question} />
             </div>

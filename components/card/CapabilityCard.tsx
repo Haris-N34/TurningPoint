@@ -174,7 +174,7 @@ export function CapabilityCard({
       <div className="min-w-0 space-y-4">
         <section aria-labelledby="dp-h" className="rounded-xl border bg-card p-4 shadow-card">
           <h2 id="dp-h" className="font-semibold">Decision path</h2>
-          <ol className="mt-4 flex items-start overflow-x-auto pb-2" data-testid="decision-path">
+          <ol className="relative mt-4 flex items-start overflow-x-auto pb-2" data-testid="decision-path">
             {card.decisionPath.map((d, i) => {
               const cp = d.checkpointId;
               return (

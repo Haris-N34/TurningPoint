@@ -42,7 +42,7 @@ export function AiHealth() {
         <Button variant="outline" onClick={() => (clearAiCalls(), reload())}>Clear log</Button>
       </div>
 
-      <section className="mt-6 overflow-x-auto rounded-xl border bg-card shadow-card" aria-labelledby="svc-h">
+      <section tabIndex={0} className="relative mt-6 overflow-x-auto rounded-xl border bg-card shadow-card" aria-labelledby="svc-h">
         <h2 id="svc-h" className="sr-only">Calls by service</h2>
         <table className="w-full text-sm" data-testid="ai-table">
           <thead className="text-left text-xs text-muted-foreground">

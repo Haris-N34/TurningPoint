@@ -21,7 +21,7 @@ const pending = [
 function GroupTable({ title, groups }: { title: string; groups: Report["groups"] }) {
   return <section className="rounded-xl border bg-card p-5 sm:p-7">
     <h2 className="font-display text-2xl">{title}</h2>
-    {!groups.length ? <p className="mt-4 text-sm text-muted-foreground">No opt-in group data. No group membership is inferred.</p> : <div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm">
+    {!groups.length ? <p className="mt-4 text-sm text-muted-foreground">No opt-in group data. No group membership is inferred.</p> : <div className="relative mt-5 overflow-x-auto"><table className="w-full text-left text-sm">
       <caption className="sr-only">Completion and shortlist rates. Shortlist comparisons require ten completed candidates per group.</caption>
       <thead><tr className="border-b text-xs text-muted-foreground"><th scope="col" className="pb-3 pr-4">Group</th><th scope="col" className="pb-3 pr-4">Started / finished</th><th scope="col" className="pb-3 pr-4">Completion</th><th scope="col" className="pb-3">Shortlisted / finished</th></tr></thead>
       <tbody>{groups.map((g) => <tr key={g.label} className="border-b last:border-0"><th scope="row" className="py-4 pr-4 font-medium">{g.label}{g.warning ? <span className="mt-1 block text-xs text-primary">Review: below four-fifths</span> : null}</th><td className="py-4 pr-4 tabular-nums">{g.started} / {g.finished}</td><td className="py-4 pr-4 tabular-nums">{percent(g.completion)}</td><td className="py-4 tabular-nums">{g.rate === null ? "Insufficient data" : `${g.shortlisted} / ${g.finished} (${percent(g.rate)})`}</td></tr>)}</tbody>

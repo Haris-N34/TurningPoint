@@ -17,7 +17,7 @@ export function Panel({ className, children, ...rest }: React.HTMLAttributes<HTM
 
 export function PixelButton({ className, tone = "primary", ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: "primary" | "plain" | "danger" }) {
   const tones = {
-    primary: "bg-[#d9472b] text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#e3593c]",
+    primary: "bg-[#c43d22] text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#b5371e]",
     plain: "bg-[#fff8e7] text-[#2e222f] shadow-[inset_0_-3px_0_#e0cfa6] hover:bg-white",
     danger: "bg-[#7a2e3a] text-white shadow-[inset_0_-3px_0_#4e1c25]",
   };
