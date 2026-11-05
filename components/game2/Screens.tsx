@@ -279,10 +279,8 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
     const c = animate(budget, state.tp.budgetAfter ?? state.budget, { duration: reduce ? 0 : 2.4, ease: "easeOut" });
     return () => c.stop();
   }, [phase, budget, state, reduce]);
-  const ref = useRef<HTMLDivElement>(null);
-  useFocusTrap(ref, phase !== "ring");
   return (
-    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
       <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       {/* The hit: a red edge flash as the money goes. */}
@@ -351,10 +349,8 @@ export function Recap({ state, day, onDone }: { state: GameState; day: number; o
     if (left <= 0) onDone();
   }, [left, onDone]);
   const names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-  const ref = useRef<HTMLDivElement>(null);
-  useFocusTrap(ref);
   return (
-    <div ref={ref} className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/70 p-4" role="dialog" aria-modal="true" aria-label="Evening recap" data-testid="recap">
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/70 p-4" role="dialog" aria-label="Evening recap" data-testid="recap">
       <Panel className="w-[min(420px,92vw)] p-4">
         <Eyebrow>Evening recap</Eyebrow>
         <h2 className={cn(pixelTitle.className, "mt-1 text-[13px]")}>{names[day]} is done</h2>
