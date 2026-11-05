@@ -7,6 +7,7 @@ import type { Kpi } from "@/lib/game/kpis";
 import type { Look, MapScenario } from "@/lib/game/schema";
 import { AVATAR_OPTIONS, characterSheet, FRAME } from "@/lib/game/sprites";
 import { useFocusTrap } from "@/lib/a11y/focusTrap";
+import { sfx } from "@/lib/game/sound";
 import { useGame } from "@/lib/game/store";
 import { formatTime } from "@/lib/game/time";
 import { cn } from "@/lib/utils";
@@ -279,6 +280,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
   }, [reduce]);
   useEffect(() => {
     if (phase !== "drain") return;
+    sfx.fail();
     const c = animate(budget, state.tp.budgetAfter ?? state.budget, { duration: reduce ? 0 : 2.4, ease: "easeOut" });
     return () => c.stop();
   }, [phase, budget, state, reduce]);
@@ -292,6 +294,8 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
       )}
       {phase === "ring" ? (
         <motion.div className="tp-scale" initial={reduce ? false : { scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
+          {/* The whole card buzzes like a phone on a table. */}
+          <motion.div animate={reduce ? {} : { x: [0, -4, 4, -4, 4, 0, 0, 0] }} transition={{ duration: 0.8, repeat: Infinity }}>
           <Panel tone="ink" className="flex w-[min(460px,92vw)] items-center gap-4 p-4 sm:p-5" aria-live="assertive">
             <motion.div className="shrink-0 rounded-[6px] border-[3px] border-[#ffd166] p-0.5" animate={reduce ? {} : { borderColor: ["#ffd166", "#c43d22", "#ffd166"] }} transition={{ duration: 0.8, repeat: Infinity }}>
               <Portrait id={caller.portrait} expression="worried" className="size-20 rounded-[3px] bg-[#2e222f] sm:size-24" />
@@ -307,6 +311,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
               </p>
             </div>
           </Panel>
+          </motion.div>
         </motion.div>
       ) : (
         <motion.div initial={reduce ? false : { y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="tp-scale w-[min(640px,94vw)]">
@@ -324,7 +329,13 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
             {phase === "drain" && (
               <div className="mt-4 flex items-center justify-between gap-3 rounded-[4px] border-2 border-[#2e222f] bg-white px-3 py-2">
                 <p className="text-[13px] font-semibold uppercase tracking-wide">Budget</p>
-                <motion.p className={cn(pixelTitle.className, "text-[20px] text-[#c43d22] sm:text-[24px]")} animate={reduce ? {} : { x: [0, -3, 3, -2, 2, 0] }} transition={{ duration: 0.4, repeat: 4 }} data-testid="budget-drain">{shown}</motion.p>
+                <div className="flex items-center gap-3">
+                  {/* How much just went, stamped in red. */}
+                  <motion.span initial={reduce ? false : { scale: 2, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: reduce ? 0 : 0.15, type: "spring", stiffness: 400, damping: 14 }} className="rounded-[3px] border-2 border-[#2e222f] bg-[#c43d22] px-1.5 text-[14px] font-bold text-white" data-testid="budget-loss">
+                    -${Math.max(0, (state.tp.budgetBefore ?? 0) - (state.tp.budgetAfter ?? 0)).toLocaleString("en-CA")}
+                  </motion.span>
+                  <motion.p className={cn(pixelTitle.className, "text-[20px] text-[#c43d22] sm:text-[24px]")} animate={reduce ? {} : { x: [0, -3, 3, -2, 2, 0] }} transition={{ duration: 0.4, repeat: 4 }} data-testid="budget-drain">{shown}</motion.p>
+                </div>
               </div>
             )}
             <div className="mt-4 flex justify-end">

@@ -267,10 +267,23 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     }
     onEmote = (e: { npc: string; emote: string }) => {
       if (!this.alive()) return;
-      const n = this.npcs.get(e.npc);
-      if (!n) return;
-      const t = this.add.text(n.sprite.x, n.sprite.y - 16, EMOTE[e.emote] ?? "!", { fontSize: "10px", resolution: 4 }).setOrigin(0.5).setDepth(66);
-      this.tweens.add({ targets: t, y: t.y - 8, alpha: 0, duration: o.reducedMotion() ? 10 : 1400, onComplete: () => t.destroy() });
+      // "__player" puts the emote over the player (the pick is acknowledged on the spot).
+      const target = e.npc === "__player" ? this.player : this.npcs.get(e.npc)?.sprite;
+      if (!target) return;
+      // A small pixel speech bubble that pops in, holds, and floats away.
+      // The player's bubble sits to the side so it never covers whoever they're facing.
+      const x = target.x + (e.npc === "__player" ? 12 : 0), y = target.y - (e.npc === "__player" ? 12 : 18);
+      const bg = this.add.rectangle(0, 0, 13, 12, 0xffffff).setStrokeStyle(1, 0x2e222f);
+      const tail = this.add.triangle(0, 7, -2, 0, 2, 0, 0, 3, 0xffffff).setStrokeStyle(1, 0x2e222f);
+      const t = this.add.text(0, 0, EMOTE[e.emote] ?? "!", { fontFamily: o.font ?? "monospace", fontSize: "9px", fontStyle: "600", color: "#c43d22", resolution: 6 }).setOrigin(0.5);
+      const c = this.add.container(x, y, [tail, bg, t]).setDepth(66);
+      if (o.reducedMotion()) {
+        this.time.delayedCall(900, () => c.destroy());
+        return;
+      }
+      c.setScale(0.2);
+      this.tweens.add({ targets: c, scale: 1, duration: 160, ease: "Back.Out" });
+      this.tweens.add({ targets: c, y: y - 6, alpha: 0, delay: 900, duration: 500, onComplete: () => c.destroy() });
     };
     onShake = (e: { intensity: number }) => {
       if (!this.alive()) return;
