@@ -149,7 +149,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E8.1 [D] Inbox shows reused cards with covered skills
 - [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
 - [x] E5.2 [D] Exported candidate links back to the card
-- [ ] PV5 [H] "How we use AI" page linked from every screen
+- [x] PV5 [H] "How we use AI" page linked from every screen (global header; tests/e2e/a11y.spec.ts walks every route)
 - Done when: the five-step loop from the PRD Summary works end to end on the deployed site.
 
 ### M4 additions: integration layer (v2 Part C) and scoring (Part D)
