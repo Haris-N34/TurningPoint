@@ -128,3 +128,21 @@ test("transcript-first hides video until revealed (E6.2)", async ({ page }) => {
   await page.getByTestId("tab-cp2").click();
   await expect(page.getByRole("button", { name: "Reveal video" })).toBeVisible();
 });
+
+test("demo inbox reads like a real list: Maya first, synthetic peers labelled, quote jump is visible on the card", async ({ page }) => {
+  await seed(page);
+  await page.goto("/recruiter");
+  const rows = page.locator('[data-testid^="row-"]');
+  await expect(rows.first()).toHaveAttribute("data-testid", `row-${MAYA}`);
+  expect(await rows.count()).toBeGreaterThan(4);
+  await expect(page.getByTestId("row-att_demo_peer_01")).toContainText("Synthetic");
+  await expect(page.getByTestId(`row-${MAYA}`)).not.toContainText("Synthetic");
+
+  await page.goto(CARD);
+  await page.getByTestId("jump-prioritization").click();
+  await expect(page.getByTestId("jump-banner")).toContainText("Prioritization");
+  // The Copilot trigger sits in the toolbar, not over the answer.
+  const ask = await page.getByTestId("copilot-open").boundingBox();
+  const answers = await page.getByTestId("answers").boundingBox();
+  expect(ask!.y + ask!.height).toBeLessThanOrEqual(answers!.y);
+});

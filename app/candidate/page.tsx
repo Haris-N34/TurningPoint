@@ -12,7 +12,7 @@ const more: { href: string; title: string; text: string; pre?: string }[] = [
 
 export default function CandidateHome() {
   return (
-    <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-10 sm:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+    <main className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-10 sm:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Candidate</p>
         <h1 className="mt-4 max-w-xl font-display text-4xl leading-[1.1] tracking-tight sm:text-5xl">Let your next move speak for you.</h1>

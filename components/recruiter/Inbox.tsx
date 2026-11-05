@@ -165,7 +165,7 @@ export function Inbox() {
       <SecondLookQueue challengeId={challenge?.id} nameFor={(id) => rows.find((r) => r.attemptId === id)?.displayName} />
 
       <div className="mt-6 overflow-hidden rounded-xl border bg-card shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border/70 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border/70 px-4 py-2.5">
           <fieldset className="grid w-full grid-cols-2 gap-2 text-sm sm:flex sm:w-auto sm:flex-wrap sm:items-center" aria-label="Filters">
             <label className="sr-only" htmlFor="filter-skill">Skill</label>
             <select
@@ -254,7 +254,7 @@ export function Inbox() {
                   className={cn("group border-b border-border/60 transition-colors last:border-0 hover:bg-muted/40", i === sel && "bg-accent/40 hover:bg-accent/40", r.withdrawn && "text-muted-foreground")}
                   data-testid={`row-${r.attemptId}`}
                 >
-                  <td className="py-3 pl-4 pr-2">
+                  <td className="py-2.5 pl-4 pr-2">
                     {!r.withdrawn && (
                       <input
                         type="checkbox"
@@ -270,7 +270,7 @@ export function Inbox() {
                       />
                     )}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <Link href={`/recruiter/card/${r.attemptId}?challenge=${challenge?.id}`} className="whitespace-nowrap font-medium underline-offset-2 hover:underline">
                         {r.displayName}
@@ -284,7 +284,7 @@ export function Inbox() {
                       </span>
                     )}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-2.5">
                     <div className="flex flex-wrap gap-x-3 gap-y-1.5">
                       {r.withdrawn ? (
                         <span>Candidate withdrew this card</span>
@@ -299,15 +299,15 @@ export function Inbox() {
                       )}
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">{r.witnessConfirmed ? <span className="text-foreground"><span aria-hidden>✓ </span>Confirmed</span> : "None yet"}</td>
-                  <td className="px-3 py-3">
+                  <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">{r.witnessConfirmed ? <span className="text-foreground"><span aria-hidden>✓ </span>Confirmed</span> : "None yet"}</td>
+                  <td className="px-3 py-2.5">
                     <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium", r.status === "new" ? "text-muted-foreground" : "text-foreground")}>
                       <span aria-hidden className={cn("size-1.5 rounded-full", r.status === "shortlist" ? "bg-primary" : r.status === "new" ? "bg-input" : "bg-foreground/50")} />
                       {STATUS_LABEL[r.status]}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3 tabular-nums text-muted-foreground">{new Date(r.date).toLocaleDateString("en-CA")}</td>
-                  <td className="py-3 pl-3 pr-4 text-right">
+                  <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-muted-foreground">{new Date(r.date).toLocaleDateString("en-CA")}</td>
+                  <td className="py-2.5 pl-3 pr-4 text-right">
                     {!r.withdrawn && r.status !== "shortlist" && (
                       <Button size="sm" variant="ghost" className="border border-transparent group-hover:border-border group-hover:bg-card" onClick={() => shortlist(r)}>
                         Shortlist

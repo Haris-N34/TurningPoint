@@ -110,7 +110,7 @@ export function CapabilityCard({
   return (
     <article className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]" data-testid="capability-card" aria-label="Capability Card">
       <header className="flex flex-col gap-4 border-b border-border/70 pb-3 lg:col-span-2 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Capability Card</p>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <h1 className="font-display text-3xl leading-tight tracking-tight" data-testid="card-name">
@@ -257,8 +257,8 @@ export function CapabilityCard({
             {card.decisionPath.map((d, i) => {
               const cp = d.checkpointId;
               return (
-                <li key={`${d.nodeId}-${i}`} className="flex items-start">
-                  <div className="flex w-14 shrink-0 flex-col items-center text-center">
+                <li key={`${d.nodeId}-${i}`} className={cn("flex items-start", i < card.decisionPath.length - 1 && "flex-1")}>
+                  <div className="flex w-16 shrink-0 flex-col items-center text-center">
                     <button
                       type="button"
                       title={`${d.prompt}\nChoice: ${d.optionLabel}`}
@@ -271,16 +271,16 @@ export function CapabilityCard({
                       )}
                       data-testid={cp ? `dot-${cp}` : undefined}
                     />
-                    <span className="mt-1 line-clamp-2 text-[10px] leading-tight text-muted-foreground">{d.optionLabel}</span>
+                    <span className="mt-1 line-clamp-3 text-[10px] leading-tight text-muted-foreground" title={d.optionLabel}>{d.optionLabel}</span>
                   </div>
                   {i < card.decisionPath.length - 1 &&
                     (i === card.turningPointAfter ? (
-                      <div className="mt-1 flex shrink-0 flex-col items-center px-1" data-testid="turning-point-marker">
+                      <div className="mt-1 flex flex-1 flex-col items-center px-1" data-testid="turning-point-marker">
                         <span className="text-[10px] font-semibold uppercase tracking-wide text-primary">Turning point</span>
-                        <span aria-hidden className="mt-0.5 h-3 w-8 border-t-2 border-dashed border-primary" />
+                        <span aria-hidden className="mt-0.5 h-3 w-full min-w-8 border-t-2 border-dashed border-primary" />
                       </div>
                     ) : (
-                      <span aria-hidden className="mt-2 h-px w-4 shrink-0 bg-border" />
+                      <span aria-hidden className="mt-2 h-px min-w-2 flex-1 bg-border" />
                     ))}
                 </li>
               );

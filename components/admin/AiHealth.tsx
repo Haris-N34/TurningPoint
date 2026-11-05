@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { fixturesOf, PROMPTS } from "@/lib/ai/prompts/registry";
@@ -29,17 +29,17 @@ export function AiHealth() {
   const recent = (calls ?? []).slice(-8).reverse();
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-8 sm:px-10" data-testid="ai-health">
-      <Link href="/admin" className="text-sm underline">← Admin</Link>
-      <p className="mt-4 text-xs font-medium uppercase tracking-[0.18em] text-primary">AI health</p>
-      <h1 className="mt-1 font-display text-3xl">AI calls</h1>
+    <main className="mx-auto max-w-5xl px-4 pb-12 pt-3 sm:px-10" data-testid="ai-health">
+      <BackLink href="/admin">Admin</BackLink>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">AI health</p>
+      <h1 className="mt-2 font-display text-3xl tracking-tight">AI calls</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Mode <span className="font-mono font-medium" data-testid="ai-mode">{aiMode()}</span>. Off runs the local rules, cached replays recorded answers, live calls Claude from the server. Every call is
         validated against its schema and guards; a failure falls back to the template.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={selfCheck} data-testid="ai-selfcheck">Run self-check</Button>
-        <Button variant="outline" onClick={() => (clearAiCalls(), reload())}>Clear log</Button>
+        <Button size="sm" onClick={selfCheck} data-testid="ai-selfcheck">Run self-check</Button>
+        <Button size="sm" variant="outline" onClick={() => (clearAiCalls(), reload())}>Clear log</Button>
       </div>
 
       <section tabIndex={0} className="relative mt-6 overflow-x-auto rounded-xl border bg-card shadow-card" aria-labelledby="svc-h">
