@@ -11,7 +11,7 @@ async function tabStaysInDialog(page: Page) {
   }
 }
 
-test.fixme("play: Tab stays inside the Paused dialog and Escape resumes (owner: agent A, components/game/Game.tsx)", async ({ page }) => {
+test("play: Tab stays inside the Paused dialog and Escape resumes (owner: agent A, components/game/Game.tsx)", async ({ page }) => {
   await page.goto("/play/sample");
   await page.getByRole("button", { name: "I agree, start" }).click();
   await page.getByRole("button", { name: "Pause" }).click();
@@ -22,7 +22,7 @@ test.fixme("play: Tab stays inside the Paused dialog and Escape resumes (owner: 
   await expect(dialog).toBeHidden();
 });
 
-test.fixme("game: Tab stays inside the pause menu (owner: agent A, components/game2)", async ({ page }) => {
+test("game: Tab stays inside the pause menu (owner: agent A, components/game2)", async ({ page }) => {
   await page.goto("/game/launch-week");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await page.keyboard.press("Enter");

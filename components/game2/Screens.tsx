@@ -1,11 +1,12 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameState } from "@/lib/game/engine";
 import type { Kpi } from "@/lib/game/kpis";
 import type { Look, MapScenario } from "@/lib/game/schema";
 import { AVATAR_OPTIONS, characterSheet, FRAME } from "@/lib/game/sprites";
+import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import { useGame } from "@/lib/game/store";
 import { formatTime } from "@/lib/game/time";
 import { cn } from "@/lib/utils";
@@ -278,8 +279,10 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
     const c = animate(budget, state.tp.budgetAfter ?? state.budget, { duration: reduce ? 0 : 2.4, ease: "easeOut" });
     return () => c.stop();
   }, [phase, budget, state, reduce]);
+  const ref = useRef<HTMLDivElement>(null);
+  useFocusTrap(ref, phase !== "ring");
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
+    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#140e18]/70 px-3" role="dialog" aria-modal="true" aria-label="Turning point" data-testid="cutscene">
       <motion.div className="absolute inset-x-0 top-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       <motion.div className="absolute inset-x-0 bottom-0 bg-black" initial={{ height: 0 }} animate={{ height: "12vh" }} transition={{ duration: reduce ? 0 : 0.35 }} />
       {/* The hit: a red edge flash as the money goes. */}
@@ -372,8 +375,14 @@ export function Recap({ state, day, onDone }: { state: GameState; day: number; o
 
 export function PauseMenu({ onResume }: { onResume: () => void }) {
   const [how, setHow] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  // Modal: Tab stays inside, Escape resumes.
+  const resume = useRef(onResume);
+  resume.current = onResume;
+  const onEscape = useCallback(() => resume.current(), []);
+  useFocusTrap(ref, true, onEscape);
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-4" role="dialog" aria-modal="true" aria-label="Paused" data-testid="pause-menu">
+    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-4" role="dialog" aria-modal="true" aria-label="Paused" data-testid="pause-menu">
       <Panel className="w-[min(420px,92vw)] p-4">
         <h2 className={cn(pixelTitle.className, "text-[16px]")}>Paused</h2>
         <p className="mt-1.5 text-[14px] text-[#6a5a4a]">The clock is stopped. Your progress is saved.</p>

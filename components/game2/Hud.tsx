@@ -116,6 +116,8 @@ export function IssueTracker({
   const issues = openIssues(scenario, state).sort((a, b) => (state.issues[a.id].deadline ?? 0) - (state.issues[b.id].deadline ?? 0));
   const volunteers = scenario.npcs.filter((n) => n.volunteer);
   const urgent = issues.filter((i) => i.severity === "high").length;
+  // Issues that appeared in the last game hour get a "New" tag so fresh trouble is easy to spot.
+  const fresh = new Set(state.events.filter((e) => e.kind === "spawned" && state.t - e.t < 60).map((e) => e.issue));
   return (
     <Panel className="w-full p-1.5 sm:w-[300px]" data-testid="issue-tracker">
       <div className="flex items-center gap-1.5">
@@ -144,6 +146,7 @@ export function IssueTracker({
                   <div className="min-w-0 flex-1 px-2 py-1">
                     <p className="text-[14px] font-semibold leading-tight">
                       <span className="sr-only">{sev.label}: </span>
+                      {fresh.has(i.id) && <span className="mr-1 inline-block -translate-y-px rounded-[3px] bg-[#ffd166] px-1 align-middle text-[10px] font-bold uppercase leading-[14px] tracking-wide text-[#2e222f]">New</span>}
                       {i.title}
                     </p>
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] leading-tight text-[#6a5a4a]">
