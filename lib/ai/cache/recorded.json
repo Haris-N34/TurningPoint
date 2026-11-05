@@ -281,7 +281,7 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.3.0:8a277183690d9e87": {
+ "evidence-scanner@1.0.0+0.4.0:8a277183690d9e87": {
   "output": {
    "evidence": [
     {
@@ -300,7 +300,7 @@
   },
   "model": "local-rules"
  },
- "evidence-scanner@1.0.0+0.3.0:a4b72d16d4ba74f1": {
+ "evidence-scanner@1.0.0+0.4.0:a4b72d16d4ba74f1": {
   "output": {
    "evidence": [
     {
@@ -392,30 +392,7 @@
   },
   "model": "local-rules"
  },
- "recruiter-copilot@1.0.0:2f7e2a703af5c13e": {
-  "output": {
-   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:12: “Losing a day would hurt the vendors more than the bands.”",
-   "citations": [
-    {
-     "kind": "transcript",
-     "label": "Checkpoint 2 · 0:00",
-     "checkpointId": "cp2",
-     "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
-     "t": 0
-    },
-    {
-     "kind": "transcript",
-     "label": "Checkpoint 2 · 0:12",
-     "checkpointId": "cp2",
-     "quote": "Losing a day would hurt the vendors more than the bands.",
-     "t": 12.69
-    }
-   ],
-   "refused": null
-  },
-  "model": "local-rules"
- },
- "recruiter-copilot@1.0.0:7c9bfc7903a327bb": {
+ "recruiter-copilot@1.0.0:688fcf39f04e65e3": {
   "output": {
    "answer": "Prioritization: Strong. Checkpoint 2, at 0:09: “So I cut promotion, decorations and the stage.”\nIn the game, Critical issues handled before deadline: 5 of 5 (100%). Handled 5 of 5 high-severity problems before they ran out of time.\nIn the game, Deliberate deferrals: Nothing left undone. Every problem was handled; nothing had to be set aside.",
    "citations": [
@@ -438,6 +415,29 @@
      "label": "KPI: Deliberate deferrals",
      "skill": "prioritization",
      "kpiId": "deliberate-deferrals"
+    }
+   ],
+   "refused": null
+  },
+  "model": "local-rules"
+ },
+ "recruiter-copilot@1.0.0:81292c30d627aa65": {
+  "output": {
+   "answer": "Checkpoint 2, at 0:00: “I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.”\nCheckpoint 2, at 0:12: “Losing a day would hurt the vendors more than the bands.”",
+   "citations": [
+    {
+     "kind": "transcript",
+     "label": "Checkpoint 2 · 0:00",
+     "checkpointId": "cp2",
+     "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
+     "t": 0
+    },
+    {
+     "kind": "transcript",
+     "label": "Checkpoint 2 · 0:12",
+     "checkpointId": "cp2",
+     "quote": "Losing a day would hurt the vendors more than the bands.",
+     "t": 12.69
     }
    ],
    "refused": null

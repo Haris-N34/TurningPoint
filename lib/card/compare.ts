@@ -14,7 +14,6 @@ export type CompareColumn = {
   attemptId: string;
   displayName: string;
   anonymous: boolean;
-  adjustedTiming: boolean;
   witnessConfirmed: boolean;
   /** One entry per employer skill, in the employer's order. Only verified quotes survive. */
   skills: { skill: SkillSlug; level: Evidence["level"]; quote?: string; checkpointId?: string; startS?: number }[];
@@ -47,7 +46,6 @@ export function compareFor(s: Store, challengeId: string, attemptIds: string[], 
       attemptId: card.attemptId,
       displayName: name.displayName,
       anonymous: name.anonymous,
-      adjustedTiming: card.adjustedTiming,
       witnessConfirmed: !!card.realStory?.witnesses.some((w) => w.status === "confirmed"),
       skills: employerSkills.map((skill) => {
         const e = evidence.find((x) => x.skill === skill);
