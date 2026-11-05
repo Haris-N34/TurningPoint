@@ -18,10 +18,11 @@ export function AdminHome() {
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Employer admin</p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-display text-4xl">Your challenges</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {!list.length && (
             <Button variant="outline" onClick={() => { seedDemo(store()); refresh(); }}>Load demo data</Button>
           )}
+          <Button variant="outline" asChild><Link href="/admin/impact">Impact report</Link></Button>
           <Button asChild><Link href="/admin/new">New challenge</Link></Button>
         </div>
       </div>
