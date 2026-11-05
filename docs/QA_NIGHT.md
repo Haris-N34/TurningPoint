@@ -77,4 +77,5 @@ Production build (`pnpm build && pnpm start`), crawled and clicked. Severity: S1
 - Full CI-style e2e on the merged integration code (production build + hooks, 3 workers): 243 passed, 0 failed, 0 flaky (59 skips are phone/desktop-only by design).
 - Stage path on a plain production build (no test hooks, as Vercel serves it), 10 in a row: sponsor cutscene, recovery B, exact checkpoint question, card Prioritization jump to cp2, hover Final score then Shortlist reveals Maya Chen, no page errors: 10/10 (11 to 12 s each).
 - Game checkpoint layout at 1280x720 and 375x812: fits without scrolling.
+- 13:45 run on the current code (integration e920676 merged): full CI-style e2e 248 passed, 1 flaky (decision-path.spec [phone], new spec, timed out clicking Wait under load, passed on retry), 0 failed. Stage path on a plain production build: 10/10.
 
