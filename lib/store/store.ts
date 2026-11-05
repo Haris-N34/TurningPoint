@@ -158,6 +158,11 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
       kv.removeItem(PREFIX + `card:${attemptId}`);
       write(kv, "shares", this.listShares().filter((x) => x.attemptId !== attemptId));
       write(kv, "reviews", this.listReviews().filter((x) => x.attemptId !== attemptId));
+      // Impact event logs (G.1) are keyed by attempt and go with it.
+      for (const k of ["x:review_sessions", "x:learning_survey", "x:impact_demo_second_look"]) {
+        const rows = read(kv, k, z.array(z.object({ attemptId: z.string() }).passthrough()));
+        if (rows) write(kv, k, rows.filter((x) => x.attemptId !== attemptId));
+      }
     },
 
     // Shares (C7.3, C7.4)
@@ -205,7 +210,7 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
      * separately (media.clear), see deleteMyData.
      */
     deleteAll() {
-      const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports", "x:addons"];
+      const candidateKeys = ["profile", "shares", "reviews", "x:witnesses", "x:ats_exports", "x:addons", "x:review_sessions", "x:learning_survey", "x:impact_demo_second_look"];
       for (const k of keys(kv, "")) {
         if (candidateKeys.includes(k) || k.startsWith("run:") || k.startsWith("card:") || /^x:(resume_private|invite|reported):/.test(k)) kv.removeItem(PREFIX + k);
       }

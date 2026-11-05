@@ -14,6 +14,7 @@ import { PASS_REASONS } from "@/lib/card/types";
 import { getChallenge, type Challenge } from "@/lib/challenge/challenge";
 import { store } from "@/lib/store/store";
 import { SecondLookPanel } from "./SecondLook";
+import { useReviewTimer } from "@/lib/impact/useReviewTimer";
 
 // Recruiter's card screen (E3) with Shortlist, Hold, Pass (E3.7). A human makes every call.
 export function RecruiterCard({ attemptId }: { attemptId: string }) {
@@ -35,6 +36,8 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
     setDecision(s.reviewFor(attemptId, challengeId)?.decision);
   };
   useEffect(load, [attemptId, challengeId]);
+  // Visible reading time for the impact dashboard's recruiter minutes (G.1). No content is recorded.
+  useReviewTimer(attemptId, challengeId, !!view && view.status !== "withdrawn");
 
   if (view === undefined) return <PageSkeleton />;
   const back = (
