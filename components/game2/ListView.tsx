@@ -29,7 +29,7 @@ export function ListView({
   const volunteers = scenario.npcs.filter((n) => n.volunteer);
   const [menu, setMenu] = useState<string | null>(null);
   return (
-    <div className="absolute inset-0 overflow-y-auto bg-[#7cbe6e] p-3 pb-52 pt-40 sm:pt-36" data-testid="list-view">
+    <div className="absolute inset-0 overflow-y-auto bg-[#7cbe6e] p-3 pt-40 sm:pt-36" data-testid="list-view">
       <div className="mx-auto grid max-w-5xl gap-3 sm:grid-cols-2">
         {scenario.zones.map((z) => {
           const here = open.filter((i) => i.zone === z.id);
@@ -108,6 +108,9 @@ export function ListView({
           );
         })}
       </div>
+      {/* Room for the footer band (Wait for news, and the coach line on a first run) plus the phone safe area,
+          as a real element so every browser scrolls the last card clear of it. */}
+      <div aria-hidden className="h-[calc(13rem+env(safe-area-inset-bottom))]" data-testid="list-spacer" />
     </div>
   );
 }

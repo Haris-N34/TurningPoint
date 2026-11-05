@@ -502,7 +502,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
           {/* List view already lists every issue by place, so it only needs the Wait control. */}
           {!cutscene && !node && !reaction && settings.view === "list" && (
             // A solid footer band: list cards scroll under it instead of being covered by a floating button.
-            <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 border-t-[3px] border-[#2e222f] bg-[#5f9a52] px-3 py-2">
+            <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 border-t-[3px] border-[#2e222f] bg-[#5f9a52] px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
               {showCoach && !showCheckpoint && (
                 <p className="rounded-[4px] border-2 border-[#2e222f] bg-[#ffd166] px-2 py-1 text-[14px] font-semibold text-[#2e222f]" role="status" data-testid="coach">
                   Press Talk on a problem to start. Wait for news lets time pass.
