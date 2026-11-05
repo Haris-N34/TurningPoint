@@ -175,7 +175,10 @@ export function makeStore(raw: KV, now: () => Date = () => new Date(), opts: { o
     getRun: (attemptId: string) => read(kv, `run:${attemptId}`, SavedRunSchema),
     saveRun(run: Omit<SavedRun, "updatedAt">) {
       // A practice challenge always makes a practice run (C8.1), whatever the caller passed.
-      const full = SavedRunSchema.parse({ ...run, practice: run.practice || isPracticeChallenge(run.challengeId), updatedAt: iso() });
+      // A run keeps its first start: callers that save after every move pass "now" (QA night #44).
+      const prev = read(kv, `run:${run.attemptId}`, SavedRunSchema);
+      const startedAt = prev && prev.startedAt < run.startedAt ? prev.startedAt : run.startedAt;
+      const full = SavedRunSchema.parse({ ...run, startedAt, practice: run.practice || isPracticeChallenge(run.challengeId), updatedAt: iso() });
       write(kv, `run:${run.attemptId}`, full);
       return full;
     },
