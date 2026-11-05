@@ -198,7 +198,7 @@ export function Builder() {
                     <p className="font-medium">{t.title}</p>
                     <p className="mt-1 text-sm text-muted-foreground">{t.summary}</p>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      About {t.estimatedMinutes ?? 15} minutes · Tests well: {t.targetSkills.map(skillName).join(", ")}
+                      {mapForTemplate(t.id)?.map.quick ? "About 5 minutes (Quick mode), full week about 15" : `About ${t.estimatedMinutes ?? 15} minutes`} · Tests well: {t.targetSkills.map(skillName).join(", ")}
                     </p>
                     <p className="mt-1 text-xs">{tests.length ? `Matches ${tests.length} of your skills` : "Doesn't target your skills directly"}</p>
                   </div>
