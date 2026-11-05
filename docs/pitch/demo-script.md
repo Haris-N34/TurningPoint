@@ -84,6 +84,7 @@ Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
 - Negotiated donated supplies from a local store, saving $2,000
+- Tracked attendance data in a spreadsheet
 ```
 
 Name, contact and employer names are stripped before analysis. The card shows the claims with no identity.

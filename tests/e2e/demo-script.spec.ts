@@ -20,7 +20,8 @@ maya.chen@example.com | (403) 555-0182
 Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
-- Negotiated donated supplies from a local store, saving $2,000`;
+- Negotiated donated supplies from a local store, saving $2,000
+- Tracked attendance data in a spreadsheet`;
 
 async function seed(page: Page) {
   await page.goto("/demo/seed");
