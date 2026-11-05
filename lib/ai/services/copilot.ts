@@ -77,10 +77,14 @@ export function blindCard(card: Card): BlindCard {
 /** The recruiter's question is blinded too: "What did Maya do?" reaches the model as "What did [name] do?". */
 const blindQuestion = (q: string, card: Card) => stripPii(q, { name: card.candidate.displayName, university: card.candidate.university });
 
-export const DECISION_Q = /\b(?:should (?:i|we) (?:hire|reject|pass|shortlist|advance|interview|move forward)|hire (?:him|her|them|this)|(?:is|are) (?:he|she|they|this candidate) (?:a )?(?:good|bad|right|strong|weak|great|poor) (?:fit|hire|candidate|choice)|worth hiring|recommend (?:hiring|rejecting)|yes or no|thumbs up|overall score|rate (?:him|her|them|this candidate)|rank (?:him|her|them)|better than|best candidate|auto-?reject)\b/i;
+/** Questions about how someone looked or sounded. Turning Point never judges face, voice, tone or emotion. */
+export const SIGNAL_Q = /\b(?:tone|voice|sound(?:s|ed)? (?:confident|nervous|unsure|sure)|confiden(?:t|ce)|nervous|anxious|camera|face|facial|emotion\w*|body language|eye contact|smil\w*|appearance|attractive|charisma\w*|presence)\b/i;
+
+export const DECISION_Q = /\b(?:culture fit|fit in|fits in|good fit|move (?:her|him|them|this candidate) (?:forward|on|ahead)|(?:good|bad|strong|weak|great|right) hire|best (?:candidate|one|fit|person)|(?:which|who)(?: candidate| one| person)? is (?:the )?best|score (?:her|him|them|out of)|out of (?:10|ten|100|five|5)|should (?:i|we) (?:hire|reject|pass|shortlist|advance|interview|move forward)|hire (?:him|her|them|this)|(?:is|are) (?:he|she|they|this candidate) (?:a )?(?:good|bad|right|strong|weak|great|poor) (?:fit|hire|candidate|choice)|worth hiring|recommend (?:hiring|rejecting)|yes or no|thumbs up|overall score|rate (?:him|her|them|this candidate)|rank (?:him|her|them)|better than|best candidate|auto-?reject)\b/i;
 
 export const REFUSAL = {
   protected: "I can't answer questions about personal characteristics. They are not part of the evidence and must not affect a hiring decision. Ask about a skill or a decision instead.",
+  signals: "Turning Point never judges face, voice, tone or emotion, so there is nothing to show. Ask about a skill or a decision instead.",
   decision: "I don't make or recommend hiring decisions, and there is no overall score. I can show you the evidence for any skill so you can decide.",
   no_evidence: "I can only answer from this card's evidence, and I found nothing on that. Try asking about one of the target skills.",
 } as const;
@@ -116,6 +120,7 @@ function timeOf(c: BlindCard["checkpoints"][number], quote: string) {
 
 export function localCopilot({ question, card }: CopilotInput): CopilotOutput {
   if (protectedMentions(question).length) return { answer: REFUSAL.protected, citations: [], refused: "protected" };
+  if (SIGNAL_Q.test(question)) return { answer: REFUSAL.signals, citations: [], refused: "protected" };
   if (DECISION_Q.test(question)) return { answer: REFUSAL.decision, citations: [], refused: "decision" };
   const lines: string[] = [];
   const citations: Citation[] = [];
@@ -196,6 +201,7 @@ export const copilotPrompt: PromptDef<CopilotInput, CopilotOutput> = {
 /** Questions that never reach a model: refusals are decided in code first. */
 function preRefuse(question: string): CopilotOutput | undefined {
   if (protectedMentions(question).length) return { answer: REFUSAL.protected, citations: [], refused: "protected" };
+  if (SIGNAL_Q.test(question)) return { answer: REFUSAL.signals, citations: [], refused: "protected" };
   if (DECISION_Q.test(question)) return { answer: REFUSAL.decision, citations: [], refused: "decision" };
   return undefined;
 }
