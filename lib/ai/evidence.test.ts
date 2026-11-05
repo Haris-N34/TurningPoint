@@ -40,6 +40,8 @@ describe("extractEvidence (AI.2, rubric)", () => {
       input({
         targetSkills: ["prioritization"],
         checkpoints: [{ id: "c", nodeId: "x", kind: "decision", transcript: tx("I cut the second weekend instead of vendor spots because the vendors had already paid and the team agreed.") }],
+        // Strong needs specificity: the answer names the decision it explains.
+        decisionPath: [{ nodeId: "x", optionId: "a", optionLabel: "Cut the second weekend" }],
       }),
     );
     expect(strong[0].level).toBe("strong");
