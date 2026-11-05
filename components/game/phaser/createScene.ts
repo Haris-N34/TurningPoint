@@ -100,11 +100,17 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
 
       // NPCs with shadows, idle breathing and issue bubbles.
       for (const n of s.npcs) {
-        if (n.id === "laptop") {
-          // The HQ laptop is a prop, not a person.
-          const g = this.add.rectangle(n.tile.x * TILE + 8, n.tile.y * TILE + 10, 10, 7, 0x2e3a4a).setStrokeStyle(1, 0x2e222f).setDepth(10);
-          const screen = this.add.rectangle(n.tile.x * TILE + 8, n.tile.y * TILE + 9, 7, 4, 0x8fd3ff).setDepth(11);
-          this.tweens.add({ targets: screen, alpha: 0.6, duration: 900, yoyo: true, repeat: -1 });
+        if (n.id === "laptop" || n.portrait.startsWith("prop:")) {
+          // The HQ laptop and other props (an old report) are objects, not people.
+          const isLaptop = n.id === "laptop";
+          const g = this.add.rectangle(n.tile.x * TILE + 8, n.tile.y * TILE + 10, 10, isLaptop ? 7 : 9, isLaptop ? 0x2e3a4a : 0x8a5a2b).setStrokeStyle(1, 0x2e222f).setDepth(10);
+          const screen = this.add.rectangle(n.tile.x * TILE + 8, n.tile.y * TILE + 9, 7, 4, isLaptop ? 0x8fd3ff : 0xe8dcb5).setDepth(11);
+          if (isLaptop) this.tweens.add({ targets: screen, alpha: 0.6, duration: 900, yoyo: true, repeat: -1 });
+          else
+            g.setInteractive({ useHandCursor: true }).on("pointerdown", (p: PhaserNS.Input.Pointer) => {
+              p.event.stopPropagation();
+              if (!o.attract) this.walkToNpc(n.id, true);
+            });
           const sprite = this.add.sprite(n.tile.x * TILE + 8, n.tile.y * TILE + 8, "__DEFAULT").setVisible(false);
           this.npcs.set(n.id, { sprite, bubble: this.makeBubble(), shadow: this.add.ellipse(0, 0, 1, 1).setVisible(false) });
           void g;

@@ -64,56 +64,115 @@ def plaza(x, y, w, h):
 
 zones = {z["id"]: z for z in scn["zones"]}
 
-# Paths: a main east-west street and a north-south avenue, plus spurs into each zone.
-path_rect(1, 17, W - 2, 18)
-path_rect(19, 2, 20, H - 1)
-path_rect(6, 10, 7, 17)     # volunteers
-path_rect(31, 10, 32, 17)   # vendors
-path_rect(26, 7, 37, 8)     # vendor row walkway
-path_rect(6, 18, 7, 22)     # storage
-path_rect(32, 18, 33, 23)   # sponsor
-path_rect(4, 7, 11, 8)      # volunteer yard
+def layout_launch_week():
+    # Paths: a main east-west street and a north-south avenue, plus spurs into each zone.
+    path_rect(1, 17, W - 2, 18)
+    path_rect(19, 2, 20, H - 1)
+    path_rect(6, 10, 7, 17)     # volunteers
+    path_rect(31, 10, 32, 17)   # vendors
+    path_rect(26, 7, 37, 8)     # vendor row walkway
+    path_rect(6, 18, 7, 22)     # storage
+    path_rect(32, 18, 33, 23)   # sponsor
+    path_rect(4, 7, 11, 8)      # volunteer yard
 
-# Entrance gate (top): fence line with an opening and two signs.
-for x in range(1, W - 1):
-    if not 17 <= x <= 22:
-        put(deco, x, 0, FENCE_H[1], True)
-put(deco, 16, 2, SIGN, True)
-put(deco, 23, 2, SIGN, True)
+    # Entrance gate (top): fence line with an opening and two signs.
+    for x in range(1, W - 1):
+        if not 17 <= x <= 22:
+            put(deco, x, 0, FENCE_H[1], True)
+    put(deco, 16, 2, SIGN, True)
+    put(deco, 23, 2, SIGN, True)
 
-# Volunteer Station: a small red tent with a table.
-building(4, 3, 4, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=1, windows=(2,))
-put(deco, 9, 6, BARREL, True)
-put(deco, 10, 6, POT, True)
-for i, t in enumerate(FENCE_H):
-    put(deco, 8 + i, 9, t, True)
+    # Volunteer Station: a small red tent with a table.
+    building(4, 3, 4, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=1, windows=(2,))
+    put(deco, 9, 6, BARREL, True)
+    put(deco, 10, 6, POT, True)
+    for i, t in enumerate(FENCE_H):
+        put(deco, 8 + i, 9, t, True)
 
-# Vendor Row: three stalls alternating roof colours.
-for k, x in enumerate([27, 31, 35]):
-    top, bot = (RED_ROOF_TOP, RED_ROOF_BOT) if k % 2 == 0 else (GREY_ROOF_TOP, GREY_ROOF_BOT)
-    building(x, 3, 3, top, bot, WOOD_WALL, windows=(1,))
-put(deco, 26, 6, BARREL2, True)
-put(deco, 38, 6, BEEHIVE, True)
+    # Vendor Row: three stalls alternating roof colours.
+    for k, x in enumerate([27, 31, 35]):
+        top, bot = (RED_ROOF_TOP, RED_ROOF_BOT) if k % 2 == 0 else (GREY_ROOF_TOP, GREY_ROOF_BOT)
+        building(x, 3, 3, top, bot, WOOD_WALL, windows=(1,))
+    put(deco, 26, 6, BARREL2, True)
+    put(deco, 38, 6, BEEHIVE, True)
 
-# HQ Tent (centre): the biggest tent, with your desk out front.
-building(16, 11, 6, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=2, windows=(1, 4))
-put(deco, 22, 14, POT, True)
-put(deco, 15, 15, SIGN, True)
+    # HQ Tent (centre): the biggest tent, with your desk out front.
+    building(16, 11, 6, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=2, windows=(1, 4))
+    put(deco, 22, 14, POT, True)
+    put(deco, 15, 15, SIGN, True)
 
-# Storage Shed: grey roof, barrels and logs.
-building(3, 19, 4, GREY_ROOF_TOP, GREY_ROOF_BOT, WOOD_WALL, door_at=2)
-for (x, y, t) in [(8, 20, BARREL), (9, 20, BARREL2), (8, 21, LOG), (3, 23, BARREL), (9, 23, POT)]:
-    put(deco, x, y, t, True)
+    # Storage Shed: grey roof, barrels and logs.
+    building(3, 19, 4, GREY_ROOF_TOP, GREY_ROOF_BOT, WOOD_WALL, door_at=2)
+    for (x, y, t) in [(8, 20, BARREL), (9, 20, BARREL2), (8, 21, LOG), (3, 23, BARREL), (9, 23, POT)]:
+        put(deco, x, y, t, True)
 
-# Sponsor Office: stone building.
-building(29, 19, 5, GREY_ROOF_TOP, GREY_ROOF_BOT, STONE_WALL, door_at=2, windows=(1, 3))
-put(deco, 35, 21, SIGN, True)
+    # Sponsor Office: stone building.
+    building(29, 19, 5, GREY_ROOF_TOP, GREY_ROOF_BOT, STONE_WALL, door_at=2, windows=(1, 3))
+    put(deco, 35, 21, SIGN, True)
 
-# Main Stage: a stone plaza with a well and signs.
-plaza(15, 24, 10, 4)
-put(deco, 14, 24, SIGN, True)
-put(deco, 25, 24, SIGN, True)
-put(deco, 12, 15, WELL, True)
+    # Main Stage: a stone plaza with a well and signs.
+    plaza(15, 24, 10, 4)
+    put(deco, 14, 24, SIGN, True)
+    put(deco, 25, 24, SIGN, True)
+    put(deco, 12, 15, WELL, True)
+
+def layout_client_pivot():
+    """Office block in town: team pod, partner's office, your desk, whiteboard room, a cafe among trees,
+    and the client's store reached from the bus stop sign (a separate plaza at the bottom)."""
+    # Streets: east-west main street, north-south avenue up to the bus stop, spurs into each building.
+    path_rect(1, 10, W - 2, 11)
+    path_rect(19, 3, 20, 21)
+    path_rect(6, 8, 10, 10)      # team pod yard
+    path_rect(31, 8, 33, 10)     # partner's office door
+    path_rect(6, 11, 7, 21)      # whiteboard room
+    path_rect(32, 11, 33, 20)    # cafe
+    path_rect(1, 18, W - 2, 18)  # back lane
+
+    # Top boundary fence with a gap at the bus stop.
+    for x in range(1, W - 1):
+        if not 16 <= x <= 23:
+            put(deco, x, 0, FENCE_H[1], True)
+    put(deco, 17, 2, SIGN, True)  # bus stop sign
+    put(deco, 22, 2, SIGN, True)
+
+    # Team pod: wood office with desks out front (barrels and pots as desks).
+    building(3, 4, 6, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=2, windows=(1, 4))
+    for (x, y, t) in [(4, 8, BARREL), (11, 7, POT), (11, 8, BARREL2)]:
+        put(deco, x, y, t, True)
+
+    # Partner's office: stone building with a sign.
+    building(29, 4, 6, GREY_ROOF_TOP, GREY_ROOF_BOT, STONE_WALL, door_at=3, windows=(1, 4))
+    put(deco, 28, 7, SIGN, True)
+    put(deco, 36, 7, POT, True)
+
+    # Your desk: small plaza with the laptop on a table.
+    plaza(16, 13, 8, 3)
+    put(deco, 17, 15, BARREL, True)
+    put(deco, 23, 13, SIGN, True)
+
+    # Whiteboard room: grey-roof office, crates of old reports.
+    building(3, 19, 5, GREY_ROOF_TOP, GREY_ROOF_BOT, WOOD_WALL, door_at=3, windows=(1,))
+    for (x, y, t) in [(9, 21, BARREL2), (10, 23, LOG), (3, 23, POT)]:
+        put(deco, x, y, t, True)
+
+    # Cafe: red roof, tables, ringed by trees.
+    building(29, 19, 6, RED_ROOF_TOP, RED_ROOF_BOT, WOOD_WALL, door_at=3, windows=(1, 4))
+    for (x, y, t) in [(30, 23, BARREL), (34, 23, BARREL), (35, 22, POT)]:
+        put(deco, x, y, t, True)
+    for (x, y) in [(27, 19), (27, 21), (27, 23), (37, 19), (37, 21), (37, 23), (29, 25), (35, 25)]:
+        put(deco, x, y, TREES[(x + y) % len(TREES)], True)
+
+    # Client site: a separate stone plaza fenced off from the office, reached by bus.
+    plaza(14, 23, 12, 6)
+    for x in range(13, 27):
+        if x not in (19, 20):
+            put(deco, x, 22, FENCE_H[1], True)
+    put(deco, 15, 23, SIGN, True)   # bus stop sign at the client site
+    put(deco, 24, 27, BARREL, True)
+    put(deco, 14, 27, BARREL2, True)
+
+LAYOUTS = {"launch-week": layout_launch_week, "client-pivot": layout_client_pivot}
+LAYOUTS[name]()
 
 # Trees around the edges and in gaps, never on paths, zones' NPC tiles or building footprints.
 npc_tiles = {(n["tile"]["x"], n["tile"]["y"]) for n in scn["npcs"]}
