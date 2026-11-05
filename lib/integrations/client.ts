@@ -12,11 +12,31 @@ import { summarize } from "./summary";
 export const companyId = () => store().getJSON("integration_company", z.string()) ?? "demo";
 export const setCompanyId = (id: string) => store().setJSON("integration_company", id);
 
+// Console secret for a locked deploy (TP_CONSOLE_SECRET): kept for this tab only, sent as a header.
+const SECRET_KEY = "tp:console-secret";
+export const setConsoleSecret = (v: string) => {
+  try {
+    sessionStorage.setItem(SECRET_KEY, v);
+  } catch {
+    // Private mode: the console asks again next time.
+  }
+};
+const consoleSecret = () => {
+  try {
+    return sessionStorage.getItem(SECRET_KEY);
+  } catch {
+    return null;
+  }
+};
+/** The message the API returns when the console is locked; the UI can catch it and ask for the secret. */
+export const CONSOLE_LOCKED = "Console secret required";
+
 export async function integrationsApi<T = unknown>(path: string, body?: unknown): Promise<T> {
   const sep = path.includes("?") ? "&" : "?";
+  const secret = consoleSecret();
   const res = await fetch(`/api/integrations/${path}${sep}company=${encodeURIComponent(companyId())}`, {
     method: body === undefined ? "GET" : "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...(secret ? { "x-tp-console-secret": secret } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const json = (await res.json()) as T & { error?: string };

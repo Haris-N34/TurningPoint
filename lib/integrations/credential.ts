@@ -1,6 +1,10 @@
 import { createHash, createPrivateKey, createPublicKey, generateKeyPairSync, randomUUID, sign, verify, type KeyObject } from "node:crypto";
 import { z } from "zod";
-import { SKILL_SLUGS, SKILLS } from "@/lib/engine/skills";
+import { getMapScenario } from "@/content/maps";
+import { getScenario } from "@/content/scenarios";
+import { extractEvidence } from "@/lib/ai/evidence";
+import { fromChunks } from "@/lib/checkpoint/transcript";
+import { SKILL_SLUGS, SKILLS, type SkillSlug } from "@/lib/engine/skills";
 
 // Portable credential (PRD v2 C2, C.9): Open Badges 3.0 as a W3C Verifiable Credential (JSON-LD),
 // secured with a Data Integrity proof, cryptosuite eddsa-jcs-2022 (Ed25519 over JCS-canonical JSON).
@@ -81,6 +85,62 @@ export const BadgeRequest = z.object({
 });
 export type BadgeRequest = z.infer<typeof BadgeRequest>;
 
+/**
+ * What the browser sends to get a badge (QA night): the answers, never the levels. The server re-scores the
+ * transcripts with the same Evidence Scanner and signs only the levels it computes, plus a SHA-256 of the
+ * transcripts so a verifier holding the card can check the badge describes those answers.
+ */
+export const BadgeEvidence = z.object({
+  scenarioId: z.string().min(1).max(80),
+  targetSkills: z.array(z.enum(SKILL_SLUGS)).min(1).max(12),
+  checkpoints: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(40),
+        nodeId: z.string().min(1).max(80),
+        kind: z.enum(["decision", "real_life", "follow_up"]),
+        question: z.string().max(600).optional(),
+        text: z.string().max(6000),
+      }),
+    )
+    .min(1)
+    .max(10),
+  decisionPath: z.array(z.object({ nodeId: z.string().max(80), optionId: z.string().max(20), optionLabel: z.string().max(300), prompt: z.string().max(300).optional() })).max(60),
+});
+export type BadgeEvidence = z.infer<typeof BadgeEvidence>;
+export const BadgeFromEvidence = BadgeRequest.omit({ skills: true }).extend({ evidence: BadgeEvidence }).strict();
+export type BadgeFromEvidence = z.infer<typeof BadgeFromEvidence>;
+
+/** Which skills each decision is designed to surface, from the authored content (never from the browser). */
+function nodeSkillsFor(scenarioId: string): Record<string, SkillSlug[]> {
+  const out: Record<string, SkillSlug[]> = {};
+  for (const i of getMapScenario(scenarioId)?.issues ?? []) out[i.id] = i.skillSignals as SkillSlug[];
+  for (const n of getScenario(scenarioId)?.nodes ?? []) if (n.type === "choice") out[n.id] = n.skillSignals as SkillSlug[];
+  return out;
+}
+
+/** SHA-256 over the canonical transcripts: any edit to an answer changes it. */
+export const evidenceDigest = (ev: Pick<BadgeEvidence, "checkpoints">) =>
+  `sha256:${sha256(jcs(ev.checkpoints.map((c) => ({ id: c.id, text: c.text })))).toString("hex")}`;
+
+/** Levels Turning Point itself finds in the answers. Strong and Some only; nothing else is put on a badge. */
+export function scoreForBadge(ev: BadgeEvidence): BadgeRequest["skills"] {
+  const evidence = extractEvidence({
+    targetSkills: ev.targetSkills,
+    checkpoints: ev.checkpoints.map((c) => ({ id: c.id, nodeId: c.nodeId, kind: c.kind, question: c.question, transcript: fromChunks([{ text: c.text, startS: 0, endS: 60 }]) })),
+    decisionPath: ev.decisionPath,
+    nodeSkills: nodeSkillsFor(ev.scenarioId),
+  });
+  return evidence.flatMap((e) => (e.level === "strong" || e.level === "some" ? [{ skill: e.skill as SkillSlug, level: e.level }] : []));
+}
+
+/** Issue a badge from the answers: the server computes the levels and binds the transcripts' digest. */
+export function issueBadgeFromEvidence(req: BadgeFromEvidence, origin: string, now = new Date()) {
+  const r = BadgeFromEvidence.parse(req);
+  const { evidence, ...rest } = r;
+  return issueBadge({ ...rest, skills: scoreForBadge(evidence) }, origin, now, evidenceDigest(evidence));
+}
+
 const CONTEXT = ["https://www.w3.org/ns/credentials/v2", "https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json"];
 const skillName = (s: string) => SKILLS.find((x) => x.slug === s)?.name ?? s;
 const LEVEL = { strong: "Strong", some: "Some" } as const;
@@ -89,7 +149,7 @@ function proofHash(doc: Record<string, unknown>, proofConfig: Record<string, unk
   return Buffer.concat([sha256(jcs(proofConfig)), sha256(jcs(doc))]);
 }
 
-export function issueBadge(req: BadgeRequest, origin: string, now = new Date()) {
+export function issueBadge(req: BadgeRequest, origin: string, now = new Date(), digest?: string) {
   const r = BadgeRequest.parse(req);
   const iss = issuer();
   const base = origin.replace(/\/$/, "");
@@ -114,7 +174,14 @@ export function issueBadge(req: BadgeRequest, origin: string, now = new Date()) 
       },
       result: r.skills.map((s) => ({ type: ["Result"], resultDescription: `urn:tp:skill:${s.skill}`, value: LEVEL[s.level] })),
     },
-    evidence: [{ id: `${base}/results/${r.attemptId}`, type: ["Evidence"], name: "Capability Card (shared by the candidate)" }],
+    evidence: [
+      {
+        id: `${base}/results/${r.attemptId}`,
+        type: ["Evidence"],
+        name: "Capability Card (shared by the candidate)",
+        ...(digest ? { description: `Levels computed by Turning Point from the candidate's answers. Answers digest: ${digest}` } : {}),
+      },
+    ],
   };
   const proofConfig = { "@context": CONTEXT, type: "DataIntegrityProof", cryptosuite: "eddsa-jcs-2022", created: now.toISOString(), verificationMethod: iss.vm, proofPurpose: "assertionMethod" };
   const sig = sign(null, proofHash(doc, proofConfig), iss.privateKey);

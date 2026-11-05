@@ -43,7 +43,10 @@ There is no single winning route. Which disruption fires and which checkpoints o
 Every quote is checked in code as an exact substring of the transcript. If it does not match, it is dropped and the skill drops a level. Every AI sentence on the card links to its source.
 
 **12. Does focus loss count against people?**
-No. Tab switches and retakes are shown as "For context, not scored".
+No. Tab switches are never shown to employers at all; only the candidate sees them. A retake shows on the card as "For context, not scored".
+
+**12b. Can someone fake a Turning Point badge?**
+The badge is an Open Badges 3.0 file signed by Turning Point. Our server computes the levels itself from the candidate's answers and puts a fingerprint of those answers in the badge, so nobody can ask for "Strong" and get it, and any edit to the file fails at /verify. A valid badge proves Turning Point issued it for those answers; the card link carries the evidence. It does not prove who typed the answers, which is why the checkpoints are live and quote the candidate's own choice.
 
 ## Validity
 
@@ -80,3 +83,4 @@ The card takes about a minute to read. The inbox filters by skill evidence and s
 - Any number not in the research brief.
 - "No score". There is a Final score. Say it sorts, shows its breakdown, and never filters, hides or rejects anyone.
 - "Integrates with Greenhouse/Workday". The adapters run against our own mocks.
+- "The badge proves the skills". It proves Turning Point issued it for those answers; the card carries the evidence.
