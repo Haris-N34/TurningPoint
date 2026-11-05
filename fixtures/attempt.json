@@ -29,7 +29,7 @@
     {
       "skill": "collaboration",
       "level": "strong",
-      "sentence": "Brings people in and weighs time against keeping the team: fifteen, minutes, volunteer.",
+      "sentence": "Weighs time against the team: fifteen, minutes, volunteer.",
       "source": {
         "type": "clip",
         "checkpointId": "cp1",
@@ -41,7 +41,7 @@
     {
       "skill": "prioritization",
       "level": "strong",
-      "sentence": "Chooses what to protect and what to cut, and who pays for it: promotion, decorations, stage.",
+      "sentence": "Protects one thing, cuts another: promotion, decorations, stage.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
@@ -53,7 +53,7 @@
     {
       "skill": "adaptability",
       "level": "some",
-      "sentence": "Adjusts the plan and gives a reason: vendors, bands.",
+      "sentence": "Adjusts the plan, with a reason: vendors, bands.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
@@ -65,7 +65,7 @@
     {
       "skill": "resilience",
       "level": "some",
-      "sentence": "Keeps going after the setback, with a reason: Saturday, Sunday, vendors.",
+      "sentence": "Keeps going, with a reason: Saturday, Sunday, vendors.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
