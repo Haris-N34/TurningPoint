@@ -10,7 +10,9 @@ import { getScenario, SCENARIO_IDS } from "@/content/scenarios";
 import { challengeUrl, publish, qrDataUrl, saveDraft, type Challenge } from "@/lib/challenge/challenge";
 import { preparePublishedContent } from "@/lib/ai/services/publish";
 import { tailor } from "@/lib/ai/services/tailor";
+import { diffMap, mapForTemplate, tailorMap } from "@/lib/challenge/mapTailor";
 import { INDUSTRIES, type Industry } from "@/lib/challenge/tailor";
+import { MapScenarioSchema, type MapScenario } from "@/lib/game/schema";
 import { ScenarioSchema, type Scenario } from "@/lib/engine/schema";
 import { SKILLS, type SkillSlug } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
@@ -29,6 +31,8 @@ export function Builder() {
   const [templateId, setTemplateId] = useState(templates[0]?.id ?? "sample");
   const [industry, setIndustry] = useState<Industry>("Non-profit");
   const [scenario, setScenario] = useState<Scenario>(templates[0]);
+  // Templates with a v2 map: the employer tailors and edits the map's dialogue; candidates play the map game.
+  const [map, setMap] = useState<MapScenario | null>(() => mapForTemplate(templates[0]?.id ?? "")?.map ?? null);
   const [tailorNote, setTailorNote] = useState<string | null>(null);
   const [draftId, setDraftId] = useState<string>();
   const [published, setPublished] = useState<Challenge | null>(null);
@@ -36,8 +40,8 @@ export function Builder() {
   const [startedAt] = useState(() => Date.now());
   const [customSkills, setCustomSkills] = useState<MappedSkill[]>([]);
 
-  const valid = useMemo(() => ScenarioSchema.safeParse(scenario), [scenario]);
-  const errors = valid.success ? [] : valid.error.issues.map((i) => i.message);
+  const valid = useMemo(() => (map ? MapScenarioSchema.safeParse(map) : ScenarioSchema.safeParse(scenario)), [map, scenario]);
+  const errors = valid.success ? [] : [...new Set(valid.error.issues.map((i) => i.message))];
 
   const canNext = [company.name.trim() && title.trim(), skills.length >= 3 && skills.length <= 4, !!scenario, valid.success][step];
 
@@ -46,12 +50,17 @@ export function Builder() {
     // Scenario Tailor (B2): wording only; structure is locked and checked.
     const r = tailor(base, ind, company.name || undefined);
     setScenario(r.scenario);
+    const m = mapForTemplate(id);
+    const mr = m ? tailorMap(m.map, ind, company.name || undefined) : undefined;
+    setMap(mr?.map ?? null);
     // E1.3: an invalid rewrite is never used; the builder says so and keeps the original.
-    setTailorNote(r.error ? `Couldn't tailor to ${ind}, kept the original: ${r.error}` : r.changed ? `Rewritten for ${ind}. Edit any line in Review.` : null);
+    const err = mr ? mr.error : r.error;
+    const changed = mr ? mr.changed : r.changed;
+    setTailorNote(err ? `Couldn't tailor to ${ind}, kept the original: ${err}` : changed ? `Rewritten for ${ind}. Edit any line in Review.` : null);
   };
 
   const persist = () => {
-    const c = saveDraft(store(), { id: draftId, company: { name: company.name.trim(), colour: company.colour, logoUrl: company.logoUrl || undefined }, title: title.trim(), templateId, industry, targetSkills: skills, scenario, customSkills });
+    const c = saveDraft(store(), { id: draftId, company: { name: company.name.trim(), colour: company.colour, logoUrl: company.logoUrl || undefined }, title: title.trim(), templateId, industry, targetSkills: skills, scenario, customSkills, mapOverrides: map ? diffMap(mapForTemplate(templateId)!.map, map) : undefined });
     setDraftId(c.id);
     return c;
   };
@@ -64,6 +73,15 @@ export function Builder() {
     setScenario((s) => {
       const next = structuredClone(s);
       patch(next.nodes[i]);
+      return next;
+    });
+  };
+
+  const editMap = (patch: (m: MapScenario) => void) => {
+    setMap((m) => {
+      if (!m) return m;
+      const next = structuredClone(m);
+      patch(next);
       return next;
     });
   };
@@ -96,7 +114,7 @@ export function Builder() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-8 sm:px-10" data-testid="builder">
+    <main className="mx-auto max-w-5xl px-6 py-8 sm:px-10" data-testid="builder" data-format={map ? "map" : "classic"}>
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">New challenge</p>
       <ol className="mt-3 flex flex-wrap gap-2" aria-label="Steps">
         {STEPS.map((s, i) => (
@@ -206,7 +224,7 @@ export function Builder() {
             </select>
           </div>
           {tailorNote && <p role="status" className="text-sm" data-testid="tailor-note">{tailorNote}</p>}
-          <p className="rounded-lg bg-story p-3 text-sm" data-testid="tailored-opening">{scenario.nodes[0]?.text}</p>
+          <p className="rounded-lg bg-story p-3 text-sm" data-testid="tailored-opening">{map ? map.summary : scenario.nodes[0]?.text}</p>
         </section>
       )}
 
@@ -221,6 +239,9 @@ export function Builder() {
               ))}
             </ul>
           )}
+          {map ? (
+            <MapReview map={map} edit={editMap} />
+          ) : (
           <ol className="space-y-3">
             {scenario.nodes.map((n, i) => (
               <li key={n.id} className="rounded-xl border bg-card p-3">
@@ -251,6 +272,7 @@ export function Builder() {
               </li>
             ))}
           </ol>
+          )}
         </section>
       )}
 
@@ -300,5 +322,58 @@ export function Builder() {
         {step === 1 && <span className="text-sm text-muted-foreground">Pick 3 or 4</span>}
       </div>
     </main>
+  );
+}
+
+/** Review step for a v2 map (E1.4): edit any line, question or option, and pick which issues can fire a checkpoint. */
+function MapReview({ map, edit }: { map: MapScenario; edit: (patch: (m: MapScenario) => void) => void }) {
+  const field = "w-full rounded-md border border-input bg-background p-2 text-sm";
+  return (
+    <ol className="space-y-3">
+      {map.issues.map((issue) => {
+        const ni = map.nodes.findIndex((n) => n.id === issue.node);
+        const n = map.nodes[ni];
+        const ii = map.issues.indexOf(issue);
+        const who = (id: string) => (id === "you" ? "You" : map.npcs.find((x) => x.id === id)?.name ?? id);
+        return (
+          <li key={issue.id} className="rounded-xl border bg-card p-3" data-testid={`issue-${issue.id}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+              <span>
+                {issue.id} · {issue.tags.includes("recovery") ? "turning point" : issue.hidden ? "hidden discovery" : issue.spawnAt ?? "follow-up"}
+              </span>
+              <label className="flex items-center gap-2 text-foreground">
+                <input type="checkbox" checked={issue.checkpointEligible} onChange={(e) => edit((m) => (m.issues[ii].checkpointEligible = e.target.checked))} data-testid={`eligible-${issue.id}`} />
+                Checkpoint can fire here
+              </label>
+            </div>
+            <label className="sr-only" htmlFor={`issue-title-${issue.id}`}>Title for {issue.id}</label>
+            <input id={`issue-title-${issue.id}`} value={issue.title} onChange={(e) => edit((m) => (m.issues[ii].title = e.target.value))} className={cn(field, "mt-1 font-medium")} />
+            {n?.lines.map((l, li) => (
+              <div key={li} className="mt-1">
+                <label className="text-xs text-muted-foreground" htmlFor={`line-${n.id}-${li}`}>{who(l.who)}</label>
+                <textarea id={`line-${n.id}-${li}`} value={l.text} rows={2} onChange={(e) => edit((m) => (m.nodes[ni].lines[li].text = e.target.value))} className={field} data-testid={`line-${n.id}-${li}`} />
+              </div>
+            ))}
+            {n && (
+              <>
+                <label className="sr-only" htmlFor={`prompt-${n.id}`}>Question for {n.id}</label>
+                <input id={`prompt-${n.id}`} value={n.prompt} onChange={(e) => edit((m) => (m.nodes[ni].prompt = e.target.value))} className={cn(field, "mt-1")} data-testid={`prompt-${n.id}`} />
+                <div className="mt-1 grid gap-1 sm:grid-cols-2">
+                  {n.options.map((o, oi) => (
+                    <input
+                      key={o.id}
+                      aria-label={`Option ${o.id} for ${n.id}`}
+                      value={o.label}
+                      onChange={(e) => edit((m) => (m.nodes[ni].options[oi].label = e.target.value))}
+                      className="min-h-9 rounded-md border border-input bg-background px-2 text-sm"
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }

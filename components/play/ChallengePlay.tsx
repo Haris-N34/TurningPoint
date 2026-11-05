@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Game } from "@/components/game/Game";
+import { GameShell } from "@/components/game2/GameShell";
 import { challengeScenario, getChallenge, getChallengeBySlug, type Challenge } from "@/lib/challenge/challenge";
+import { mapForTemplate } from "@/lib/challenge/mapTailor";
 import { saveInvite } from "@/lib/integrations/client";
 import { store } from "@/lib/store/store";
 
@@ -20,6 +22,10 @@ export function ChallengePlay({ slug, challengeId, sandbox = false }: { slug?: s
 
   if (c === undefined) return <div className="p-8" aria-busy="true">Loading…</div>;
   if (c === null) return <main className="mx-auto max-w-xl p-6">This challenge isn&apos;t available.</main>;
+  const shell = { id: c.id, title: c.title, company: c.company.name, targetSkills: c.targetSkills };
+  // Templates with a v2 map play the map game, with the employer's tailoring and edits applied.
+  const map = mapForTemplate(c.templateId);
+  if (map) return <GameShell mapId={map.mapId} challenge={shell} sandbox={sandbox} overrides={c.mapOverrides} />;
   return (
     <>
       {sandbox && (
@@ -29,7 +35,7 @@ export function ChallengePlay({ slug, challengeId, sandbox = false }: { slug?: s
       )}
       <Game
         scenario={challengeScenario(c)}
-        challenge={{ id: c.id, title: c.title, company: c.company.name, targetSkills: c.targetSkills }}
+        challenge={shell}
         sandbox={sandbox}
       />
     </>

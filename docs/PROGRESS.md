@@ -131,9 +131,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 
 - [x] E1.1 [D] Skills step: 10 skill cards, pick 3 or 4
 - [x] E1.2 [D] Scenario step: 2+ templates with length and skills
-- [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original
-- [x] E1.4 [D] Inline scene editing, mark checkpoint-eligible
-- [x] E1.5 [D] Preview as candidate, no data saved
+- [x] E1.3 [D] Tailoring (local word swaps per industry) returns schema-valid JSON or keeps the original. Also tailors the v2 map's dialogue for map templates (lib/challenge/mapTailor.ts)
+- [x] E1.4 [D] Inline scene editing, mark checkpoint-eligible. For map templates: edit map lines, questions, options and checkpoint-eligible issues (min 3); stored as map overrides on the challenge
+- [x] E1.5 [D] Preview as candidate, no data saved. Challenges on a template with a v2 map (/c/<slug>, admin preview) play the map game with the employer's edits (tests/e2e/builder.spec.ts, loop.spec.ts)
 - [x] E1.6 [D] Publish creates public link, job code and QR
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
 - [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)

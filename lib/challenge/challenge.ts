@@ -2,7 +2,9 @@ import { z } from "zod";
 import { hashSeed } from "@/lib/engine/seed";
 import { parseScenario, type Scenario } from "@/lib/engine/schema";
 import { SKILL_SLUGS, type SkillSlug } from "@/lib/engine/skills";
+import type { MapScenario } from "@/lib/game/schema";
 import type { Store } from "@/lib/store/store";
+import { applyMapOverrides, mapForTemplate, MapOverridesSchema, parseMapWithOverrides } from "./mapTailor";
 
 // Employer challenges (E1). A challenge is a tailored copy of a template plus the employer's 3 or 4 skills.
 
@@ -14,6 +16,8 @@ export const ChallengeSchema = z.object({
   industry: z.string(),
   targetSkills: z.array(z.enum(SKILL_SLUGS)).min(3).max(4),
   scenario: z.unknown(),
+  /** Employer wording and checkpoint edits to the template's v2 map, when it has one (E1.3, E1.4). */
+  mapOverrides: MapOverridesSchema.optional(),
   status: z.enum(["draft", "published"]),
   publicSlug: z.string().optional(),
   jobCode: z.string().optional(),
@@ -36,6 +40,11 @@ export const listChallenges = list;
 export const getChallenge = (s: Store, id: string) => list(s).find((c) => c.id === id);
 export const getChallengeBySlug = (s: Store, slug: string) => list(s).find((c) => c.publicSlug === slug && c.status === "published");
 export const challengeScenario = (c: Challenge): Scenario => parseScenario(c.scenario);
+/** The v2 map this challenge plays, with the employer's edits, or undefined for classic-only templates. */
+export function challengeMap(c: Pick<Challenge, "templateId" | "mapOverrides">): { mapId: string; map: MapScenario } | undefined {
+  const m = mapForTemplate(c.templateId);
+  return m && { mapId: m.mapId, map: applyMapOverrides(m.map, c.mapOverrides) };
+}
 
 export function slugify(text: string) {
   const s = text
@@ -62,13 +71,20 @@ function code(seed: string, n: number) {
 /** The public link slug a challenge gets on publish. Deterministic, so the server can rebuild it. */
 export const publicSlugFor = (id: string, companyName: string, title: string) => `${slugify(`${companyName} ${title}`)}-${code(id, 4).toLowerCase()}`;
 
+/** Map edits must keep the map valid (at least 3 checkpoint-eligible issues, and so on). */
+function validateMap(c: Pick<Challenge, "templateId" | "mapOverrides">) {
+  const m = mapForTemplate(c.templateId);
+  if (m && c.mapOverrides) parseMapWithOverrides(m.map, c.mapOverrides);
+}
+
 export function saveDraft(
   s: Store,
-  d: Pick<Challenge, "company" | "title" | "templateId" | "industry" | "targetSkills"> & { scenario: Scenario; id?: string; customSkills?: Challenge["customSkills"] },
+  d: Pick<Challenge, "company" | "title" | "templateId" | "industry" | "targetSkills"> & { scenario: Scenario; id?: string; customSkills?: Challenge["customSkills"]; mapOverrides?: Challenge["mapOverrides"] },
   now = new Date(),
 ): Challenge {
   if (d.targetSkills.length < 3 || d.targetSkills.length > 4) throw new Error("Pick 3 or 4 skills");
   parseScenario(d.scenario);
+  validateMap(d);
   const id = d.id ?? `ch_${code(`${d.company.name}|${d.title}|${now.toISOString()}`, 8).toLowerCase()}`;
   const prev = getChallenge(s, id);
   const c = ChallengeSchema.parse({ ...prev, ...d, id, status: prev?.status ?? "draft", createdAt: prev?.createdAt ?? now.toISOString() });
@@ -81,6 +97,7 @@ export function publish(s: Store, id: string, now = new Date()): Challenge {
   const c = getChallenge(s, id);
   if (!c) throw new Error("No such challenge");
   parseScenario(c.scenario);
+  validateMap(c);
   const publicSlug = c.publicSlug ?? publicSlugFor(id, c.company.name, c.title);
   const jobCode = c.jobCode ?? `TP-${code(id + "job", 5)}`;
   const out = { ...c, status: "published" as const, publicSlug, jobCode, publishedAt: c.publishedAt ?? now.toISOString() };

@@ -13,7 +13,7 @@ import { pixelTitle } from "./fonts";
 import { Portrait } from "./Portrait";
 import { Panel, PixelButton } from "./ui";
 
-export function TitleScreen({ scenario, onStart, canResume, onResume }: { scenario: MapScenario; onStart: () => void; canResume: boolean; onResume: () => void }) {
+export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: { scenario: MapScenario; onStart: () => void; canResume: boolean; onResume: () => void; brief?: { company: string; title: string } }) {
   const settings = useGame((g) => g.settings);
   const setSettings = useGame((g) => g.setSettings);
   const [showSettings, setShowSettings] = useState(false);
@@ -34,6 +34,13 @@ export function TitleScreen({ scenario, onStart, canResume, onResume }: { scenar
         TURNING<br />POINT
       </motion.h1>
       <p className="mt-3 rounded-[4px] bg-[#2e222f]/80 px-3 py-1 text-[#ffd166]">{scenario.title}: {scenario.role}</p>
+      {brief && (
+        // An employer's challenge: who it is for and the tailored setting.
+        <div className="mt-2 max-w-[min(560px,92vw)] rounded-[4px] bg-[#2e222f]/80 px-3 py-2 text-sm text-[#fff8e7]" data-testid="title-brief">
+          <h2 className="font-bold">{brief.company} · {brief.title}</h2>
+          <p className="mt-1">{scenario.summary}</p>
+        </div>
+      )}
       <motion.p animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} className={cn(pixelTitle.className, "mt-10 text-[12px] text-white drop-shadow-[0_2px_0_#2e222f]")}>
         PRESS ENTER / TAP TO START
       </motion.p>
