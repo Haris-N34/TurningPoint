@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // QA night. On the recruiter card, Pass opens the reason form as a popover over the Answers tabs and the
 // player (docs/qa/pass-form-covers-tabs.png). Neither Escape nor a click outside closes it, so a recruiter who
 // wants to re-check the real-life answer before passing has to find the Pass button again.
-test.fixme("recruiter card: the Pass reason popover closes on Escape and on an outside click (owner: agent C, components/recruiter/RecruiterCard.tsx)", async ({ page }, info) => {
+test("recruiter card: the Pass reason popover closes on Escape and on an outside click (owner: agent C, components/recruiter/RecruiterCard.tsx)", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "desktop layout puts the popover over the tabs");
   await page.goto("/demo/seed");
   await expect(page.getByTestId("seeded")).toBeVisible();

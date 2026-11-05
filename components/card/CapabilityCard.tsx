@@ -282,13 +282,13 @@ export function CapabilityCard({
             )}
           </div>
           <div className="relative">
-          {pathEdge.left && <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-card to-transparent" />}
-          {pathEdge.right && <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-card to-transparent" />}
-          <ol ref={pathRef} onScroll={updatePathEdge} className="relative mt-3 flex items-start overflow-x-auto pb-2 [scrollbar-width:thin]" data-testid="decision-path">
+          {pathEdge.left && <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-2 bg-gradient-to-r from-card to-transparent" />}
+          {pathEdge.right && <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-card to-transparent" />}
+          <ol ref={pathRef} onScroll={updatePathEdge} className="relative mt-3 flex snap-x snap-mandatory items-start overflow-x-auto pb-2 [scrollbar-width:thin]" data-testid="decision-path">
             {card.decisionPath.map((d, i) => {
               const cp = d.checkpointId;
               return (
-                <li key={`${d.nodeId}-${i}`} className={cn("flex items-start", i < card.decisionPath.length - 1 && "flex-1")}>
+                <li key={`${d.nodeId}-${i}`} className={cn("flex snap-start items-start", i < card.decisionPath.length - 1 && "flex-1")}>
                   <div className="flex w-20 shrink-0 flex-col items-center text-center">
                     <button
                       type="button"
@@ -302,7 +302,7 @@ export function CapabilityCard({
                       )}
                       data-testid={cp ? `dot-${cp}` : undefined}
                     />
-                    <span className="mt-1 line-clamp-3 text-[10px] leading-tight text-muted-foreground" title={d.optionLabel}>{d.optionLabel}</span>
+                    <span className="mt-1 line-clamp-3 px-1.5 text-[10px] leading-tight text-muted-foreground" title={d.optionLabel}>{d.optionLabel}</span>
                   </div>
                   {i < card.decisionPath.length - 1 &&
                     (i === card.turningPointAfter ? (
