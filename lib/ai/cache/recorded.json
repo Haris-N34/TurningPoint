@@ -21,14 +21,14 @@
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:1132d5c714a34a47": {
+ "checkpoint-question@1.0.0:0a241d02125b976e": {
   "output": {
    "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
    "source": "generated"
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:df68a6ced2ac9252": {
+ "checkpoint-question@1.0.0:a834870b4e204c93": {
   "output": {
    "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
    "source": "generated"
@@ -67,23 +67,23 @@
   },
   "model": "local-rules"
  },
- "dialogue-variants@1.0.1:2dfb06066a102e99": {
+ "dialogue-variants@1.0.1:76d5eb24d456a68f": {
   "output": {
    "variants": [
     {
      "key": "n-roles:0",
      "texts": [
-      "Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
-      "Look. Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.",
-      "Quick one. Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday."
+      "Two volunteers want social media. Nobody's on deliveries or set-up, and both need cover by Saturday.",
+      "Look. Two volunteers want social media. Nobody's on deliveries or set-up, and both need cover by Saturday.",
+      "Quick one. Two volunteers want social media. Nobody's on deliveries or set-up, and both need cover by Saturday."
      ]
     },
     {
      "key": "n-vendor-mix:0",
      "texts": [
-      "We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
-      "Hey. We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.",
-      "Listen. We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours."
+      "I need the fee by tomorrow. Trucks pay more, but small stalls bring the neighbours.",
+      "Hey. I need the fee by tomorrow. Trucks pay more, but small stalls bring the neighbours.",
+      "Listen. I need the fee by tomorrow. Trucks pay more, but small stalls bring the neighbours."
      ]
     },
     {
@@ -97,25 +97,25 @@
     {
      "key": "n-logo:0",
      "texts": [
-      "Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
-      "Heads up. Our board wants the logo on every table, banner and bag. That was the spirit of the deal.",
-      "Quick one. Our board wants the logo on every table, banner and bag. That was the spirit of the deal."
+      "Our board wants the logo on every table, banner and bag. That was the deal.",
+      "Heads up. Our board wants the logo on every table, banner and bag. That was the deal.",
+      "Quick one. Our board wants the logo on every table, banner and bag. That was the deal."
      ]
     },
     {
      "key": "n-schedule:0",
      "texts": [
-      "Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
-      "Look. Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.",
-      "Quick one. Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon."
+      "Ari and Jess are both on Saturday set-up. Clean-up has nobody, and Jess leaves at noon.",
+      "Look. Ari and Jess are both on Saturday set-up. Clean-up has nobody, and Jess leaves at noon.",
+      "Quick one. Ari and Jess are both on Saturday set-up. Clean-up has nobody, and Jess leaves at noon."
      ]
     },
     {
      "key": "n-vendor-cut:0",
      "texts": [
-      "I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
-      "Look. I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.",
-      "Listen. I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay."
+      "Another festival offered me more for the same weekend. I need $400 extra to stay.",
+      "Look. Another festival offered me more for the same weekend. I need $400 extra to stay.",
+      "Listen. Another festival offered me more for the same weekend. I need $400 extra to stay."
      ]
     },
     {
@@ -137,17 +137,17 @@
     {
      "key": "n-recovery:0",
      "texts": [
-      "The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
-      "Look. The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
-      "Quick one. The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left."
+      "The sponsor's gone, and most of the budget with it. I need a plan that fits what's left.",
+      "Look. The sponsor's gone, and most of the budget with it. I need a plan that fits what's left.",
+      "Quick one. The sponsor's gone, and most of the budget with it. I need a plan that fits what's left."
      ]
     },
     {
      "key": "n-recovery-venue:0",
      "texts": [
-      "We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
-      "Look. We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
-      "Quick one. We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go."
+      "We lost the site and the backup costs more. Everyone needs to know where to go.",
+      "Look. We lost the site and the backup costs more. Everyone needs to know where to go.",
+      "Quick one. We lost the site and the backup costs more. Everyone needs to know where to go."
      ]
     },
     {
@@ -177,41 +177,41 @@
     {
      "key": "n-handover:0",
      "texts": [
-      "Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float.",
-      "Before I go I want to hand over properly. I've the rota, the vendor contacts and the gate float.",
-      "Quick one. Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float."
+      "Before I go, I want to hand over properly: the rota, the vendor contacts, the gate float.",
+      "Look. Before I go, I want to hand over properly: the rota, the vendor contacts, the gate float.",
+      "Quick one. Before I go, I want to hand over properly: the rota, the vendor contacts, the gate float."
      ]
     },
     {
      "key": "n-lost-lead:0",
      "texts": [
-      "Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
-      "Heads up. Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
-      "Right. Everyone liked working with Priya. A couple of the new ones asked who they report to now."
+      "Everyone liked working with Priya. The new ones are asking who they report to now.",
+      "Heads up. Everyone liked working with Priya. The new ones are asking who they report to now.",
+      "Right. Everyone liked working with Priya. The new ones are asking who they report to now."
      ]
     },
     {
      "key": "n-vendors-worried:0",
      "texts": [
-      "Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier.",
-      "Is the market still on this weekend? I have ordered flour for two days and need to know what to tell my supplier.",
-      "Listen. Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier."
+      "Is the market still on? I've ordered flour for two days. What do I tell my supplier?",
+      "Is the market still on? I have ordered flour for two days. What do I tell my supplier?",
+      "Listen. Is the market still on? I've ordered flour for two days. What do I tell my supplier?"
      ]
     },
     {
      "key": "n-new-partner:0",
      "texts": [
-      "The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
-      "Alright. The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.",
-      "Right. The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today."
+      "The credit union offers $800 if you pitch this afternoon, or $500 for a written plan. They want an answer today.",
+      "Alright. The credit union offers $800 if you pitch this afternoon, or $500 for a written plan. They want an answer today.",
+      "Right. The credit union offers $800 if you pitch this afternoon, or $500 for a written plan. They want an answer today."
      ]
     },
     {
      "key": "n-feedback:0",
      "texts": [
-      "Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?",
-      "Families asked for an activity they can join without buying anything. I still can't see one in the plan. Can we make room?",
-      "Right. Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?"
+      "Families want an activity they can join without buying anything. I still don't see one. Can we make room?",
+      "Families want an activity they can join without buying anything. I still do not see one. Can we make room?",
+      "Right. Families want an activity they can join without buying anything. I still don't see one. Can we make room?"
      ]
     },
     {
@@ -225,9 +225,9 @@
     {
      "key": "n-weather:0",
      "texts": [
-      "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
-      "There's a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
-      "Right. There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space."
+      "40% chance of rain Saturday morning. The gym is free, but it has less stall space.",
+      "Heads up. 40% chance of rain Saturday morning. The gym is free, but it has less stall space.",
+      "Right. 40% chance of rain Saturday morning. The gym is free, but it has less stall space."
      ]
     },
     {

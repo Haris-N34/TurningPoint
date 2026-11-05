@@ -18,14 +18,16 @@ export function FinalScoreBox({ score }: { score: FinalScore }) {
       <button
         type="button"
         aria-describedby={id}
-        className="flex min-w-28 flex-col items-end rounded-xl border bg-card px-3 py-2 text-right shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-11 items-center gap-3 rounded-lg border bg-card pl-3 pr-3.5 text-left shadow-xs transition-colors hover:border-input/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">Final score</span>
-        <span className="font-display text-2xl leading-none" data-testid="final-score-value">
+        <span className="font-display text-2xl leading-none tabular-nums" data-testid="final-score-value">
           {score.value}
           <span className="text-sm text-muted-foreground">/100</span>
         </span>
-        <span className="mt-0.5 text-[10px] text-muted-foreground">Sorts only. Hover for breakdown</span>
+        <span className="flex flex-col whitespace-nowrap leading-tight">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Final score</span>
+          <span className="text-xs font-medium text-foreground">Sorts only <span className="font-normal text-muted-foreground">· breakdown ⓘ</span></span>
+        </span>
       </button>
       <div
         id={id}

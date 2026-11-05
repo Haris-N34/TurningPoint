@@ -26,7 +26,45 @@ type Props = {
   onModeChange?: (m: Mode) => void;
   /** False in the admin preview sandbox: recordings are discarded (E1.5). */
   persistMedia?: boolean;
+  /** "pixel" matches the game's pixel UI kit; "app" is the site style. Behaviour is identical. */
+  skin?: "app" | "pixel";
 };
+
+// Class names per skin. Only looks change; every control, label and flow stays the same.
+const SKINS = {
+  app: {
+    overlay: "bg-black/50 backdrop-blur-md",
+    card: "rounded-3xl bg-background text-foreground shadow-2xl",
+    eyebrow: "text-xs font-semibold uppercase tracking-widest text-primary",
+    question: "text-xl sm:text-2xl font-semibold leading-snug",
+    ringTrack: "stroke-black/10 dark:stroke-white/10",
+    ringFill: "stroke-orange-600",
+    note: "text-sm opacity-80",
+    mode: "rounded-full border px-4 py-2 text-sm capitalize",
+    modeOn: "bg-foreground text-background",
+    primary: "rounded-full bg-foreground px-5 py-2.5 font-medium text-background",
+    secondary: "rounded-full border px-5 py-2.5 font-medium",
+    field: "mt-1 w-full rounded-2xl border p-3",
+    panel: "rounded-2xl bg-black/[.04] dark:bg-white/[.06] p-4",
+    calm: "text-sm opacity-80",
+  },
+  pixel: {
+    overlay: "bg-[#2e222f]/75",
+    card: "rounded-[6px] border-[3px] border-[#2e222f] bg-[#fff8e7] text-[#2e222f] shadow-[inset_0_-4px_0_#e8d9b5,0_6px_0_#1a1320]",
+    eyebrow: "text-[12px] font-semibold uppercase tracking-[0.14em] text-[#9c2c18]",
+    question: "text-[20px] sm:text-[24px] font-semibold leading-snug",
+    ringTrack: "stroke-[#e8d9b5]",
+    ringFill: "stroke-[#c43d22]",
+    note: "text-[15px] text-[#5a4a4a]",
+    mode: "rounded-[4px] border-2 border-[#2e222f] bg-white px-4 py-1.5 text-[15px] font-semibold capitalize shadow-[inset_0_-3px_0_#e8d9b5] focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-[#ffd166]",
+    modeOn: "!bg-[#2e222f] text-[#ffd166] !shadow-none",
+    primary: "min-h-11 rounded-[4px] border-[3px] border-[#2e222f] bg-[#c43d22] px-5 py-2 text-[16px] font-semibold text-white shadow-[inset_0_-3px_0_#9c2c18] hover:bg-[#d4492c] active:translate-y-0.5 disabled:opacity-50 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#ffd166]",
+    secondary: "min-h-11 rounded-[4px] border-[3px] border-[#2e222f] bg-[#fff8e7] px-5 py-2 text-[16px] font-semibold shadow-[inset_0_-3px_0_#e0cfa6] hover:bg-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#ffd166]",
+    field: "mt-1 w-full rounded-[4px] border-[3px] border-[#2e222f] bg-white p-3 text-[17px] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffd166]",
+    panel: "rounded-[4px] border-2 border-[#2e222f] bg-white p-3",
+    calm: "text-[14px] text-[#5a4a4a]",
+  },
+} as const;
 
 type Phase = "think" | "answer" | "review" | "saving";
 
@@ -62,21 +100,21 @@ function useCountdown(seconds: number, running: boolean, onZero: () => void) {
   return left;
 }
 
-function Ring({ left, total, label }: { left: number; total: number; label: string }) {
+function Ring({ left, total, label, track, fill }: { left: number; total: number; label: string; track: string; fill: string }) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
     <div className="relative h-16 w-16 shrink-0" role="timer" aria-label={`${label}: ${Math.ceil(left)} seconds left`}>
       <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-hidden>
-        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="5" className="stroke-black/10 dark:stroke-white/10" />
-        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="5" strokeLinecap="round" className="stroke-orange-600 transition-[stroke-dashoffset] duration-200" strokeDasharray={c} strokeDashoffset={c * (1 - left / total)} />
+        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="5" className={track} />
+        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="5" strokeLinecap="round" className={`${fill} transition-[stroke-dashoffset] duration-200`} strokeDasharray={c} strokeDashoffset={c * (1 - left / total)} />
       </svg>
       <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold tabular-nums">{Math.ceil(left)}</span>
     </div>
   );
 }
 
-function TypedQuestion({ text }: { text: string }) {
+function TypedQuestion({ text, className }: { text: string; className: string }) {
   const reduce = useReducedMotion();
   const words = text.split(" ");
   const [n, setN] = useState(reduce ? words.length : 0);
@@ -87,13 +125,22 @@ function TypedQuestion({ text }: { text: string }) {
     return () => clearInterval(t);
   }, [text, reduce, words.length]);
   return (
-    <h2 className="text-xl sm:text-2xl font-semibold leading-snug" aria-label={text} data-testid="checkpoint-question">
-      <span aria-hidden>{words.slice(0, n).join(" ")}</span>
+    // Every word is laid out from the start (no reflow, never cut off); unrevealed words are just invisible.
+    <h2 className={className} aria-label={text} data-testid="checkpoint-question">
+      <span aria-hidden>
+        {words.map((w, i) => (
+          <span key={i} className={i < n ? undefined : "opacity-0"}>
+            {w}
+            {i < words.length - 1 ? " " : ""}
+          </span>
+        ))}
+      </span>
     </h2>
   );
 }
 
 export function Checkpoint(p: Props) {
+  const k = SKINS[p.skin ?? "app"];
   const t = timing(p.kind, p.multiplier);
   const [mode, setModeState] = useState<Mode>(p.textOnly ? "text" : p.defaultMode);
   const [phase, setPhase] = useState<Phase>("think");
@@ -122,7 +169,7 @@ export function Checkpoint(p: Props) {
       r.prepare(mode).then((s) => {
         if (!s) {
           // No dead end: fall back to text (C1.3, A1).
-          setDeviceMsg(`Couldn't use your ${mode === "video" ? "camera" : "microphone"}, so this one is in text. You can switch back any time.`);
+          setDeviceMsg(`No ${mode === "video" ? "camera" : "microphone"} here, so this one is in text. You can switch any time.`);
           setModeState("text");
         }
       });
@@ -234,45 +281,45 @@ export function Checkpoint(p: Props) {
       aria-label={label}
       data-testid="checkpoint"
       data-phase={phase}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-md p-3 sm:p-6"
+      className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-6 ${k.overlay}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
       <motion.div
-        className="w-full max-w-xl max-h-[95svh] overflow-y-auto rounded-3xl bg-background p-5 sm:p-7 text-foreground shadow-2xl"
+        className={`w-full max-w-xl max-h-[95svh] overflow-y-auto p-5 sm:p-7 ${k.card}`}
         initial={{ y: 60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 24 }}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{label}</p>
+            <p className={k.eyebrow}>{label}</p>
             <div className="mt-2">
-              <TypedQuestion text={p.question} />
+              <TypedQuestion text={p.question} className={k.question} />
             </div>
           </div>
-          {phase === "think" && <Ring left={thinkLeft} total={t.thinkS} label="Think time" />}
-          {phase === "answer" && <Ring left={answerLeft} total={t.answerS} label="Answer time" />}
+          {phase === "think" && <Ring left={thinkLeft} total={t.thinkS} label="Think time" track={k.ringTrack} fill={k.ringFill} />}
+          {phase === "answer" && <Ring left={answerLeft} total={t.answerS} label="Answer time" track={k.ringTrack} fill={k.ringFill} />}
         </div>
 
         {phase === "think" && (
           <div className="mt-5 space-y-4">
-            <p className="text-sm opacity-80">
+            <p className={k.note}>
               Take {t.thinkS} seconds to think. You then have {t.answerS} seconds. Only your words are used, never your face or voice.
             </p>
             <fieldset>
               <legend className="text-sm font-medium">Answer by</legend>
               <div className="mt-2 flex gap-2" role="radiogroup">
                 {(["video", "voice", "text"] as Mode[]).map((m) => (
-                  <label key={m} className={`cursor-pointer rounded-full border px-4 py-2 text-sm capitalize ${mode === m ? "bg-foreground text-background" : ""} ${p.textOnly && m !== "text" ? "opacity-40" : ""}`}>
+                  <label key={m} className={`cursor-pointer ${k.mode} ${mode === m ? k.modeOn : ""} ${p.textOnly && m !== "text" ? "opacity-40" : ""}`}>
                     <input type="radio" name={`mode-${p.id}`} className="sr-only" value={m} checked={mode === m} disabled={p.textOnly && m !== "text"} onChange={() => setMode(m)} />
                     {m}
                   </label>
                 ))}
               </div>
             </fieldset>
-            {deviceMsg && <p className="text-sm text-orange-700 dark:text-orange-300" role="status">{deviceMsg}</p>}
-            <button onClick={() => void beginAnswer()} className="rounded-full bg-foreground px-5 py-2.5 font-medium text-background" autoFocus>
+            {deviceMsg && <p className={k.calm} role="status">{deviceMsg}</p>}
+            <button onClick={() => void beginAnswer()} className={k.primary} autoFocus>
               I&apos;m ready, start answering
             </button>
           </div>
@@ -303,13 +350,13 @@ export function Checkpoint(p: Props) {
                   }}
                   onDrop={(e) => e.preventDefault()}
                   rows={5}
-                  className="mt-1 w-full rounded-2xl border p-3"
+                  className={k.field}
                 />
-                {pasteBlocked && <p className="text-sm text-orange-700 dark:text-orange-300" role="status">Paste is off for checkpoints. Type your answer.</p>}
+                {pasteBlocked && <p className={k.calm} role="status">Paste is off for checkpoints. Type your answer.</p>}
               </div>
             )}
             {mode !== "text" && <p className="text-sm opacity-80" aria-live="polite">Recording…</p>}
-            <button onClick={finishAnswer} className="rounded-full bg-foreground px-5 py-2.5 font-medium text-background" disabled={mode === "text" && !text.trim()}>
+            <button onClick={finishAnswer} className={k.primary} disabled={mode === "text" && !text.trim()}>
               Done
             </button>
           </div>
@@ -317,18 +364,18 @@ export function Checkpoint(p: Props) {
 
         {phase === "review" && result && (
           <div className="mt-5 space-y-4">
-            <div className="rounded-2xl bg-black/[.04] dark:bg-white/[.06] p-4">
+            <div className={k.panel}>
               <p className="text-xs font-semibold uppercase tracking-wide opacity-70">What we heard</p>
               <p className="mt-1" data-testid="transcript">
                 {result.transcript.text || "No words were picked up. Your recording is still saved, and a recruiter can play it."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button onClick={submit} className="rounded-full bg-foreground px-5 py-2.5 font-medium text-background" autoFocus>
+              <button onClick={submit} className={k.primary} autoFocus>
                 Submit
               </button>
               {retakes < MAX_RETAKES && (
-                <button onClick={retake} className="rounded-full border px-5 py-2.5 font-medium">
+                <button onClick={retake} className={k.secondary}>
                   Retake ({MAX_RETAKES - retakes} left)
                 </button>
               )}

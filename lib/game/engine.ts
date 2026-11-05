@@ -109,7 +109,10 @@ export function walkMinutes(s: MapScenario, from: string, to: string): number {
 export function newGame(s: MapScenario, seed: string, opts: { turnBased?: boolean } = {}): GameState {
   const r = rng(`${seed}:map`);
   const disruptionId = s.turningPoint.pool[Math.floor(r() * s.turningPoint.pool.length)];
-  const eligible = s.issues.filter((i) => i.checkpointEligible && !i.hidden).map((i) => i.id);
+  // Follow-ups of the other disruptions never appear in this run, so they can't hold a seeded checkpoint.
+  const chosen = s.turningPoint.disruptions.find((d) => d.id === disruptionId)!;
+  const otherTp = new Set(s.turningPoint.disruptions.flatMap((d) => d.spawn).filter((id) => !chosen.spawn.includes(id)));
+  const eligible = s.issues.filter((i) => i.checkpointEligible && !i.hidden && !otherTp.has(i.id)).map((i) => i.id);
   const shuffled = [...eligible];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(r() * (i + 1));
@@ -161,12 +164,22 @@ function applyEffects(state: GameState, e: Record<string, number>, share = 1): v
   if (state.tp.fired) state.moraleLowAfterTp = Math.min(state.moraleLowAfterTp ?? state.morale, state.morale);
 }
 
+/** A lifetime ends with the working day (nobody can act at night). With under 30 minutes left, it moves to the next morning. */
+function lifetimeDeadline(at: number, lifetime: number): number {
+  const day = dayOf(at);
+  const end = dayEndOf(day);
+  if (at + lifetime <= end) return at + lifetime;
+  if (end - at >= 30 || day + 1 >= GAME.workDays) return Math.max(end, at + 30);
+  return dayStartOf(day + 1) + 30;
+}
+
 function spawn(s: MapScenario, state: GameState, issueId: string, at: number) {
   const st = state.issues[issueId];
   if (!st || st.status !== "pending") return;
   const def = issueById(s, issueId);
-  const deadline = def.deadline ? parseTime(def.deadline) : def.lifetime ? at + def.lifetime : undefined;
-  state.issues[issueId] = { status: "open", openedAt: at, deadline: deadline !== undefined ? Math.max(deadline, at + 30) : undefined };
+  // A fixed deadline is authored on the clock; a lifetime is cut at the day end.
+  const deadline = def.deadline ? Math.max(parseTime(def.deadline), at + 30) : def.lifetime ? lifetimeDeadline(at, Math.max(def.lifetime, 30)) : undefined;
+  state.issues[issueId] = { status: "open", openedAt: at, deadline };
   state.events.push({ t: at, kind: "spawned", issue: issueId });
 }
 
@@ -219,11 +232,13 @@ function settle(s: MapScenario, state: GameState, target: number): GameState {
       at: dayEnd,
       prio: 3,
       run: () => {
+        if (day + 1 >= GAME.workDays) {
+          // Saturday is market day: whatever is still open is out of time (counted in Friday's recap).
+          for (const i of s.issues) if (state.issues[i.id].status === "open" && !i.hidden) expire(s, state, i.id, dayEnd);
+        }
         state.events.push({ t: dayEnd, kind: "day_end" });
         state.recaps.push(recapOf(state, day));
         if (day + 1 >= GAME.workDays) {
-          // Saturday is market day: whatever is still open is out of time.
-          for (const i of s.issues) if (state.issues[i.id].status === "open" && !i.hidden) expire(s, state, i.id, dayEnd);
           state.t = dayStartOf(GAME.workDays);
           state.events.push({ t: state.t, kind: "market_day" });
           state.ended = true;

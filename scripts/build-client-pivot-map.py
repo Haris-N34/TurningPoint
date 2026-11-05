@@ -71,7 +71,7 @@ CHARTS = [
 ]
 
 nodes = [
-    node("n-kickoff", "partner", [("partner", "The client says 'modernise inventory'. That's not a brief. What do they actually need from us by Friday?", "neutral")],
+    node("n-kickoff", "partner", [("partner", "The client says 'modernise inventory'. That's not a brief. What do they need from us by Friday?", "neutral")],
          "How do you frame the problem?", [
         opt("a", "Pin down one measurable goal with the client first", {"trust.firm": 8}, ("heart", "happy", "Good. A goal we can be held to.")),
         opt("b", "Start building a full system comparison right away", {"morale": -4}, ("sweat", "worried", "That's a lot of work toward an unclear goal.")),
@@ -79,23 +79,23 @@ nodes = [
     ]),
     node("n-data", "laptop", [("you", "Three dashboards from the client. Mei pulled them last night.", "neutral")],
          "What's the finding that matters?", [
-        opt("a", "Stockouts are concentrated in the small stores, where orders are placed by hand", {"trust.firm": 6}, ("note", "happy"), kpi={"insight": "correct"}),
-        opt("b", "Stockouts are rising everywhere, so every store needs the new system", {}, ("question", "neutral"), kpi={"insight": "partial"}),
+        opt("a", "Stockouts cluster in the small stores, where orders are done by hand", {"trust.firm": 6}, ("note", "happy"), kpi={"insight": "correct"}),
+        opt("b", "Stockouts are up everywhere, so every store needs the new system", {}, ("question", "neutral"), kpi={"insight": "partial"}),
         opt("c", "Food waste is the real problem, so lead with waste", {}, ("note", "neutral"), unlocks=["credibility-hit"], kpi={"insight": "wrong"}),
     ], charts=CHARTS),
     node("n-dev-estimate", "dev", [("dev", "Honest answer? Integrating with their old till system is six weeks, not two.", "worried")],
          "What do you do with Tomi's estimate?", [
         opt("a", "Put the real estimate in the plan and flag the risk", {"trust.firm": 4, "morale": 4}, ("heart", "happy", "Thanks for not shaving it down.")),
-        opt("b", "Ask him to find a two-week version", {"morale": -8}, ("anger", "angry", "That's how projects fail.")),
+        opt("b", "Ask Tomi for a two-week version", {"morale": -8}, ("anger", "angry", "That's how projects fail.")),
         opt("c", "Leave integration out of the recommendation", {"trust.cfo": -4}, ("sweat", "worried"), explain=True),
     ]),
-    node("n-manager-visit", "manager", [("manager", "Last time head office 'modernised', my staff spent a month typing everything twice.", "angry")],
+    node("n-manager-visit", "manager", [("manager", "Last time head office 'modernised', my staff typed everything twice for a month.", "angry")],
          "What do you ask her?", [
         opt("a", "Ask her to walk you through how orders work today", {"trust.manager": 10}, ("heart", "happy", "Nobody from head office has asked me that.")),
         opt("b", "Reassure her the new system is much better", {"trust.manager": -4}, ("question", "neutral", "They all say that.")),
         opt("c", "Promise nothing changes for her team", {"trust.manager": 4, "trust.cfo": -4}, ("note", "neutral"), explain=True),
     ]),
-    node("n-analyst-model", "analyst", [("analyst", "I can forecast demand per store or per region. Per store is more accurate but takes two extra days.", "neutral")],
+    node("n-analyst-model", "analyst", [("analyst", "I can forecast per store or per region. Per store is sharper but takes two more days.", "neutral")],
          "Which forecast model?", [
         opt("a", "Per store for the small stores only", {"morale": 3}, ("note", "happy", "Smart. That's where the problem is.")),
         opt("b", "Per store everywhere", {"morale": -4}, ("sweat", "worried"), minutes=60),
@@ -103,11 +103,11 @@ nodes = [
     ]),
     node("n-pitch-manager", "manager", [("manager", "So what are you actually recommending? In plain words, please.", "neutral")],
          "How do you explain it to the store manager?", [
-        opt("a", "'Your small stores stop running out of milk, and you stop typing orders by hand.'", {"trust.manager": 12}, ("heart", "happy", "Now that I understand."), kpi={"fit": "good"}),
-        opt("b", "'We'll deploy a cloud ERP with ML-driven demand forecasting and API integration.'", {"trust.manager": -8}, ("question", "worried", "...What?"), kpi={"fit": "poor"}),
-        opt("c", "'Kai told me the night shift reorders from memory. This fixes that first.'", {"trust.manager": 16}, ("heart", "happy", "That's exactly it."), requires=["store-employee"], kpi={"fit": "good"}, explain=True),
+        opt("a", "'Small stores stop running out of milk. No more typing orders.'", {"trust.manager": 12}, ("heart", "happy", "Now that I understand."), kpi={"fit": "good"}),
+        opt("b", "'A cloud ERP with ML demand forecasting and API integration.'", {"trust.manager": -8}, ("question", "worried", "...What?"), kpi={"fit": "poor"}),
+        opt("c", "'Kai says nights reorder from memory. This fixes that first.'", {"trust.manager": 16}, ("heart", "happy", "That's exactly it."), requires=["store-employee"], kpi={"fit": "good"}, explain=True),
     ]),
-    node("n-phased-plan", "laptop", [("you", "The CFO cut the budget in half and wants a phased plan by Friday. The original plan doesn't fit any more.", "worried")],
+    node("n-phased-plan", "laptop", [("you", "The CFO halved the budget and wants a phased plan by Friday. The old plan doesn't fit.", "worried")],
          "What goes in phase 1?", [
         opt("a", "Phase 1: the small stores only, where stockouts are worst", {"morale": 4}, ("note", "neutral"), kpi={"coreBudgetShare": 0.85}),
         opt("b", "Phase 1: every store, but without the forecasting", {"morale": -2}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.55}, explain=True),
@@ -128,11 +128,11 @@ nodes = [
     ]),
     node("n-pitch-cfo", "cfo", [("cfo", "Convince me phase 1 is worth the money.", "neutral")],
          "How do you make the case to the CFO?", [
-        opt("a", "Show phase-1 cost per small store and how fewer stockouts could repay it", {"trust.cfo": 12}, ("heart", "happy", "Show me the costs and assumptions behind that."), kpi={"fit": "good"}),
-        opt("b", "Walk him through the architecture diagram", {"trust.cfo": -8}, ("sweat", "worried", "I'm not the IT department."), kpi={"fit": "poor"}),
+        opt("a", "Show phase 1 cost per small store, and how fewer stockouts repay it", {"trust.cfo": 12}, ("heart", "happy", "Show me the costs and assumptions behind that."), kpi={"fit": "good"}),
+        opt("b", "Walk Mr. Lindqvist through the architecture diagram", {"trust.cfo": -8}, ("sweat", "worried", "I'm not the IT department."), kpi={"fit": "poor"}),
         opt("c", "Show why the 2019 rollout failed and how phase 1 avoids it", {"trust.cfo": 16}, ("heart", "happy", "You did your homework."), requires=["cafe-chat"], kpi={"fit": "good"}, explain=True),
     ]),
-    node("n-feedback", "partner", [("partner", "I read your deck. Honestly, it's unreadable. Twenty slides of features and no answer on slide one.", "angry")],
+    node("n-feedback", "partner", [("partner", "I read your deck. Honestly? Twenty slides of features and no answer on slide one.", "angry")],
          "How do you take it?", [
         opt("a", "Ask what he'd put on slide one, and rebuild it around that", {"trust.firm": 10}, ("heart", "happy", "Answer first. Then evidence."), kpi={"feedback": "open"}),
         opt("b", "Explain that the client asked for detail", {"trust.firm": -4}, ("note", "neutral", "Then put the detail at the back."), kpi={"feedback": "defensive"}),
@@ -150,7 +150,7 @@ nodes = [
         opt("b", "Build the demo on made-up numbers", {"trust.cfo": -6}, ("sweat", "worried"), explain=True),
         opt("c", "Drop the demo from the pitch", {"morale": -4}, ("note", "neutral")),
     ]),
-    node("n-credibility", "partner", [("partner", "The client's ops lead says your waste number doesn't hold up. Waste moved from 4% to 5%, while small stores have 19 stockouts a week.", "angry")],
+    node("n-credibility", "partner", [("partner", "Their ops lead says your waste number doesn't hold up. Waste went 4% to 5%. Small stores have 19 stockouts a week.", "angry")],
          "How do you respond?", [
         opt("a", "Own the misread and re-run the analysis", {"trust.firm": 4}, ("note", "neutral", "Good. Fix it fast.")),
         opt("b", "Defend the waste angle", {"trust.firm": -8, "trust.cfo": -6}, ("anger", "angry")),
@@ -171,7 +171,7 @@ nodes = [
         opt("a", "Ask what the night shift actually does", {}, ("heart", "happy", "They reorder from memory. Always have.")),
         opt("b", "Thank her and head back", {}, ("note", "neutral")),
     ]),
-    node("n-store-employee", "kai", [("kai", "Honestly? When the system's down at night, we just reorder from memory. Half the stockouts are that.", "neutral")],
+    node("n-store-employee", "kai", [("kai", "Honestly? When the system's down at night, we reorder from memory. That's half the stockouts.", "neutral")],
          "What do you do with that?", [
         opt("a", "Ask if you can mention it to Rachel", {}, ("note", "happy", "Sure, she knows.")),
         opt("b", "Note it down", {}, ("note", "neutral")),
@@ -239,7 +239,7 @@ scenario = {
         "pool": ["budget-halved"],
         "disruptions": [
             {"id": "budget-halved", "title": "The CFO halves the budget", "caller": "cfo",
-             "text": "Our board has cut this project's budget in half. I need a phased plan from you by Friday. Phase 1 has to pay for itself.",
+             "text": "Our board has halved this project's budget. I need a phased plan by Friday. Phase 1 has to pay for itself.",
              "budgetCut": 0.5, "effects": {"morale": -10}, "spawn": ["phased-plan", "team-worried", "cfo-call"]},
         ],
     },
