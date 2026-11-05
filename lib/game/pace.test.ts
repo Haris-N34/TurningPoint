@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { getMapScenario } from "@/content/maps";
 import { newGame } from "./engine";
-import { paceOf, scriptedRun } from "./pace";
+import { timing } from "@/lib/checkpoint/timing";
+import { NORMAL_PACE, paceOf, scriptedRun } from "./pace";
 
 describe("run length at normal pace (A.19)", () => {
   for (const id of ["launch-week", "client-pivot"]) {
@@ -20,4 +21,20 @@ describe("run length at normal pace (A.19)", () => {
       });
     }
   }
+});
+
+describe("whole challenge at normal pace (C2.5)", () => {
+  it("game plus the real-life checkpoint takes 12 to 18 minutes on every map", () => {
+    const t = timing("real_life");
+    const realLife = t.thinkS / 2 + t.answerS * NORMAL_PACE.answerShare + NORMAL_PACE.reviewS;
+    for (const id of ["launch-week", "client-pivot"]) {
+      const s = getMapScenario(id)!;
+      const start = newGame(s, "pace", { turnBased: true });
+      for (const pick of [(ids: string[]) => ids[0], (ids: string[]) => ids.at(-1)!]) {
+        const min = (paceOf(s, start, scriptedRun(s, start, pick)).total + realLife) / 60;
+        expect(min).toBeGreaterThanOrEqual(12);
+        expect(min).toBeLessThanOrEqual(18);
+      }
+    }
+  });
 });

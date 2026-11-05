@@ -3,7 +3,7 @@ import { getScenario } from "@/content/scenarios";
 import attempt from "@/fixtures/attempt.json";
 import { CardSchema } from "@/lib/card/types";
 import { newGame, nodeById } from "@/lib/game/engine";
-import { coachPrompt } from "../services/coach";
+import { coachPrompt, practiceFeedbackPrompt } from "../services/coach";
 import { consistencyPrompt } from "../services/consistency";
 import { blindCard, copilotPrompt } from "../services/copilot";
 import { fairnessPrompt } from "../services/fairness";
@@ -29,6 +29,7 @@ export const PROMPTS: AnyPrompt[] = [
   valueMapperPrompt,
   copilotPrompt,
   coachPrompt,
+  practiceFeedbackPrompt,
   fairnessPrompt,
 ];
 

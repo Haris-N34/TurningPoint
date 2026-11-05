@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type PhaserNS from "phaser";
 import type { Look, MapScenario } from "@/lib/game/schema";
 import { useGame } from "@/lib/game/store";
@@ -9,9 +9,13 @@ import { createScene } from "./phaser/createScene";
 // Client-only Phaser mount (PRD v2, A2). Loaded with next/dynamic and ssr: false by its parent.
 export default function MapCanvas({ scenario, avatar, attract = false, label }: { scenario: MapScenario; avatar: Look; attract?: boolean; label: string }) {
   const host = useRef<HTMLDivElement>(null);
+  // Add ?fps=1 to the URL to see the live frame rate (A.20 device check).
+  const [fps, setFps] = useState<number | null>(null);
   useEffect(() => {
     let game: PhaserNS.Game | undefined;
     let alive = true;
+    const showFps = new URLSearchParams(window.location.search).has("fps");
+    const fpsTimer = showFps ? setInterval(() => game && setFps(Math.round(game.loop.actualFps)), 500) : undefined;
     void import("phaser").then((Phaser) => {
       if (!alive || !host.current) return;
       const Scene = createScene(Phaser, {
@@ -41,10 +45,20 @@ export default function MapCanvas({ scenario, avatar, attract = false, label }: 
     });
     return () => {
       alive = false;
+      clearInterval(fpsTimer);
       game?.destroy(true);
     };
     // Recreate only when the scenario or avatar changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scenario.id, attract, JSON.stringify(avatar)]);
-  return <div ref={host} className="absolute inset-0 [image-rendering:pixelated]" role="img" aria-label={label} data-testid={attract ? "title-map" : "map-canvas"} />;
+  return (
+    <>
+      <div ref={host} className="absolute inset-0 [image-rendering:pixelated]" role="img" aria-label={label} data-testid={attract ? "title-map" : "map-canvas"} />
+      {fps !== null && (
+        <span className="pointer-events-none absolute bottom-2 left-1/2 z-[80] -translate-x-1/2 rounded bg-black/70 px-2 font-mono text-xs text-white" data-testid="fps">
+          {fps} fps
+        </span>
+      )}
+    </>
+  );
 }

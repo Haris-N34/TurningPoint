@@ -349,6 +349,49 @@
   },
   "model": "local-rules"
  },
+ "practice-feedback@1.0.0:0d75122c1339fce7": {
+  "output": {
+   "clarity": {
+    "strengths": [
+     "You said plainly what you decided.",
+     "You gave the reason for the call.",
+     "You named what you gave up, so the trade-off is easy to follow."
+    ],
+    "tips": []
+   },
+   "specificity": {
+    "strengths": [
+     "You used a concrete detail (a number, a time or a day).",
+     "You said who the decision affected.",
+     "You named the exact choice you were asked about."
+    ],
+    "tips": []
+   }
+  },
+  "model": "local-rules"
+ },
+ "practice-feedback@1.0.0:24a53e3752058d4f": {
+  "output": {
+   "clarity": {
+    "strengths": [
+     "You said plainly what you decided."
+    ],
+    "tips": [
+     "Add the reason: 'I did X because Y.'",
+     "Name what you gave up: 'instead of...' or 'rather than...'."
+    ]
+   },
+   "specificity": {
+    "strengths": [],
+    "tips": [
+     "Add one concrete detail: a number, a time, or a day.",
+     "Say who the decision affected and how.",
+     "Name the choice itself, so a reader knows which call you mean."
+    ]
+   }
+  },
+  "model": "local-rules"
+ },
  "recruiter-copilot@1.0.0:44d1b918bfc1cb67": {
   "output": {
    "answer": "Checkpoint 2, at 0:07: “The vendors were the reason people came, and some of them had already paid for stock.”",

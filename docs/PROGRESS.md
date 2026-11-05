@@ -27,8 +27,8 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] C2.2 [D] Choices change resources and branch; resource bar animates
 - [x] C2.3 [D] Every choice logged with timestamp, node id, option id, decided_ms
 - [x] C2.4 [D] Pause; progress saved locally; resumes on refresh (another device needs a server, out of demo scope)
-- [ ] C2.5 [D+H] Full run 12 to 18 minutes (needs Launch Week); works at 375 px (done, e2e)
-- [ ] C2.6 [D+H] Keyboard-only play (done, e2e); all art has alt text (enforced by content test, needs art)
+- [x] C2.5 [D+H] Full run 12 to 18 minutes; works at 375 px (pace model with the real-life checkpoint: 14 to 18 min on both maps, lib/game/pace.test.ts; phone e2e)
+- [x] C2.6 [D+H] Keyboard-only play (list-view full week by keyboard, e2e); all art has alt text (content/scenarios/art.test.ts, content/portraits.test.ts; map canvas and title still are labelled images)
 - [x] C3.1 [D] Turning point fires between 40% and 60%, full-screen transition, mutable sound
 - [x] C3.2 [D] Resets a resource sharply and unlocks new choices
 - [x] C3.3 [D] Disruption picked from pool by per-candidate seed
@@ -62,10 +62,10 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
 - [x] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
 - [x] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace (pace model lib/game/pace.ts over scripted runs: Launch Week 12.2 to 14.4 min, Client Pivot 13.2 to 15.7 min)
-- [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop
+- [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop (Lighthouse mobile 86 twice on the production build, title screen is a still image and the engine starts at the avatar step. fps: needs a real GPU; this machine renders WebGL on the CPU (56 fps at 720x450, 21 at 1440x900). Check on a laptop with /game/launch-week?fps=1)
 - [x] A.21 [D] Test hooks window.__tp (NEXT_PUBLIC_TEST_HOOKS=1); Playwright full run in map view (desktop, phone) and list view (keyboard only)
 - [x] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills via the Value Mapper (B.5)
-- [ ] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete
+- [x] A.23 [H] 6 to 8 NPC portrait sets (4 expressions) in public/assets/portraits; LICENSES.md complete (13 sets, content/portraits.test.ts; Kenney packs and fonts added to LICENSES.md. Nice to have: a portrait for Kai in The Client Pivot)
 - Done when: every A item above passes and the quiz-test screenshots show a game, not a form.
 
 ## M2. Checkpoints
@@ -110,7 +110,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E3.8 [D] Every AI sentence labelled "AI summary" with a source link
 - [x] E6.1 [D] Anonymous first review ON by default
 - [x] E6.2 [D] Transcript-first video setting
-- [ ] PV3 [D] Recordings served by 1-hour signed URLs only
+- [x] PV3 [D] Recordings served by 1-hour signed URLs only (local: `tp-media:` links with an HMAC-SHA256 token and 1 h expiry, checked before IndexedDB is read; per-session random secret; lib/store/signed.test.ts)
 - Done when: finishing a run produces a card where every AI sentence links to a real timestamp, and a recruiter can shortlist from the inbox.
 
 ## M3.5. AI Engine (v2 Part B)
@@ -136,9 +136,9 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E1.5 [D] Preview as candidate, no data saved. Challenges on a template with a v2 map (/c/<slug>, admin preview) play the map game with the employer's edits (tests/e2e/builder.spec.ts, loop.spec.ts)
 - [x] E1.6 [D] Publish creates public link, job code and QR
 - [x] E1.7 [D] Setup under 10 minutes (scripted e2e; human timing in rehearsal)
-- [ ] C6.1 [H] Add up to 2 witnesses with relationship (functional form on results by D; design H)
+- [x] C6.1 [H] Add up to 2 witnesses with relationship: slot count, list with relationship and status in words (tests/e2e/witness.spec.ts, desktop and phone)
 - [x] C6.2 [D] Witness one-time link, expires in 14 days (shown to send, not emailed: demo scope)
-- [ ] C6.3 [H] Witness page, no account, phone, under 30 s (functional /witness/<token> by D, e2e on phone; design H)
+- [x] C6.3 [H] Witness page, no account, phone, under 30 s: names the relationship, skill counter, headed done/used/invalid/expired states (tests/e2e/witness.spec.ts, tests/e2e/a11y.spec.ts on phone)
 - [x] C6.4 [D] Card shows "Confirmed by ..." never the witness email
 - [x] C6.5 [D] Reject witness email matching candidate email or domain alias
 - [x] C7.1 [D] Candidate sees own card exactly as a recruiter would
@@ -149,7 +149,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E8.1 [D] Inbox shows reused cards with covered skills
 - [x] E5.1 [D] Mock Greenhouse endpoint, success toast with payload
 - [x] E5.2 [D] Exported candidate links back to the card
-- [ ] PV5 [H] "How we use AI" page linked from every screen
+- [x] PV5 [H] "How we use AI" page linked from every screen (global header; tests/e2e/a11y.spec.ts walks every route)
 - Done when: the five-step loop from the PRD Summary works end to end on the deployed site.
 
 ### M4 additions: integration layer (v2 Part C) and scoring (Part D)
@@ -177,16 +177,16 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] E7.2 [H] Completion and shortlist rate by mode and accommodation (lib/impact/fairness.test.ts)
 - [x] E7.3 [D+H] Opt-in demographics, four-fifths warning; never on cards, inbox rows or evidence (lib/impact/fairness.test.ts)
 - [x] E7.4 [H] Seed data: 200 fake candidates, 3 employers, deterministic generator, synthetic names; loads from the inbox or /admin/impact (lib/impact/seed.ts)
-- [ ] C8.1 [D] Practice mode, nothing shared, deleted after 24 h
-- [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
+- [x] C8.1 [D] Practice mode, nothing shared, deleted after 24 h (/practice; store refuses to share practice runs and hides them from employer lists; purge on every page load; lib/practice/practice.test.ts with an injected clock, tests/e2e/practice.spec.ts)
+- [x] C8.2 [D] Practice feedback on clarity and specificity, never a score (practice-feedback prompt in lib/ai/services/coach.ts, local rules behind the provider; lib/ai/practiceFeedback.test.ts, tests/e2e/practice.spec.ts)
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
-- [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)
-- [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
-- [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
-- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/)
+- [x] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe): zero serious/critical axe findings on every route in light and dark (tests/e2e/a11y.spec.ts, lib/store/accommodations.test.ts; docs/POLISH.md)
+- [x] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px): docs/POLISH.md, each item tied to a test
+- [x] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script (Ctrl+Shift+D panel: roles, seed, reset, jumps; /demo/reset and `pnpm demo:reset`; lib/demo/reset.test.ts, tests/e2e/demo.spec.ts)
+- [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video (draft ready for Haris: docs/pitch/, updated for the v2 merge: Second Look, Resume vs Evidence, Final score sorts only, Ctrl+Shift+D panel)
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
-- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts passes with --repeat-each=2; Second Look, Resume vs Evidence and the demo panel steps skipped until merged)
-- [ ] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario
+- [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug (draft ready for Haris: tests/e2e/demo-script.spec.ts covers every script step incl. demo panel reset, Second Look and Resume vs Evidence, green with --repeat-each=2; only the turning-point jump is skipped because the demo panel has no such link, so the script uses a prepared tab. Needs two human rehearsals.)
+- [x] E8.2 [D] (P2) "Ask for a short add-on" mini-scenario (recruiter one-click request on a reused card, 5-minute text mini-scenario for only the missing skills, evidence levels only; lib/addon/addon.test.ts, tests/e2e/addon.spec.ts)
 - Done when: axe zero serious issues, Lighthouse 85+ on the game page, bias test passes, demo runs twice in a row without a bug.
 
 ## Blockers

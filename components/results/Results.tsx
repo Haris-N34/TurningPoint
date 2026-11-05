@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
@@ -9,6 +10,8 @@ import { store } from "@/lib/store/store";
 import { BadgeExport } from "./BadgeExport";
 import { CandidateActions } from "./CandidateActions";
 import { ResumeIntake } from "./ResumeIntake";
+import { PracticeResults } from "@/components/practice/PracticeResults";
+import { isPracticeChallenge } from "@/lib/practice/practice";
 
 // Candidate's results (C7): their own card exactly as an employer sees it, plus their controls.
 export function Results({ attemptId }: { attemptId: string }) {
@@ -27,8 +30,11 @@ export function Results({ attemptId }: { attemptId: string }) {
       .catch(() => undefined);
   }, [loaded, attemptId]);
 
-  if (card === undefined) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (card === undefined) return <PageSkeleton />;
   if (card === null) return <main className="mx-auto max-w-2xl px-6 py-16"><span aria-hidden="true" className="text-5xl text-primary">↗</span><h1 className="mt-6 font-display text-4xl">Your card is not on this device</h1><p className="mt-4 text-muted-foreground">Results stay in the browser where you completed the challenge. Return to that browser, or start a new challenge here.</p><Link className="mt-6 inline-flex min-h-11 items-center rounded-md bg-primary px-5 font-medium text-primary-foreground" href="/candidate">Explore challenges</Link></main>;
+
+  // A practice run has no card to share: show its private feedback instead (C8.1, C8.2).
+  if (isPracticeChallenge(card.challenge.id)) return <PracticeResults card={card} />;
 
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-6 py-6 sm:px-10" data-testid="results">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { withAccommodation } from "@/lib/store/accommodations";
 import { useRecorder, type Mode } from "@/components/checkpoint/useRecorder";
 import { store, type Profile } from "@/lib/store/store";
 
@@ -81,7 +82,7 @@ export function Onboarding({ scenarioId, title }: { scenarioId: string; title: s
         {step === 2 && <form onSubmit={e => e.preventDefault()} className="mt-6 space-y-7">
           <fieldset><legend className="mb-3 font-semibold">Your default answer format</legend><div className="flex flex-wrap gap-3">{(["video", "voice", "text"] as Mode[]).map(m => <label key={m} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border px-4"><input type="radio" name="answer-mode" checked={mode === m} onChange={() => selectMode(m)} />{m === "text" ? "Text only" : m === "video" ? "Video" : "Voice"}</label>)}</div><p className="mt-2 text-sm text-muted-foreground">You can change this again at every checkpoint.</p></fieldset>
           <fieldset><legend className="mb-3 font-semibold">Extra time, whenever you need it</legend><div className="flex flex-wrap gap-3">{([1, 1.5, 2] as const).map(value => <label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border px-4"><input type="radio" name="time-multiplier" checked={multiplier === value} onChange={() => save({ ...profile, accommodations: { ...profile.accommodations, timeMultiplier: value } })} />{value}× time</label>)}</div><p className="mt-2 text-sm text-muted-foreground">Your decision checkpoints: {Math.round(15 * multiplier)} seconds to think, {60 * multiplier} seconds to answer. Employers only see “adjusted timing”.</p></fieldset>
-          <div className="space-y-3">{([["screenReader", "Screen reader mode"], ["reducedMotion", "Reduce motion"], ["lowBandwidth", "Low bandwidth"]] as const).map(([key, label]) => <label key={key} className="flex min-h-11 items-center gap-3"><input type="checkbox" checked={profile.accommodations[key]} onChange={e => save({ ...profile, accommodations: { ...profile.accommodations, [key]: e.target.checked } })} />{label}</label>)}</div>
+          <div className="space-y-3">{([["screenReader", "Screen reader mode"], ["reducedMotion", "Reduce motion"], ["lowBandwidth", "Low bandwidth"]] as const).map(([key, label]) => <label key={key} className="flex min-h-11 items-center gap-3"><input type="checkbox" checked={profile.accommodations[key]} onChange={e => save(withAccommodation(profile, key, e.target.checked))} />{label}</label>)}</div>
           <p className="text-sm text-muted-foreground">Preferences save automatically on this device. You do not need to give a reason.</p>
         </form>}
         {step === 3 && <div className="mt-6 space-y-5">

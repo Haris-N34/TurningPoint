@@ -24,13 +24,19 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
     let url: string | undefined;
     let alive = true;
     if (checkpoint.media) {
-      // Demo seed clips are static files; candidate recordings live in IndexedDB.
+      // Demo seed clips are static files; candidate recordings live in IndexedDB and play only
+      // through a 1-hour signed link (PV3).
       if (checkpoint.media.startsWith("demo/")) setSrc(`/${checkpoint.media}`);
       else
-        media.url(checkpoint.media).then((u) => {
-          url = u;
-          if (alive) setSrc(u);
-        });
+        media
+          .signedUrl(checkpoint.media)
+          .then(media.playbackUrl)
+          .then((u) => {
+            url = u;
+            if (alive) setSrc(u);
+            else if (u) URL.revokeObjectURL(u);
+          })
+          .catch(() => {});
     }
     return () => {
       alive = false;
@@ -58,9 +64,9 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} controls playsInline onTimeUpdate={onTime} className="aspect-video w-full rounded-xl bg-black" data-testid="clip-media" />
+            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video w-full rounded-xl bg-black" data-testid="clip-media" />
           ) : (
-            <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
+            <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}
         </div>
       )}

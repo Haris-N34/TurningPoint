@@ -61,7 +61,7 @@ export function VerifyIdentity() {
         <button onClick={() => setStep("sso")} className="mt-6 rounded-full bg-foreground px-5 py-2.5 font-medium text-background">
           Sign in with {school.name}
         </button>
-        <p className="mt-3 text-xs opacity-60">Demo: this sign-in is simulated.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Demo: this sign-in is simulated.</p>
       </main>
     );
   }

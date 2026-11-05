@@ -13,6 +13,19 @@ import { pixelTitle } from "./fonts";
 import { Portrait } from "./Portrait";
 import { Panel, PixelButton } from "./ui";
 
+/** The title screen's map: a still image with a slow pan (no game engine on the first screen). */
+export function TitleBackdrop({ mapId, label }: { mapId: string; label: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-[#2e222f]" role="img" aria-label={label} data-testid="title-map">
+      <picture>
+        <source media="(max-width: 640px)" srcSet={`/assets/title/${mapId}-phone.jpg`} />
+        <img src={`/assets/title/${mapId}.jpg`} alt="" fetchPriority="high" className="h-full w-[115%] max-w-none object-cover [image-rendering:pixelated] motion-safe:animate-[tp-pan_28s_ease-in-out_infinite_alternate]" />
+      </picture>
+      <style>{`@keyframes tp-pan { from { transform: translateX(0) } to { transform: translateX(-13%) } }`}</style>
+    </div>
+  );
+}
+
 export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: { scenario: MapScenario; onStart: () => void; canResume: boolean; onResume: () => void; brief?: { company: string; title: string } }) {
   const settings = useGame((g) => g.settings);
   const setSettings = useGame((g) => g.setSettings);
@@ -30,7 +43,7 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
   }, [onStart, showSettings]);
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-gradient-to-b from-[#2e222f]/40 via-transparent to-[#2e222f]/70 p-4 text-center" data-testid="title-screen" onClick={(e) => e.target === e.currentTarget && onStart()}>
-      <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className={cn(pixelTitle.className, "text-[28px] leading-tight text-[#fff8e7] drop-shadow-[0_4px_0_#2e222f] sm:text-[44px]")}>
+      <motion.h1 initial={{ y: -20 }} animate={{ y: 0 }} className={cn(pixelTitle.className, "text-[28px] leading-tight text-[#fff8e7] drop-shadow-[0_4px_0_#2e222f] sm:text-[44px]")}>
         TURNING<br />POINT
       </motion.h1>
       <p className="mt-3 rounded-[4px] bg-[#2e222f]/80 px-3 py-1 text-[#ffd166]">{scenario.title}: {scenario.role}</p>
@@ -249,7 +262,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
           <div className="flex gap-3">
             <Portrait id={caller.portrait} expression="worried" className="size-20 shrink-0 rounded-[4px] border-[3px] border-[#2e222f] bg-[#3b2f45]" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#d9472b]">Turning point</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#c43d22]">Turning point</p>
               <h2 className={cn(pixelTitle.className, "mt-1 text-[13px] leading-snug")}>{d.title}</h2>
               <p className="mt-2 text-[16px]">{caller.name}: “{d.text}”</p>
             </div>
@@ -257,7 +270,7 @@ export function Cutscene({ scenario, state, onDone }: { scenario: MapScenario; s
           {phase === "drain" && (
             <div className="mt-3 rounded-[4px] border-2 border-[#2e222f] bg-white p-2 text-center">
               <p className="text-xs font-semibold uppercase">Budget</p>
-              <motion.p className={cn(pixelTitle.className, "text-[18px] text-[#d9472b]")} data-testid="budget-drain">{shown}</motion.p>
+              <motion.p className={cn(pixelTitle.className, "text-[18px] text-[#c43d22]")} data-testid="budget-drain">{shown}</motion.p>
             </div>
           )}
           <div className="mt-3 flex justify-end">
@@ -368,7 +381,7 @@ export function ResultsScreen({ scenario, state, kpis, onContinue }: { scenario:
         <h3 className="mt-4 text-sm font-bold">Your key moments</h3>
         <ol className="mt-1 flex gap-2 overflow-x-auto pb-2">
           {moments.map((e, i) => (
-            <li key={i} className={cn("min-w-[150px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[12px]", e.kind === "turning_point" ? "bg-[#d9472b] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
+            <li key={i} className={cn("min-w-[150px] rounded-[4px] border-2 border-[#2e222f] p-2 text-[12px]", e.kind === "turning_point" ? "bg-[#c43d22] text-white" : e.kind === "expired" ? "bg-[#e8d9b5]" : "bg-white")}>
               <span className="block font-bold">{formatTime(e.t)}</span>
               {label(e)}
             </li>

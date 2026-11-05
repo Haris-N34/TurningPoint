@@ -315,13 +315,13 @@ export function Game({ scenario, challenge, sandbox = false }: { scenario: Scena
                 initial={{ scale: 0.92, y: 24 }}
                 animate={{ scale: 1, y: 0 }}
               >
-                <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Turning point</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary">Turning point</p>
                 <h2 id="tp-title" className="mt-2 text-2xl font-semibold">{v.title}</h2>
                 <p className="mt-3 leading-relaxed">{v.text}</p>
                 {v.disruption && (
                   <ul className="mt-4 flex flex-wrap gap-2" aria-label="What changed">
                     {Object.entries(v.disruption.effects).map(([k, d]) => (
-                      <li key={k} className="rounded-full bg-orange-600/10 px-3 py-1 text-sm font-medium text-orange-700 dark:text-orange-300">
+                      <li key={k} className="rounded-full bg-orange-600/10 px-3 py-1 text-sm font-medium text-orange-800 dark:text-orange-200">
                         {scenario.resources[k]?.label} {d > 0 ? "+" : "−"}
                         {scenario.resources[k]?.unit === "$" ? `$${Math.abs(d).toLocaleString("en-CA")}` : Math.abs(d)}
                       </li>

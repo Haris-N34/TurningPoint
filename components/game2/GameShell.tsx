@@ -26,7 +26,7 @@ import { DialogueBox, ReactionBox } from "./DialogueBox";
 import { pixelBody, pixelTitle } from "./fonts";
 import { Clock, IssueTracker, Resources, Toasts } from "./Hud";
 import { ListView } from "./ListView";
-import { AvatarCreator, Cutscene, LoadingScreen, PauseMenu, Recap, ResultsScreen, TitleScreen } from "./Screens";
+import { AvatarCreator, Cutscene, LoadingScreen, PauseMenu, Recap, ResultsScreen, TitleScreen, TitleBackdrop } from "./Screens";
 import { Panel, PixelButton } from "./ui";
 
 const MapCanvas = dynamic(() => import("@/components/game/MapCanvas"), { ssr: false });
@@ -79,7 +79,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setProfile(p);
     // Extra-time accommodations switch on turn-based mode automatically (A5).
     if (p.accommodations.timeMultiplier > 1) setSettings({ turnBased: true });
-    if (p.accommodations.reducedMotion) setSettings({ reducedMotion: true });
+    if (p.accommodations.reducedMotion || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setSettings({ reducedMotion: true });
     setHydrated(true);
     if (!sandbox) {
       const r = s.activeRun(challenge.id);
@@ -123,9 +123,26 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setScreen("loading");
   }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
 
+  // Demo jump (P.2): /game/<map>?jump=turning-point fast-forwards a fresh run to the turning point. Never saved.
+  const [jump, setJump] = useState(false);
+  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
+  const jumped = useRef(false);
+  useEffect(() => {
+    if (!jump || jumped.current || screen !== "play" || !state) return;
+    jumped.current = true;
+    for (let i = 0; i < 80; i++) {
+      const st = useGame.getState().state;
+      if (!st || st.ended || st.tp.fired) break;
+      for (const c of st.checkpointsDue) dispatch(c.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: c.id });
+      if (useGame.getState().state?.dialogue) dispatch({ type: "leave" });
+      dispatch({ type: "wait" });
+    }
+    setRecapDay(undefined);
+  }, [jump, screen, state, dispatch, setRecapDay]);
+
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
-    if (!state || sandbox || !attemptId) return;
+    if (!state || sandbox || jump || !attemptId) return;
     store().saveRun({
       attemptId,
       challengeId: challenge.id,
@@ -137,7 +154,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       startedAt: new Date().toISOString(),
       practice: false,
     });
-  }, [state, answers, integrity, attemptId, sandbox, challenge.id, mapId, avatar, phase]);
+  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase]);
 
   // Music: calm, then tense after the turning point (A0).
   useEffect(() => {
@@ -331,7 +348,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
 
   return (
     <div className={cn(pixelBody.className, "fixed inset-0 z-[60] overflow-hidden bg-[#2e222f] text-[#2e222f]")} data-testid="game-shell" data-screen={screen} data-ready={hydrated ? "1" : "0"} data-saw-loading={sawLoading ? "1" : "0"} data-last-reaction={lastReaction}>
-      {(screen === "title" || screen === "avatar") && <MapCanvas scenario={scenario} avatar={avatar.look} attract label="The market at Launch Week, seen from above" />}
+      {/* Title: a still of the map, so the first screen paints fast on phones (A.20). The live map starts at the avatar step. */}
+      {screen === "title" && <TitleBackdrop mapId={mapId} label={`${scenario.title}, seen from above`} />}
+      {screen === "avatar" && <MapCanvas scenario={scenario} avatar={avatar.look} attract label={`${scenario.title}, seen from above`} />}
       {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} brief={challenge.id.startsWith("map-") ? undefined : challenge} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}
       {(screen === "loading" || screen === "play" || screen === "results") && state && (

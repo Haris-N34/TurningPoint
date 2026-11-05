@@ -1,5 +1,6 @@
 "use client";
 
+import { PageSkeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { Game } from "@/components/game/Game";
 import { GameShell } from "@/components/game2/GameShell";
@@ -20,7 +21,7 @@ export function ChallengePlay({ slug, challengeId, sandbox = false }: { slug?: s
     setC(found);
   }, [slug, challengeId, sandbox]);
 
-  if (c === undefined) return <div className="p-8" aria-busy="true">Loading…</div>;
+  if (c === undefined) return <PageSkeleton />;
   if (c === null) return <main className="mx-auto max-w-xl p-6">This challenge isn&apos;t available.</main>;
   const shell = { id: c.id, title: c.title, company: c.company.name, targetSkills: c.targetSkills };
   // Templates with a v2 map play the map game, with the employer's tailoring and edits applied.
