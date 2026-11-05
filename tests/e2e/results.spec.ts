@@ -18,7 +18,7 @@ test("results controls and witness confirmation are accessible, with a copyable 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const resultsAxe = await new AxeBuilder({page}).analyze();
   expect(resultsAxe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
-  await page.screenshot({ path: `/private/tmp/tp-results-${test.info().project.name}.png`, fullPage: true });
+  await page.screenshot({ path: test.info().outputPath("tp-results.png"), fullPage: true });
   await page.goto(link!);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   const skills = page.getByRole("checkbox");
@@ -26,7 +26,7 @@ test("results controls and witness confirmation are accessible, with a copyable 
   await expect(skills.nth(3)).toBeDisabled();
   const witnessAxe = await new AxeBuilder({page}).analyze();
   expect(witnessAxe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
-  await page.screenshot({ path: `/private/tmp/tp-witness-${test.info().project.name}.png`, fullPage: true });
+  await page.screenshot({ path: test.info().outputPath("tp-witness.png"), fullPage: true });
   await page.getByRole("button", { name: "I can't confirm this" }).click();
   await expect(page.getByTestId("witness-done")).toContainText("can't confirm");
 });
