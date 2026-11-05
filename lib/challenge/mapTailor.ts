@@ -10,6 +10,8 @@ const texts = z.record(z.string(), z.string().min(1));
 export const MapOverridesSchema = z.object({
   title: z.string().min(1).optional(),
   summary: z.string().min(1).optional(),
+  /** Quick mode (Mon to Wed) has its own summary on the title screen. */
+  quickSummary: z.string().min(1).optional(),
   role: z.string().min(1).optional(),
   /** NPC lines, keyed "node:index". */
   lines: texts.default({}),
@@ -35,6 +37,7 @@ function merge(base: MapScenario, ov: MapOverrides): MapScenario {
   const m = structuredClone(base);
   if (ov.title) m.title = ov.title;
   if (ov.summary) m.summary = ov.summary;
+  if (ov.quickSummary && m.quick) m.quick.summary = ov.quickSummary;
   if (ov.role) m.role = ov.role;
   for (const n of m.nodes) {
     n.lines.forEach((l, i) => (l.text = ov.lines[`${n.id}:${i}`] ?? l.text));
@@ -74,6 +77,7 @@ export function diffMap(base: MapScenario, edited: MapScenario): MapOverrides {
   const ov: MapOverrides = { lines: {}, prompts: {}, options: {}, reactions: {}, issues: {}, disruptions: {} };
   if (edited.title !== base.title) ov.title = edited.title;
   if (edited.summary !== base.summary) ov.summary = edited.summary;
+  if (edited.quick?.summary && edited.quick.summary !== base.quick?.summary) ov.quickSummary = edited.quick.summary;
   if (edited.role !== base.role) ov.role = edited.role;
   for (const n of base.nodes) {
     const e = edited.nodes.find((x) => x.id === n.id);
@@ -118,6 +122,7 @@ export function tailorMap(base: MapScenario, industry: Industry, company?: strin
     const m = structuredClone(base);
     m.title = t(m.title);
     m.summary = t(m.summary);
+    if (m.quick?.summary) m.quick.summary = t(m.quick.summary);
     m.role = t(m.role);
     m.industryFlavour = industry.toLowerCase();
     for (const n of m.nodes) {

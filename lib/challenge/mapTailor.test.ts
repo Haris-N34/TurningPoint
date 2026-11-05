@@ -77,3 +77,15 @@ describe("map tailoring and edits (E1.3, E1.4 on v2 maps)", () => {
     expect(challengeMap({ templateId: "sample" })).toBeUndefined();
   });
 });
+
+describe("Quick mode title summary is tailored too", () => {
+  it("rewrites quick.summary for the industry and keeps it through the stored diff", () => {
+    const base = mapForTemplate("launch-week")!.map;
+    expect(base.quick?.summary).toMatch(/community market/i);
+    const { map } = tailorMap(base, "Energy", "Prairie Grid Energy");
+    expect(map.quick?.summary).toMatch(/community energy fair/i);
+    const ov = diffMap(base, map);
+    expect(ov.quickSummary).toBe(map.quick?.summary);
+    expect(applyMapOverrides(base, ov).quick?.summary).toBe(map.quick?.summary);
+  });
+});
