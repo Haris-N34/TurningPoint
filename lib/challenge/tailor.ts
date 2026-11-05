@@ -8,7 +8,7 @@ export type Industry = (typeof INDUSTRIES)[number];
 
 type Lexicon = [RegExp, string | ((m: string) => string)][];
 
-const LEX: Record<Industry, Lexicon> = {
+export const LEX: Record<Industry, Lexicon> = {
   "Non-profit": [],
   Energy: [
     [/pop-up food market/gi, "community energy fair"],
@@ -83,7 +83,7 @@ const LEX: Record<Industry, Lexicon> = {
   ],
 };
 
-function swap(text: string, lex: Lexicon, company?: string): string {
+export function swap(text: string, lex: Lexicon, company?: string): string {
   let out = text;
   for (const [re, to] of lex) out = typeof to === "string" ? out.replace(re, to) : out.replace(re, to);
   if (company) out = out.replace(/\{company\}/g, company);

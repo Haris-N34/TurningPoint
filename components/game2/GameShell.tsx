@@ -16,6 +16,7 @@ import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
 import { scenarioForRun } from "@/lib/ai/services/publish";
+import { applyMapOverrides, type MapOverrides } from "@/lib/challenge/mapTailor";
 import { useGame } from "@/lib/game/store";
 import { parseTime } from "@/lib/game/time";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -38,8 +39,9 @@ function newAttemptId() {
   return "att_" + r.replace(/-/g, "").slice(0, 10);
 }
 
-export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean }) {
-  const scenario = useMemo(() => getMapScenario(mapId)!, [mapId]);
+export function GameShell({ mapId, challenge, sandbox = false, overrides }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean; overrides?: MapOverrides }) {
+  // The employer's wording and checkpoint edits (E1.3, E1.4). Ids and effects are untouched, so replay stays valid.
+  const scenario = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
   const router = useRouter();
   const screen = useGame((g) => g.screen);
   const state = useGame((g) => g.state);
@@ -349,7 +351,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
       {/* Title: a still of the map, so the first screen paints fast on phones (A.20). The live map starts at the avatar step. */}
       {screen === "title" && <TitleBackdrop mapId={mapId} label={`${scenario.title}, seen from above`} />}
       {screen === "avatar" && <MapCanvas scenario={scenario} avatar={avatar.look} attract label={`${scenario.title}, seen from above`} />}
-      {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} />}
+      {screen === "title" && <TitleScreen scenario={scenario} onStart={start} canResume={!!resumable} onResume={resume} brief={challenge.id.startsWith("map-") ? undefined : challenge} />}
       {screen === "avatar" && <AvatarCreator onDone={begin} />}
       {(screen === "loading" || screen === "play" || screen === "results") && state && (
         <>
