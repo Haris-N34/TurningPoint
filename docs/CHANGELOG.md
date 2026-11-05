@@ -29,6 +29,6 @@ Ticked: A.3, A.4, A.5, A.6, A.7, A.8, A.10, A.11, A.12, A.13, A.14, A.15, A.16, 
 - Fixes: dialogue waits behind cutscene and recap (they stole focus); camera pan ease crashed the page; dialogue name tag said "You" under the NPC's portrait; game fonts self-hosted.
 
 Screens (desktop, `SCREENS=1 pnpm exec playwright test -g screenshots`):
-`game-title`, `game-avatar`, `game-map`, `game-dialogue`, `game-checkpoint`, `game-cutscene`, `game-results`. Phone has all but results (the phone run timed out on a loaded machine; rerun to refresh).
+`game-title`, `game-avatar`, `game-map`, `game-dialogue`, `game-checkpoint`, `game-cutscene`, `game-results`. Phone has the same set.
 
 Open in M1.5: A.1 and A.2 (quiz test review), A.9 (map-view full run), A.19 (12 to 16 minute timing), A.20 (Lighthouse and fps), A.21 (map-view full runs), A.23 (portrait sets, Haris).

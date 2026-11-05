@@ -272,13 +272,13 @@ test("screenshots: title, map, dialogue, checkpoint, cutscene, results (A.3)", a
   await shot("checkpoint");
   await clearOverlay(page);
   for (let i = 0; i < 40 && !(await page.getByTestId("cutscene").isVisible()); i++) {
-    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click();
+    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click({ timeout: 3000 }).catch(() => {});
   }
   await expect(page.getByTestId("cutscene")).toBeVisible();
   await page.waitForTimeout(800);
   await shot("cutscene");
   for (let i = 0; i < 200 && !(await page.getByTestId("to-results").isVisible()); i++) {
-    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click();
+    if (!(await clearOverlay(page))) await page.getByTestId("wait").first().click({ timeout: 3000 }).catch(() => {});
   }
   await page.getByTestId("to-results").click();
   await expect(page.getByTestId("results-screen")).toBeVisible();
