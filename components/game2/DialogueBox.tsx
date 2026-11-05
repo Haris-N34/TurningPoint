@@ -88,6 +88,10 @@ export function DialogueBox({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Keys typed into a field or pressed inside another dialog (a checkpoint) are not for this box (QA #30).
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.('input, textarea, select, [contenteditable="true"]') || (t?.closest?.('[role="dialog"]') && !t.closest('[data-testid="dialogue"]'))) return;
+      if (document.querySelector('[data-testid="checkpoint"]')) return;
       if (!tw.done && (e.key === " " || e.key === "Enter")) {
         e.preventDefault();
         tw.skip();
