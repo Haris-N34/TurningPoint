@@ -52,3 +52,32 @@ test("landing and candidate pages link straight to the game", async ({ page }) =
   await expect(page.getByTestId("play-game")).toHaveAttribute("href", "/game/launch-week");
   await expect(page.getByRole("link", { name: /Play the game: The Client Pivot/ })).toHaveAttribute("href", "/game/client-pivot");
 });
+
+test("landing preview: four captioned stills that loop, pause on request, and stay still under reduced motion", async ({ page }) => {
+  await page.goto("/");
+  const preview = page.getByTestId("hero-preview");
+  await expect(preview).toContainText("See it in 10 seconds");
+  for (const c of ["The plan breaks.", "You choose.", "We ask why.", "The recruiter sees evidence."]) await expect(preview).toContainText(c);
+  const frame = page.getByTestId("hero-frame");
+  await expect(frame).toHaveAttribute("alt", /title screen/);
+  // It advances on its own...
+  await expect(frame).not.toHaveAttribute("alt", /title screen/, { timeout: 6000 });
+  // ...and stops when paused.
+  await page.getByTestId("hero-pause").click();
+  const alt = await frame.getAttribute("alt");
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(3000);
+  await expect(frame).toHaveAttribute("alt", alt!);
+  // Steps are buttons, so anyone can move through it by hand.
+  await preview.getByRole("button", { name: /The recruiter sees evidence/ }).click();
+  await expect(frame).toHaveAttribute("alt", /Capability Card/);
+});
+
+test("landing preview does not move under reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const frame = page.getByTestId("hero-frame");
+  await expect(frame).toHaveAttribute("alt", /title screen/);
+  await page.waitForTimeout(3500);
+  await expect(frame).toHaveAttribute("alt", /title screen/);
+});
