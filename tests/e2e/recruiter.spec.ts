@@ -150,3 +150,25 @@ test("demo inbox reads like a real list: Maya first, synthetic peers labelled, q
   const answers = await page.getByTestId("answers").boundingBox();
   expect(ask!.y + ask!.height).toBeLessThanOrEqual(answers!.y);
 });
+
+test("employers never see accommodation status: card, inbox and compare (privacy)", async ({ page }) => {
+  await seed(page);
+  // Maya and a peer both used an accommodation (extra time or turn-based play).
+  await page.evaluate(() => {
+    for (const id of ["att_demo_maya", "att_demo_peer_01"]) {
+      const key = `tp:card:${id}`;
+      const card = JSON.parse(localStorage.getItem(key)!);
+      localStorage.setItem(key, JSON.stringify({ ...card, adjustedTiming: true }));
+    }
+  });
+  const hidden = /adjusted timing|accommodation|extra time|turn-based/i;
+  await page.goto("/recruiter");
+  await expect(page.getByTestId(`row-${MAYA}`)).toBeVisible();
+  await expect(page.getByTestId("inbox")).not.toContainText(hidden);
+  await page.goto(CARD);
+  await expect(page.getByTestId("capability-card")).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(hidden);
+  await page.goto(`/recruiter/compare?challenge=ch_demo_energy&ids=${MAYA},att_demo_peer_01`);
+  await expect(page.getByTestId("compare")).toBeVisible();
+  await expect(page.getByTestId("compare")).not.toContainText(hidden);
+});

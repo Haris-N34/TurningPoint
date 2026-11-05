@@ -103,7 +103,7 @@ export function Inbox() {
             setVersion((v) => v + 1);
           }}
         >
-          Load 200 fictional candidates
+          Load 200 fictional candidates (3 employers)
         </Button>
       </main>
     );
@@ -308,11 +308,16 @@ export function Inbox() {
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 tabular-nums text-muted-foreground max-sm:order-3 max-sm:text-xs">{new Date(r.date).toLocaleDateString("en-CA")}</td>
                   <td className="py-2.5 pl-3 pr-4 text-right max-sm:order-2 max-sm:ml-auto">
-                    {!r.withdrawn && r.status !== "shortlist" && (
-                      <Button size="sm" variant="ghost" className="border border-transparent group-hover:border-border group-hover:bg-card" onClick={() => shortlist(r)}>
-                        Shortlist
-                      </Button>
-                    )}
+                    {!r.withdrawn &&
+                      (r.status === "shortlist" ? (
+                        <span className="inline-flex min-h-9 items-center gap-1 whitespace-nowrap rounded-lg px-3.5 text-[13px] font-medium text-primary">
+                          <span aria-hidden>✓</span> Shortlisted
+                        </span>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => shortlist(r)}>
+                          Shortlist
+                        </Button>
+                      ))}
                   </td>
                 </tr>
               ))}
