@@ -117,7 +117,6 @@ export function CapabilityCard({
               {identity.displayName}
             </h1>
             {card.candidate.verified && <Badge variant="secondary">Verified student</Badge>}
-            {card.adjustedTiming && <Badge variant="outline">Adjusted timing</Badge>}
             {identity.anonymous && <Badge variant="outline">Anonymous review</Badge>}
             {reused && (
               <Badge variant="outline" data-testid="reused-badge">

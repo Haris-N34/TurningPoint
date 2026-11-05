@@ -53,7 +53,7 @@ export function AdminHome() {
             </div>
           </li>
         ))}
-        {!list.length && <li className="text-muted-foreground">No challenges yet. Create one in about 10 minutes.</li>}
+        {!list.length && <li className="text-muted-foreground">No challenges yet. Setup takes under 10 minutes.</li>}
       </ul>
     </main>
   );

@@ -93,7 +93,7 @@ export function Builder() {
       <main className="mx-auto max-w-3xl px-6 py-12" data-testid="published">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">Published</p>
         <h1 className="mt-2 font-display text-4xl">{published.title}</h1>
-        <p className="mt-1 text-muted-foreground">{published.company.name} · set up in about {mins} minute{mins === 1 ? "" : "s"}</p>
+        <p className="mt-1 text-muted-foreground">{published.company.name} · set up in {mins <= 1 ? "about a minute" : `about ${mins} minutes`}</p>
         <div className="mt-8 grid gap-6 sm:grid-cols-[1fr_auto]">
           <div className="space-y-3">
             <p className="text-sm font-medium">Candidate link</p>
