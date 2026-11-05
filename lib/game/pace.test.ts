@@ -4,8 +4,7 @@ import { newGame } from "./engine";
 import { paceOf, scriptedRun } from "./pace";
 
 describe("run length at normal pace (A.19)", () => {
-  // The Client Pivot is 16.0 min on its slowest path; it joins this list once its content trim lands (claude/v2-disruptions).
-  for (const id of ["launch-week"]) {
+  for (const id of ["launch-week", "client-pivot"]) {
     for (const [name, pick] of [
       ["first option", (ids: string[]) => ids[0]],
       ["last option", (ids: string[]) => ids.at(-1)!],

@@ -21,16 +21,16 @@
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:f52aad86892e3947": {
+ "checkpoint-question@1.0.0:1132d5c714a34a47": {
   "output": {
-   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
    "source": "generated"
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:f5722ffd75c35d6d": {
+ "checkpoint-question@1.0.0:df68a6ced2ac9252": {
   "output": {
-   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
+   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
    "source": "generated"
   },
   "model": "local-rules"
@@ -67,7 +67,7 @@
   },
   "model": "local-rules"
  },
- "dialogue-variants@1.0.1:415eb3a13b01f8b3": {
+ "dialogue-variants@1.0.1:2dfb06066a102e99": {
   "output": {
    "variants": [
     {
@@ -137,9 +137,25 @@
     {
      "key": "n-recovery:0",
      "texts": [
-      "The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left.",
-      "The disruption has cut our budget and unsettled the team. I need a plan that fits what we've left.",
-      "Quick one. The disruption has cut our budget and unsettled the team. I need a plan that fits what we have left."
+      "The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
+      "Look. The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.",
+      "Quick one. The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left."
+     ]
+    },
+    {
+     "key": "n-recovery-venue:0",
+     "texts": [
+      "We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
+      "Look. We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.",
+      "Quick one. We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go."
+     ]
+    },
+    {
+     "key": "n-recovery-cover:0",
+     "texts": [
+      "Priya leaves Thursday. Her set-up and gate shifts on Saturday have nobody on them yet.",
+      "Look. Priya leaves Thursday. Her set-up and gate shifts on Saturday have nobody on them yet.",
+      "Quick one. Priya leaves Thursday. Her set-up and gate shifts on Saturday have nobody on them yet."
      ]
     },
     {
@@ -148,6 +164,30 @@
       "The group chat went quiet after the news. Two people asked if it's even happening.",
       "The group chat went quiet after the news. Two people asked if it is even happening.",
       "Quick one. The group chat went quiet after the news. Two people asked if it's even happening."
+     ]
+    },
+    {
+     "key": "n-vendors-moved:0",
+     "texts": [
+      "So where do we set up now? I need power for my oven and a time to unload.",
+      "Hey. So where do we set up now? I need power for my oven and a time to unload.",
+      "Listen. So where do we set up now? I need power for my oven and a time to unload."
+     ]
+    },
+    {
+     "key": "n-handover:0",
+     "texts": [
+      "Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float.",
+      "Before I go I want to hand over properly. I've the rota, the vendor contacts and the gate float.",
+      "Quick one. Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float."
+     ]
+    },
+    {
+     "key": "n-lost-lead:0",
+     "texts": [
+      "Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
+      "Heads up. Everyone liked working with Priya. A couple of the new ones asked who they report to now.",
+      "Right. Everyone liked working with Priya. A couple of the new ones asked who they report to now."
      ]
     },
     {
@@ -187,7 +227,7 @@
      "texts": [
       "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
       "There's a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.",
-      "Quick one. There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space."
+      "Right. There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space."
      ]
     },
     {

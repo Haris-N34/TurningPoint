@@ -61,7 +61,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] A.16 [D] All A8 KPIs compute correctly from a recorded input log (unit tests with fixtures)
 - [x] A.17 [D] Checkpoints trigger after eligible actions; the order question fires once and logs said-vs-did
 - [x] A.18 [D] List view gives identical engine state to map view for the same inputs (unit test)
-- [x] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace (pace model lib/game/pace.ts over a scripted run: Launch Week 14.3 to 15.5 min; Client Pivot joins after its trim)
+- [x] A.19 [D] Full run takes 12 to 16 minutes in a scripted Playwright run at normal pace (pace model lib/game/pace.ts over scripted runs: Launch Week 12.2 to 14.4 min, Client Pivot 13.2 to 15.7 min)
 - [ ] A.20 [D] Lighthouse performance 80+ on the game page (mid-range phone profile); 50+ fps on desktop
 - [x] A.21 [D] Test hooks window.__tp (NEXT_PUBLIC_TEST_HOOKS=1); Playwright full run in map view (desktop, phone) and list view (keyboard only)
 - [x] A.22 [D] Skill framework extended to 12 (Analytical thinking, Curiosity and discovery); custom employer skills via the Value Mapper (B.5)
