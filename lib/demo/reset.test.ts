@@ -43,9 +43,10 @@ describe("P.2 demo reset", () => {
     expect(kv.length).toBe(1);
   });
 
-  it("jump links cover game, results, recruiter card and admin impact", () => {
+  it("jump links cover game, turning point, results, recruiter card and admin impact", () => {
     expect(DEMO_JUMPS.map((j) => j.href)).toEqual([
       "/game/launch-week",
+      "/game/launch-week?jump=turning-point",
       "/results/att_demo_maya",
       "/recruiter/card/att_demo_maya?challenge=ch_demo_energy",
       "/admin/impact",

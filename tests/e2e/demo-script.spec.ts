@@ -207,8 +207,19 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
   });
 
-  test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async () => {
-    test.skip(true, "The merged demo panel (P.2) jumps to Game, Results, Recruiter card and Admin impact only; it has no turning-point jump. The script uses the prepared tab instead.");
+  test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async ({ page }) => {
+    await seed(page);
+    await page.goto("/");
+    await page.keyboard.press("Control+Shift+D");
+    await page.getByTestId("demo-panel").getByRole("link", { name: "Turning point" }).click();
+    await expect(page).toHaveURL(/jump=turning-point/);
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.getByTestId("start").click();
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Wed 09:/);
+    // A jumped run is never saved.
+    expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("tp:run:")).length)).toBe(0);
   });
 
   test("step 6: Second Look restores a candidate the mock ATS rejected", async ({ page }) => {

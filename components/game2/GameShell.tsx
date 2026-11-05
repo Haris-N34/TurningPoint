@@ -121,9 +121,26 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
     setScreen("loading");
   }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
 
+  // Demo jump (P.2): /game/<map>?jump=turning-point fast-forwards a fresh run to the turning point. Never saved.
+  const [jump, setJump] = useState(false);
+  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
+  const jumped = useRef(false);
+  useEffect(() => {
+    if (!jump || jumped.current || screen !== "play" || !state) return;
+    jumped.current = true;
+    for (let i = 0; i < 80; i++) {
+      const st = useGame.getState().state;
+      if (!st || st.ended || st.tp.fired) break;
+      for (const c of st.checkpointsDue) dispatch(c.kind === "order" ? { type: "orderAnswer", ranking: [] } : { type: "checkpointDone", id: c.id });
+      if (useGame.getState().state?.dialogue) dispatch({ type: "leave" });
+      dispatch({ type: "wait" });
+    }
+    setRecapDay(undefined);
+  }, [jump, screen, state, dispatch, setRecapDay]);
+
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
-    if (!state || sandbox || !attemptId) return;
+    if (!state || sandbox || jump || !attemptId) return;
     store().saveRun({
       attemptId,
       challengeId: challenge.id,
@@ -135,7 +152,7 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
       startedAt: new Date().toISOString(),
       practice: false,
     });
-  }, [state, answers, integrity, attemptId, sandbox, challenge.id, mapId, avatar, phase]);
+  }, [state, answers, integrity, attemptId, sandbox, jump, challenge.id, mapId, avatar, phase]);
 
   // Music: calm, then tense after the turning point (A0).
   useEffect(() => {
