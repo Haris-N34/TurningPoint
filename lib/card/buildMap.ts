@@ -68,7 +68,7 @@ export function buildMapCard(i: MapBuildInput): Card {
   const known = { name: i.candidate.displayName, university: i.candidate.university };
   // Evidence Scanner (B2): blind inputs, verified quotes.
   const evidence = scanEvidence(
-    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })), decisionPath, nodeSkills },
+    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, question, transcript }) => ({ id, nodeId, kind, question, transcript })), decisionPath, nodeSkills },
     known,
   );
   return CardSchema.parse({

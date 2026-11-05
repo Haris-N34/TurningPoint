@@ -35,17 +35,47 @@ export type BlindCard = Pick<Card, "evidence" | "decisionPath" | "kpis" | "targe
 };
 export type CopilotInput = { question: string; card: BlindCard };
 
+/** Word timings for the blinded text: kept words keep their start, a placeholder takes the start of the words it replaced. */
+export function blindWords(words: { w: string; start: number }[], blinded: string): { w: string; start: number }[] {
+  const tokens = blinded.split(/\s+/).filter(Boolean);
+  const out: { w: string; start: number }[] = [];
+  let i = 0;
+  for (let k = 0; k < tokens.length; k++) {
+    const start = words[Math.min(i, words.length - 1)]?.start ?? 0;
+    out.push({ w: tokens[k], start });
+    if (words[i]?.w === tokens[k]) {
+      i++;
+      continue;
+    }
+    // A redaction. Back-to-back placeholders take one word each; the last one skips up to the next kept word.
+    const next = tokens[k + 1];
+    i++;
+    if (next === undefined || next.startsWith("[")) continue;
+    while (i < words.length && words[i].w !== next) i++;
+  }
+  return out;
+}
+
 export function blindCard(card: Card): BlindCard {
   const known = { name: card.candidate.displayName, university: card.candidate.university };
+  const blind = (t: string) => stripPii(t, known);
   return {
     targetSkills: card.targetSkills,
-    evidence: card.evidence,
+    // Evidence quotes are transcript text too: blinded the same way, so they still match the blinded transcript.
+    evidence: card.evidence.map((e) => (e.source?.type === "clip" ? { ...e, sentence: e.sentence && blind(e.sentence), source: { ...e.source, quote: blind(e.source.quote) } } : e)),
     decisionPath: card.decisionPath,
     kpis: card.kpis,
     // Quotes must stay exact substrings of the stored transcripts, so text is only blinded where it held identity.
-    checkpoints: card.checkpoints.map((c) => ({ id: c.id, kind: c.kind, question: c.question, transcript: stripPii(c.transcript.text, known), words: c.transcript.words.map(({ w, start }) => ({ w, start })) })),
+    checkpoints: card.checkpoints.map((c) => {
+      const transcript = blind(c.transcript.text);
+      const words = c.transcript.words.map(({ w, start }) => ({ w, start }));
+      return { id: c.id, kind: c.kind, question: c.question, transcript, words: transcript === c.transcript.text ? words : blindWords(words, transcript) };
+    }),
   };
 }
+
+/** The recruiter's question is blinded too: "What did Maya do?" reaches the model as "What did [name] do?". */
+const blindQuestion = (q: string, card: Card) => stripPii(q, { name: card.candidate.displayName, university: card.candidate.university });
 
 export const DECISION_Q = /\b(?:should (?:i|we) (?:hire|reject|pass|shortlist|advance|interview|move forward)|hire (?:him|her|them|this)|(?:is|are) (?:he|she|they|this candidate) (?:a )?(?:good|bad|right|strong|weak|great|poor) (?:fit|hire|candidate|choice)|worth hiring|recommend (?:hiring|rejecting)|yes or no|thumbs up|overall score|rate (?:him|her|them|this candidate)|rank (?:him|her|them)|better than|best candidate|auto-?reject)\b/i;
 
@@ -171,8 +201,8 @@ function preRefuse(question: string): CopilotOutput | undefined {
 }
 
 export function askCopilot(question: string, card: Card, opts: RunOptions = {}): CopilotOutput {
-  return preRefuse(question) ?? runSync(copilotPrompt, { question, card: blindCard(card) }, opts).output;
+  return preRefuse(question) ?? runSync(copilotPrompt, { question: blindQuestion(question, card), card: blindCard(card) }, opts).output;
 }
 export async function askCopilotAsync(question: string, card: Card, opts: RunOptions = {}): Promise<CopilotOutput> {
-  return preRefuse(question) ?? (await run(copilotPrompt, { question, card: blindCard(card) }, opts)).output;
+  return preRefuse(question) ?? (await run(copilotPrompt, { question: blindQuestion(question, card), card: blindCard(card) }, opts)).output;
 }
