@@ -33,7 +33,7 @@ test.fixme("game: Tab stays inside the pause menu (owner: agent A, components/ga
   await tabStaysInDialog(page);
 });
 
-test.fixme("game: Tab stays inside the checkpoint dialog (owner: agent C, components/checkpoint/Checkpoint.tsx)", async ({ page }, info) => {
+test("game: Tab stays inside the checkpoint dialog (owner: agent C, components/checkpoint/Checkpoint.tsx)", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "same path as the stage demo");
   await page.goto("/demo/seed");
   await page.goto("/game/launch-week?jump=turning-point");

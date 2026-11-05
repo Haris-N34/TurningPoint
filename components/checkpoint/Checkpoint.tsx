@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Portrait } from "@/components/game2/Portrait";
+import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { UNSUPPORTED_MESSAGE } from "@/lib/checkpoint/speech";
 import { MAX_RETAKES, timing, type CheckpointKind } from "@/lib/checkpoint/timing";
@@ -76,8 +77,8 @@ const hasVideo = (s: MediaStream | null) => !!s?.getVideoTracks().some((t) => t.
 
 /** Calm, plain-words note when a device can't start. Never an error tone: other ways to answer are fine. */
 function deviceNote(wanted: Mode, got: Mode, err: DeviceError | null) {
-  const what = wanted === "video" ? "camera" : "microphone";
-  const why = err === "denied" ? `The browser didn't allow the ${what}.` : err === "missing" ? `We couldn't find a ${what}.` : err === "busy" ? `Another app may be using the ${what}.` : `We couldn't start the ${what}.`;
+  const what = wanted === "video" ? (got === "text" ? "camera and microphone" : "camera") : "microphone";
+  const why = err === "denied" ? `The browser didn't allow the ${what}.` : err === "missing" ? `No ${what} found.` : err === "busy" ? `Another app may be using the ${what}.` : `The ${what} didn't start.`;
   return `${why} This one is set to ${got}, which counts exactly the same. You can switch any time.`;
 }
 
@@ -126,6 +127,9 @@ export function Checkpoint(p: Props) {
   const blurAt = useRef<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const r = useRecorder();
+  // Modal: Tab and Shift+Tab stay inside. No Escape: a checkpoint can't be skipped, only answered (text always works).
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap(dialogRef, true);
   const quietS = useQuiet(r.level, phase === "answer" && mode !== "text");
 
   const setMode = (m: Mode) => {
@@ -382,6 +386,7 @@ export function Checkpoint(p: Props) {
 
   return (
     <motion.div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={label}
