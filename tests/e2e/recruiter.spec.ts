@@ -1,5 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import mayaFixture from "../../fixtures/attempt.json";
+
+// Maya's anonymous ID comes from the demo fixture, so a fixture rebuild never breaks the check.
+const MAYA_ANON = mayaFixture.anonId;
 
 async function seed(page: Page) {
   await page.goto("/demo/seed");
@@ -12,7 +16,7 @@ test("inbox: anonymous rows, filters, keyboard shortlist reveals the name (E2, E
   await seed(page);
   await page.goto("/recruiter");
   const row = page.getByTestId(`row-${MAYA}`);
-  await expect(row).toContainText("Candidate 4F7K");
+  await expect(row).toContainText(MAYA_ANON);
   await expect(row).not.toContainText("Maya");
   await expect(row).toContainText("Confirmed");
   await expect(row).toContainText("Strong");
@@ -49,7 +53,7 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   await seed(page);
   await page.goto(CARD);
   const card = page.getByTestId("capability-card");
-  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+  await expect(page.getByTestId("card-name")).toHaveText(MAYA_ANON);
   await expect(card).toContainText("Verified student");
   // v2 D.4 adds a Final score box at the top right; the evidence itself still carries levels, never numbers.
   await expect(card.getByTestId("evidence")).not.toContainText(/score\s*[:=]?\s*\d/i);
@@ -72,7 +76,7 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   await page.getByLabel("Reason (required)").selectOption("Position filled");
   await page.getByRole("button", { name: "Confirm pass" }).click();
   await expect(page.getByTestId("decision")).toContainText("pass");
-  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+  await expect(page.getByTestId("card-name")).toHaveText(MAYA_ANON);
 
   await page.getByRole("button", { name: "Shortlist" }).click();
   await expect(page.getByTestId("decision")).toContainText("Shortlisted");

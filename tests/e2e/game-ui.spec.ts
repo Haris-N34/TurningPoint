@@ -77,3 +77,22 @@ test("every game panel fits the viewport with no clipped text at 1280x720 and on
     }
   }
 });
+
+test("Escape opens and closes the pause menu once each, and focus stays inside it", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "keyboard path");
+  await page.goto("/game/launch-week");
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+  await page.keyboard.press("Enter");
+  await page.getByTestId("avatar-done").click();
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("pause-menu")).toBeVisible();
+  // Toggling a setting must not throw focus back to the first control.
+  await page.getByTestId("set-reduced-motion").focus();
+  await page.keyboard.press("Space");
+  await expect(page.getByTestId("set-reduced-motion")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("pause-menu")).toBeHidden();
+  await page.waitForTimeout(300);
+  await expect(page.getByTestId("pause-menu")).toBeHidden();
+});

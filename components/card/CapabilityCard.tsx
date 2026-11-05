@@ -175,7 +175,7 @@ export function CapabilityCard({
                     ) : (
                       <p className="text-sm text-foreground">Choice: “{e.source.optionLabel}”</p>
                     )}
-                    <p className="text-xs leading-relaxed text-muted-foreground">
+                    <p className="line-clamp-1 text-xs leading-relaxed text-muted-foreground" title={e.sentence}>
                       <span className="mr-1.5 rounded bg-muted px-1 py-px text-[10px] font-medium uppercase tracking-wide text-foreground/80">AI summary</span>
                       {e.sentence}
                     </p>
@@ -275,8 +275,8 @@ export function CapabilityCard({
                   </div>
                   {i < card.decisionPath.length - 1 &&
                     (i === card.turningPointAfter ? (
-                      <div className="mt-1 flex flex-1 flex-col items-center px-1" data-testid="turning-point-marker">
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-primary">Turning point</span>
+                      <div className="mt-1 flex flex-1 shrink-0 flex-col items-center px-1" data-testid="turning-point-marker">
+                        <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-primary">Turning point</span>
                         <span aria-hidden className="mt-0.5 h-3 w-full min-w-8 border-t-2 border-dashed border-primary" />
                       </div>
                     ) : (

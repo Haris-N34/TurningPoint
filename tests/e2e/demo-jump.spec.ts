@@ -19,6 +19,8 @@ test("demo panel: Turning point jump from inside the game goes back to the title
   await page.keyboard.press("Control+Shift+D");
   await page.getByTestId("demo-panel").getByRole("link", { name: "Turning point", exact: true }).click();
   await expect(page.getByTestId("title-screen")).toBeVisible({ timeout: 10_000 });
+  // A full reload: wait for the game to be ready again, as at the start.
+  await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await page.keyboard.press("Enter");
   await page.getByTestId("avatar-done").click();
   await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });

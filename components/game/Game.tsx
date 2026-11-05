@@ -14,6 +14,7 @@ import { Checkpoint, type CheckpointResult, type IntegrityNote } from "@/compone
 import { RealLife, type RealStory } from "@/components/checkpoint/RealLife";
 import Link from "next/link";
 import { buildCard } from "@/lib/card/build";
+import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import { ResourceBar } from "./ResourceBar";
 import { chime } from "./sound";
 
@@ -352,19 +353,29 @@ export function Game({ scenario, challenge, sandbox = false }: { scenario: Scena
           />
         )}
 
-        {paused && (
-          <div role="dialog" aria-modal="true" aria-label="Paused" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-            <div className="rounded-3xl bg-background p-6 text-center text-foreground">
-              <p className="text-lg font-semibold">Paused</p>
-              <p className="mt-1 text-sm opacity-80">Your progress is saved. You can close this tab and come back.</p>
-              <button onClick={togglePause} className="mt-4 rounded-full bg-foreground px-5 py-2 text-background" autoFocus>
-                Resume
-              </button>
-            </div>
-          </div>
-        )}
+        {paused && <PausedDialog onResume={togglePause} />}
       </main>
     </MotionConfig>
+  );
+}
+
+/** Pause overlay: focus stays inside it (Tab cycles, Escape resumes). */
+function PausedDialog({ onResume }: { onResume: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const resume = useRef(onResume);
+  resume.current = onResume;
+  const onEscape = useCallback(() => resume.current(), []);
+  useFocusTrap(ref, true, onEscape);
+  return (
+    <div ref={ref} role="dialog" aria-modal="true" aria-label="Paused" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="rounded-3xl bg-background p-6 text-center text-foreground">
+        <p className="text-lg font-semibold">Paused</p>
+        <p className="mt-1 text-sm opacity-80">Your progress is saved. You can close this tab and come back.</p>
+        <button onClick={onResume} className="mt-4 rounded-full bg-foreground px-5 py-2 text-background" autoFocus>
+          Resume
+        </button>
+      </div>
+    </div>
   );
 }
 
