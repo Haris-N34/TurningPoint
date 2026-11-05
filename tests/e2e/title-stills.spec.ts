@@ -18,6 +18,9 @@ for (const map of ["launch-week", "client-pivot"]) {
         const nx = document.querySelector("nextjs-portal") as HTMLElement | null;
         if (nx) nx.style.display = "none";
       });
+      // No player in the still: the logo and Start own the middle of the title screen.
+      await expect.poll(() => page.evaluate("!!window.__phaser?.scene?.scenes?.[0]?.player")).toBe(true);
+      await page.evaluate(`(() => { const s = window.__phaser.scene.scenes[0]; s.player.setVisible(false); s.children.getByName("player-shadow")?.setVisible(false); })()`);
       await page.waitForTimeout(2500);
       await page.screenshot({ path: `public/assets/title/${map}${v.suffix}.jpg`, type: "jpeg", quality: 80 });
     });

@@ -201,6 +201,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       this.input.on("pointerdown", (p: PhaserNS.Input.Pointer) => {
         if (o.attract || o.isFrozen()) return;
         const tx = Math.floor(p.worldX / TILE), ty = Math.floor(p.worldY / TILE);
+        this.endTour();
         this.walkToTile(tx, ty);
       });
 
@@ -233,7 +234,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     makeBubble() {
       const c = this.add.container(0, 0).setDepth(65).setVisible(false);
       const bg = this.add.circle(0, 0, 5, 0xffffff).setStrokeStyle(1, 0x2e222f);
-      const t = this.add.text(0, 0, "!", { fontFamily: "monospace", fontSize: "8px", color: "#2e222f", fontStyle: "bold", resolution: 4 }).setOrigin(0.5);
+      const t = this.add.text(0, 0.5, "!", { fontFamily: o.font ?? "monospace", fontSize: "8px", color: "#2e222f", fontStyle: "600", resolution: 6 }).setOrigin(0.5);
       c.add([bg, t]);
       this.tweens.add({ targets: c, y: "-=2", duration: 450, yoyo: true, repeat: -1, ease: "Sine.inOut" });
       return c;
@@ -252,7 +253,10 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     }
 
     onWalkTo = (e: { npc: string; thenInteract: boolean }) => {
-      if (this.alive()) this.walkToNpc(e.npc, e.thenInteract);
+      if (!this.alive()) return;
+      // The player acted: the camera stops touring and comes back to them.
+      this.endTour();
+      this.walkToNpc(e.npc, e.thenInteract);
     };
     /** False once the scene or game is torn down; handlers must not touch a dead scene. */
     alive() {
@@ -279,6 +283,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
         this.tweens.add({ targets: p, x: p.x + Math.cos(a) * 14, y: p.y + Math.sin(a) * 14 - 6, alpha: 0, duration: 600, onComplete: () => p.destroy() });
       }
     };
+    tour: PhaserNS.Time.TimerEvent[] = [];
     onPan = (e: { npcs: string[] }) => {
       if (!this.alive()) return;
       const cam = this.cameras.main;
@@ -288,17 +293,26 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const pts = e.npcs.map((id) => this.npcs.get(id)?.sprite).filter(Boolean) as PhaserNS.GameObjects.Sprite[];
       let delay = 0;
       for (const p of pts) {
-        this.time.delayedCall(delay, () => cam.pan(p.x, p.y, 700, Phaser.Math.Easing.Sine.InOut));
+        this.tour.push(this.time.delayedCall(delay, () => cam.pan(p.x, p.y, 700, Phaser.Math.Easing.Sine.InOut)));
         delay += 1100;
       }
-      this.time.delayedCall(delay, () => {
-        cam.pan(this.player.x, this.player.y, 600, Phaser.Math.Easing.Sine.InOut);
-        this.time.delayedCall(650, () => {
-          this.panning = false;
-          cam.startFollow(this.player, true, 0.12, 0.12);
-        });
-      });
+      this.tour.push(
+        this.time.delayedCall(delay, () => {
+          cam.pan(this.player.x, this.player.y, 600, Phaser.Math.Easing.Sine.InOut);
+          this.tour.push(this.time.delayedCall(650, () => this.endTour()));
+        }),
+      );
     };
+    /** Stop the post-cutscene camera tour (or finish it) and follow the player again. */
+    endTour() {
+      for (const t of this.tour) t.remove(false);
+      this.tour = [];
+      if (!this.panning) return;
+      this.panning = false;
+      const cam = this.cameras.main;
+      cam.panEffect.reset();
+      cam.startFollow(this.player, true, 0.12, 0.12);
+    }
 
     walkToNpc(id: string, thenInteract: boolean) {
       const n = s.npcs.find((x) => x.id === id);
@@ -438,7 +452,10 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
         if (k.W.isDown || k.UP.isDown) vy = -1;
         else if (k.S.isDown || k.DOWN.isDown) vy = 1;
       }
-      if (vx || vy) this.path = [];
+      if (vx || vy) {
+        this.path = [];
+        if (this.panning) this.endTour();
+      }
       // Fast travel took too long (slow device or blocked route): finish it now.
       if (this.walkGoal && this.pathTarget && this.time.now > this.walkDeadline && !frozen) {
         this.player.setPosition(this.walkGoal.x * TILE + 8, this.walkGoal.y * TILE + 8);
@@ -517,7 +534,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
         text.setVisible(inView && !hide);
         if (!inView || hide) continue;
         text.setScale(scale);
-        const hw = text.displayWidth / 2 + 2;
+        const hw = text.displayWidth / 2 + 8 / z;
         const y = Phaser.Math.Clamp(zy - 2, v.y + top + text.displayHeight, v.bottom - 2);
         const right = y - v.y < listBottom ? v.right - listW : v.right;
         const x = Phaser.Math.Clamp(zx + zw / 2, v.x + hw, Math.max(v.x + hw, right - hw));
