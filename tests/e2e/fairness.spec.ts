@@ -6,6 +6,9 @@ test("synthetic cohort feeds funnel, mode and timing rates, opt-in four-fifths c
   await page.getByRole("button", { name: "Load 200 fictional candidates" }).click();
   await page.goto("/recruiter?challenge=ch_impact_energy");
   await expect(page.getByTestId("inbox")).toBeVisible();
+  // The inbox shows 20 rows at a time; nobody is removed, every row is one click away.
+  await expect(page.getByTestId("inbox-pager")).toContainText(/Showing 1 to 20 of \d+/);
+  await page.getByTestId("show-all").click();
   await expect(page.getByTestId("row-att_impact_demo_004")).toBeVisible();
   await expect(page.getByTestId("inbox")).not.toContainText(/opt-in group/i);
 
