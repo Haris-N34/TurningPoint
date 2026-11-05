@@ -48,9 +48,9 @@ test("keyboard-only demo path with reduced motion: cutscene alone on screen, tra
   await expect(cp.locator('label:has(input[value="text"])')).toBeVisible();
 });
 
-test("every game panel fits the viewport with no clipped text at 1280x720 and on a phone", async ({ page }, info) => {
+test("every game panel fits the viewport with no clipped text at 1280x720 and on a phone (portrait and landscape)", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "sizes are set here");
-  for (const vp of [{ width: 1280, height: 720 }, { width: 375, height: 812 }]) {
+  for (const vp of [{ width: 1280, height: 720 }, { width: 375, height: 812 }, { width: 812, height: 375 }]) {
     await page.setViewportSize(vp);
     await page.goto("/game/launch-week?jump=turning-point");
     await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
@@ -71,7 +71,7 @@ test("every game panel fits the viewport with no clipped text at 1280x720 and on
       return bad;
     });
     expect(out).toEqual([]);
-    if (vp.width >= 640) {
+    if (vp.width >= 640 && vp.height >= 700) {
       const scrolls = await page.locator('[data-testid="issue-tracker"] ul').evaluate((ul) => ul.scrollHeight > ul.clientHeight + 1);
       expect(scrolls).toBe(false);
     }

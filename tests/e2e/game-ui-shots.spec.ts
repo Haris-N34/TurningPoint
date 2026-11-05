@@ -8,6 +8,7 @@ const SIZES = [
   { name: "1440x900", width: 1440, height: 900 },
   { name: "1920x1080", width: 1920, height: 1080 },
   { name: "375x812", width: 375, height: 812 },
+  { name: "812x375", width: 812, height: 375 },
 ];
 
 async function untilVisible(page: Page, id: string) {
@@ -128,5 +129,31 @@ for (const size of [SIZES[0], SIZES[4]]) {
     await page.getByTestId("toggle-view").click();
     await page.waitForTimeout(800);
     await shot("14-list-view");
+  });
+}
+
+// The second map's turning point (different caller and disruption).
+for (const size of [SIZES[0], SIZES[4]]) {
+  test(`game UI pivot cutscene ${size.name}`, async ({ page }, info) => {
+    test.skip(process.env.SCREENS !== "1", "set SCREENS=1 to take review shots");
+    test.skip(info.project.name !== "desktop", "sizes are set per test");
+    test.setTimeout(120_000);
+    const dir = process.env.SHOTS_DIR ?? "docs/screens/night/game-ui/latest";
+    await page.setViewportSize({ width: size.width, height: size.height });
+    const shot = (n: string) => page.screenshot({ path: `${dir}/${n}-${size.name}.png`, style: "nextjs-portal { display: none !important; }" });
+    await page.goto("/game/client-pivot?jump=turning-point");
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.keyboard.press("Enter");
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("cutscene-next")).toBeVisible({ timeout: 20_000 });
+    await shot("15-pivot-cutscene");
+    await page.getByTestId("cutscene-next").click();
+    await page.getByTestId("cutscene-done").click();
+    await page.waitForTimeout(800);
+    // On this map the order question follows the turning point.
+    await expect(page.getByTestId("order-pick")).toBeVisible({ timeout: 10_000 });
+    const ranks = page.locator('[data-testid^="rank-"]:not([data-testid="rank-done"])');
+    await ranks.nth(1).click();
+    await shot("16-pivot-order");
   });
 }

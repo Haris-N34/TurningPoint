@@ -19,6 +19,7 @@ import type { Issue, Look } from "@/lib/game/schema";
 import { music, sfx } from "@/lib/game/sound";
 import { scenarioForRun } from "@/lib/ai/services/publish";
 import { applyMapOverrides, type MapOverrides } from "@/lib/challenge/mapTailor";
+import { useFocusTrap } from "@/lib/a11y/focusTrap";
 import { useGame } from "@/lib/game/store";
 import { parseTime } from "@/lib/game/time";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -503,8 +504,10 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
 function OrderPick({ scenario, state, onDone }: { scenario: ReturnType<typeof getMapScenario> & object; state: GameState; onDone: (r: string[]) => void }) {
   const open = openIssues(scenario, state);
   const [rank, setRank] = useState<string[]>([]);
+  const ref = useRef<HTMLDivElement>(null);
+  useFocusTrap(ref);
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-3" role="dialog" aria-label="The order question" data-testid="order-pick">
+    <div ref={ref} className="absolute inset-0 z-50 flex items-center justify-center bg-[#2e222f]/75 p-3" role="dialog" aria-modal="true" aria-label="The order question" data-testid="order-pick">
       <Panel className="w-[min(520px,94vw)] p-4">
         <Eyebrow>Checkpoint</Eyebrow>
         <h2 className={cn(pixelTitle.className, "mt-1.5 text-[13px] leading-relaxed")}>You&apos;ve got {open.length} open problems. Which are you going to first?</h2>
@@ -515,7 +518,7 @@ function OrderPick({ scenario, state, onDone }: { scenario: ReturnType<typeof ge
             return (
               <li key={i.id}>
                 <button className={cn("flex min-h-11 w-full items-center gap-2 rounded-[4px] border-2 border-[#2e222f] p-2 text-left text-[15px] shadow-[inset_0_-3px_0_#e8d9b5] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-1 focus-visible:outline-[#ffd166]", n >= 0 ? "bg-[#ffe08a]" : "bg-white hover:bg-[#fff1c4]")} onClick={() => setRank((r) => (n >= 0 ? r.filter((x) => x !== i.id) : [...r, i.id]))} data-testid={`rank-${i.id}`}>
-                  <span className="flex size-6 items-center justify-center rounded-[3px] bg-[#2e222f] text-sm font-bold text-white">{n >= 0 ? n + 1 : ""}</span>
+                  <span className={cn(pixelTitle.className, "flex size-6 shrink-0 items-center justify-center rounded-[3px] border-2 border-[#2e222f] text-[10px]", n >= 0 ? "bg-[#2e222f] text-[#ffd166]" : "bg-white")}>{n >= 0 ? n + 1 : ""}</span>
                   {i.title}
                 </button>
               </li>
