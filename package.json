@@ -14,7 +14,8 @@
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm e2e",
     "evals": "vitest run lib/ai/evals lib/ai/bias.test.ts lib/ai/copilot.test.ts",
     "evals:report": "WRITE_EVALS=1 vitest run lib/ai/evals",
-    "ai:record": "AI_RECORD=1 vitest run lib/ai/cache/record.test.ts"
+    "ai:record": "AI_RECORD=1 vitest run lib/ai/cache/record.test.ts",
+    "demo:reset": "node scripts/demo-reset.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.5.0",

@@ -182,7 +182,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
 - [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)
 - [ ] P.1 [H] Polish checklist (empty states, skeletons, toasts, favicon, themes, 375 and 1440 px)
-- [ ] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script
+- [x] P.2 [D] Demo shortcuts behind a key combo; demo seed and reset script (Ctrl+Shift+D panel: roles, seed, reset, jumps; /demo/reset and `pnpm demo:reset`; lib/demo/reset.test.ts, tests/e2e/demo.spec.ts)
 - [ ] P.3 [H] Deck, demo script, Q&A prep, timing, backup video
 - [ ] G.1 [D+H] /admin/impact with seeded data (200 candidates, 3 employers): all Part G metrics
 - [ ] I.1 [D+H] Demo script v2 (PRD Part I) runs twice in a row without a bug
