@@ -98,6 +98,13 @@ test("speech restarts after the browser stops it, shows live captions, keeps eve
   expect(a.mode).toBe("voice");
   expect(a.transcript.text).toBe("I cut the second weekend because vendors were the main draw");
   expect(a.transcript.words.map((w) => w.w).join(" ")).toBe(a.transcript.text);
+  // The original recognition is kept for the recruiter, and the fix is noted as context.
+  expect((a as unknown as { recognizedText: string }).recognizedText).toBe("I cut the second weekend because vendors were the draw");
+  const integrity = await page.evaluate(() => {
+    const k = Object.keys(localStorage).find((x) => x.startsWith("tp:run:"))!;
+    return JSON.parse(localStorage.getItem(k)!).extra.integrity as { kind: string; detail: string }[];
+  });
+  expect(integrity).toContainEqual(expect.objectContaining({ kind: "transcript_corrected", detail: "Transcript corrected before submit: 1 word changed (context, not scored)" }));
 });
 
 test("a blocked speech service says so in plain words and the candidate types instead", async ({ page }) => {
@@ -177,12 +184,21 @@ async function toGameCheckpoint(page: Page) {
 }
 
 test("game: the checkpoint pops up as a video interview with the camera on by default", async ({ page }) => {
+  // 2x think time so a slow test machine never runs out the think timer before the keyboard check.
+  await page.addInitScript(() => {
+    if (!localStorage.getItem("tp:profile")) localStorage.setItem("tp:profile", JSON.stringify({ accommodations: { timeMultiplier: 2, textOnly: false } }));
+  });
   await scriptedSpeech(page, [[{ at: 300, type: "interim", text: "I took it" }, { at: 900, type: "final", text: "I took logistics myself so the team stayed happy" }]]);
   const cp = await toGameCheckpoint(page);
   await expect(cp).toHaveAttribute("data-variant", "game");
   await expect(cp).toHaveAttribute("data-mode", "video");
   await expect(cp.getByTestId("interviewer")).toContainText("Priya");
   await expect(cp.getByTestId("checkpoint-question")).toHaveAttribute("aria-label", /^You chose C/);
+  // The option letter is a badge (B never reads as 8 in the pixel font), and the question shows in full at once.
+  await expect(cp.getByTestId("choice-letter")).toHaveText("C");
+  await expect(cp.getByTestId("checkpoint-question")).toContainText("Walk us through why.");
+  await expect(cp.getByTestId("timer-label")).toHaveText("Think 30s");
+  await expect(cp.getByText("Take 30 seconds to think.")).toBeVisible();
   await expect(cp.getByTestId("camera-check")).toContainText("Camera check", { timeout: 15_000 });
   await expect.poll(() => cp.getByTestId("camera-preview").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 10_000 }).toBeGreaterThan(0);
   // The mic meter moves with the fake device's beep.
@@ -191,11 +207,11 @@ test("game: the checkpoint pops up as a video interview with the camera on by de
   await expect(cp.locator('input[value="text"]')).toBeEnabled();
   if ((page.viewportSize()?.width ?? 0) >= 640) await expect(cp.getByTestId("switch-text")).toBeVisible();
 
+  // Keyboard only: the start button has focus.
+  await expect(cp.getByRole("button", { name: /start answering/i })).toBeFocused();
   const results = await new AxeBuilder({ page }).include('[data-testid="checkpoint"]').analyze();
   expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
 
-  // Keyboard only: the start button has focus.
-  await expect(cp.getByRole("button", { name: /start answering/i })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(cp).toHaveAttribute("data-phase", "answer", { timeout: 20_000 });
   await expect(cp.getByTestId("live-captions")).toContainText("I took logistics myself", { timeout: 5000 });

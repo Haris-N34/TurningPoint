@@ -286,7 +286,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "The client says 'modernise inventory'. That's not a brief. What do they actually need from us by Friday?",
+          "text": "The client says 'modernise inventory'. That's not a brief. What do they need from us by Friday?",
           "expression": "neutral"
         }
       ],
@@ -344,7 +344,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Stockouts are concentrated in the small stores, where orders are placed by hand",
+          "label": "Stockouts cluster in the small stores, where orders are done by hand",
           "effects": {
             "trust.firm": 6
           },
@@ -358,7 +358,7 @@
         },
         {
           "id": "b",
-          "label": "Stockouts are rising everywhere, so every store needs the new system",
+          "label": "Stockouts are up everywhere, so every store needs the new system",
           "effects": {},
           "reaction": {
             "emote": "question",
@@ -468,7 +468,7 @@
         },
         {
           "id": "b",
-          "label": "Ask him to find a two-week version",
+          "label": "Ask Tomi for a two-week version",
           "effects": {
             "morale": -8
           },
@@ -498,7 +498,7 @@
       "lines": [
         {
           "who": "manager",
-          "text": "Last time head office 'modernised', my staff spent a month typing everything twice.",
+          "text": "Last time head office 'modernised', my staff typed everything twice for a month.",
           "expression": "angry"
         }
       ],
@@ -549,7 +549,7 @@
       "lines": [
         {
           "who": "analyst",
-          "text": "I can forecast demand per store or per region. Per store is more accurate but takes two extra days.",
+          "text": "I can forecast per store or per region. Per store is sharper but takes two more days.",
           "expression": "neutral"
         }
       ],
@@ -604,7 +604,7 @@
       "options": [
         {
           "id": "a",
-          "label": "'Your small stores stop running out of milk, and you stop typing orders by hand.'",
+          "label": "'Small stores stop running out of milk. No more typing orders.'",
           "effects": {
             "trust.manager": 12
           },
@@ -619,7 +619,7 @@
         },
         {
           "id": "b",
-          "label": "'We'll deploy a cloud ERP with ML-driven demand forecasting and API integration.'",
+          "label": "'A cloud ERP with ML demand forecasting and API integration.'",
           "effects": {
             "trust.manager": -8
           },
@@ -634,7 +634,7 @@
         },
         {
           "id": "c",
-          "label": "'Kai told me the night shift reorders from memory. This fixes that first.'",
+          "label": "'Kai says nights reorder from memory. This fixes that first.'",
           "effects": {
             "trust.manager": 16
           },
@@ -659,7 +659,7 @@
       "lines": [
         {
           "who": "you",
-          "text": "The CFO cut the budget in half and wants a phased plan by Friday. The original plan doesn't fit any more.",
+          "text": "The CFO halved the budget and wants a phased plan by Friday. The old plan doesn't fit.",
           "expression": "worried"
         }
       ],
@@ -836,7 +836,7 @@
       "options": [
         {
           "id": "a",
-          "label": "Show phase-1 cost per small store and how fewer stockouts could repay it",
+          "label": "Show phase 1 cost per small store, and how fewer stockouts repay it",
           "effects": {
             "trust.cfo": 12
           },
@@ -851,7 +851,7 @@
         },
         {
           "id": "b",
-          "label": "Walk him through the architecture diagram",
+          "label": "Walk Mr. Lindqvist through the architecture diagram",
           "effects": {
             "trust.cfo": -8
           },
@@ -891,7 +891,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "I read your deck. Honestly, it's unreadable. Twenty slides of features and no answer on slide one.",
+          "text": "I read your deck. Honestly? Twenty slides of features and no answer on slide one.",
           "expression": "angry"
         }
       ],
@@ -1048,7 +1048,7 @@
       "lines": [
         {
           "who": "partner",
-          "text": "The client's ops lead says your waste number doesn't hold up. Waste moved from 4% to 5%, while small stores have 19 stockouts a week.",
+          "text": "Their ops lead says your waste number doesn't hold up. Waste went 4% to 5%. Small stores have 19 stockouts a week.",
           "expression": "angry"
         }
       ],
@@ -1191,7 +1191,7 @@
       "lines": [
         {
           "who": "kai",
-          "text": "Honestly? When the system's down at night, we just reorder from memory. Half the stockouts are that.",
+          "text": "Honestly? When the system's down at night, we reorder from memory. That's half the stockouts.",
           "expression": "neutral"
         }
       ],
@@ -1697,7 +1697,7 @@
         "id": "budget-halved",
         "title": "The CFO halves the budget",
         "caller": "cfo",
-        "text": "Our board has cut this project's budget in half. I need a phased plan from you by Friday. Phase 1 has to pay for itself.",
+        "text": "Our board has halved this project's budget. I need a phased plan by Friday. Phase 1 has to pay for itself.",
         "budgetCut": 0.5,
         "effects": {
           "morale": -10

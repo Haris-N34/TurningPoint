@@ -22,23 +22,26 @@ export function Header() {
   return (
     <>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-card focus:p-4">Skip to content</a>
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex min-h-20 max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3 sm:px-10">
-          <Link href="/" aria-label="Turning Point home" className="flex items-center gap-2.5 text-lg font-semibold tracking-tight">
-            <span aria-hidden className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">↗</span>
-            Turning Point<span aria-hidden className="text-primary">.</span>
+      <header className="border-b border-border/70 bg-background">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-10">
+          <Link href="/" aria-label="Turning Point home" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+            <span aria-hidden className="flex size-7 items-center justify-center rounded-full bg-primary text-sm text-primary-foreground">↗</span>
+            <span className="hidden min-[400px]:inline">Turning Point<span aria-hidden className="text-primary">.</span></span>
           </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href="/how-we-use-ai" className="mr-3 inline-flex min-h-11 items-center text-xs text-muted-foreground underline underline-offset-4">How we use AI</Link>
-            <label htmlFor="demo-role" className="text-xs font-medium text-muted-foreground">Demo role</label>
-            <select id="demo-role" value={activeRole} onChange={e => {
-              const role = Role.parse(e.target.value);
-              store().setRole(role);
-              window.dispatchEvent(new Event(event));
-              router.push(`/${role}`);
-            }} className="min-h-11 max-w-36 rounded-md border border-input bg-background px-3 text-sm text-foreground">
-              {roles.map(role => <option key={role} value={role}>{labels[role]}</option>)}
-            </select>
+          <div className="flex items-center gap-1 sm:gap-4">
+            <Link href="/how-we-use-ai" className="inline-flex min-h-11 items-center rounded-md px-2 text-sm text-muted-foreground transition-colors hover:text-foreground">How we use AI</Link>
+            <span aria-hidden className="hidden h-5 w-px bg-border sm:block" />
+            <div className="flex items-center gap-2">
+              <label htmlFor="demo-role" className="sr-only text-xs font-medium uppercase tracking-wider text-muted-foreground sm:not-sr-only">Demo role</label>
+              <select id="demo-role" value={activeRole} onChange={e => {
+                const role = Role.parse(e.target.value);
+                store().setRole(role);
+                window.dispatchEvent(new Event(event));
+                router.push(`/${role}`);
+              }} className="min-h-11 rounded-full border border-input/60 bg-card px-3 pr-8 text-sm font-medium text-foreground shadow-sm transition-colors hover:border-input sm:min-h-9">
+                {roles.map(role => <option key={role} value={role}>{labels[role]}</option>)}
+              </select>
+            </div>
           </div>
         </div>
       </header>

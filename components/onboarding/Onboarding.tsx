@@ -71,7 +71,7 @@ export function Onboarding({ scenarioId, title }: { scenarioId: string; title: s
         {step === 0 && <div className="mt-6 space-y-5 text-lg leading-relaxed">
           <p>You will guide a team through a short story, make decisions and balance limited resources. Partway through, the situation changes.</p>
           <p>Allow around 15 minutes. You can pause between decisions and return in this browser. This demo stores your progress on this device.</p>
-          <p>There is no single winning route, overall score or automatic rejection. A human reviews the evidence you choose to share.</p>
+          <p>There is no single winning route and no automatic rejection. A human reviews the evidence you choose to share.</p>
         </div>}
         {step === 1 && <div className="mt-6 space-y-5 text-lg leading-relaxed">
           <p>Two or three surprise checkpoints ask about choices you just made. You will know checkpoints are coming, but not exactly when.</p>

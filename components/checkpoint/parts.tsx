@@ -1,48 +1,113 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { pixelTitle } from "@/components/game2/fonts";
 import { UNSUPPORTED_MESSAGE } from "@/lib/checkpoint/speech";
 import { cn } from "@/lib/utils";
 import type { SpeechState } from "./useRecorder";
 
-export function Ring({ left, total, label, pixel }: { left: number; total: number; label: string; pixel?: boolean }) {
+export function Ring({
+  left,
+  total,
+  label,
+  caption,
+  pixel,
+}: {
+  left: number;
+  total: number;
+  label: string;
+  caption: string;
+  pixel?: boolean;
+}) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
-    <div className="relative h-16 w-16 shrink-0" role="timer" aria-label={`${label}: ${Math.ceil(left)} seconds left`}>
-      <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-hidden>
-        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="5" className={pixel ? "stroke-[#e8d9b5]" : "stroke-black/10 dark:stroke-white/10"} />
-        <circle
-          cx="32"
-          cy="32"
-          r={r}
-          fill="none"
-          strokeWidth={pixel ? 6 : 5}
-          strokeLinecap={pixel ? "butt" : "round"}
-          className={cn("transition-[stroke-dashoffset] duration-200", pixel ? "stroke-[#c43d22]" : "stroke-orange-600")}
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - left / total)}
-        />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold tabular-nums">{Math.ceil(left)}</span>
+    <div className="flex shrink-0 flex-col items-center gap-0.5">
+      <div
+        className="relative h-16 w-16"
+        role="timer"
+        aria-label={`${label}: ${Math.ceil(left)} seconds left`}
+      >
+        <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-hidden>
+          <circle
+            cx="32"
+            cy="32"
+            r={r}
+            fill="none"
+            strokeWidth="5"
+            className={
+              pixel
+                ? "stroke-[#e8d9b5]"
+                : "stroke-black/10 dark:stroke-white/10"
+            }
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r={r}
+            fill="none"
+            strokeWidth={pixel ? 6 : 5}
+            strokeLinecap={pixel ? "butt" : "round"}
+            className={cn(
+              "transition-[stroke-dashoffset] duration-200",
+              pixel ? "stroke-[#c43d22]" : "stroke-orange-600",
+            )}
+            strokeDasharray={c}
+            strokeDashoffset={c * (1 - left / total)}
+          />
+        </svg>
+        <span className={cn("absolute inset-0 flex items-center justify-center font-semibold tabular-nums", pixel ? cn(pixelTitle.className, "text-[12px]") : "text-sm")}>
+          {Math.ceil(left)}
+        </span>
+      </div>
+      {/* The total, so it matches "Take 15 seconds" while the ring counts down. */}
+      <span className={cn("font-semibold", pixel ? cn(pixelTitle.className, "text-[9px]") : "text-xs")} data-testid="timer-label">
+        {caption}
+      </span>
     </div>
   );
 }
 
-export function TypedQuestion({ text, className }: { text: string; className?: string }) {
-  const reduce = useReducedMotion();
-  const words = text.split(" ");
-  const [n, setN] = useState(reduce ? words.length : 0);
-  useEffect(() => {
-    if (reduce) return setN(words.length);
-    setN(0);
-    const t = setInterval(() => setN((x) => (x >= words.length ? (clearInterval(t), x) : x + 1)), 70);
-    return () => clearInterval(t);
-  }, [text, reduce, words.length]);
+/**
+ * The question, shown in full at once (no typewriter, never cut off). In the game, the option letter in
+ * "You chose B, ..." is drawn as the same badge as the A-D choices, so B never reads as 8.
+ */
+export function TypedQuestion({
+  text,
+  className,
+  pixel,
+}: {
+  text: string;
+  className?: string;
+  pixel?: boolean;
+}) {
+  const m = pixel ? /^You chose ([A-D])\b/.exec(text) : null;
   return (
-    <h2 className={cn("text-xl sm:text-2xl font-semibold leading-snug", className)} aria-label={text} data-testid="checkpoint-question">
-      <span aria-hidden>{words.slice(0, n).join(" ")}</span>
+    <h2
+      className={cn(
+        "text-xl sm:text-2xl font-semibold leading-snug",
+        className,
+      )}
+      aria-label={text}
+      data-testid="checkpoint-question"
+    >
+      {m ? (
+        <span aria-hidden>
+          You chose{" "}
+          <span
+            data-testid="choice-letter"
+            className={cn(
+              pixelTitle.className,
+              "mx-0.5 inline-flex size-6 -translate-y-0.5 items-center justify-center rounded-[3px] bg-[#2e222f] align-middle text-[11px] text-[#ffd166]",
+            )}
+          >
+            {m[1]}
+          </span>
+          {text.slice(m[0].length)}
+        </span>
+      ) : (
+        <span aria-hidden>{text}</span>
+      )}
     </h2>
   );
 }
@@ -52,15 +117,36 @@ export function MicMeter({ level, pixel }: { level: number; pixel?: boolean }) {
   const bars = 12;
   const on = Math.round(Math.min(1, level) * bars);
   return (
-    <div className="flex items-center gap-2" data-testid="mic-meter" data-level={level.toFixed(2)}>
+    <div
+      className="flex items-center gap-2"
+      data-testid="mic-meter"
+      data-level={level.toFixed(2)}
+    >
       <span className="text-xs font-semibold" aria-hidden>
         Mic
       </span>
-      <div role="meter" aria-label="Microphone level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level * 100)} className="flex h-4 items-end gap-[3px]">
+      <div
+        role="meter"
+        aria-label="Microphone level"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(level * 100)}
+        className="flex h-4 items-end gap-[3px]"
+      >
         {Array.from({ length: bars }).map((_, i) => (
           <span
             key={i}
-            className={cn("w-1.5", pixel ? "rounded-none" : "rounded-sm", i < on ? (i > bars * 0.8 ? "bg-[#c43d22]" : "bg-[#3a7d44]") : pixel ? "bg-[#e8d9b5]" : "bg-black/10 dark:bg-white/15")}
+            className={cn(
+              "w-1.5",
+              pixel ? "rounded-none" : "rounded-sm",
+              i < on
+                ? i > bars * 0.8
+                  ? "bg-[#c43d22]"
+                  : "bg-[#3a7d44]"
+                : pixel
+                  ? "bg-[#e8d9b5]"
+                  : "bg-black/10 dark:bg-white/15",
+            )}
             style={{ height: `${6 + (i / bars) * 10}px` }}
           />
         ))}
@@ -77,7 +163,10 @@ export function useQuiet(level: number, running: boolean) {
     last.current = performance.now();
     setQuietS(0);
     if (!running) return;
-    const t = setInterval(() => setQuietS((performance.now() - last.current) / 1000), 500);
+    const t = setInterval(
+      () => setQuietS((performance.now() - last.current) / 1000),
+      500,
+    );
     return () => clearInterval(t);
   }, [running]);
   useEffect(() => {
@@ -87,15 +176,37 @@ export function useQuiet(level: number, running: boolean) {
 }
 
 /** What speech to text has heard so far, with the words still being worked out shown lighter. */
-export function Captions({ heard, interim, speech, pixel }: { heard: string; interim: string; speech: SpeechState; pixel?: boolean }) {
+export function Captions({
+  heard,
+  interim,
+  speech,
+  pixel,
+}: {
+  heard: string;
+  interim: string;
+  speech: SpeechState;
+  pixel?: boolean;
+}) {
   const box = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (box.current) box.current.scrollTop = box.current.scrollHeight;
   }, [heard, interim]);
-  const status = speech.kind === "listening" ? "Listening. Your words appear below as you speak." : speech.kind === "error" ? speech.message : speech.kind === "unsupported" ? UNSUPPORTED_MESSAGE : "";
+  const status =
+    speech.kind === "listening"
+      ? "Listening. Your words appear below as you speak."
+      : speech.kind === "error"
+        ? speech.message
+        : speech.kind === "unsupported"
+          ? UNSUPPORTED_MESSAGE
+          : "";
   return (
     <div className="space-y-1">
-      <p className="text-xs" role="status" data-testid="speech-status" data-speech={speech.kind}>
+      <p
+        className="text-xs"
+        role="status"
+        data-testid="speech-status"
+        data-speech={speech.kind}
+      >
         {status}
       </p>
       {speech.kind !== "unsupported" && (
@@ -103,14 +214,26 @@ export function Captions({ heard, interim, speech, pixel }: { heard: string; int
           ref={box}
           data-testid="live-captions"
           aria-label="Live captions"
-          className={cn("max-h-24 min-h-12 overflow-y-auto p-2 text-sm", pixel ? "rounded-[4px] border-2 border-[#2e222f] bg-white" : "rounded-xl bg-black/[.04] dark:bg-white/[.06]")}
+          className={cn(
+            "max-h-24 min-h-12 overflow-y-auto p-2 text-sm",
+            pixel
+              ? "rounded-[4px] border-2 border-[#2e222f] bg-white"
+              : "rounded-xl bg-black/[.04] dark:bg-white/[.06]",
+          )}
         >
           {heard || interim ? (
             <>
-              <span>{heard}</span> <span className="opacity-60" data-testid="interim">{interim}</span>
+              <span>{heard}</span>{" "}
+              <span className="opacity-60" data-testid="interim">
+                {interim}
+              </span>
             </>
           ) : (
-            <span className="opacity-60">{speech.kind === "listening" ? "Start talking. We'll show your words here." : "No words yet."}</span>
+            <span className="opacity-60">
+              {speech.kind === "listening"
+                ? "Start talking. We'll show your words here."
+                : "No words yet."}
+            </span>
           )}
         </div>
       )}
@@ -120,9 +243,17 @@ export function Captions({ heard, interim, speech, pixel }: { heard: string; int
 
 /** Three interviewers behind a desk, drawn as pixels. Used when no character is involved. */
 export function PanelPortrait({ className }: { className?: string }) {
-  const px = (x: number, y: number, w: number, h: number, fill: string) => <rect x={x} y={y} width={w} height={h} fill={fill} />;
+  const px = (x: number, y: number, w: number, h: number, fill: string) => (
+    <rect x={x} y={y} width={w} height={h} fill={fill} />
+  );
   return (
-    <svg viewBox="0 0 32 32" className={cn("[image-rendering:pixelated]", className)} shapeRendering="crispEdges" role="img" aria-label="The hiring panel: three interviewers at a desk">
+    <svg
+      viewBox="0 0 32 32"
+      className={cn("[image-rendering:pixelated]", className)}
+      shapeRendering="crispEdges"
+      role="img"
+      aria-label="The hiring panel: three interviewers at a desk"
+    >
       {px(0, 0, 32, 32, "#3e6b8a")}
       {px(0, 22, 32, 10, "#8a5a3b")}
       {px(0, 22, 32, 2, "#a8744f")}
@@ -150,4 +281,9 @@ export function PanelPortrait({ className }: { className?: string }) {
       {px(20, 23, 4, 2, "#fff8e7")}
     </svg>
   );
+}
+
+/** A number in the game's title font: in the pixel body font 5 reads as S and 8 as B. */
+export function Num({ children, pixel }: { children: React.ReactNode; pixel?: boolean }) {
+  return pixel ? <span className={cn(pixelTitle.className, "text-[0.75em]")}>{children}</span> : <>{children}</>;
 }

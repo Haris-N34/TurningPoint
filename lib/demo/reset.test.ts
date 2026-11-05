@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { makeStore, MemoryKV } from "@/lib/store/store";
 import { listChallenges } from "@/lib/challenge/challenge";
 import { clearDemoKeys, DEMO_JUMPS, resetDemo } from "./reset";
+import { isPeer } from "./peers";
 
 describe("P.2 demo reset", () => {
   it("clears every tp: key, keeps other keys, clears media and reloads the seed", async () => {
@@ -21,10 +22,10 @@ describe("P.2 demo reset", () => {
     expect(kv.getItem("tp:x:witnesses")).toBeNull();
     expect(s.getRole()).toBe("candidate");
     expect(s.getProfile().displayName ?? "").toBe("");
-    // Seed is back: two demo employers and Maya's card shared with the first.
+    // Seed is back: two demo employers, Maya's card shared with the first, plus the labelled synthetic peers.
     expect(listChallenges(s).map((c) => c.id).sort()).toEqual(["ch_demo_bank", "ch_demo_energy"]);
     expect(s.getCard("att_demo_maya")).toBeTruthy();
-    expect(s.sharesFor("ch_demo_energy").map((x) => x.attemptId)).toEqual(["att_demo_maya"]);
+    expect(s.sharesFor("ch_demo_energy").map((x) => x.attemptId).filter((id) => !isPeer(id))).toEqual(["att_demo_maya"]);
   });
 
   it("still reseeds when media cannot be cleared (no IndexedDB)", async () => {

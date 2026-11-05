@@ -6,13 +6,13 @@ import { Portrait } from "@/components/game2/Portrait";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { UNSUPPORTED_MESSAGE } from "@/lib/checkpoint/speech";
 import { MAX_RETAKES, timing, type CheckpointKind } from "@/lib/checkpoint/timing";
-import { applyCorrection, fromTyping } from "@/lib/checkpoint/transcript";
+import { applyCorrection, fromTyping, wordsChanged } from "@/lib/checkpoint/transcript";
 import { cameraCheck, media } from "@/lib/store/media";
 import { cn } from "@/lib/utils";
-import { Captions, MicMeter, PanelPortrait, Ring, TypedQuestion, useQuiet } from "./parts";
+import { Captions, MicMeter, Num, PanelPortrait, Ring, TypedQuestion, useQuiet } from "./parts";
 import { speechSupported, useRecorder, type DeviceError, type Mode, type Recording } from "./useRecorder";
 
-export type IntegrityNote = { checkpointId: string; kind: "focus_lost" | "retake_used"; detail: string };
+export type IntegrityNote = { checkpointId: string; kind: "focus_lost" | "retake_used" | "transcript_corrected"; detail: string };
 export type CheckpointResult = { checkpoint: CardCheckpoint; integrity: IntegrityNote[] };
 
 /** Who asks the question in the game: a character's portrait, or the hiring panel. */
@@ -257,6 +257,11 @@ export function Checkpoint(p: Props) {
     const lost = Math.round(focusLostMs.current / 1000);
     if (lost > 0) integrity.push({ checkpointId: p.id, kind: "focus_lost", detail: `Window lost focus for ${lost} second${lost === 1 ? "" : "s"} during the answer` });
     if (retakes > 0) integrity.push({ checkpointId: p.id, kind: "retake_used", detail: "Retake used" });
+    // Fixing misheard words is allowed before submit (C7.2 forbids edits after). Recruiters see that it happened and the original.
+    const recognized = mode === "text" ? undefined : result.transcript.text;
+    const changed = recognized === undefined || transcript.text === recognized ? 0 : wordsChanged(recognized, transcript.text);
+    if (changed > 0)
+      integrity.push({ checkpointId: p.id, kind: "transcript_corrected", detail: `Transcript corrected before submit: ${changed} word${changed === 1 ? "" : "s"} changed (context, not scored)` });
     p.onDone({
       checkpoint: {
         id: p.id,
@@ -268,6 +273,7 @@ export function Checkpoint(p: Props) {
         media: key,
         durationS: result.durationS,
         transcript,
+        ...(changed > 0 ? { recognizedText: recognized } : {}),
         retakeUsed: retakes > 0,
         hidden: false,
       },
@@ -402,8 +408,8 @@ export function Checkpoint(p: Props) {
               </div>
             )}
           </div>
-          {phase === "think" && <Ring left={thinkLeft} total={t.thinkS} label="Think time" pixel={game} />}
-          {phase === "answer" && <Ring left={answerLeft} total={t.answerS} label="Answer time" pixel={game} />}
+          {phase === "think" && <Ring left={thinkLeft} total={t.thinkS} label="Think time" caption={`Think ${t.thinkS}s`} pixel={game} />}
+          {phase === "answer" && <Ring left={answerLeft} total={t.answerS} label="Answer time" caption={`Answer ${t.answerS}s`} pixel={game} />}
         </div>
 
         {game && (
@@ -411,7 +417,7 @@ export function Checkpoint(p: Props) {
             <div className="space-y-3">
               {interviewerSide}
               <div className={cn("relative p-3", s.well)}>
-                <TypedQuestion text={p.question} className="text-base sm:text-lg" />
+                <TypedQuestion text={p.question} className="text-base sm:text-lg" pixel />
               </div>
             </div>
             {(phase === "think" || phase === "answer") && <div className="space-y-3">{mode !== "text" ? you : phase === "think" ? <TextNote /> : null}</div>}
@@ -421,7 +427,7 @@ export function Checkpoint(p: Props) {
         {phase === "think" && (
           <div className="mt-5 space-y-4">
             <p className="text-sm opacity-80">
-              Take {t.thinkS} seconds to think. You then have {t.answerS} seconds.{firstCheck && mode === "video" ? "" : " Only your words are used, never your face or voice."}
+              Take <Num pixel={game}>{t.thinkS}</Num> seconds to think. You then have <Num pixel={game}>{t.answerS}</Num> seconds.{firstCheck && mode === "video" ? "" : " Only your words are used, never your face or voice."}
             </p>
             {modePicker}
             {mode !== "text" && !speechSupported() && (

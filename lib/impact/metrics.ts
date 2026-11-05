@@ -13,7 +13,8 @@ const fraction = (a: number, b: number) => b ? a / b : null;
 
 /** Aggregate local evidence, never infer identities, protected traits or time spent. */
 export function impactReport(s: Store, challengeId?: string, source: Source = "all") {
-  const include = (id: string) => source === "all" || id.startsWith(DEMO_PREFIX) === (source === "demo");
+  // Demo inbox peers (lib/demo/peers.ts) are scenery for the recruiter screen, not part of any cohort.
+  const include = (id: string) => !id.startsWith("att_demo_peer_") && (source === "all" || id.startsWith(DEMO_PREFIX) === (source === "demo"));
   const shares = s.listShares().filter((x) => !x.revokedAt);
   const visible = (c: Card) => !challengeId || c.challenge.id === challengeId || shares.some((x) => x.attemptId === c.attemptId && x.challengeId === challengeId);
   const cards = s.listCards().filter((c) => include(c.attemptId) && visible(c));
@@ -77,7 +78,8 @@ export function impactReport(s: Store, challengeId?: string, source: Source = "a
 
 /** E7.1: started, finished and shortlisted per challenge. A shared card counts in each challenge it was shared with. */
 export function funnelByChallenge(s: Store, source: Source = "all") {
-  const include = (id: string) => source === "all" || id.startsWith(DEMO_PREFIX) === (source === "demo");
+  // Demo inbox peers (lib/demo/peers.ts) are scenery for the recruiter screen, not part of any cohort.
+  const include = (id: string) => !id.startsWith("att_demo_peer_") && (source === "all" || id.startsWith(DEMO_PREFIX) === (source === "demo"));
   const names = new Map<string, { company: string; title: string }>();
   for (const c of s.listCards().filter((c) => include(c.attemptId))) names.set(c.challenge.id, { company: c.challenge.company, title: c.challenge.title });
   const ids = new Set([...names.keys(), ...s.listRuns().filter((r) => !r.practice && include(r.attemptId)).map((r) => r.challengeId), ...s.listShares().filter((x) => !x.revokedAt && include(x.attemptId)).map((x) => x.challengeId)]);

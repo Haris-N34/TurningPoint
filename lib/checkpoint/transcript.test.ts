@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCorrection, fromChunks } from "./transcript";
+import { applyCorrection, fromChunks, wordsChanged } from "./transcript";
 
 describe("applyCorrection", () => {
   const t = fromChunks([{ text: "I let the team vote", startS: 1, endS: 3 }, { text: "we cut the second weekend", startS: 5, endS: 8 }]);
@@ -38,5 +38,14 @@ describe("applyCorrection", () => {
 
   it("an emptied transcript is unavailable", () => {
     expect(applyCorrection(t, "  ", 10).status).toBe("unavailable");
+  });
+});
+
+describe("wordsChanged", () => {
+  it("counts word edits", () => {
+    expect(wordsChanged("I cut the second weekend", "I cut the second weekend")).toBe(0);
+    expect(wordsChanged("I cut the second week", "I cut the second weekend")).toBe(1);
+    expect(wordsChanged("", "two words")).toBe(2);
+    expect(wordsChanged("we kept both days", "we kept both of the days")).toBe(2);
   });
 });

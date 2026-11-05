@@ -60,13 +60,13 @@ npcs = [
 ]
 
 nodes = [
-    node("n-roles", "priya", [("priya", "Two volunteers asked for social media. Nobody has taken deliveries or set-up. We need both covered before Saturday.", "worried")],
+    node("n-roles", "priya", [("priya", "Two volunteers want social media. Nobody's on deliveries or set-up, and both need cover by Saturday.", "worried")],
          "How do you split the roles?", [
         opt("a", "Assign roles myself and post a checklist", {"morale": -8}, ("sweat", "neutral", "Clear, but a couple of them look flat.")),
-        opt("b", "Ask who's free when, then pair people on logistics", {"morale": 6}, ("heart", "happy", "I can pair an experienced volunteer with someone new. That gives us cover."), minutes=15),
+        opt("b", "Ask who's free when, then pair people on logistics", {"morale": 6}, ("heart", "happy", "I'll pair someone experienced with someone new. That's cover."), minutes=15),
         opt("c", "Take logistics myself so the team stays happy", {"morale": 10, "budget": 0}, ("note", "worried", "You sure you have time for that?"), explain=True, minutes=30),
     ]),
-    node("n-vendor-mix", "rosa", [("rosa", "We need to know the fee by tomorrow. Big trucks pay more, but small stalls bring the neighbours.", "neutral")],
+    node("n-vendor-mix", "rosa", [("rosa", "I need the fee by tomorrow. Trucks pay more, but small stalls bring the neighbours.", "neutral")],
          "What vendor mix and fee do you set?", [
         opt("a", "Mostly local stalls at a low fee", {"budget": -300, "trust.vendors": 10, "trust.community": 5}, ("heart", "happy", "The neighbours will love that.")),
         opt("b", "Mix: two trucks pay more, the rest stay cheap", {"budget": 200, "trust.vendors": 4}, ("note", "neutral", "Balanced. I can work with it.")),
@@ -78,19 +78,19 @@ nodes = [
         opt("b", "Theo files it; I check the form first", {"trust.partner": 3, "morale": 4}, ("note", "happy", "On it.")),
         opt("c", "Pay a runner $150 to file it", {"budget": -150}, ("note", "neutral", "Done, but that's budget gone.")),
     ]),
-    node("n-logo", "okafor", [("okafor", "Our board wants the logo on every table, banner and bag. That was the spirit of the deal.", "neutral")],
+    node("n-logo", "okafor", [("okafor", "Our board wants the logo on every table, banner and bag. That was the deal.", "neutral")],
          "What do you say?", [
         opt("a", "Yes to everything, keep the sponsor happy", {"budget": -200, "trust.community": -4}, ("heart", "happy", "Wonderful.")),
         opt("b", "Banner and stage only, and say why", {"trust.community": 3}, ("note", "neutral", "Reasonable. I'll take it back.")),
         opt("c", "Push back: the market isn't an ad", {"trust.community": 5, "budget": 0}, ("anger", "angry", "That's not how partnerships work."), explain=True),
     ]),
-    node("n-schedule", "priya", [("priya", "Ari and Jess are both on Saturday set-up, but clean-up has no cover. Jess can only stay until noon.", "worried")],
+    node("n-schedule", "priya", [("priya", "Ari and Jess are both on Saturday set-up. Clean-up has nobody, and Jess leaves at noon.", "worried")],
          "How do you fix the schedule?", [
         opt("a", "Rebuild the rota myself tonight", {"morale": -3}, ("sweat", "neutral"), minutes=45),
-        opt("b", "Ask who can swap into clean-up, then confirm the revised shifts", {"morale": 6}, ("heart", "happy", "They both said yes.")),
+        opt("b", "Ask who can swap to clean-up, then confirm the new shifts", {"morale": 6}, ("heart", "happy", "They both said yes.")),
         opt("c", "Leave it, sort it on the day", {"morale": -6}, ("sweat", "worried", "That makes me nervous.")),
     ]),
-    node("n-vendor-cut", "kenji", [("kenji", "I reserved the market weekend, but another festival offered me more. I need an extra $400 to stay.", "angry")],
+    node("n-vendor-cut", "kenji", [("kenji", "Another festival offered me more for the same weekend. I need $400 extra to stay.", "angry")],
          "What do you offer Kenji?", [
         opt("a", "No more money, but the best spot by the gate", {"trust.vendors": 4}, ("note", "neutral", "Hm. Foot traffic is money. Deal.")),
         opt("b", "Pay the extra $400 to keep Kenji", {"budget": -400, "trust.vendors": -3}, ("heart", "happy", "Now we're talking."), explain=True),
@@ -101,7 +101,7 @@ nodes = [
          "How do you get the word out?", [
         opt("a", "Flyers through the school newsletters", {"budget": -120, "trust.community": 8}, ("heart", "happy", "The schools will share it.")),
         opt("b", "Paid social ads", {"budget": -500, "trust.community": 3}, ("note", "neutral")),
-        opt("c", "Ask vendors to promote it to their customers", {"trust.vendors": 2, "trust.community": 5}, ("note", "happy", "I'll ask what they can share. We need to get them the details today.")),
+        opt("c", "Ask vendors to promote it to their customers", {"trust.vendors": 2, "trust.community": 5}, ("note", "happy", "I'll ask what they can share. They need the details today.")),
     ]),
     node("n-fridge", "theo", [("theo", "The fridge rental fell through. Without cold storage, half the food can't be sold.", "worried")],
          "What do you do about cold storage?", [
@@ -110,14 +110,14 @@ nodes = [
         opt("c", "Cut the dairy and meat vendors", {"trust.vendors": -10, "budget": 100}, ("anger", "worried", "Two vendors are furious."), explain=True),
     ]),
     # One recovery node per disruption. Option ids and KPIs on n-recovery stay fixed so old sponsor logs replay.
-    node("n-recovery", "laptop", [("you", "The sponsor money is gone and most of the budget went with it. I need a plan that fits what's left.", "worried")],
+    node("n-recovery", "laptop", [("you", "The sponsor's gone, and most of the budget with it. I need a plan that fits what's left.", "worried")],
          "What is your recovery plan?", [
         opt("a", "Run Saturday only; protect vendor access and food safety", {"morale": 4}, ("note", "neutral"), kpi={"coreBudgetShare": 0.8}),
         opt("b", "Keep Saturday and Sunday; cut promotion, decorations and the stage", {"morale": -4, "trust.community": -4}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.6}, explain=True),
         opt("c", "Move the market back two days and rebuild with partners", {"morale": -6, "trust.vendors": -6}, ("question", "worried"), kpi={"coreBudgetShare": 0.7}, explain=True),
-        opt("d", "Keep the full programme while seeking replacement funding", {"morale": 2}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.3}),
+        opt("d", "Keep the full programme and chase replacement funding", {"morale": 2}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.3}),
     ]),
-    node("n-recovery-venue", "laptop", [("you", "We lost the site and the backup costs more. Vendors, volunteers and families all need to know where to go.", "worried")],
+    node("n-recovery-venue", "laptop", [("you", "We lost the site and the backup costs more. Everyone needs to know where to go.", "worried")],
          "Where does the market happen now?", [
         opt("a", "Book the school field nearby and keep the full vendor list", {"trust.vendors": 4, "morale": -2}, ("note", "neutral"), kpi={"coreBudgetShare": 0.7}),
         opt("b", "Shrink into the church car park: fewer stalls, food and families first", {"trust.vendors": -6, "trust.community": 2}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.8}, explain=True),
@@ -126,49 +126,49 @@ nodes = [
     node("n-recovery-cover", "laptop", [("you", "Priya leaves Thursday. Her set-up and gate shifts on Saturday have nobody on them yet.", "worried")],
          "How do you cover Priya's shifts?", [
         opt("a", "Cover the gate myself and move Theo to lead set-up", {"morale": 2}, ("note", "neutral"), kpi={"coreBudgetShare": 0.8}),
-        opt("b", "Share her shifts across the team and drop the late clean-up shift", {"morale": -4}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.75}, explain=True),
+        opt("b", "Share her shifts across the team; drop the late clean-up", {"morale": -4}, ("sweat", "worried"), kpi={"coreBudgetShare": 0.75}, explain=True),
         opt("c", "Pay a college student to take her shifts", {"budget": -400, "morale": 4}, ("note", "happy"), kpi={"coreBudgetShare": 0.5}, explain=True),
     ]),
     node("n-shaken", "priya", [("priya", "The group chat went quiet after the news. Two people asked if it's even happening.", "worried")],
          "How do you reassure the team?", [
-        opt("a", "Call everyone in today, explain the new plan and what stays", {"morale": 12}, ("heart", "happy", "That helped. People feel included.")),
+        opt("a", "Call everyone in today: the new plan and what stays", {"morale": 12}, ("heart", "happy", "That helped. People feel included.")),
         opt("b", "Post a short update in the chat", {"morale": 4}, ("note", "neutral")),
         opt("c", "Say nothing until the plan is final", {"morale": -10}, ("sweat", "worried", "People are guessing the worst."), explain=True),
     ]),
     node("n-vendors-moved", "rosa", [("rosa", "So where do we set up now? I need power for my oven and a time to unload.", "worried")],
          "What do you tell the vendors?", [
         opt("a", "Send every vendor a site map and load-in times today", {"trust.vendors": 10}, ("heart", "happy", "That's all I needed.")),
-        opt("b", "Walk the new site with the vendors before giving out spots", {"trust.vendors": 6, "trust.community": 2}, ("note", "happy"), minutes=45),
+        opt("b", "Walk the new site with vendors before handing out spots", {"trust.vendors": 6, "trust.community": 2}, ("note", "happy"), minutes=45),
         opt("c", "Tell them to come early and sort spots on the day", {"trust.vendors": -8}, ("anger", "angry", "With an oven? That won't work."), explain=True),
     ]),
-    node("n-handover", "priya", [("priya", "Before I go I want to hand over properly. I have the rota, the vendor contacts and the gate float.", "neutral")],
+    node("n-handover", "priya", [("priya", "Before I go, I want to hand over properly: the rota, the vendor contacts, the gate float.", "neutral")],
          "How do you take over Priya's work?", [
         opt("a", "Sit down with Priya and Theo and write it all down", {"morale": 4}, ("heart", "happy", "Good. Nothing gets lost."), minutes=30),
         opt("b", "Ask Priya to send her notes tonight", {"morale": -2}, ("note", "neutral", "I'll try, but some of it is in my head.")),
         opt("c", "Split it: the rota to Theo, the vendor contacts to me", {"morale": 2}, ("note", "neutral"), explain=True),
     ]),
-    node("n-lost-lead", "theo", [("theo", "Everyone liked working with Priya. A couple of the new ones asked who they report to now.", "worried")],
+    node("n-lost-lead", "theo", [("theo", "Everyone liked working with Priya. The new ones are asking who they report to now.", "worried")],
          "How do you steady the team?", [
         opt("a", "Tell the team today who leads what from Thursday", {"morale": 10}, ("heart", "happy", "Clear. That helps.")),
         opt("b", "Ask Theo to step up as lead and tell the team", {"morale": 6}, ("exclaim", "happy", "Me? Okay. I'll do it.")),
         opt("c", "Let things settle and see who steps up", {"morale": -8}, ("sweat", "worried", "People are just waiting around."), explain=True),
     ]),
-    node("n-vendors-worried", "rosa", [("rosa", "Is the market still on this weekend? I've ordered flour for two days and need to know what to tell my supplier.", "worried")],
+    node("n-vendors-worried", "rosa", [("rosa", "Is the market still on? I've ordered flour for two days. What do I tell my supplier?", "worried")],
          "What do you tell the vendors?", [
-        opt("a", "Tell them the truth today, with what changes and what doesn't", {"trust.vendors": 10}, ("heart", "happy", "Thank you for being straight with us.")),
-        opt("b", "Say everything is fine for now", {"trust.vendors": -6}, ("question", "worried", "I still need dates and stall details before I can plan."), explain=True),
+        opt("a", "Tell them the truth today: what changes and what doesn't", {"trust.vendors": 10}, ("heart", "happy", "Thank you for being straight with us.")),
+        opt("b", "Say everything is fine for now", {"trust.vendors": -6}, ("question", "worried", "I still need dates and stall details to plan."), explain=True),
         opt("c", "Offer refunds on fees to anyone who wants out", {"budget": -300, "trust.vendors": 6}, ("note", "happy")),
     ]),
-    node("n-new-partner", "dana", [("dana", "The credit union could offer $800 if you pitch this afternoon, or $500 if I take your written plan. Both need an answer today.", "happy")],
+    node("n-new-partner", "dana", [("dana", "The credit union offers $800 if you pitch this afternoon, or $500 for a written plan. They want an answer today.", "happy")],
          "Do you go after the new partner?", [
         opt("a", "Pitch it myself this afternoon", {"budget": 800, "trust.partner": 4}, ("heart", "happy", "They're in!"), minutes=60),
         opt("b", "Send Dana with my one-page plan", {"budget": 500, "trust.partner": 2}, ("note", "happy")),
         opt("c", "Skip it, we have enough to do", {}, ("sweat", "worried")),
     ]),
-    node("n-feedback", "dana", [("dana", "Families asked for an activity they can join without buying anything. I still cannot see one in the plan. Can we make room?", "angry")],
+    node("n-feedback", "dana", [("dana", "Families want an activity they can join without buying anything. I still don't see one. Can we make room?", "angry")],
          "How do you respond to Dana's feedback?", [
-        opt("a", "Ask which change matters most, then add a free children's activity", {"trust.partner": 10, "trust.community": 6}, ("heart", "happy", "Thank you. Let's add a kids' corner."), kpi={"feedback": "open"}),
-        opt("b", "Defend the existing plan and keep the programme unchanged", {"trust.partner": -4}, ("note", "neutral", "I hear you. I still think it's off."), kpi={"feedback": "defensive"}),
+        opt("a", "Ask what matters most, then add a free kids' activity", {"trust.partner": 10, "trust.community": 6}, ("heart", "happy", "Thank you. Let's add a kids' corner."), kpi={"feedback": "open"}),
+        opt("b", "Defend the plan and keep the programme as it is", {"trust.partner": -4}, ("note", "neutral", "I hear you. I still think it's off."), kpi={"feedback": "defensive"}),
         opt("c", "Say there's no time for changes now", {"trust.partner": -10}, ("anger", "angry"), kpi={"feedback": "dismissive"}, explain=True),
     ]),
     node("n-supplies", "theo", [("theo", "After the cuts we're short eight tables and two tents.", "worried")],
@@ -177,7 +177,7 @@ nodes = [
         opt("b", "Rent what's missing", {"budget": -350}, ("note", "neutral")),
         opt("c", "Vendors bring their own tables", {"trust.vendors": -5}, ("sweat", "worried")),
     ]),
-    node("n-weather", "theo", [("theo", "There is a 40% chance of rain on Saturday morning. The gym is available, but it has less stall space.", "worried")],
+    node("n-weather", "theo", [("theo", "40% chance of rain Saturday morning. The gym is free, but it has less stall space.", "worried")],
          "What's the call?", [
         opt("a", "Book the gym as a backup, decide Friday night", {"budget": -150}, ("note", "happy", "Good, a plan B.")),
         opt("b", "Keep the outdoor layout and accept the rain risk", {}, ("sweat", "worried")),
@@ -192,7 +192,7 @@ nodes = [
     node("n-permit-fine", "theo", [("theo", "The city called. Without the permit we get fined, or shut down Saturday.", "angry")],
          "How do you fix it now?", [
         opt("a", "Pay the late fee and file today", {"budget": -250}, ("note", "neutral")),
-        opt("b", "Ask Dana to arrange an urgent filing through the non-profit", {"trust.partner": -4}, ("sweat", "worried")),
+        opt("b", "Ask Dana to rush the filing through the non-profit", {"trust.partner": -4}, ("sweat", "worried")),
     ]),
     node("n-kenji-leaves", "kenji", [("kenji", "I'm packing up. I'll do the food festival instead.", "angry")],
          "Last chance. What do you say?", [
@@ -246,10 +246,10 @@ scenario = {
              "text": "I'm sorry. Our board has withdrawn the sponsorship, effective today. We can't fund the market.",
              "budgetCut": 0.6, "effects": {"morale": -10}, "darkZone": "sponsor", "spawn": ["recovery-plan", "team-shaken", "vendors-worried"]},
             {"id": "venue-cancels", "title": "The venue cancels", "caller": "dana",
-             "text": "The site owner has cancelled our booking. The replacement venue costs more, so we have less money for the programme. We need to rework the weekend.",
+             "text": "The site owner cancelled our booking. The replacement costs more, so there's less for the programme. We need to rework the weekend.",
              "budgetCut": 0.3, "effects": {"morale": -12, "trust.vendors": -8}, "spawn": ["recovery-venue", "team-shaken", "vendors-moved"]},
             {"id": "lead-volunteer-quits", "title": "Your lead volunteer leaves", "caller": "priya",
-             "text": "I got the paid internship and start Thursday. I need to hand over my shifts. Paid cover will take part of the budget, but I can brief someone today.",
+             "text": "I got the paid internship. I start Thursday. Paid cover will cost us, but I can brief someone today.",
              "budgetCut": 0.2, "effects": {"morale": -25}, "spawn": ["recovery-cover", "handover", "lost-lead"]},
         ],
     },

@@ -103,3 +103,16 @@ export function applyCorrection(t: Transcript, edited: string, durationS: number
   }
   return { text, words, status: "ready" };
 }
+
+/** How many words differ between two texts (word-level edit distance, case-insensitive). */
+export function wordsChanged(a: string, b: string): number {
+  const x = a.toLowerCase().split(/\s+/).filter(Boolean);
+  const y = b.toLowerCase().split(/\s+/).filter(Boolean);
+  let prev = Array.from({ length: y.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= x.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= y.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (x[i - 1] === y[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[y.length];
+}

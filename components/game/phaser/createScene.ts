@@ -15,6 +15,8 @@ type Opts = {
   isFrozen: () => boolean;
   reducedMotion: () => boolean;
   attract?: boolean; // title screen: camera drifts, no player control
+  /** CSS font family for zone signs (the game's pixel body font). */
+  font?: string;
 };
 
 const TILE = 16;
@@ -44,6 +46,9 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
     focusRing?: PhaserNS.GameObjects.Ellipse;
     lastStepTile = "";
     minimap?: PhaserNS.Cameras.Scene2D.Camera;
+    /** True while the camera tours the new problems after the cutscene; signs step aside. */
+    panning = false;
+    labels: { text: PhaserNS.GameObjects.Text; zone: MapScenario["zones"][number] }[] = [];
 
     constructor() {
       super("market");
@@ -83,17 +88,22 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       this.star.enableCornerCutting();
       this.star.disableDiagonals();
 
-      // Zone signs.
+      // Zone signs in the pixel UI font. They stay inside the view and fade with distance (see placeLabels).
+      // The attract map (title and avatar backdrop) shows none: the art carries the mood.
       for (const z of s.zones) {
-        const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, z.name.toUpperCase(), {
-          fontFamily: "monospace",
-          fontSize: "7px",
-          color: "#fffef4",
-          backgroundColor: "#2e222fcc",
-          padding: { x: 2, y: 1 },
-          resolution: 4,
-        });
-        label.setOrigin(0.5, 1).setDepth(60);
+        if (!o.attract) {
+          const label = this.add.text((z.x + z.w / 2) * TILE, z.y * TILE - 2, z.name, {
+            fontFamily: o.font ?? "monospace",
+            fontSize: "8px",
+            fontStyle: "600",
+            color: "#fff8e7",
+            backgroundColor: "#2e222fe6",
+            padding: { x: 3, y: 1 },
+            resolution: 6,
+          });
+          label.setOrigin(0.5, 1).setDepth(60);
+          this.labels.push({ text: label, zone: z });
+        }
         const dark = this.add.rectangle(z.x * TILE, z.y * TILE, z.w * TILE, z.h * TILE, 0x0b0b1a, 0).setOrigin(0, 0).setDepth(55);
         this.darkRects.set(z.id, dark);
       }
@@ -177,7 +187,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
         const mw = 160, mh = 120;
         this.minimap = this.cameras.add(this.scale.width - mw - 12, this.scale.height - mh - 12, mw, mh).setZoom(mw / map.widthInPixels).setName("minimap");
         this.minimap.setBounds(0, 0, map.widthInPixels, map.heightInPixels).setBackgroundColor(0x2e222f);
-        this.minimap.ignore(this.light);
+        this.minimap.ignore([this.light, ...this.labels.map((l) => l.text)]);
         this.scale.on("resize", () => this.minimap?.setPosition(this.scale.width - mw - 12, this.scale.height - mh - 12));
       }
 
@@ -272,6 +282,7 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       const cam = this.cameras.main;
       if (o.reducedMotion()) return;
       cam.stopFollow();
+      this.panning = true;
       const pts = e.npcs.map((id) => this.npcs.get(id)?.sprite).filter(Boolean) as PhaserNS.GameObjects.Sprite[];
       let delay = 0;
       for (const p of pts) {
@@ -280,7 +291,10 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
       }
       this.time.delayedCall(delay, () => {
         cam.pan(this.player.x, this.player.y, 600, Phaser.Math.Easing.Sine.InOut);
-        this.time.delayedCall(650, () => cam.startFollow(this.player, true, 0.12, 0.12));
+        this.time.delayedCall(650, () => {
+          this.panning = false;
+          cam.startFollow(this.player, true, 0.12, 0.12);
+        });
       });
     };
 
@@ -410,6 +424,9 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
 
       if (o.attract || !this.player) return;
       const frozen = o.isFrozen();
+      // The minimap steps aside while a dialogue, checkpoint or cutscene is up.
+      this.minimap?.setVisible(!frozen);
+      this.placeLabels();
       const k = this.keys;
       let vx = 0, vy = 0;
       if (!frozen) {
@@ -473,6 +490,36 @@ export function createScene(Phaser: typeof PhaserNS, o: Opts) {
             this.walkToNpc(withIssues[this.focusIndex], false);
           }
         }
+      }
+    }
+
+    /** Keep zone signs fully on screen and clear of the HUD panels while their zone is in view; dim the far ones. */
+    placeLabels() {
+      const cam = this.cameras.main;
+      const v = cam.worldView;
+      const z = cam.zoom;
+      const sw = this.scale.width;
+      const desktop = sw >= 640;
+      // Screen-space reserves: the top HUD strip, and on desktop the issue list in the top right.
+      const big = sw >= 1700 && this.scale.height >= 950; // the HUD is drawn 1.25x there (tp-scale in GameShell)
+      const k = big ? 1.25 : 1;
+      const top = (132 * k) / z;
+      const listW = desktop ? (320 * k) / z : 0, listBottom = (360 * k) / z;
+      // Signs keep one on-screen size whatever the camera zoom (about 18 px tall).
+      const scale = (desktop ? 17 : 14) / (8 * z);
+      for (const { text, zone: zn } of this.labels) {
+        const zx = zn.x * TILE, zy = zn.y * TILE, zw = zn.w * TILE, zh = zn.h * TILE;
+        const inView = zx < v.right && zx + zw > v.x && zy < v.bottom && zy + zh > v.y;
+        text.setVisible(inView && !this.panning);
+        if (!inView || this.panning) continue;
+        text.setScale(scale);
+        const hw = text.displayWidth / 2 + 2;
+        const y = Phaser.Math.Clamp(zy - 2, v.y + top + text.displayHeight, v.bottom - 2);
+        const right = y - v.y < listBottom ? v.right - listW : v.right;
+        const x = Phaser.Math.Clamp(zx + zw / 2, v.x + hw, Math.max(v.x + hw, right - hw));
+        text.setPosition(x, y);
+        const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, zx + zw / 2, zy + zh / 2) / TILE;
+        text.setAlpha(Phaser.Math.Clamp(1.4 - d / 18, 0.45, 1));
       }
     }
 
