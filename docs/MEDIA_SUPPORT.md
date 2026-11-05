@@ -38,7 +38,11 @@ The demo has no API keys, so speech to text uses the browser's built-in `SpeechR
 
 The checkpoint pops up as a short live interview: the character (or a pixel "Hiring panel") with the question on one side, the candidate's camera preview on the other. Video is the default. The first checkpoint of a run doubles as a camera check ("this is how you'll appear"), with "Voice instead" and "Text instead" right under the preview. The think timer only starts once the camera or mic is on, so a permission prompt never eats think time (capped at 20 seconds). The choice is remembered for the rest of the run.
 
-On stage: if camera and mic are already allowed for the site, there is no extra step. The camera starts in about half a second, the timer starts, and the "Camera check" line just sits above the preview. If not allowed yet, the browser's permission prompt shows with the first checkpoint and the timer waits. Before a demo, open the game once on the presenting laptop and allow the camera. Candidates with text-only accommodations never see the camera. Timer multipliers (1.5x, 2x) apply as everywhere else.
+On stage: if camera and mic are already allowed for the site, there is no extra step. The camera starts in about half a second, the timer starts, and the "Camera check" line just sits above the preview. If not allowed yet, the browser's permission prompt shows with the first checkpoint and the timer waits. Before a demo, open the game once on the presenting laptop and allow the camera.
+
+Mic meter during the camera check: the meter reads the same microphone stream the camera check opens (Web Audio analyser on the getUserMedia audio track), so it moves before the first answer starts. In tests, Chromium's fake device plays a short beep about once a second, so the bars only flick briefly; `checkpoint-media.spec.ts` asserts the level goes above zero. It was not tried with a physical microphone in the cloud test environment, so check it on the stage laptop.
+
+Pre-stage check: say a word during the camera check; the mic bars should move. Candidates with text-only accommodations never see the camera. Timer multipliers (1.5x, 2x) apply as everywhere else.
 
 ## Testing
 
