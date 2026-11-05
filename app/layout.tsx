@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/site/Header";
+import { Housekeeping } from "@/components/practice/Housekeeping";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
         className="antialiased"
       >
         <Header />
+        <Housekeeping />
         <div id="main-content" tabIndex={-1}>{children}</div>
       </body>
     </html>

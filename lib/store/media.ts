@@ -25,6 +25,11 @@ export const media = {
   get: (key: string) => tx<Blob | undefined>("readonly", (s) => s.get(key)),
   delete: (key: string) => tx("readwrite", (s) => s.delete(key)).then(() => undefined),
   clear: () => tx("readwrite", (s) => s.clear()).then(() => undefined),
+  keys: () => tx<IDBValidKey[]>("readonly", (s) => s.getAllKeys()).then((ks) => ks.map(String)),
+  /** Delete every recording of one attempt (keys are `<attemptId>/<checkpointId>`). */
+  async deletePrefix(prefix: string) {
+    for (const k of await media.keys()) if (k.startsWith(prefix)) await media.delete(k);
+  },
   /** Object URL for playback. Caller revokes it when done. */
   async url(key: string) {
     const b = await media.get(key);

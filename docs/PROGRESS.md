@@ -177,7 +177,7 @@ Owner: Div unless marked. [H] = Haris (portraits, art direction, map authoring h
 - [ ] E7.2 [H] Completion and shortlist rate by mode and accommodation
 - [ ] E7.3 [D+H] Opt-in demographics, four-fifths warning
 - [ ] E7.4 [H] Seed data: 200 fake candidates
-- [ ] C8.1 [D] Practice mode, nothing shared, deleted after 24 h
+- [x] C8.1 [D] Practice mode, nothing shared, deleted after 24 h (/practice; store refuses to share practice runs and hides them from employer lists; purge on every page load; lib/practice/practice.test.ts with an injected clock, tests/e2e/practice.spec.ts)
 - [ ] C8.2 [D] Practice feedback on clarity and specificity, never a score
 - [x] G4 [D] Bias test (6 names and dialect variants) fails the build if levels differ (lib/ai/bias.test.ts, runs in CI)
 - [ ] A1 to A5 [H] Accessibility pass (keyboard, focus, labels, captions, reduced motion, low bandwidth, axe)

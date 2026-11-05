@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CardSchema, passNeedsReason, PASS_REASON_ERROR, type Card } from "@/lib/card/types";
+import { isPracticeChallenge } from "@/lib/practice/practice";
 
 // Local-only data layer (demo scope: no database). Everything lives in one storage backend,
 // localStorage in the browser and an in-memory map in tests. Recordings live in IndexedDB (media.ts).
@@ -126,7 +127,8 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
     // Runs
     getRun: (attemptId: string) => read(kv, `run:${attemptId}`, SavedRunSchema),
     saveRun(run: Omit<SavedRun, "updatedAt">) {
-      const full = SavedRunSchema.parse({ ...run, updatedAt: iso() });
+      // A practice challenge always makes a practice run (C8.1), whatever the caller passed.
+      const full = SavedRunSchema.parse({ ...run, practice: run.practice || isPracticeChallenge(run.challengeId), updatedAt: iso() });
       write(kv, `run:${run.attemptId}`, full);
       return full;
     },
@@ -142,11 +144,27 @@ export function makeStore(kv: KV, now: () => Date = () => new Date()) {
     // Cards
     getCard: (attemptId: string): Card | undefined => read(kv, `card:${attemptId}`, CardSchema),
     saveCard: (card: Card) => write(kv, `card:${card.attemptId}`, CardSchema.parse(card)),
-    listCards: (): Card[] => keys(kv, "card:").map((k) => read(kv, k, CardSchema)).filter((c): c is Card => !!c),
+    /** Real cards by default. Practice cards (C8.1) only with `{ practice: true }`, so no employer view lists them. */
+    listCards: (opts: { practice?: boolean } = {}): Card[] =>
+      keys(kv, "card:")
+        .map((k) => read(kv, k, CardSchema))
+        .filter((c): c is Card => !!c && isPracticeChallenge(c.challenge.id) === !!opts.practice),
+    isPractice(attemptId: string) {
+      return !!this.getRun(attemptId)?.practice || isPracticeChallenge(this.getCard(attemptId)?.challenge.id);
+    },
+    /** Remove one attempt: run, card, its shares and reviews. Recordings are cleared by the caller. */
+    deleteAttempt(attemptId: string) {
+      kv.removeItem(PREFIX + `run:${attemptId}`);
+      kv.removeItem(PREFIX + `card:${attemptId}`);
+      write(kv, "shares", this.listShares().filter((x) => x.attemptId !== attemptId));
+      write(kv, "reviews", this.listReviews().filter((x) => x.attemptId !== attemptId));
+    },
 
     // Shares (C7.3, C7.4)
     listShares: (): Share[] => read(kv, "shares", z.array(ShareSchema)) ?? [],
-    share(attemptId: string, challengeId: string, reused: boolean): Share {
+    /** Returns undefined for a practice run: practice is never shared with an employer (C8.1). */
+    share(attemptId: string, challengeId: string, reused: boolean): Share | undefined {
+      if (isPracticeChallenge(challengeId) || this.isPractice(attemptId)) return undefined;
       const all = this.listShares();
       const existing = all.find((s) => s.attemptId === attemptId && s.challengeId === challengeId);
       if (existing && !existing.revokedAt) return existing;
