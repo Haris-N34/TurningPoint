@@ -245,7 +245,7 @@ export function CapabilityCard({
                     players.current[c.id] = h;
                   }}
                 />
-                {c.retakeUsed && <p className="text-xs text-muted-foreground">Retake used</p>}
+                {c.retakeUsed && <p className="text-xs text-muted-foreground">Answered on the second take</p>}
               </div>
             ))}
           </section>
@@ -325,7 +325,7 @@ export function CapabilityCard({
             <h2 id="int-h" className="font-medium">Integrity notes · For context, not scored</h2>
             <ul className="mt-1 list-disc pl-4">
               {card.integrity.map((n, i) => (
-                <li key={i}>{n.detail}</li>
+                <li key={i}>{integrityText(n)}</li>
               ))}
             </ul>
           </section>
@@ -335,4 +335,11 @@ export function CapabilityCard({
       <ResumeEvidence card={{ ...card, evidence }} onJump={jump} />
     </article>
   );
+}
+
+/** Neutral wording for integrity notes (older saved cards say "Retake used", which reads as a penalty). */
+export function integrityText(n: { kind: string; detail: string }) {
+  if (n.kind !== "retake_used") return n.detail;
+  const cp = /checkpoint (\d+)/i.exec(n.detail)?.[1];
+  return `Answered on the second take${cp ? ` (checkpoint ${cp})` : ""}`;
 }
