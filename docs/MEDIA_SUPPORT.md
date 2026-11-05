@@ -11,6 +11,7 @@ The demo has no API keys, so speech to text uses the browser's built-in `SpeechR
 - A mic level meter shows during the think time and the answer, so the candidate can see the mic works. Loudness is only drawn on screen, never stored or scored.
 - After the answer, the candidate sees "What we heard" in an editable box and can fix misheard words or type what they said. That text is what is saved and scored. Paste is off in that box, same as text answers.
 - The recording is kept either way (unless the candidate deletes or hides it later).
+- If they change any words, the card keeps the original speech-to-text text (`recognizedText`) and adds an integrity note: "Transcript corrected before submit: N words changed (context, not scored)". Recruiters can open the original under the clip. Evidence quotes still have to match the submitted transcript exactly. Transcripts can't be edited after submit (C7.2).
 
 ## By browser
 
@@ -35,7 +36,9 @@ The demo has no API keys, so speech to text uses the browser's built-in `SpeechR
 
 ## In the map game
 
-The checkpoint pops up as a short live interview: the character (or a pixel "Hiring panel") with the question on one side, the candidate's camera preview on the other. Video is the default. The first checkpoint of a run doubles as a camera check ("this is how you'll appear"), with "Voice instead" and "Text instead" right under the preview. The think timer only starts once the camera or mic is on, so a permission prompt never eats think time (capped at 20 seconds). The choice is remembered for the rest of the run. Candidates with text-only accommodations never see the camera. Timer multipliers (1.5x, 2x) apply as everywhere else.
+The checkpoint pops up as a short live interview: the character (or a pixel "Hiring panel") with the question on one side, the candidate's camera preview on the other. Video is the default. The first checkpoint of a run doubles as a camera check ("this is how you'll appear"), with "Voice instead" and "Text instead" right under the preview. The think timer only starts once the camera or mic is on, so a permission prompt never eats think time (capped at 20 seconds). The choice is remembered for the rest of the run.
+
+On stage: if camera and mic are already allowed for the site, there is no extra step. The camera starts in about half a second, the timer starts, and the "Camera check" line just sits above the preview. If not allowed yet, the browser's permission prompt shows with the first checkpoint and the timer waits. Before a demo, open the game once on the presenting laptop and allow the camera. Candidates with text-only accommodations never see the camera. Timer multipliers (1.5x, 2x) apply as everywhere else.
 
 ## Testing
 
