@@ -51,7 +51,9 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   const card = page.getByTestId("capability-card");
   await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
   await expect(card).toContainText("Verified student");
-  await expect(card).not.toContainText(/score\s*[:=]?\s*\d/i);
+  // v2 D.4 adds a Final score box at the top right; the evidence itself still carries levels, never numbers.
+  await expect(card.getByTestId("evidence")).not.toContainText(/score\s*[:=]?\s*\d/i);
+  await expect(card.getByTestId("evidence")).not.toContainText(/\d+\/100/);
   const jumps = card.locator('[data-testid^="jump-"]');
   expect(await jumps.count()).toBe(4);
   expect(await card.getByText("AI summary").count()).toBe(4);

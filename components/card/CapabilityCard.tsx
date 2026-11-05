@@ -7,7 +7,10 @@ import { verifyEvidence } from "@/lib/card/verify";
 import { SKILLS } from "@/lib/engine/skills";
 import { confirmationLine } from "@/lib/witness/witness";
 import { cn } from "@/lib/utils";
+import { scoreCard } from "@/lib/scoring/score";
 import { ClipPlayer, type ClipHandle } from "./ClipPlayer";
+import { FinalScoreBox } from "./FinalScoreBox";
+import { ResumeEvidence } from "./ResumeEvidence";
 
 // The Capability Card (E3). One component for the recruiter and for the candidate's own preview (C7.1).
 // It fits a laptop screen: evidence on the left, decision path and clips on the right.
@@ -51,6 +54,8 @@ export function CapabilityCard({
   reused,
   actions,
   seekTo,
+  resumeWeight,
+  showFinalScore = true,
 }: {
   card: Card;
   identity: CardIdentity;
@@ -60,9 +65,15 @@ export function CapabilityCard({
   actions?: React.ReactNode;
   /** Jump a clip from outside the card (Recruiter Copilot citations). `n` makes repeat clicks re-seek. */
   seekTo?: { checkpointId: string; t: number; n: number };
+  /** Employer's resume weight (0 to 40%). Defaults to the scoring config. */
+  resumeWeight?: number;
+  /** The Final score depends on each employer's weights, so the candidate preview leaves it out. */
+  showFinalScore?: boolean;
 }) {
   // Never render evidence that has not passed the quote check (G1, E3.8).
   const evidence = useMemo(() => verifyEvidence(card).evidence, [card]);
+  // Final score (Part D): sorts only, shown top right with its breakdown; evidence still leads.
+  const final = useMemo(() => scoreCard(card, card.resume ? { claims: card.resume.claims, resumeWeight } : {}), [card, resumeWeight]);
   const decisionClips = card.checkpoints.filter((c) => c.kind === "decision").slice(0, 3);
   const realLife = card.checkpoints.find((c) => c.id === card.realStory?.checkpointId);
   const followUp = card.checkpoints.find((c) => c.id === card.realStory?.followUpCheckpointId);
@@ -109,14 +120,17 @@ export function CapabilityCard({
             )}
           </div>
         </div>
-        {actions}
+        <div className="flex flex-col items-end gap-3">
+          {showFinalScore && <FinalScoreBox score={final} />}
+          {actions}
+        </div>
       </header>
 
       <div className="space-y-4">
         <section aria-labelledby="ev-h" className="rounded-xl border bg-card p-4 shadow-card">
           <div className="flex items-baseline justify-between">
             <h2 id="ev-h" className="font-semibold">Skill evidence</h2>
-            <span className="text-xs text-muted-foreground">No overall score</span>
+            <span className="text-xs text-muted-foreground">Evidence first</span>
           </div>
           <ul className="mt-3 space-y-3" data-testid="evidence">
             {evidence.map((e) => (
@@ -288,6 +302,8 @@ export function CapabilityCard({
           </section>
         )}
       </div>
+
+      <ResumeEvidence card={{ ...card, evidence }} onJump={jump} />
     </article>
   );
 }

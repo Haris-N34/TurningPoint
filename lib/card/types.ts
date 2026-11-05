@@ -123,6 +123,34 @@ export const CardSchema = z.object({
     .optional(),
   /** Said vs did (v2 B2 Consistency Checker): context for the recruiter, never a penalty. */
   consistency: z.array(z.object({ kind: z.enum(["order", "explanation", "story"]), said: z.string(), did: z.string(), consistent: z.boolean() })).optional(),
+  /** Resume vs Evidence (v2 C4, C.7). Claims are redacted before analysis. Optional: no resume means game only. */
+  resume: z
+    .object({
+      source: z.enum(["upload", "ats"]),
+      consentAt: z.string(),
+      /** How many identity or prestige items were removed before analysis. */
+      redactions: z.number().int().min(0),
+      claims: z.array(
+        z.object({
+          id: z.string(),
+          text: z.string(),
+          roleLabel: z.string(),
+          action: z.string(),
+          result: z.string().optional(),
+          hasNumber: z.boolean(),
+          skills: z.array(skill),
+          backed: z.boolean(),
+          link: z
+            .discriminatedUnion("type", [
+              z.object({ type: z.literal("clip"), skill, checkpointId: z.string(), startS: z.number().min(0), quote: z.string() }),
+              z.object({ type: z.literal("kpi"), skill, kpiId: z.string(), label: z.string() }),
+              z.object({ type: z.literal("choice"), skill, nodeId: z.string(), optionLabel: z.string() }),
+            ])
+            .optional(),
+        }),
+      ),
+    })
+    .optional(),
   /** How the card was made, so it can be audited (G3). */
   audit: z.object({ extractor: z.string(), version: z.string(), createdAt: z.string() }),
 });
