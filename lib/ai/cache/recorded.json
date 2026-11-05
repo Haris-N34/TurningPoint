@@ -21,16 +21,16 @@
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:1132d5c714a34a47": {
+ "checkpoint-question@1.0.0:10029ac22580a397": {
   "output": {
-   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
+   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
    "source": "generated"
   },
   "model": "local-rules"
  },
- "checkpoint-question@1.0.0:df68a6ced2ac9252": {
+ "checkpoint-question@1.0.0:7faf9a25ea26515d": {
   "output": {
-   "question": "You've got 1 open problems: nobody wants logistics. Which are you going to first, and why?",
+   "question": "You chose A, to assign roles myself and post a checklist. Walk us through why.",
    "source": "generated"
   },
   "model": "local-rules"
