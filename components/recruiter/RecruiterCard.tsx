@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CapabilityCard } from "@/components/card/CapabilityCard";
 import { Button } from "@/components/ui/button";
+import { Copilot } from "./Copilot";
 import { cardFor, decide, type RecruiterCardView } from "@/lib/card/recruiter";
 import { PASS_REASONS } from "@/lib/card/types";
 import { getChallenge, type Challenge } from "@/lib/challenge/challenge";
@@ -20,6 +21,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [seekTo, setSeekTo] = useState<{ checkpointId: string; t: number; n: number }>();
 
   const load = () => {
     const s = store();
@@ -103,8 +105,10 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
           hiddenClipIds={view.hiddenClipIds}
           reused={share?.reused ? { covers } : undefined}
           actions={actions}
+          seekTo={seekTo}
         />
       </div>
+      <Copilot card={view.card} onCite={(c) => setSeekTo((p) => ({ ...c, n: (p?.n ?? 0) + 1 }))} />
     </main>
   );
 }

@@ -1,4 +1,6 @@
-import { EXTRACTOR, extractEvidence } from "@/lib/ai/evidence";
+import { EXTRACTOR } from "@/lib/ai/evidence";
+import { cardConsistencyInput, checkConsistency } from "@/lib/ai/services/consistency";
+import { scanEvidence } from "@/lib/ai/services/scanner";
 import type { RunState } from "@/lib/engine/engine";
 import type { RunPlan } from "@/lib/engine/seed";
 import type { Scenario } from "@/lib/engine/schema";
@@ -62,12 +64,11 @@ export function buildCard(i: BuildInput): Card {
   const nodeSkills: Record<string, SkillSlug[]> = {};
   for (const n of i.scenario.nodes) if (n.type === "choice") nodeSkills[n.id] = n.skillSignals as SkillSlug[];
 
-  const evidence = extractEvidence({
-    targetSkills,
-    checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })),
-    decisionPath,
-    nodeSkills,
-  });
+  // Evidence Scanner (B2): blind inputs, verified quotes. The name and school are stripped before it runs.
+  const evidence = scanEvidence(
+    { targetSkills, checkpoints: i.answers.map(({ id, nodeId, kind, transcript }) => ({ id, nodeId, kind, transcript })), decisionPath, nodeSkills },
+    { name: i.candidate.displayName, university: i.candidate.university },
+  );
 
   return CardSchema.parse({
     attemptId: i.attemptId,
@@ -84,6 +85,19 @@ export function buildCard(i: BuildInput): Card {
     checkpoints: i.answers,
     realStory: i.realStory ? { ...i.realStory, witnesses: [] } : undefined,
     integrity: i.integrity,
+    // Consistency Checker (B2): said vs did, context only.
+    consistency: checkConsistency(
+      cardConsistencyInput({ checkpoints: i.answers, decisionPath, realStory: i.realStory ? { ...i.realStory, witnesses: [] } : undefined }, (id) => optionsOf(i.scenario, id), {
+        name: i.candidate.displayName,
+        university: i.candidate.university,
+      }),
+    ),
     audit: { extractor: EXTRACTOR.name, version: EXTRACTOR.version, createdAt: now },
   });
+}
+
+/** A choice node's options, for said-vs-did. */
+export function optionsOf(s: Scenario, nodeId: string) {
+  const n = s.nodes.find((x) => x.id === nodeId);
+  return n?.type === "choice" ? n.options.map((o) => ({ id: o.id, label: o.label })) : [];
 }

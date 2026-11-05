@@ -4,6 +4,9 @@ import { CardSchema } from "@/lib/card/types";
 import { listChallenges, publish, saveDraft, type Challenge } from "@/lib/challenge/challenge";
 import { tailorScenario } from "@/lib/challenge/tailor";
 import type { Store } from "@/lib/store/store";
+import { cardConsistencyInput, checkConsistency } from "@/lib/ai/services/consistency";
+import { preparePublishedContent } from "@/lib/ai/services/publish";
+import { optionsOf } from "@/lib/card/build";
 
 // Demo data: two fictional employers with published challenges, and Maya's finished card in the
 // first one's inbox so the pitch can open on a real card (PRD, Demo script step 1).
@@ -20,9 +23,14 @@ export function seedDemo(s: Store, templateId = "launch-week"): Challenge[] {
     if (!listChallenges(s).some((c) => c.id === e.id)) {
       saveDraft(s, { id: e.id, company: e.company, title: e.title, templateId, industry: e.industry, targetSkills: [...e.targetSkills], scenario: tailorScenario(base, e.industry, e.company.name).scenario });
     }
-    out.push(publish(s, e.id));
+    const c = publish(s, e.id);
+    // Publish-time AI (B.3): dialogue variants cached with each demo challenge.
+    preparePublishedContent(s, c);
+    out.push(c);
   }
   const maya = CardSchema.parse(fixture);
+  // Said vs did for the demo card, from the same checker real runs use (context, never scored).
+  maya.consistency ??= checkConsistency(cardConsistencyInput(maya, (id) => optionsOf(base, id), { name: maya.candidate.displayName, university: maya.candidate.university }));
   if (!s.getCard(maya.attemptId)) {
     s.saveCard(maya);
     s.share(maya.attemptId, DEMO_EMPLOYERS[0].id, false);

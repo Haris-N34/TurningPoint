@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import type { Card, Evidence } from "@/lib/card/types";
 import { verifyEvidence } from "@/lib/card/verify";
@@ -30,6 +30,7 @@ const LEVEL_MARK: Record<Evidence["level"], string> = { strong: "●●", some: 
 export const skillName = (slug: string) => SKILLS.find((s) => s.slug === slug)?.name ?? slug;
 const mmss = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
 const KIND_LABEL = { decision: "Checkpoint", real_life: "Real life", follow_up: "Follow-up" } as const;
+const CONSISTENCY_LABEL = { order: "Order plan", explanation: "Explanation vs choice", story: "Real story vs follow-up" } as const;
 
 export type CardIdentity = { displayName: string; university?: string; anonymous: boolean };
 
@@ -49,6 +50,7 @@ export function CapabilityCard({
   hiddenClipIds = [],
   reused,
   actions,
+  seekTo,
 }: {
   card: Card;
   identity: CardIdentity;
@@ -56,6 +58,8 @@ export function CapabilityCard({
   hiddenClipIds?: string[];
   reused?: { covers: string[] };
   actions?: React.ReactNode;
+  /** Jump a clip from outside the card (Recruiter Copilot citations). `n` makes repeat clicks re-seek. */
+  seekTo?: { checkpointId: string; t: number; n: number };
 }) {
   // Never render evidence that has not passed the quote check (G1, E3.8).
   const evidence = useMemo(() => verifyEvidence(card).evidence, [card]);
@@ -73,6 +77,14 @@ export function CapabilityCard({
     // Let the tab render before seeking.
     setTimeout(() => players.current[checkpointId]?.seek(t), 0);
   };
+
+  useEffect(() => {
+    if (!seekTo) return;
+    // The follow-up has no tab of its own; it sits with the real-life story.
+    const id = clipTabs.some((c) => c.id === seekTo.checkpointId) ? seekTo.checkpointId : realLife?.id;
+    if (id) jump(id, id === seekTo.checkpointId ? seekTo.t : 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seekTo?.n]);
 
   return (
     <article className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]" data-testid="capability-card" aria-label="Capability Card">
@@ -233,6 +245,37 @@ export function CapabilityCard({
           </section>
         )}
 
+        {!!card.consistency?.length && (
+          // Collapsed by default so the card still fits one laptop screen.
+          <details aria-labelledby="svd-h" className="rounded-xl border bg-card px-4 py-3 shadow-card" data-testid="said-vs-did">
+            <summary className="flex cursor-pointer items-baseline justify-between gap-2" data-testid="said-vs-did-toggle">
+              <h2 id="svd-h" className="text-sm font-semibold">
+                Said vs did{" "}
+                <span className="font-normal text-muted-foreground">
+                  · {card.consistency.length} comparison{card.consistency.length === 1 ? "" : "s"}
+                  {card.consistency.some((c) => !c.consistent) ? `, ${card.consistency.filter((c) => !c.consistent).length} differ` : ", all match"}
+                </span>
+              </h2>
+              <span className="text-xs text-muted-foreground">Context, not scored</span>
+            </summary>
+            <ul className="mt-2 space-y-2">
+              {card.consistency.map((c, i) => (
+                <li key={i} className="text-sm" data-testid={`svd-${c.kind}`} data-consistent={c.consistent}>
+                  <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{CONSISTENCY_LABEL[c.kind]}</span>
+                  <p>
+                    <span className="text-muted-foreground">Said: </span>
+                    {c.kind === "order" ? c.said : `“${c.said}”`}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Did: </span>
+                    {c.did}
+                  </p>
+                  <p className="text-xs font-medium">{c.consistent ? "✓ Matches" : "≠ Differs, worth asking about"}</p>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
 
         {card.integrity.length > 0 && (
           <section aria-labelledby="int-h" className="rounded-xl bg-muted px-4 py-3 text-xs text-muted-foreground" data-testid="integrity">

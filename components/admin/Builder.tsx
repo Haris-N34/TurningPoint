@@ -5,9 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import { skillName } from "@/components/card/CapabilityCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ValueMapper, type MappedSkill } from "./ValueMapper";
 import { getScenario, SCENARIO_IDS } from "@/content/scenarios";
 import { challengeUrl, publish, qrDataUrl, saveDraft, type Challenge } from "@/lib/challenge/challenge";
-import { INDUSTRIES, tailorScenario, type Industry } from "@/lib/challenge/tailor";
+import { preparePublishedContent } from "@/lib/ai/services/publish";
+import { tailor } from "@/lib/ai/services/tailor";
+import { INDUSTRIES, type Industry } from "@/lib/challenge/tailor";
 import { ScenarioSchema, type Scenario } from "@/lib/engine/schema";
 import { SKILLS, type SkillSlug } from "@/lib/engine/skills";
 import { store } from "@/lib/store/store";
@@ -31,6 +34,7 @@ export function Builder() {
   const [published, setPublished] = useState<Challenge | null>(null);
   const [qr, setQr] = useState<string>();
   const [startedAt] = useState(() => Date.now());
+  const [customSkills, setCustomSkills] = useState<MappedSkill[]>([]);
 
   const valid = useMemo(() => ScenarioSchema.safeParse(scenario), [scenario]);
   const errors = valid.success ? [] : valid.error.issues.map((i) => i.message);
@@ -39,14 +43,15 @@ export function Builder() {
 
   const applyTemplate = (id: string, ind: Industry) => {
     const base = getScenario(id)!;
-    const r = tailorScenario(base, ind, company.name || undefined);
+    // Scenario Tailor (B2): wording only; structure is locked and checked.
+    const r = tailor(base, ind, company.name || undefined);
     setScenario(r.scenario);
     // E1.3: an invalid rewrite is never used; the builder says so and keeps the original.
     setTailorNote(r.error ? `Couldn't tailor to ${ind}, kept the original: ${r.error}` : r.changed ? `Rewritten for ${ind}. Edit any line in Review.` : null);
   };
 
   const persist = () => {
-    const c = saveDraft(store(), { id: draftId, company: { name: company.name.trim(), colour: company.colour, logoUrl: company.logoUrl || undefined }, title: title.trim(), templateId, industry, targetSkills: skills, scenario });
+    const c = saveDraft(store(), { id: draftId, company: { name: company.name.trim(), colour: company.colour, logoUrl: company.logoUrl || undefined }, title: title.trim(), templateId, industry, targetSkills: skills, scenario, customSkills });
     setDraftId(c.id);
     return c;
   };
@@ -135,6 +140,7 @@ export function Builder() {
         <section className="mt-8" aria-labelledby="skills-h">
           <h2 id="skills-h" className="font-display text-2xl">Pick 3 or 4 skills</h2>
           <p className="text-sm text-muted-foreground">One shared framework, so candidates can reuse their card across employers. {skills.length} of 4 picked.</p>
+          <ValueMapper picked={skills} onUse={(sl) => setSkills((x) => (x.includes(sl) || x.length >= 4 ? x : [...x, sl]))} onDecided={setCustomSkills} />
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {SKILLS.map((s) => {
               const on = skills.includes(s.slug);
@@ -282,6 +288,8 @@ export function Builder() {
               disabled={!valid.success}
               onClick={() => {
                 const c = persist();
+                // Publish-time AI (B.3): dialogue variants are made once here and cached with the challenge.
+                preparePublishedContent(store(), c);
                 setPublished(publish(store(), c.id));
               }}
             >

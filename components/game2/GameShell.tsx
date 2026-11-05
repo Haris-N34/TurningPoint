@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Checkpoint, type CheckpointResult, type IntegrityNote } from "@/components/checkpoint/Checkpoint";
 import { RealLife, type RealStory } from "@/components/checkpoint/RealLife";
 import { getMapScenario } from "@/content/maps";
-import { mapCheckpointQuestion } from "@/lib/ai/questions";
+import { interviewQuestion } from "@/lib/ai/services/interviewer";
 import { buildMapCard } from "@/lib/card/buildMap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { bus } from "@/lib/game/bus";
@@ -387,8 +387,8 @@ export function GameShell({ mapId, challenge, sandbox = false }: { mapId: string
                 nodeId={due.issue ?? "order"}
                 kind="decision"
                 title={due.kind === "order" ? "The order question" : due.kind === "explain" ? "Explain your pick" : "Checkpoint"}
-                question={mapCheckpointQuestion(scenario, state, due).question}
-                questionSource={mapCheckpointQuestion(scenario, state, due).source}
+                question={interviewQuestion(scenario, state, due).question}
+                questionSource={interviewQuestion(scenario, state, due).source}
                 attemptId={attemptId}
                 multiplier={profile.accommodations.timeMultiplier}
                 defaultMode={profile.defaultMode}
