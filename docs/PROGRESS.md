@@ -27,8 +27,8 @@ Every acceptance criterion from `docs/PRD.md`, grouped by milestone. Tick only w
 - [x] C2.2 [D] Choices change resources and branch; resource bar animates
 - [x] C2.3 [D] Every choice logged with timestamp, node id, option id, decided_ms
 - [x] C2.4 [D] Pause; progress saved locally; resumes on refresh (another device needs a server, out of demo scope)
-- [ ] C2.5 [D+H] Full run 12 to 18 minutes (needs Launch Week); works at 375 px (done, e2e)
-- [ ] C2.6 [D+H] Keyboard-only play (done, e2e); all art has alt text (enforced by content test, needs art)
+- [x] C2.5 [D+H] Full run 12 to 18 minutes; works at 375 px (pace model with the real-life checkpoint: 14 to 18 min on both maps, lib/game/pace.test.ts; phone e2e)
+- [x] C2.6 [D+H] Keyboard-only play (list-view full week by keyboard, e2e); all art has alt text (content/scenarios/art.test.ts, content/portraits.test.ts; map canvas and title still are labelled images)
 - [x] C3.1 [D] Turning point fires between 40% and 60%, full-screen transition, mutable sound
 - [x] C3.2 [D] Resets a resource sharply and unlocks new choices
 - [x] C3.3 [D] Disruption picked from pool by per-candidate seed

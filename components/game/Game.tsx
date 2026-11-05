@@ -321,7 +321,7 @@ export function Game({ scenario, challenge, sandbox = false }: { scenario: Scena
                 {v.disruption && (
                   <ul className="mt-4 flex flex-wrap gap-2" aria-label="What changed">
                     {Object.entries(v.disruption.effects).map(([k, d]) => (
-                      <li key={k} className="rounded-full bg-orange-600/10 px-3 py-1 text-sm font-medium text-orange-700 dark:text-orange-300">
+                      <li key={k} className="rounded-full bg-orange-600/10 px-3 py-1 text-sm font-medium text-orange-800 dark:text-orange-200">
                         {scenario.resources[k]?.label} {d > 0 ? "+" : "−"}
                         {scenario.resources[k]?.unit === "$" ? `$${Math.abs(d).toLocaleString("en-CA")}` : Math.abs(d)}
                       </li>

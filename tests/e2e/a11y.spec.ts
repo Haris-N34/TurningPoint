@@ -24,7 +24,7 @@ async function axe(page: Page) {
   const r = await new AxeBuilder({ page }).analyze();
   return r.violations
     .filter((v) => ["serious", "critical"].includes(v.impact ?? ""))
-    .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(", ")}`);
+    .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(", ")}${process.env.AXE_DEBUG ? " " + v.nodes.map((n) => n.html + " :: " + n.failureSummary).join(" | ").slice(0, 600) : ""}`);
 }
 
 // Compare with the device viewport, not innerWidth: mobile browsers widen the layout viewport to fit wide content.
@@ -36,6 +36,8 @@ async function noHorizontalScroll(page: Page) {
 
 async function check(page: Page, label: string) {
   await page.waitForLoadState("networkidle").catch(() => {});
+  // Let entrance animations (fades) finish so contrast is measured on the settled screen; skip looping ones.
+  await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {})))).catch(() => {});
   expect.soft(await axe(page), `${label} axe`).toEqual([]);
   await expect.soft(page.getByRole("link", { name: "How we use AI" }).first(), `${label} AI link`).toBeAttached();
   expect.soft(await noHorizontalScroll(page), `${label} horizontal scroll`).toBe(true);
