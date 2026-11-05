@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LevelBadge, skillName } from "@/components/card/CapabilityCard";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { compareFor, type Comparison } from "@/lib/card/compare";
 import { getChallenge } from "@/lib/challenge/challenge";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -39,15 +39,11 @@ export function Compare() {
     };
   }, [challengeId, idsKey]);
 
-  const back = (
-    <Button asChild variant="link" className="px-0">
-      <Link href={`/recruiter?challenge=${challengeId}`}>← Inbox</Link>
-    </Button>
-  );
+  const back = <BackLink href={`/recruiter?challenge=${challengeId}`}>Inbox</BackLink>;
   if (!result) return <div className="p-8" aria-busy="true">Loading…</div>;
   if (!result.ok)
     return (
-      <main className="mx-auto max-w-3xl px-6 py-8" data-testid="compare-error">
+      <main className="mx-auto max-w-3xl px-4 pb-12 pt-3 sm:px-10" data-testid="compare-error">
         {back}
         <h1 className="mt-4 font-display text-3xl">Can&apos;t compare these cards</h1>
         <p className="mt-2 text-muted-foreground">{result.reason}</p>
@@ -59,10 +55,10 @@ export function Compare() {
   const grid = { gridTemplateColumns: `minmax(6rem, 9rem) repeat(${columns.length}, minmax(13rem, 1fr))`, minWidth: `${6 + columns.length * 13}rem` };
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-10" data-testid="compare">
+    <main className="mx-auto max-w-7xl px-4 pb-12 pt-3 sm:px-10" data-testid="compare">
       {back}
-      <p className="mt-2 text-xs font-medium uppercase tracking-[0.18em] text-primary">Compare</p>
-      <h1 className="mt-1 font-display text-3xl sm:text-4xl">{columns.length} Capability Cards, side by side</h1>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Compare</p>
+      <h1 className="mt-2 font-display text-3xl tracking-tight">{columns.length} Capability Cards, side by side</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         Columns follow the order you picked. There is no overall score and no ranking. Read the evidence, then decide on each card.
       </p>
@@ -76,7 +72,6 @@ export function Compare() {
               <h2 className="font-display text-lg leading-tight">{c.displayName}</h2>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {c.anonymous && <Badge variant="outline">Anonymous review</Badge>}
-                {c.adjustedTiming && <Badge variant="outline">Adjusted timing</Badge>}
                 <Badge variant="secondary">{c.witnessConfirmed ? "Witness confirmed" : "No witness yet"}</Badge>
               </div>
               <Link href={`/recruiter/card/${c.attemptId}?challenge=${challengeId}`} className="mt-2 inline-block text-xs underline underline-offset-2">

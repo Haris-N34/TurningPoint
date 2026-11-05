@@ -11,6 +11,11 @@ export type ClipHandle = { seek: (seconds: number) => void };
  * "Transcript first" hides the video until the reviewer chooses to reveal it (E6.2).
  * Text answers have no media; the transcript is the answer.
  */
+/** Poster for video answers: a calm card instead of an empty dark box before the clip plays. */
+const VIDEO_POSTER = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><rect width="640" height="360" fill="#2b2620"/><circle cx="320" cy="140" r="44" fill="#a63e20"/><path d="M308 116 L308 164 L348 140 Z" fill="#fff"/><text x="320" y="226" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="#f1ede5">Video answer</text></svg>`,
+)}`;
+
 type Highlight = { t: number; quote: string; n: number };
 
 /** Indexes of the transcript words that make up a quote starting near second `t`. */
@@ -80,7 +85,7 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       {checkpoint.media && src && (
         <div className={revealed ? "" : "hidden"}>
           {isVideo ? (
-            <video ref={el} src={src} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-56 w-full rounded-xl bg-black object-contain" data-testid="clip-media" />
+            <video ref={el} src={src} poster={VIDEO_POSTER} controls playsInline preload="metadata" onTimeUpdate={onTime} className="aspect-video max-h-44 w-full rounded-xl bg-foreground/90 object-contain" data-testid="clip-media" />
           ) : (
             <audio ref={el as unknown as React.Ref<HTMLAudioElement>} src={src} controls preload="metadata" onTimeUpdate={onTime} className="w-full" data-testid="clip-media" />
           )}
@@ -94,12 +99,12 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
       <p className="max-h-32 overflow-y-auto text-sm leading-relaxed" tabIndex={0} aria-label="Transcript" data-testid="transcript-words">
         {checkpoint.transcript.words.length
           ? checkpoint.transcript.words.map((w, i) => [
-              i > 0 ? " " : null,
+              i > 0 ? (marked.has(i) && marked.has(i - 1) ? <span key={`s${i}`} className="bg-accent">{" "}</span> : " ") : null,
               <button
                 key={i}
                 type="button"
                 onClick={() => seek(w.start)}
-                className={`rounded px-px hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "bg-accent text-accent-foreground" : ""}`}
+                className={`inline rounded-sm hover:bg-black/5 dark:hover:bg-white/10 ${i === activeWord ? "bg-amber-200 dark:bg-amber-700/50" : marked.has(i) ? "rounded-none bg-accent text-accent-foreground" : ""}`}
                 aria-label={`${w.w}, jump to ${Math.floor(w.start)} seconds`}
               >
                 {w.w}
@@ -107,6 +112,12 @@ export const ClipPlayer = forwardRef<ClipHandle, { checkpoint: CardCheckpoint; t
             ])
           : checkpoint.transcript.text || <em>Transcript unavailable.</em>}
       </p>
+      {checkpoint.recognizedText !== undefined && (
+        <details className="text-xs text-muted-foreground" data-testid="recognized-text">
+          <summary className="cursor-pointer">The candidate fixed words before submitting. Show what speech to text heard</summary>
+          <p className="mt-1 whitespace-pre-wrap">{checkpoint.recognizedText || <em>Speech to text heard nothing.</em>}</p>
+        </details>
+      )}
     </div>
   );
 });

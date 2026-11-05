@@ -154,7 +154,8 @@ export function computeKpis(s: MapScenario, st: GameState): Kpi[] {
   });
 
   // A12 extras (The Client Pivot): only when the scenario has them.
-  const discoveries = s.issues.filter((i) => i.hidden);
+  // Only discoveries this run can reach (Quick mode drops them; dropped issues have no spawn time).
+  const discoveries = s.issues.filter((i) => i.hidden && i.spawnAt);
   if (discoveries.length) {
     const found = discoveries.filter((i) => st.discoveries.includes(i.id)).length;
     kpis.push({

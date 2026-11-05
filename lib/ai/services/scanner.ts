@@ -82,6 +82,23 @@ export function blindCheckpoint<C extends Pick<CardCheckpoint, "id" | "nodeId" |
   return { ...cp, transcript: { ...t, status: cp.transcript.status } };
 }
 
+const RANK = { strong: 3, some: 2, needs_review: 1, not_observed: 0 } as const;
+
+/**
+ * One quote backs at most one skill per card, whatever the provider returned: the strongest claim on a quote
+ * keeps it (ties: the employer's skill order), any other skill citing the same quote reads Not observed.
+ */
+export function onePerQuote(rows: Evidence[]): Evidence[] {
+  const owner = new Map<string, number>();
+  rows.forEach((e, i) => {
+    if (e.source?.type !== "clip") return;
+    const key = `${e.source.checkpointId}\u0000${e.source.quote}`;
+    const prev = owner.get(key);
+    if (prev === undefined || RANK[e.level] > RANK[rows[prev].level]) owner.set(key, i);
+  });
+  return rows.map((e, i) => (e.source?.type === "clip" && owner.get(`${e.source.checkpointId}\u0000${e.source.quote}`) !== i ? { skill: e.skill, level: "not_observed" as const } : e));
+}
+
 /**
  * Scan a run. The scanner sees the blind copy; quotes are then located in the original transcripts for
  * exact timestamps, and anything that can't be verified there is dropped a level (G1).
@@ -97,7 +114,7 @@ export function scanEvidence(input: ExtractInput, known: Known = {}, opts: RunOp
     return at ? { ...e, source: { ...src, ...at } } : e;
   });
   // Every target skill gets a row, even if the provider skipped one.
-  const rows = input.targetSkills.map((skill) => relocated.find((e) => e.skill === skill) ?? { skill, level: "not_observed" as const });
+  const rows = onePerQuote(input.targetSkills.map((skill) => relocated.find((e) => e.skill === skill) ?? { skill, level: "not_observed" as const }));
   return verifyEvidence({
     evidence: rows,
     checkpoints: input.checkpoints as CardCheckpoint[],

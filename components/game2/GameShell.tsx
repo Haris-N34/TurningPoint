@@ -12,7 +12,7 @@ import { buildMapCard } from "@/lib/card/buildMap";
 import type { CardCheckpoint } from "@/lib/card/types";
 import { bus } from "@/lib/game/bus";
 import { GAME } from "@/lib/game/config";
-import { openIssues, replay, type Action, type CheckpointDue, type GameState } from "@/lib/game/engine";
+import { forLength, openIssues, replay, type Action, type CheckpointDue, type GameLength, type GameState } from "@/lib/game/engine";
 import { DEMO_JUMP_SEED, playToTurningPoint } from "@/lib/game/demoJump";
 import { computeKpis } from "@/lib/game/kpis";
 import type { Issue, Look } from "@/lib/game/schema";
@@ -43,7 +43,8 @@ function newAttemptId() {
 
 export function GameShell({ mapId, challenge, sandbox = false, overrides }: { mapId: string; challenge: ShellChallenge; sandbox?: boolean; overrides?: MapOverrides }) {
   // The employer's wording and checkpoint edits (E1.3, E1.4). Ids and effects are untouched, so replay stays valid.
-  const scenario = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
+  // The engine always gets the authored map (`base`); it derives the quick variant from the run's length itself.
+  const base = useMemo(() => applyMapOverrides(getMapScenario(mapId)!, overrides), [mapId, overrides]);
   const router = useRouter();
   const screen = useGame((g) => g.screen);
   const state = useGame((g) => g.state);
@@ -53,6 +54,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const recapDay = useGame((g) => g.recapDay);
   const avatar = useGame((g) => g.avatar);
   const error = useGame((g) => g.error);
+  // What the screens show: the scenario for this run's length (Quick mode by default, "Full week" in Settings).
+  const length = state?.length ?? settings.length;
+  const scenario = useMemo(() => forLength(base, length), [base, length]);
   const { dispatch, setScreen, setPaused, setCutscene, setRecapDay, floater, toast, init, restore, setSettings } = useGame.getState();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [attemptId, setAttemptId] = useState("");
@@ -64,7 +68,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   const [integrity, setIntegrity] = useState<IntegrityNote[]>([]);
   const [phase, setPhase] = useState<"game" | "real-life">("game");
   const [orderRanking, setOrderRanking] = useState<string[] | null>(null);
-  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean } | null>(null);
+  const [resumable, setResumable] = useState<{ attemptId: string; log: Action[]; seed: string; answers: CardCheckpoint[]; integrity: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased: boolean; length: GameLength } | null>(null);
   const prev = useRef<GameState | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [sawLoading, setSawLoading] = useState(false);
@@ -72,14 +76,6 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     if (screen === "loading") setSawLoading(true);
   }, [screen]);
   const shownTp = useRef(false);
-  // Text is the calm default in the game: video or voice only when the browser already allows it,
-  // so a checkpoint never opens with a permission prompt or an error on stage.
-  const [mediaOk, setMediaOk] = useState<Record<"video" | "voice", boolean>>({ video: false, voice: false });
-  useEffect(() => {
-    const q = (name: string) =>
-      navigator.permissions?.query({ name: name as PermissionName }).then((r) => r.state === "granted").catch(() => false) ?? Promise.resolve(false);
-    void Promise.all([q("camera"), q("microphone")]).then(([cam, mic]) => setMediaOk({ video: cam && mic, voice: mic }));
-  }, []);
 
   // Profile, accommodations and any unfinished run on this device.
   useEffect(() => {
@@ -93,9 +89,9 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     setHydrated(true);
     if (!sandbox) {
       const r = s.activeRun(challenge.id);
-      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean } | undefined;
+      const extra = r?.extra as { map?: string; log?: Action[]; answers?: CardCheckpoint[]; integrity?: IntegrityNote[]; avatar?: { look: Look; name: string }; turnBased?: boolean; length?: GameLength } | undefined;
       if (r && extra?.map === mapId && extra.log)
-        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased });
+        setResumable({ attemptId: r.attemptId, log: extra.log, seed: r.seed, answers: extra.answers ?? [], integrity: extra.integrity ?? [], avatar: extra.avatar, turnBased: !!extra.turnBased, length: extra.length ?? "full" });
     }
     return () => music.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,37 +107,44 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
   }, [setScreen]);
 
   const [jump, setJump] = useState(false);
-  useEffect(() => setJump(new URLSearchParams(window.location.search).get("jump") === "turning-point"), []);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    setJump(q.get("jump") === "turning-point");
+    // ?week=full starts the five-day week (same as the "Full week" setting).
+    if (q.get("week") === "full") setSettings({ length: "full" });
+    else if (q.get("week") === "quick") setSettings({ length: "quick" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const begin = useCallback(() => {
     const id = newAttemptId();
     setAttemptId(id);
-    init(scenario, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view });
+    init(base, jump ? DEMO_JUMP_SEED : id, { turnBased: settings.turnBased, view: settings.view, length: settings.length });
     if (jump) {
       // Demo jump (P.2): a scripted sensible player runs Monday and Tuesday on the fixed seed (sponsor pulls out).
       // Its recaps, checkpoints and toasts stay silent; only the turning point itself is new, so the cutscene plays.
-      const j = playToTurningPoint(scenario, DEMO_JUMP_SEED, { turnBased: settings.turnBased });
+      const j = playToTurningPoint(base, DEMO_JUMP_SEED, { turnBased: settings.turnBased, length: settings.length });
       prev.current = { ...j.state, events: j.state.events.slice(0, j.tpIndex) };
       shownTp.current = false;
-      restore(scenario, j.state, j.log);
+      restore(base, j.state, j.log);
     }
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [init, restore, scenario, settings.turnBased, settings.view, setScreen, jump]);
+  }, [init, restore, base, settings.turnBased, settings.view, settings.length, setScreen, jump]);
 
   const resume = useCallback(() => {
     if (!resumable) return;
-    const st = replay(scenario, resumable.seed, resumable.log, { turnBased: resumable.turnBased });
+    const st = replay(base, resumable.seed, resumable.log, { turnBased: resumable.turnBased, length: resumable.length });
     shownTp.current = st.tp.fired;
     prev.current = st;
-    restore(scenario, st, resumable.log);
+    restore(base, st, resumable.log);
     setAttemptId(resumable.attemptId);
     setAnswers(resumable.answers);
     setIntegrity(resumable.integrity);
     if (resumable.avatar) useGame.setState({ avatar: resumable.avatar });
-    setSettings({ turnBased: resumable.turnBased });
+    setSettings({ turnBased: resumable.turnBased, length: resumable.length });
     setReady(settings.view === "list");
     setScreen("loading");
-  }, [resumable, scenario, restore, setScreen, setSettings, settings.view]);
+  }, [resumable, base, restore, setScreen, setSettings, settings.view]);
 
   // Save after every change so a refresh resumes exactly (C2.4).
   useEffect(() => {
@@ -152,7 +155,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       scenarioId: `map:${mapId}`,
       seed: state.seed,
       state: { t: state.t, ended: state.ended },
-      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased },
+      extra: { map: mapId, log: useGame.getState().log, answers, integrity, avatar, turnBased: state.turnBased, length: state.length },
       status: state.ended && phase === "real-life" ? "finished" : "playing",
       startedAt: new Date().toISOString(),
       practice: false,
@@ -246,7 +249,14 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       }
     }
     // A recap from the same step as the turning point is stale: the cutscene takes over.
-    if (state.recaps.length > p.recaps.length && !state.ended && !hold) setRecapDay(state.recaps.at(-1)!.day);
+    if (state.recaps.length > p.recaps.length && !state.ended && !hold) {
+      const day = state.recaps.at(-1)!.day;
+      // Quick mode: no recap modal, just a short non-blocking note (bus "dayDone" for a banner).
+      if (scenario.recapModal === false) {
+        bus.emit("dayDone", { day });
+        note(`${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]} done`);
+      } else setRecapDay(day);
+    }
   }, [state, scenario, floater, note, setCutscene, setRecapDay]);
 
   const talk = useCallback(
@@ -330,7 +340,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
     const s = store();
     s.saveCard(card);
     s.share(attemptId, challenge.id, false);
-    s.saveRun({ attemptId, challengeId: challenge.id, scenarioId: `map:${mapId}`, seed: state.seed, state: { t: state.t, ended: true }, extra: { map: mapId, log: useGame.getState().log, answers: all, integrity: ints }, status: "finished", startedAt: new Date().toISOString(), practice: false });
+    s.saveRun({ attemptId, challengeId: challenge.id, scenarioId: `map:${mapId}`, seed: state.seed, state: { t: state.t, ended: true }, extra: { map: mapId, log: useGame.getState().log, answers: all, integrity: ints, length: state.length }, status: "finished", startedAt: new Date().toISOString(), practice: false });
     router.push(`/results/${attemptId}`);
   };
 
@@ -460,10 +470,11 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
                 questionSource={interviewQuestion(scenario, state, due).source}
                 attemptId={attemptId}
                 multiplier={profile.accommodations.timeMultiplier}
-                defaultMode={profile.defaultMode === "text" || !mediaOk[profile.defaultMode] ? "text" : profile.defaultMode}
-                skin="pixel"
+                defaultMode={profile.defaultMode}
                 textOnly={profile.accommodations.textOnly}
                 persistMedia={!sandbox}
+                variant="game"
+                interviewer={((n) => (n ? { name: n.name, role: `${n.role} · asking for the hiring panel`, portrait: n.portrait } : undefined))(scenario.npcs.find((n) => n.id === scenario.issues.find((i) => i.id === due.issue)?.npc))}
                 onDone={(r) => onCheckpointDone(due, r)}
               />
             )
@@ -482,7 +493,7 @@ export function GameShell({ mapId, challenge, sandbox = false, overrides }: { ma
       {screen === "results" && state && phase === "real-life" && profile && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#2e222f]/85 p-3">
           <Panel className="w-[min(640px,96vw)] p-4">
-            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} onModeChange={() => {}} onDone={finish} />
+            <RealLife attemptId={attemptId} nodeId="rl" prompt="When have you faced something like this in real life?" profile={profile} persistMedia={!sandbox} variant="game" onModeChange={() => {}} onDone={finish} />
           </Panel>
         </div>
       )}

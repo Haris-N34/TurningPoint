@@ -14,7 +14,7 @@ This replaces `docs/demo/V2_SCRIPT.md` once Haris accepts it.
 | 2. Value Mapper, publish | Publishes **Launch Week**, not The Client Pivot (the builder offers Launch Week, Client Rescue and a sample; The Client Pivot is a map game at `/game/client-pivot`, not a builder template). |
 | 3. Explain-on-pick checkpoint | As written |
 | 4. Defer with a reason | The follow-up checkpoint about the deferral is seeded, so it may or may not fire. |
-| 5. Turning point | The Ctrl+Shift+D demo panel has no turning-point jump (it jumps to Game, Results, Recruiter card, Admin impact). Use the prepared tab. |
+| 5. Turning point | The Ctrl+Shift+D demo panel's **Turning point** link jumps straight to Tuesday 09:00 in Quick mode (the sponsor pulls out). The prepared full-week tab (Wednesday morning) is the backup. |
 | 6. Second Look | Needs a fresh demo tenant in setup (the mock ATS keeps state on the server). |
 | 7. Resume vs Evidence, Final score | Needs the resume added in setup (the seed has none). Say the Final score only sorts; it never hides or rejects anyone. |
 | 8. Copilot with citation | As written |
@@ -25,12 +25,12 @@ This replaces `docs/demo/V2_SCRIPT.md` once Haris accepts it.
 1. Laptop on power. Wifi off is fine: the demo makes no model calls (`AI_MODE` off).
 2. Fresh Chrome profile. Zoom 110%. Sound on, low.
 3. Open `/` and reset (see "Reset"). The seed reloads with Prairie Grid Energy and Bow River Credit Union.
-4. Resume: open `/results/att_demo_maya`, paste the demo resume (end of this file) into the resume box, tick consent, **Compare with my evidence**. It should say it added 2 claims.
+4. Resume: open `/results/att_demo_maya`, paste the demo resume (end of this file) into the resume box, tick consent, **Compare with my evidence**. It should say it added 3 claims.
 5. Second Look: open `/admin/integrations`, click **Start a fresh demo tenant**. Leave this tab open.
 6. Pre-open tabs in this order:
-   - Tab 1: `/game/launch-week` (title screen)
+   - Tab 1: `/game/launch-week?week=full` (title screen; or tick **Full week** in Settings)
    - Tab 2: `/admin/new`
-   - Tab 3: `/game/launch-week` paused just before Wednesday (see "Prepared turning-point tab")
+   - Tab 3: `/game/launch-week?week=full` paused just before Wednesday (see "Prepared turning-point tab"). The long script plays the full week; Quick mode, the default, breaks on Tuesday.
    - Tab 4: `/admin/integrations` (fresh tenant from step 5)
    - Tab 5: `/recruiter?challenge=ch_demo_energy`
    - Tab 6: `/admin/impact`
@@ -84,6 +84,7 @@ Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
 - Negotiated donated supplies from a local store, saving $2,000
+- Tracked weekly sign-up data in a spreadsheet to spot no-shows
 ```
 
 Name, contact and employer names are stripped before analysis. The card shows the claims with no identity.

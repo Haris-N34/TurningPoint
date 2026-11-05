@@ -16,7 +16,10 @@ describe("fixtures/attempt.json (M0.4)", () => {
   });
 
   it("never has an overall score (F2)", () => {
-    expect(JSON.stringify(fixture)).not.toMatch(/"(score|overall|rating)"/i);
+    // KPIs carry their own 0 to 100 score (Part D inputs). Nothing else on the card is a score, and nothing is overall.
+    const { kpis, ...rest } = fixture as typeof fixture & { kpis?: unknown[] };
+    expect(JSON.stringify(rest)).not.toMatch(/"(score|overall|rating)"/i);
+    expect(JSON.stringify(kpis ?? [])).not.toMatch(/"(overall|rating)"/i);
   });
 
   it("never exposes a witness email (C6.4)", () => {
@@ -53,7 +56,8 @@ describe("verifyEvidence (G1)", () => {
     const bad = structuredClone(card);
     const e = bad.evidence[1];
     expect(e.level).toBe("strong");
-    if (e.source?.type === "clip") e.source.quote = e.source.quote.replace("instead of", "rather than");
+    // One word changed: no longer an exact substring.
+    if (e.source?.type === "clip") e.source.quote = e.source.quote.replace("decorations", "decoration");
     expect(verifyEvidence(bad).evidence[1].level).toBe("needs_review");
   });
 

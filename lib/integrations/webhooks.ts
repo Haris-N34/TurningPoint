@@ -27,11 +27,23 @@ export type WebhookEnvelope = z.infer<typeof WebhookEnvelope>;
 
 export type WebhookResult = { status: number; body: Record<string, unknown> };
 
+/** What the console log keeps of a payload: emails masked, resume text replaced by its length. */
+export function logSafe(payload: unknown): unknown {
+  if (typeof payload === "string") return payload.replace(/[^\s"'<>@]+@[^\s"'<>@]+\.[a-z]{2,}/gi, (m) => maskEmail(m));
+  if (Array.isArray(payload)) return payload.map(logSafe);
+  if (!payload || typeof payload !== "object") return payload;
+  return Object.fromEntries(
+    Object.entries(payload as Record<string, unknown>).map(([k, v]) =>
+      k === "resume_text" && typeof v === "string" ? [k, `[resume held, ${v.length} characters]`] : [k, logSafe(v)],
+    ),
+  );
+}
+
 export async function receiveWebhook(companyId: string, rawBody: string, headers: Headers, nowS = Math.floor(Date.now() / 1000)): Promise<WebhookResult> {
   const c = company(companyId);
   if (!c) return { status: 404, body: { error: "Unknown company" } };
   const log = (e: Omit<WebhookEvent, "id" | "receivedAt">) => {
-    const entry = { id: nextId("whe"), receivedAt: nowIso(), ...e };
+    const entry = { id: nextId("whe"), receivedAt: nowIso(), ...e, payload: logSafe(e.payload) };
     c.events.unshift(entry);
     return entry;
   };

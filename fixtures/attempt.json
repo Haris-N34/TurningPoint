@@ -13,7 +13,7 @@
   },
   "scenario": {
     "id": "launch-week",
-    "version": 1,
+    "version": 2,
     "seed": "att_demo_maya",
     "disruptionId": "sponsor-pulls-out"
   },
@@ -29,370 +29,412 @@
     {
       "skill": "collaboration",
       "level": "strong",
-      "sentence": "Weighs losing two days against losing a volunteer and picks the team.",
+      "sentence": "Names the trade-off, says why, and considers who it affects.",
       "source": {
         "type": "clip",
         "checkpointId": "cp1",
-        "quote": "I'd rather lose two days than lose a volunteer.",
-        "startS": 19.15,
-        "endS": 23.22
+        "quote": "It cost us fifteen minutes, but I'd rather lose time than a volunteer.",
+        "startS": 11.54,
+        "endS": 16.51
       }
     },
     {
       "skill": "prioritization",
       "level": "strong",
-      "sentence": "Protects vendor spots over a second weekend, and says why.",
+      "sentence": "Names the trade-off, says why, and considers who it affects.",
       "source": {
         "type": "clip",
         "checkpointId": "cp2",
-        "quote": "I cut the second weekend instead of cutting vendor spots.",
-        "startS": 2.77,
-        "endS": 7.67
+        "quote": "So I cut promotion, decorations and the stage.",
+        "startS": 9.62,
+        "endS": 12.66
       }
     },
     {
       "skill": "adaptability",
       "level": "some",
-      "sentence": "Replaced bought soil with a donation after funding fell through.",
+      "sentence": "Gives a reason for the decision, without naming a trade-off.",
       "source": {
         "type": "clip",
-        "checkpointId": "rl",
-        "quote": "we asked the local hardware store for donated soil instead of buying it.",
-        "startS": 18.07,
-        "endS": 24.18
+        "checkpointId": "cp2",
+        "quote": "Losing a day would hurt the vendors more than the bands.",
+        "startS": 12.69,
+        "endS": 16.89
       }
     },
     {
       "skill": "resilience",
       "level": "some",
-      "sentence": "Finished the season on half the budget after the funder left.",
+      "sentence": "Gives a reason for the decision, without naming a trade-off.",
       "source": {
         "type": "clip",
-        "checkpointId": "rl",
-        "quote": "We finished the season with half the budget.",
-        "startS": 24.3,
-        "endS": 28.01
+        "checkpointId": "cp2",
+        "quote": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage.",
+        "startS": 0,
+        "endS": 9.58
       }
     }
   ],
   "decisionPath": [
     {
-      "nodeId": "n1",
-      "prompt": "Recruit volunteers",
+      "nodeId": "roles",
+      "prompt": "Mon 09:20 · Nobody wants logistics",
       "optionId": "b",
-      "optionLabel": "Post in three student clubs",
-      "decidedMs": 6400,
-      "at": "2026-11-04T17:26:10.000Z"
-    },
-    {
-      "nodeId": "n3",
-      "prompt": "Two volunteers want social media. Nobody wants logistics.",
-      "optionId": "b",
-      "optionLabel": "Let the team vote",
-      "decidedMs": 11800,
-      "at": "2026-11-04T17:28:02.000Z",
+      "optionLabel": "Ask who's free when, then pair people on logistics",
+      "decidedMs": 0,
+      "at": "Mon 09:20",
       "checkpointId": "cp1"
     },
     {
-      "nodeId": "n4",
-      "prompt": "Choose a vendor mix",
+      "nodeId": "vendor-mix",
+      "prompt": "Mon 10:50 · Vendor mix and fees",
       "optionId": "a",
-      "optionLabel": "Mostly local food vendors",
-      "decidedMs": 9100,
-      "at": "2026-11-04T17:29:40.000Z"
+      "optionLabel": "Mostly local stalls at a low fee",
+      "decidedMs": 0,
+      "at": "Mon 10:50"
     },
     {
-      "nodeId": "n6",
-      "prompt": "A vendor asks for a bigger cut",
-      "optionId": "c",
-      "optionLabel": "Offer a better spot instead of more money",
-      "decidedMs": 14200,
-      "at": "2026-11-04T17:31:15.000Z"
+      "nodeId": "permit",
+      "prompt": "Mon 13:40 · Food permit not filed",
+      "optionId": "a",
+      "optionLabel": "Drop everything and file it in person now",
+      "decidedMs": 0,
+      "at": "Mon 13:40"
     },
     {
-      "nodeId": "n9",
-      "prompt": "The budget is down 60%. What goes first?",
+      "nodeId": "logo",
+      "prompt": "Mon 15:40 · Sponsor wants logos everywhere",
       "optionId": "a",
-      "optionLabel": "Cut the second weekend",
-      "decidedMs": 17600,
-      "at": "2026-11-04T17:33:50.000Z",
+      "optionLabel": "Yes to everything, keep the sponsor happy",
+      "decidedMs": 0,
+      "at": "Mon 15:40"
+    },
+    {
+      "nodeId": "schedule",
+      "prompt": "Tue 10:10 · Saturday rota clash",
+      "optionId": "b",
+      "optionLabel": "Ask who can swap to clean-up, then confirm the new shifts",
+      "decidedMs": 0,
+      "at": "Tue 10:10"
+    },
+    {
+      "nodeId": "vendor-cut",
+      "prompt": "Tue 11:30 · Kenji wants a bigger cut",
+      "optionId": "a",
+      "optionLabel": "No more money, but the best spot by the gate",
+      "decidedMs": 0,
+      "at": "Tue 11:30"
+    },
+    {
+      "nodeId": "signups",
+      "prompt": "Tue 14:10 · Low sign-ups",
+      "optionId": "a",
+      "optionLabel": "Flyers through the school newsletters",
+      "decidedMs": 0,
+      "at": "Tue 14:10"
+    },
+    {
+      "nodeId": "fridge",
+      "prompt": "Tue 15:20 · Fridge rental fell through",
+      "optionId": "b",
+      "optionLabel": "Borrow the church's walk-in fridge",
+      "decidedMs": 0,
+      "at": "Tue 15:20"
+    },
+    {
+      "nodeId": "team-shaken",
+      "prompt": "Wed 09:20 · The team is shaken",
+      "optionId": "a",
+      "optionLabel": "Call everyone in today: the new plan and what stays",
+      "decidedMs": 0,
+      "at": "Wed 09:20"
+    },
+    {
+      "nodeId": "vendors-worried",
+      "prompt": "Wed 10:20 · Vendors ask if it's still on",
+      "optionId": "a",
+      "optionLabel": "Tell them the truth today: what changes and what doesn't",
+      "decidedMs": 0,
+      "at": "Wed 10:20"
+    },
+    {
+      "nodeId": "recovery-plan",
+      "prompt": "Wed 11:10 · Recovery plan",
+      "optionId": "b",
+      "optionLabel": "Keep Saturday and Sunday; cut promotion, decorations and the stage",
+      "decidedMs": 0,
+      "at": "Wed 11:10",
       "checkpointId": "cp2"
     },
     {
-      "nodeId": "n11",
-      "prompt": "The team is shaken",
-      "optionId": "b",
-      "optionLabel": "Tell everyone the plan the same day",
-      "decidedMs": 8300,
-      "at": "2026-11-04T17:35:20.000Z"
+      "nodeId": "new-partner",
+      "prompt": "Thu 09:50 · A possible new sponsor",
+      "optionId": "a",
+      "optionLabel": "Pitch it myself this afternoon",
+      "decidedMs": 0,
+      "at": "Thu 09:50"
     },
     {
-      "nodeId": "n13",
-      "prompt": "The non-profit lead says the queue was a mess",
+      "nodeId": "feedback",
+      "prompt": "Thu 11:20 · Dana's critical feedback",
       "optionId": "a",
-      "optionLabel": "Ask what they would change first",
-      "decidedMs": 7700,
-      "at": "2026-11-04T17:37:05.000Z"
+      "optionLabel": "Ask what matters most, then add a free kids' activity",
+      "decidedMs": 0,
+      "at": "Thu 11:20"
+    },
+    {
+      "nodeId": "supplies",
+      "prompt": "Thu 13:20 · Short of tables and tents",
+      "optionId": "a",
+      "optionLabel": "Borrow from the school and the library",
+      "decidedMs": 0,
+      "at": "Thu 13:20"
+    },
+    {
+      "nodeId": "weather",
+      "prompt": "Fri 09:30 · Rain forecast for Saturday",
+      "optionId": "a",
+      "optionLabel": "Book the gym as a backup, decide Friday night",
+      "decidedMs": 0,
+      "at": "Fri 09:30"
+    },
+    {
+      "nodeId": "dropout",
+      "prompt": "Fri 11:40 · A vendor drops out",
+      "optionId": "a",
+      "optionLabel": "Give her spot to a community group for free",
+      "decidedMs": 0,
+      "at": "Fri 11:40"
     }
   ],
-  "turningPointAfter": 3,
+  "turningPointAfter": 7,
   "checkpoints": [
     {
       "id": "cp1",
-      "nodeId": "n3",
+      "nodeId": "roles",
       "kind": "decision",
-      "question": "You let the team vote instead of assigning logistics yourself. Why?",
+      "question": "For nobody wants logistics, you chose \"Ask who's free when, then pair people on logistics\". Why?",
       "questionSource": "generated",
       "mode": "voice",
       "media": "demo/cp1.webm",
-      "durationS": 23.22,
+      "durationS": 16.54,
       "transcript": {
-        "text": "I let the team vote because two people already wanted social media and nobody wanted logistics. If I assigned it, the person stuck with logistics would check out by week two. The trade-off is it cost us two days, but I'd rather lose two days than lose a volunteer.",
+        "text": "I asked who was free when, because nobody wanted deliveries or set-up. I paired Ari, who has run markets, with a new volunteer on logistics, so nobody was stuck alone. It cost us fifteen minutes, but I'd rather lose time than a volunteer.",
         "words": [
           {
             "w": "I",
-            "start": 0.4,
-            "end": 0.58
+            "start": 0,
+            "end": 0.35
           },
           {
-            "w": "let",
-            "start": 0.7,
-            "end": 0.93
+            "w": "asked",
+            "start": 0.38,
+            "end": 0.73
           },
           {
-            "w": "the",
-            "start": 1.05,
-            "end": 1.28
+            "w": "who",
+            "start": 0.77,
+            "end": 1.12
           },
           {
-            "w": "team",
-            "start": 1.4,
-            "end": 1.71
+            "w": "was",
+            "start": 1.15,
+            "end": 1.5
           },
           {
-            "w": "vote",
-            "start": 1.83,
-            "end": 2.14
+            "w": "free",
+            "start": 1.54,
+            "end": 1.89
+          },
+          {
+            "w": "when,",
+            "start": 1.92,
+            "end": 2.27
           },
           {
             "w": "because",
-            "start": 2.26,
-            "end": 2.8
-          },
-          {
-            "w": "two",
-            "start": 2.92,
-            "end": 3.15
-          },
-          {
-            "w": "people",
-            "start": 3.27,
-            "end": 3.73
-          },
-          {
-            "w": "already",
-            "start": 3.85,
-            "end": 4.39
-          },
-          {
-            "w": "wanted",
-            "start": 4.51,
-            "end": 4.97
-          },
-          {
-            "w": "social",
-            "start": 5.09,
-            "end": 5.55
-          },
-          {
-            "w": "media",
-            "start": 5.67,
-            "end": 6.05
-          },
-          {
-            "w": "and",
-            "start": 6.17,
-            "end": 6.4
+            "start": 2.31,
+            "end": 2.66
           },
           {
             "w": "nobody",
-            "start": 6.52,
-            "end": 6.99
+            "start": 2.69,
+            "end": 3.04
           },
           {
             "w": "wanted",
-            "start": 7.11,
-            "end": 7.57
+            "start": 3.08,
+            "end": 3.43
           },
           {
-            "w": "logistics.",
-            "start": 7.69,
-            "end": 8.46
+            "w": "deliveries",
+            "start": 3.46,
+            "end": 3.81
           },
           {
-            "w": "If",
-            "start": 8.58,
-            "end": 8.76
+            "w": "or",
+            "start": 3.85,
+            "end": 4.2
+          },
+          {
+            "w": "set-up.",
+            "start": 4.23,
+            "end": 4.58
           },
           {
             "w": "I",
-            "start": 8.88,
-            "end": 9.06
+            "start": 4.62,
+            "end": 4.97
           },
           {
-            "w": "assigned",
-            "start": 9.18,
-            "end": 9.79
+            "w": "paired",
+            "start": 5,
+            "end": 5.35
           },
           {
-            "w": "it,",
-            "start": 9.91,
-            "end": 10.14
+            "w": "Ari,",
+            "start": 5.39,
+            "end": 5.74
           },
           {
-            "w": "the",
-            "start": 10.26,
-            "end": 10.49
+            "w": "who",
+            "start": 5.77,
+            "end": 6.12
           },
           {
-            "w": "person",
-            "start": 10.61,
-            "end": 11.08
+            "w": "has",
+            "start": 6.15,
+            "end": 6.5
           },
           {
-            "w": "stuck",
-            "start": 11.2,
-            "end": 11.58
+            "w": "run",
+            "start": 6.54,
+            "end": 6.89
+          },
+          {
+            "w": "markets,",
+            "start": 6.92,
+            "end": 7.27
           },
           {
             "w": "with",
-            "start": 11.7,
-            "end": 12.01
-          },
-          {
-            "w": "logistics",
-            "start": 12.13,
-            "end": 12.82
-          },
-          {
-            "w": "would",
-            "start": 12.94,
-            "end": 13.32
-          },
-          {
-            "w": "check",
-            "start": 13.44,
-            "end": 13.83
-          },
-          {
-            "w": "out",
-            "start": 13.95,
-            "end": 14.18
-          },
-          {
-            "w": "by",
-            "start": 14.3,
-            "end": 14.48
-          },
-          {
-            "w": "week",
-            "start": 14.6,
-            "end": 14.91
-          },
-          {
-            "w": "two.",
-            "start": 15.03,
-            "end": 15.34
-          },
-          {
-            "w": "The",
-            "start": 15.46,
-            "end": 15.69
-          },
-          {
-            "w": "trade-off",
-            "start": 15.81,
-            "end": 16.5
-          },
-          {
-            "w": "is",
-            "start": 16.62,
-            "end": 16.8
-          },
-          {
-            "w": "it",
-            "start": 16.92,
-            "end": 17.1
-          },
-          {
-            "w": "cost",
-            "start": 17.22,
-            "end": 17.53
-          },
-          {
-            "w": "us",
-            "start": 17.65,
-            "end": 17.83
-          },
-          {
-            "w": "two",
-            "start": 17.95,
-            "end": 18.18
-          },
-          {
-            "w": "days,",
-            "start": 18.3,
-            "end": 18.68
-          },
-          {
-            "w": "but",
-            "start": 18.8,
-            "end": 19.03
-          },
-          {
-            "w": "I'd",
-            "start": 19.15,
-            "end": 19.38
-          },
-          {
-            "w": "rather",
-            "start": 19.5,
-            "end": 19.96
-          },
-          {
-            "w": "lose",
-            "start": 20.08,
-            "end": 20.39
-          },
-          {
-            "w": "two",
-            "start": 20.51,
-            "end": 20.74
-          },
-          {
-            "w": "days",
-            "start": 20.86,
-            "end": 21.17
-          },
-          {
-            "w": "than",
-            "start": 21.29,
-            "end": 21.6
-          },
-          {
-            "w": "lose",
-            "start": 21.72,
-            "end": 22.03
+            "start": 7.31,
+            "end": 7.66
           },
           {
             "w": "a",
-            "start": 22.15,
-            "end": 22.33
+            "start": 7.69,
+            "end": 8.04
+          },
+          {
+            "w": "new",
+            "start": 8.08,
+            "end": 8.43
+          },
+          {
+            "w": "volunteer",
+            "start": 8.46,
+            "end": 8.81
+          },
+          {
+            "w": "on",
+            "start": 8.85,
+            "end": 9.2
+          },
+          {
+            "w": "logistics,",
+            "start": 9.23,
+            "end": 9.58
+          },
+          {
+            "w": "so",
+            "start": 9.62,
+            "end": 9.97
+          },
+          {
+            "w": "nobody",
+            "start": 10,
+            "end": 10.35
+          },
+          {
+            "w": "was",
+            "start": 10.39,
+            "end": 10.74
+          },
+          {
+            "w": "stuck",
+            "start": 10.77,
+            "end": 11.12
+          },
+          {
+            "w": "alone.",
+            "start": 11.15,
+            "end": 11.5
+          },
+          {
+            "w": "It",
+            "start": 11.54,
+            "end": 11.89
+          },
+          {
+            "w": "cost",
+            "start": 11.92,
+            "end": 12.27
+          },
+          {
+            "w": "us",
+            "start": 12.31,
+            "end": 12.66
+          },
+          {
+            "w": "fifteen",
+            "start": 12.69,
+            "end": 13.04
+          },
+          {
+            "w": "minutes,",
+            "start": 13.08,
+            "end": 13.43
+          },
+          {
+            "w": "but",
+            "start": 13.46,
+            "end": 13.81
+          },
+          {
+            "w": "I'd",
+            "start": 13.85,
+            "end": 14.2
+          },
+          {
+            "w": "rather",
+            "start": 14.23,
+            "end": 14.58
+          },
+          {
+            "w": "lose",
+            "start": 14.62,
+            "end": 14.97
+          },
+          {
+            "w": "time",
+            "start": 15,
+            "end": 15.35
+          },
+          {
+            "w": "than",
+            "start": 15.39,
+            "end": 15.74
+          },
+          {
+            "w": "a",
+            "start": 15.77,
+            "end": 16.12
           },
           {
             "w": "volunteer.",
-            "start": 22.45,
-            "end": 23.22
+            "start": 16.16,
+            "end": 16.51
           }
         ],
         "status": "ready"
@@ -402,230 +444,305 @@
     },
     {
       "id": "cp2",
-      "nodeId": "n9",
+      "nodeId": "recovery-plan",
       "kind": "decision",
-      "question": "You cut the second weekend instead of vendor spots. What did that cost you?",
+      "question": "You chose B, to keep Saturday and Sunday; cut promotion, decorations and the stage. Walk us through why.",
       "questionSource": "generated",
       "mode": "video",
       "media": "demo/cp2.webm",
-      "durationS": 20.29,
+      "durationS": 22.31,
       "transcript": {
-        "text": "When the sponsor pulled out I cut the second weekend instead of cutting vendor spots. The vendors were the reason people came, and some of them had already paid for stock. I told the team the same day so nobody heard it secondhand.",
+        "text": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for the food, not the stage. So I cut promotion, decorations and the stage. Losing a day would hurt the vendors more than the bands. I told both bands myself that morning and offered them a slot next year.",
         "words": [
           {
-            "w": "When",
-            "start": 0.4,
-            "end": 0.71
-          },
-          {
-            "w": "the",
-            "start": 0.83,
-            "end": 1.06
-          },
-          {
-            "w": "sponsor",
-            "start": 1.18,
-            "end": 1.72
-          },
-          {
-            "w": "pulled",
-            "start": 1.84,
-            "end": 2.3
-          },
-          {
-            "w": "out",
-            "start": 2.42,
-            "end": 2.65
-          },
-          {
             "w": "I",
-            "start": 2.77,
-            "end": 2.95
+            "start": 0,
+            "end": 0.35
           },
           {
-            "w": "cut",
-            "start": 3.07,
-            "end": 3.3
+            "w": "kept",
+            "start": 0.38,
+            "end": 0.73
           },
           {
-            "w": "the",
-            "start": 3.42,
-            "end": 3.65
-          },
-          {
-            "w": "second",
-            "start": 3.77,
-            "end": 4.23
-          },
-          {
-            "w": "weekend",
-            "start": 4.35,
-            "end": 4.89
-          },
-          {
-            "w": "instead",
-            "start": 5.01,
-            "end": 5.55
-          },
-          {
-            "w": "of",
-            "start": 5.67,
-            "end": 5.85
-          },
-          {
-            "w": "cutting",
-            "start": 5.97,
-            "end": 6.51
-          },
-          {
-            "w": "vendor",
-            "start": 6.63,
-            "end": 7.09
-          },
-          {
-            "w": "spots.",
-            "start": 7.21,
-            "end": 7.67
-          },
-          {
-            "w": "The",
-            "start": 7.79,
-            "end": 8.02
-          },
-          {
-            "w": "vendors",
-            "start": 8.14,
-            "end": 8.68
-          },
-          {
-            "w": "were",
-            "start": 8.8,
-            "end": 9.11
-          },
-          {
-            "w": "the",
-            "start": 9.23,
-            "end": 9.46
-          },
-          {
-            "w": "reason",
-            "start": 9.58,
-            "end": 10.04
-          },
-          {
-            "w": "people",
-            "start": 10.16,
-            "end": 10.62
-          },
-          {
-            "w": "came,",
-            "start": 10.74,
-            "end": 11.13
+            "w": "Saturday",
+            "start": 0.77,
+            "end": 1.12
           },
           {
             "w": "and",
-            "start": 11.25,
-            "end": 11.48
+            "start": 1.15,
+            "end": 1.5
           },
           {
-            "w": "some",
-            "start": 11.6,
-            "end": 11.9
+            "w": "Sunday",
+            "start": 1.54,
+            "end": 1.89
           },
           {
-            "w": "of",
-            "start": 12.02,
-            "end": 12.2
+            "w": "because",
+            "start": 1.92,
+            "end": 2.27
           },
           {
-            "w": "them",
-            "start": 12.32,
-            "end": 12.63
+            "w": "the",
+            "start": 2.31,
+            "end": 2.66
+          },
+          {
+            "w": "vendors",
+            "start": 2.69,
+            "end": 3.04
           },
           {
             "w": "had",
-            "start": 12.75,
-            "end": 12.98
+            "start": 3.08,
+            "end": 3.43
           },
           {
             "w": "already",
-            "start": 13.1,
-            "end": 13.64
+            "start": 3.46,
+            "end": 3.81
           },
           {
             "w": "paid",
-            "start": 13.76,
-            "end": 14.07
+            "start": 3.85,
+            "end": 4.2
           },
           {
             "w": "for",
-            "start": 14.19,
-            "end": 14.42
+            "start": 4.23,
+            "end": 4.58
           },
           {
-            "w": "stock.",
-            "start": 14.54,
-            "end": 15
+            "w": "two",
+            "start": 4.62,
+            "end": 4.97
+          },
+          {
+            "w": "days",
+            "start": 5,
+            "end": 5.35
+          },
+          {
+            "w": "of",
+            "start": 5.39,
+            "end": 5.74
+          },
+          {
+            "w": "stock,",
+            "start": 5.77,
+            "end": 6.12
+          },
+          {
+            "w": "and",
+            "start": 6.15,
+            "end": 6.5
+          },
+          {
+            "w": "families",
+            "start": 6.54,
+            "end": 6.89
+          },
+          {
+            "w": "come",
+            "start": 6.92,
+            "end": 7.27
+          },
+          {
+            "w": "for",
+            "start": 7.31,
+            "end": 7.66
+          },
+          {
+            "w": "the",
+            "start": 7.69,
+            "end": 8.04
+          },
+          {
+            "w": "food,",
+            "start": 8.08,
+            "end": 8.43
+          },
+          {
+            "w": "not",
+            "start": 8.46,
+            "end": 8.81
+          },
+          {
+            "w": "the",
+            "start": 8.85,
+            "end": 9.2
+          },
+          {
+            "w": "stage.",
+            "start": 9.23,
+            "end": 9.58
+          },
+          {
+            "w": "So",
+            "start": 9.62,
+            "end": 9.97
           },
           {
             "w": "I",
-            "start": 15.12,
-            "end": 15.3
+            "start": 10,
+            "end": 10.35
           },
           {
-            "w": "told",
-            "start": 15.42,
-            "end": 15.73
+            "w": "cut",
+            "start": 10.39,
+            "end": 10.74
+          },
+          {
+            "w": "promotion,",
+            "start": 10.77,
+            "end": 11.12
+          },
+          {
+            "w": "decorations",
+            "start": 11.15,
+            "end": 11.5
+          },
+          {
+            "w": "and",
+            "start": 11.54,
+            "end": 11.89
           },
           {
             "w": "the",
-            "start": 15.85,
-            "end": 16.08
+            "start": 11.92,
+            "end": 12.27
           },
           {
-            "w": "team",
-            "start": 16.2,
-            "end": 16.51
+            "w": "stage.",
+            "start": 12.31,
+            "end": 12.66
           },
           {
-            "w": "the",
-            "start": 16.63,
-            "end": 16.86
+            "w": "Losing",
+            "start": 12.69,
+            "end": 13.04
           },
           {
-            "w": "same",
-            "start": 16.98,
-            "end": 17.29
+            "w": "a",
+            "start": 13.08,
+            "end": 13.43
           },
           {
             "w": "day",
-            "start": 17.41,
-            "end": 17.64
+            "start": 13.46,
+            "end": 13.81
           },
           {
-            "w": "so",
-            "start": 17.76,
-            "end": 17.94
+            "w": "would",
+            "start": 13.85,
+            "end": 14.2
           },
           {
-            "w": "nobody",
-            "start": 18.06,
-            "end": 18.52
+            "w": "hurt",
+            "start": 14.23,
+            "end": 14.58
           },
           {
-            "w": "heard",
-            "start": 18.64,
-            "end": 19.02
+            "w": "the",
+            "start": 14.62,
+            "end": 14.97
           },
           {
-            "w": "it",
-            "start": 19.14,
-            "end": 19.32
+            "w": "vendors",
+            "start": 15,
+            "end": 15.35
           },
           {
-            "w": "secondhand.",
-            "start": 19.44,
-            "end": 20.29
+            "w": "more",
+            "start": 15.39,
+            "end": 15.74
+          },
+          {
+            "w": "than",
+            "start": 15.77,
+            "end": 16.12
+          },
+          {
+            "w": "the",
+            "start": 16.16,
+            "end": 16.51
+          },
+          {
+            "w": "bands.",
+            "start": 16.54,
+            "end": 16.89
+          },
+          {
+            "w": "I",
+            "start": 16.92,
+            "end": 17.27
+          },
+          {
+            "w": "told",
+            "start": 17.31,
+            "end": 17.66
+          },
+          {
+            "w": "both",
+            "start": 17.69,
+            "end": 18.04
+          },
+          {
+            "w": "bands",
+            "start": 18.08,
+            "end": 18.43
+          },
+          {
+            "w": "myself",
+            "start": 18.46,
+            "end": 18.81
+          },
+          {
+            "w": "that",
+            "start": 18.85,
+            "end": 19.2
+          },
+          {
+            "w": "morning",
+            "start": 19.23,
+            "end": 19.58
+          },
+          {
+            "w": "and",
+            "start": 19.62,
+            "end": 19.97
+          },
+          {
+            "w": "offered",
+            "start": 20,
+            "end": 20.35
+          },
+          {
+            "w": "them",
+            "start": 20.39,
+            "end": 20.74
+          },
+          {
+            "w": "a",
+            "start": 20.77,
+            "end": 21.12
+          },
+          {
+            "w": "slot",
+            "start": 21.16,
+            "end": 21.51
+          },
+          {
+            "w": "next",
+            "start": 21.54,
+            "end": 21.89
+          },
+          {
+            "w": "year.",
+            "start": 21.93,
+            "end": 22.28
           }
         ],
         "status": "ready"
@@ -1189,9 +1306,129 @@
       "detail": "Window lost focus for 3 seconds during the answer"
     }
   ],
+  "kpis": [
+    {
+      "id": "critical-handled",
+      "label": "Critical issues handled before deadline",
+      "value": 1,
+      "display": "5 of 5 (100%)",
+      "explanation": "Handled 5 of 5 high-severity problems before they ran out of time.",
+      "skills": [
+        "prioritization"
+      ],
+      "score": 100
+    },
+    {
+      "id": "deliberate-deferrals",
+      "label": "Deliberate deferrals",
+      "value": null,
+      "display": "Nothing left undone",
+      "explanation": "Every problem was handled; nothing had to be set aside.",
+      "skills": [
+        "prioritization",
+        "ambiguity"
+      ],
+      "score": 100
+    },
+    {
+      "id": "recovery-speed",
+      "label": "Recovery speed",
+      "value": 2.2,
+      "display": "2.2 game hours",
+      "explanation": "Committed a recovery plan 2.2 game hours after the turning point.",
+      "skills": [
+        "resilience",
+        "adaptability"
+      ],
+      "score": 98
+    },
+    {
+      "id": "budget-protected",
+      "label": "Budget protected for core goal",
+      "value": 0.6,
+      "display": "60%",
+      "explanation": "The recovery plan kept about 60% of the remaining budget for what the market is for.",
+      "skills": [
+        "creativity"
+      ],
+      "score": 60
+    },
+    {
+      "id": "morale-trajectory",
+      "label": "Team morale trajectory",
+      "value": 8,
+      "display": "72 → 80 (+8)",
+      "explanation": "Team morale went from a low of 72 after the setback to 80.",
+      "skills": [
+        "collaboration",
+        "empathy"
+      ],
+      "score": 70
+    },
+    {
+      "id": "delegation-quality",
+      "label": "Delegation quality",
+      "value": null,
+      "display": "No delegation",
+      "explanation": "Handled everything personally; nothing was delegated.",
+      "skills": [
+        "collaboration"
+      ],
+      "score": null
+    },
+    {
+      "id": "stakeholder-balance",
+      "label": "Stakeholder balance",
+      "value": 76,
+      "display": "Lowest trust 76 (Community)",
+      "explanation": "No stakeholder group fell below 30 trust; the lowest was Community at 76.",
+      "skills": [
+        "empathy",
+        "communication"
+      ],
+      "score": 100
+    },
+    {
+      "id": "feedback-response",
+      "label": "Feedback response",
+      "value": 1,
+      "display": "Took it on board",
+      "explanation": "After critical feedback, asked what to change first and changed it.",
+      "skills": [
+        "feedback"
+      ],
+      "score": 100
+    }
+  ],
+  "consistency": [
+    {
+      "kind": "order",
+      "said": "Said they'd go to recovery plan first",
+      "did": "Went to the team is shaken first instead",
+      "consistent": false
+    },
+    {
+      "kind": "explanation",
+      "said": "I asked who was free when, because nobody wanted deliveries or set-up.",
+      "did": "Picked B: Ask who's free when, then pair people on logistics",
+      "consistent": true
+    },
+    {
+      "kind": "explanation",
+      "said": "I kept Saturday and Sunday because the vendors had already paid for two days of stock, and families come for",
+      "did": "Picked B: Keep Saturday and Sunday; cut promotion, decorations and the stage",
+      "consistent": true
+    },
+    {
+      "kind": "story",
+      "said": "I wrote to every volunteer myself before the group chat found out.",
+      "did": "Real story: “The summer our garden lost its funding”",
+      "consistent": true
+    }
+  ],
   "audit": {
     "extractor": "local-rules",
-    "version": "0.1.0",
-    "createdAt": "2026-11-04T17:42:30.000Z"
+    "version": "0.4.0",
+    "createdAt": "2026-11-04T17:42:00.000Z"
   }
 }

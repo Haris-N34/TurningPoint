@@ -1,7 +1,7 @@
 "use client";
 
 import { PageSkeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { useSearchParams } from "next/navigation";
 import { AddonRequest } from "@/components/addon/AddonRequest";
 import type { SkillSlug } from "@/lib/engine/skills";
@@ -41,11 +41,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
   useReviewTimer(attemptId, challengeId, !!view && view.status !== "withdrawn");
 
   if (view === undefined) return <PageSkeleton />;
-  const back = (
-    <Button asChild variant="ghost" size="sm" className="-ml-3.5">
-      <Link href={`/recruiter?challenge=${challengeId}`}>← Inbox</Link>
-    </Button>
-  );
+  const back = <BackLink href={`/recruiter?challenge=${challengeId}`}>Inbox</BackLink>;
   if (view === null) return <main className="mx-auto max-w-3xl p-6">{back}<p>This card isn&apos;t shared with this challenge.</p></main>;
   if (view.status === "withdrawn")
     return (
@@ -77,7 +73,7 @@ export function RecruiterCard({ attemptId }: { attemptId: string }) {
         <Button variant="outline" onClick={() => act("hold")} aria-pressed={decision === "hold"} className="aria-pressed:border-foreground">Hold</Button>
         <Button variant="outline" onClick={() => setPassing((p) => !p)} aria-pressed={decision === "pass"} aria-expanded={passing} className="aria-pressed:border-foreground">Pass</Button>
       </div>
-      {decision && <p className="mt-1.5 text-xs text-muted-foreground" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
+      {decision && <p className="mt-1.5 text-xs text-muted-foreground lg:absolute lg:right-0 lg:top-full lg:whitespace-nowrap" data-testid="decision">Your decision: <span className="font-medium capitalize text-foreground">{decision === "shortlist" ? "Shortlisted" : decision}</span></p>}
       {passing && (
         <form
           className="tp-pop mt-2 w-full space-y-2 rounded-xl border bg-card p-3 shadow-card lg:absolute lg:right-0 lg:z-20 lg:w-72"

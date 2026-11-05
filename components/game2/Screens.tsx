@@ -87,7 +87,7 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
         </div>
         {showSettings && (
           <Panel className="mt-3 w-[min(360px,92vw)] p-3 text-left" onClick={(e) => e.stopPropagation()}>
-            <SettingsForm />
+            <SettingsForm onTitle />
           </Panel>
         )}
       </div>
@@ -95,11 +95,17 @@ export function TitleScreen({ scenario, onStart, canResume, onResume, brief }: {
   );
 }
 
-export function SettingsForm() {
+export function SettingsForm({ onTitle = false }: { onTitle?: boolean }) {
   const s = useGame((g) => g.settings);
   const set = useGame((g) => g.setSettings);
   return (
     <div className="space-y-1 text-[15px]" data-testid="settings">
+      {onTitle && (
+        <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
+          Full week (Mon to Fri, about 15 min)
+          <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.length === "full"} onChange={(e) => set({ length: e.target.checked ? "full" : "quick" })} data-testid="set-full-week" />
+        </label>
+      )}
       <label className="flex min-h-9 cursor-pointer items-center justify-between gap-3 rounded-[3px] px-1 hover:bg-[#2e222f]/5">
         Turn-based mode (no clock pressure)
         <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-[#c43d22]" checked={s.turnBased} onChange={(e) => set({ turnBased: e.target.checked })} data-testid="set-turn-based" />

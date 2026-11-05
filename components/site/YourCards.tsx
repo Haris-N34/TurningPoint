@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Card } from "@/lib/card/types";
 import { store } from "@/lib/store/store";
+import { isPeer } from "@/lib/demo/peers";
+import { DEMO_PREFIX } from "@/lib/impact/metrics";
 
 // Candidate home: the cards finished on this device, newest first. Hidden when there are none.
 export function YourCards() {
   const [cards, setCards] = useState<Card[]>([]);
   useEffect(() => {
-    setCards(store().listCards().sort((a, b) => b.finishedAt.localeCompare(a.finishedAt)).slice(0, 3));
+    // Synthetic demo candidates are recruiter-side scenery, never "your" cards.
+    setCards(store().listCards().filter((c) => !isPeer(c.attemptId) && !c.attemptId.startsWith(DEMO_PREFIX)).sort((a, b) => b.finishedAt.localeCompare(a.finishedAt)).slice(0, 3));
   }, []);
   if (!cards.length) return null;
   return (

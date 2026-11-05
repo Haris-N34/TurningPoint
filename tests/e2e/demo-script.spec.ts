@@ -1,4 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
+import mayaFixture from "../../fixtures/attempt.json";
+
+// Maya's anonymous ID comes from the demo fixture, so a fixture rebuild never breaks the check.
+const MAYA_ANON = mayaFixture.anonId;
 
 // I.1 (start): plays docs/pitch/demo-script.md step by step against the app.
 // Run twice in a row: pnpm e2e tests/e2e/demo-script.spec.ts --repeat-each=2
@@ -20,7 +24,8 @@ maya.chen@example.com | (403) 555-0182
 Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
-- Negotiated donated supplies from a local store, saving $2,000`;
+- Negotiated donated supplies from a local store, saving $2,000
+- Tracked weekly sign-up data in a spreadsheet to spot no-shows`;
 
 async function seed(page: Page) {
   await page.goto("/demo/seed");
@@ -88,6 +93,8 @@ async function startLaunchWeek(page: Page) {
   await expect(page.getByTestId("title-screen")).toContainText("PRESS ENTER");
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByTestId("set-turn-based").check();
+  // The long demo plays the full week (Quick mode, the default, is the one-minute demo).
+  await page.getByTestId("set-full-week").check();
   await page.getByTestId("start").click();
   await expect(page.getByTestId("avatar-creator")).toBeVisible();
   await page.getByTestId("avatar-done").click();
@@ -207,6 +214,26 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
   });
 
+  test("step 5 (Quick mode, the default): the turning point hits Tuesday morning and opens the recovery plan", async ({ page }) => {
+    await page.goto("/game/launch-week");
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
+    await page.getByRole("button", { name: "Settings" }).click();
+    await page.getByTestId("set-turn-based").check();
+    await expect(page.getByTestId("set-full-week")).not.toBeChecked();
+    await page.getByTestId("start").click();
+    await page.getByTestId("avatar-done").click();
+    await expect(page.getByTestId("game-shell")).toHaveAttribute("data-screen", "play", { timeout: 20_000 });
+    for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
+      await clearOverlay(page);
+      await tp(page, (x) => x.setClock("Tue 09:00"));
+    }
+    await expect(page.getByTestId("cutscene")).toBeVisible();
+    await page.getByTestId("cutscene-next").click();
+    await page.getByTestId("cutscene-done").click();
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
+    expect((await tp(page, (x) => x.openIssues())).some((id) => id.startsWith("recovery"))).toBe(true);
+  });
+
   test("step 5b: Ctrl+Shift+D jumps straight to the turning point", async ({ page }) => {
     await seed(page);
     await page.goto("/");
@@ -217,10 +244,10 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByTestId("start").click();
     await page.getByTestId("avatar-done").click();
     await expect(page.getByTestId("cutscene")).toBeVisible({ timeout: 20_000 });
-    // The HUD hides during the cutscene; the clock shows Wednesday morning once it closes.
+    // The HUD hides during the cutscene; the clock shows Tuesday morning (Quick mode, the default) once it closes.
     await page.getByTestId("cutscene-next").click();
     await page.getByTestId("cutscene-done").click();
-    await expect(page.getByTestId("clock-time")).toHaveText(/^Wed 09:/);
+    await expect(page.getByTestId("clock-time")).toHaveText(/^Tue 09:/);
     // A jumped run is never saved.
     expect(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("tp:run:")).length)).toBe(0);
   });
@@ -251,7 +278,7 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await seed(page);
     await page.goto("/recruiter");
     const row = page.getByTestId("row-att_demo_maya");
-    await expect(row).toContainText("Candidate 4F7K");
+    await expect(row).toContainText(MAYA_ANON);
     await expect(row).not.toContainText("Maya");
     await row.getByRole("link").first().click();
     await expect(page).toHaveURL(/\/recruiter\/card\/att_demo_maya/);

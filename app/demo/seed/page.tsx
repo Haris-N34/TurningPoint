@@ -11,14 +11,20 @@ export default function SeedPage() {
   const [list, setList] = useState<Challenge[]>([]);
   useEffect(() => setList(seedDemo(store())), []);
   return (
-    <main className="mx-auto max-w-xl space-y-4 px-4 py-10" data-testid="seeded">
-      <h1 className="text-2xl font-semibold">Demo data loaded</h1>
-      <ul className="space-y-2">
+    <main className="mx-auto max-w-xl space-y-5 px-4 py-10" data-testid="seeded">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Demo</p>
+        <h1 className="mt-2 font-display text-3xl tracking-tight">Demo data loaded</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Two fictional employers, Maya&apos;s card and a few labelled synthetic candidates, stored in this browser.</p>
+      </div>
+      <ul className="divide-y divide-border/70 rounded-xl border bg-card shadow-card">
         {list.map((c) => (
-          <li key={c.id} className="rounded-xl border p-3">
-            <p className="font-medium">{c.company.name}</p>
-            <p className="text-sm opacity-80">{c.title} · {c.jobCode}</p>
-            <Link className="text-sm underline" href={`/c/${c.publicSlug}`} data-testid={`play-${c.id}`}>
+          <li key={c.id} className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="min-w-0">
+              <p className="font-medium">{c.company.name}</p>
+              <p className="text-sm text-muted-foreground">{c.title} · {c.jobCode}</p>
+            </div>
+            <Link className="shrink-0 text-sm font-medium underline underline-offset-2" href={`/c/${c.publicSlug}`} data-testid={`play-${c.id}`}>
               Candidate link
             </Link>
           </li>

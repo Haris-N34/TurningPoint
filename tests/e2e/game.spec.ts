@@ -13,12 +13,14 @@ type TP = {
 };
 const tp = <T,>(page: Page, fn: (tp: TP) => T) => page.evaluate(`(${fn.toString()})(window.__tp)`) as Promise<T>;
 
-async function startGame(page: Page, opts: { list?: boolean; turnBased?: boolean; reducedMotion?: boolean } = {}) {
+async function startGame(page: Page, opts: { list?: boolean; turnBased?: boolean; reducedMotion?: boolean; full?: boolean } = {}) {
   await page.goto("/game/launch-week");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await expect(page.getByTestId("title-screen")).toBeVisible();
-  if (opts.list || opts.turnBased || opts.reducedMotion) {
+  if (opts.list || opts.turnBased || opts.reducedMotion || opts.full) {
     await page.getByRole("button", { name: "Settings" }).click();
+    // Quick mode (Mon to Wed) is the default; the five-day week is a setting.
+    if (opts.full) await page.getByTestId("set-full-week").check();
     if (opts.reducedMotion) await page.getByTestId("set-reduced-motion").check();
     if (opts.turnBased) await page.getByTestId("set-turn-based").check();
     if (opts.list) await page.getByTestId("set-list-view").check();
@@ -49,6 +51,11 @@ async function clearOverlay(page: Page): Promise<boolean> {
       void key;
       return true;
     }
+  }
+  // The cutscene rings for a moment before its buttons show.
+  if (await page.getByTestId("cutscene").isVisible()) {
+    await page.waitForTimeout(400);
+    return true;
   }
   if (await page.getByTestId("order-pick").isVisible()) {
     const ranks = page.locator('[data-testid^="rank-"]:not([data-testid="rank-done"])');
@@ -170,7 +177,8 @@ test("delegate and defer from the issue tracker (A.13)", async ({ page }) => {
 });
 
 test("choice-triggered video checkpoint quotes the option picked (A.7)", async ({ page }) => {
-  await startGame(page, { turnBased: true });
+  // Full week: Quick mode keeps its one decision checkpoint for the recovery pick.
+  await startGame(page, { turnBased: true, full: true });
   await page.getByTestId("go-roles").click();
   await expect(page.getByTestId("dialogue")).toBeVisible({ timeout: 15_000 });
   await toChoices(page);
@@ -181,11 +189,12 @@ test("choice-triggered video checkpoint quotes the option picked (A.7)", async (
 });
 
 test("turning point plays as a cutscene, drains the budget and spawns issues (A.15)", async ({ page }) => {
+  // Quick mode (the default): the plan breaks Tuesday morning.
   await startGame(page, { turnBased: true });
-  await tp(page, (x) => x.setClock("Wed 09:00"));
+  await tp(page, (x) => x.setClock("Tue 09:00"));
   for (let i = 0; i < 12 && !(await page.getByTestId("cutscene").isVisible()); i++) {
     await clearOverlay(page);
-    await tp(page, (x) => x.setClock("Wed 09:00"));
+    await tp(page, (x) => x.setClock("Tue 09:00"));
     if (!(await tp(page, (x) => x.getState().tp.fired))) await page.getByTestId("wait").click();
   }
   await expect(page.getByTestId("cutscene")).toBeVisible();
@@ -199,7 +208,8 @@ test("turning point plays as a cutscene, drains the budget and spawns issues (A.
 });
 
 test("evening recap shows the day's numbers (A.14)", async ({ page }) => {
-  await startGame(page, { turnBased: true });
+  // Full week: Quick mode shows a short "Monday done" note instead of the recap.
+  await startGame(page, { turnBased: true, full: true });
   for (let i = 0; i < 10 && !(await page.getByTestId("recap").isVisible()); i++) {
     if (!(await clearOverlay(page))) await page.getByTestId("wait").click();
   }
@@ -208,8 +218,8 @@ test("evening recap shows the day's numbers (A.14)", async ({ page }) => {
 });
 
 test("list view: a full week with the keyboard, then results and real-life (A.10, A.21)", async ({ page }) => {
-  test.setTimeout(180_000);
-  await startGame(page, { list: true, turnBased: true });
+  test.setTimeout(300_000);
+  await startGame(page, { list: true, turnBased: true, full: true });
   await expect(page.getByTestId("list-view")).toBeVisible();
   for (let i = 0; i < 160; i++) {
     if (await page.getByTestId("to-results").isVisible()) break;
@@ -248,7 +258,7 @@ test("screenshots: title, map, dialogue, checkpoint, cutscene, results (A.3)", a
   const errors: string[] = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text().slice(0, 300)));
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/game/launch-week");
+  await page.goto("/game/launch-week?week=full");
   await expect(page.getByTestId("title-screen")).toBeVisible();
   await page.waitForTimeout(1500);
   await shot("title");
@@ -343,11 +353,26 @@ test("quiz test: choices only ever show with a character, a scene and an animati
   expect(near as number).toBeLessThan(40);
 });
 
+test("Quick mode is the default: Mon to Wed, the plan breaks Tuesday; Full week in Settings switches to five days", async ({ page }) => {
+  await startGame(page, { turnBased: true });
+  expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("quick");
+  await tp(page, (x) => x.setClock("Tue 09:00"));
+  expect(await tp(page, (x) => x.getState().tp.fired)).toBe(true);
+  // No order question and no recap modal in Quick mode.
+  expect(await tp(page, (x) => x.getState().order.asked)).toBe(false);
+  await expect(page.getByTestId("cutscene")).toBeVisible();
+  while (await clearOverlay(page));
+  await expect(page.getByTestId("recap")).toHaveCount(0);
+  await startGame(page, { full: true });
+  expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("full");
+});
+
 test("map view: a full week through the issue tracker, then results (A.21)", async ({ page }) => {
   // Reduced motion skips the walk animation (walking itself is covered by the A.9 test), so a full week fits CI.
   test.setTimeout(420_000);
-  await startGame(page, { turnBased: true, reducedMotion: true });
+  await startGame(page, { turnBased: true, reducedMotion: true, full: true });
   await expect(page.getByTestId("map-canvas")).toBeVisible();
+  expect(await tp(page, (x) => (x.getState() as unknown as { length: string }).length)).toBe("full");
   for (let i = 0; i < 200; i++) {
     if (await page.getByTestId("to-results").isVisible()) break;
     if (await clearOverlay(page)) continue;

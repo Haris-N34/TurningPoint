@@ -81,6 +81,10 @@ test("game UI shot: checkpoint without media permission", async ({ browser }, in
   const dir = process.env.SHOTS_DIR ?? "docs/screens/night/game-ui/latest";
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, permissions: [] });
   const page = await ctx.newPage();
+  // The fake-media launch flag grants devices even with no permissions, so refuse them here like a browser that says no.
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+  });
   await page.goto("/game/launch-week?jump=turning-point");
   await expect(page.getByTestId("game-shell")).toHaveAttribute("data-ready", "1");
   await page.keyboard.press("Enter");
@@ -92,7 +96,8 @@ test("game UI shot: checkpoint without media permission", async ({ browser }, in
   await page.waitForTimeout(500);
   await page.getByTestId("choice-b").click();
   await expect(page.getByTestId("checkpoint")).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByTestId("checkpoint").locator('input[value="text"]')).toBeChecked();
+  // The game asks for video first, then falls back to voice and to text, calmly.
+  await expect(page.getByTestId("checkpoint").locator('input[value="text"]')).toBeChecked({ timeout: 10_000 });
   await expect(page.getByTestId("checkpoint")).not.toContainText(/couldn't/i);
   await page.waitForTimeout(2500);
   await page.screenshot({ path: `${dir}/10-checkpoint-no-media-1280x720.png`, style: "nextjs-portal { display: none !important; }" });

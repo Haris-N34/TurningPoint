@@ -1,5 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import mayaFixture from "../../fixtures/attempt.json";
+
+// Maya's anonymous ID comes from the demo fixture, so a fixture rebuild never breaks the check.
+const MAYA_ANON = mayaFixture.anonId;
 
 async function seed(page: Page) {
   await page.goto("/demo/seed");
@@ -12,7 +16,7 @@ test("inbox: anonymous rows, filters, keyboard shortlist reveals the name (E2, E
   await seed(page);
   await page.goto("/recruiter");
   const row = page.getByTestId(`row-${MAYA}`);
-  await expect(row).toContainText("Candidate 4F7K");
+  await expect(row).toContainText(MAYA_ANON);
   await expect(row).not.toContainText("Maya");
   await expect(row).toContainText("Confirmed");
   await expect(row).toContainText("Strong");
@@ -49,7 +53,7 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   await seed(page);
   await page.goto(CARD);
   const card = page.getByTestId("capability-card");
-  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+  await expect(page.getByTestId("card-name")).toHaveText(MAYA_ANON);
   await expect(card).toContainText("Verified student");
   // v2 D.4 adds a Final score box at the top right; the evidence itself still carries levels, never numbers.
   await expect(card.getByTestId("evidence")).not.toContainText(/score\s*[:=]?\s*\d/i);
@@ -72,7 +76,7 @@ test("card: evidence with sources, decision path, real story, integrity, actions
   await page.getByLabel("Reason (required)").selectOption("Position filled");
   await page.getByRole("button", { name: "Confirm pass" }).click();
   await expect(page.getByTestId("decision")).toContainText("pass");
-  await expect(page.getByTestId("card-name")).toHaveText("Candidate 4F7K");
+  await expect(page.getByTestId("card-name")).toHaveText(MAYA_ANON);
 
   await page.getByRole("button", { name: "Shortlist" }).click();
   await expect(page.getByTestId("decision")).toContainText("Shortlisted");
@@ -127,4 +131,64 @@ test("transcript-first hides video until revealed (E6.2)", async ({ page }) => {
   await page.goto(CARD);
   await page.getByTestId("tab-cp2").click();
   await expect(page.getByRole("button", { name: "Reveal video" })).toBeVisible();
+});
+
+test("demo inbox reads like a real list: Maya first, synthetic peers labelled, quote jump is visible on the card", async ({ page }) => {
+  await seed(page);
+  await page.goto("/recruiter");
+  const rows = page.locator('[data-testid^="row-"]');
+  await expect(rows.first()).toHaveAttribute("data-testid", `row-${MAYA}`);
+  expect(await rows.count()).toBeGreaterThan(4);
+  await expect(page.getByTestId("row-att_demo_peer_01")).toContainText("Synthetic");
+  await expect(page.getByTestId(`row-${MAYA}`)).not.toContainText("Synthetic");
+
+  await page.goto(CARD);
+  await page.getByTestId("jump-prioritization").click();
+  await expect(page.getByTestId("jump-banner")).toContainText("Prioritization");
+  // The Copilot trigger sits in the toolbar, not over the answer.
+  const ask = await page.getByTestId("copilot-open").boundingBox();
+  const answers = await page.getByTestId("answers").boundingBox();
+  expect(ask!.y + ask!.height).toBeLessThanOrEqual(answers!.y);
+});
+
+test("employers never see accommodation status: card, inbox and compare (privacy)", async ({ page }) => {
+  await seed(page);
+  // Maya and a peer both used an accommodation (extra time or turn-based play).
+  await page.evaluate(() => {
+    for (const id of ["att_demo_maya", "att_demo_peer_01"]) {
+      const key = `tp:card:${id}`;
+      const card = JSON.parse(localStorage.getItem(key)!);
+      localStorage.setItem(key, JSON.stringify({ ...card, adjustedTiming: true }));
+    }
+  });
+  const hidden = /adjusted timing|accommodation|extra time|turn-based/i;
+  await page.goto("/recruiter");
+  await expect(page.getByTestId(`row-${MAYA}`)).toBeVisible();
+  await expect(page.getByTestId("inbox")).not.toContainText(hidden);
+  await page.goto(CARD);
+  await expect(page.getByTestId("capability-card")).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(hidden);
+  await page.goto(`/recruiter/compare?challenge=ch_demo_energy&ids=${MAYA},att_demo_peer_01`);
+  await expect(page.getByTestId("compare")).toBeVisible();
+  await expect(page.getByTestId("compare")).not.toContainText(hidden);
+});
+
+test("decision path keeps the turning point in view, with arrows when the path scrolls", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "checked at laptop sizes");
+  await seed(page);
+  for (const viewport of [{ width: 1280, height: 720 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto(CARD);
+    const path = page.getByTestId("decision-path");
+    await expect(page.getByTestId("turning-point-marker")).toBeVisible();
+    const m = (await page.getByTestId("turning-point-marker").boundingBox())!;
+    const p = (await path.boundingBox())!;
+    expect(m.x).toBeGreaterThanOrEqual(p.x);
+    expect(m.x + m.width).toBeLessThanOrEqual(p.x + p.width);
+    if (await path.evaluate((el) => el.scrollWidth > el.clientWidth)) {
+      await expect(page.getByTestId("path-right")).toBeVisible();
+      await page.getByTestId("path-right").click();
+      await expect.poll(() => path.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+    }
+  }
 });

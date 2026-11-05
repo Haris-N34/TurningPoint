@@ -5,6 +5,7 @@ import { preparePublishedContent, scenarioForRun } from "@/lib/ai/services/publi
 import { replay } from "@/lib/game/engine";
 import { makeStore, MemoryKV } from "@/lib/store/store";
 import { challengeMap, publish, saveDraft } from "./challenge";
+import { forLength } from "@/lib/game/engine";
 import { applyMapOverrides, diffMap, mapForTemplate, parseMapWithOverrides, tailorMap } from "./mapTailor";
 import { INDUSTRIES } from "./tailor";
 
@@ -22,6 +23,14 @@ describe("map tailoring and edits (E1.3, E1.4 on v2 maps)", () => {
     const energy = tailorMap(map, "Energy").map;
     expect(energy.summary).toMatch(/community energy fair/);
     expect(JSON.stringify(energy.nodes)).not.toMatch(/\bmarket\b/i);
+  });
+
+  it("tailors the Quick mode intro too, and the stored diff carries it to the played map", () => {
+    const energy = tailorMap(map, "Energy").map;
+    expect(energy.quick?.summary).toMatch(/community energy fair/);
+    const played = applyMapOverrides(map, diffMap(map, energy));
+    expect(played.quick?.summary).toMatch(/community energy fair/);
+    expect(forLength(played, "quick").summary).toMatch(/community energy fair/);
   });
 
   it("is deterministic", () => {
@@ -75,5 +84,17 @@ describe("map tailoring and edits (E1.3, E1.4 on v2 maps)", () => {
   it("templates without a map have none", () => {
     expect(mapForTemplate("sample")).toBeUndefined();
     expect(challengeMap({ templateId: "sample" })).toBeUndefined();
+  });
+});
+
+describe("Quick mode title summary is tailored too", () => {
+  it("rewrites quick.summary for the industry and keeps it through the stored diff", () => {
+    const base = mapForTemplate("launch-week")!.map;
+    expect(base.quick?.summary).toMatch(/community market/i);
+    const { map } = tailorMap(base, "Energy", "Prairie Grid Energy");
+    expect(map.quick?.summary).toMatch(/community energy fair/i);
+    const ov = diffMap(base, map);
+    expect(ov.quickSummary).toBe(map.quick?.summary);
+    expect(applyMapOverrides(base, ov).quick?.summary).toBe(map.quick?.summary);
   });
 });

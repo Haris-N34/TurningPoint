@@ -67,7 +67,7 @@ export function Onboarding({ scenarioId, title }: { scenarioId: string; title: s
         <ol aria-label="Preparation steps" className="mt-8 space-y-3 text-sm">{STEPS.map((label, i) => <li key={label} aria-current={step === i ? "step" : undefined} className={step === i ? "font-semibold text-foreground" : "text-muted-foreground"}>{i < step ? "✓ " : `${i + 1}. `}{label}</li>)}</ol>
       </aside>
       <div className="min-w-0">
-        <h1 ref={heading} tabIndex={-1} className="font-display text-4xl leading-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">{["Show how you think when plans change.", "A pause to explain your next move.", "Set yourself up to take part.", "Make sure your format works."][step]}</h1>
+        <h1 ref={heading} tabIndex={-1} className="font-display text-4xl leading-tight outline-none">{["Show how you think when plans change.", "A pause to explain your next move.", "Set yourself up to take part.", "Make sure your format works."][step]}</h1>
         {step === 0 && <div className="mt-6 space-y-5 text-lg leading-relaxed">
           <p>You will guide a team through a short story, make decisions and balance limited resources. Partway through, the situation changes.</p>
           <p>Allow around 15 minutes. You can pause between decisions and return in this browser. This demo stores your progress on this device.</p>

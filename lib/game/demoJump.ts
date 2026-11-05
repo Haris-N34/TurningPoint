@@ -1,5 +1,6 @@
-import { availableOptions, issueById, newGame, nodeById, openIssues, step, type Action, type GameState } from "./engine";
+import { availableOptions, forLength, issueById, newGame, nodeById, openIssues, step, type Action, type GameLength, type GameState } from "./engine";
 import type { DialogueOption, MapScenario } from "./schema";
+import { parseTime } from "./time";
 
 // The stage demo jump (P.2): play a sensible scripted player from Monday 09:00 up to the turning point,
 // so Wednesday morning looks like a decent run. Pure and deterministic, like the engine.
@@ -17,12 +18,13 @@ function score(o: DialogueOption): number {
 export type DemoJump = { state: GameState; log: Action[]; tpIndex: number };
 
 /**
- * Play to the turning point. Waits until a few problems are open (so the order question is asked and answered
- * before the turning point, not on top of the recovery plan), then handles them earliest deadline first.
+ * Play to the turning point. Lets a few problems pile up while there is slack (so the order question is asked and
+ * answered before the turning point, not on top of the recovery plan), then handles them earliest deadline first.
  * Every checkpoint raised on the way is answered, so none is left for the presenter.
  */
-export function playToTurningPoint(s: MapScenario, seed = DEMO_JUMP_SEED, opts: { turnBased?: boolean } = {}): DemoJump {
-  let st = newGame(s, seed, opts);
+export function playToTurningPoint(base: MapScenario, seed = DEMO_JUMP_SEED, opts: { turnBased?: boolean; length?: GameLength } = {}): DemoJump {
+  const s = forLength(base, opts.length);
+  let st = newGame(base, seed, opts);
   const log: Action[] = [];
   const act = (a: Action) => {
     st = step(s, st, a);
@@ -41,11 +43,17 @@ export function playToTurningPoint(s: MapScenario, seed = DEMO_JUMP_SEED, opts: 
       continue;
     }
     const open = openIssues(s, st).sort((a, b) => (st.issues[a.id].deadline ?? Infinity) - (st.issues[b.id].deadline ?? Infinity));
-    const soon = open.find((i) => (st.issues[i.id].deadline ?? Infinity) - st.t <= 120);
-    if (open.length && (st.order.asked || soon || open.length >= 3)) act({ type: "talk", issue: (soon ?? open[0]).id });
-    else act({ type: "wait" });
+    // Wait for the next problem only while that leaves an hour of slack on the most urgent open one.
+    const urgent = open.length ? (st.issues[open[0].id].deadline ?? Infinity) : Infinity;
+    const nextSpawn = Math.min(...s.issues.filter((i) => st.issues[i.id].status === "pending" && i.spawnAt).map((i) => parseTime(i.spawnAt!)).filter((x) => x > st.t));
+    const tp = st.tp.fired ? Infinity : parseTime(s.turningPoint.at);
+    const canWait = !open.length || (!st.order.asked && open.length < 3 && nextSpawn < tp && nextSpawn <= urgent - 60);
+    act(canWait ? { type: "wait" } : { type: "talk", issue: open[0].id });
   }
 
+  // If the order question only came up with the turning point's new issues, answer it here too: the presenter
+  // goes straight from the cutscene to the recovery issue.
+  for (const c of [...st.checkpointsDue]) act(c.kind === "order" ? { type: "orderAnswer", ranking: openIssues(s, st).map((i) => i.id) } : { type: "checkpointDone", id: c.id });
   const tpIndex = st.events.findIndex((e) => e.kind === "turning_point");
   return { state: st, log, tpIndex };
 }

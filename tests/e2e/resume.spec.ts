@@ -12,7 +12,8 @@ Bachelor of Commerce, University of Calgary, Class of 2027
 Experience
 Volunteer Coordinator at Bow Valley Food Bank (May 2025 - Aug 2025)
 - Led a team of 50 volunteers and kept every volunteer informed when funding was cut
-- Negotiated donated supplies from a local store, saving $2,000`;
+- Negotiated donated supplies from a local store, saving $2,000
+- Tracked weekly sign-up data in a spreadsheet to spot no-shows`;
 
 test("candidate adds a resume with consent; recruiter sees Resume vs Evidence, redacted (C.5, C.6, C.7)", async ({ page }) => {
   await page.goto("/demo/seed");
@@ -24,7 +25,7 @@ test("candidate adds a resume with consent; recruiter sees Resume vs Evidence, r
   await expect(intake.getByRole("alert")).toContainText("consent");
   await intake.getByTestId("resume-consent").check();
   await intake.getByTestId("resume-analyze").click();
-  await expect(intake.getByTestId("resume-added")).toContainText("2 claims");
+  await expect(intake.getByTestId("resume-added")).toContainText("3 claims");
   await expect(intake.getByTestId("resume-suggestion")).toContainText("You might talk about");
 
   await page.goto(`/recruiter/card/${MAYA}?challenge=ch_demo_energy`);
@@ -34,7 +35,8 @@ test("candidate adds a resume with consent; recruiter sees Resume vs Evidence, r
   await expect(rve).toContainText("Game: evidence");
   await expect(page.getByTestId("claim-rc1")).toHaveAttribute("data-backed", "true");
   await expect(page.getByTestId("claim-rc1")).toContainText("Backed by game evidence");
-  await expect(page.getByTestId("claim-rc2")).toContainText("Not yet shown");
+  // Her run has no analytical evidence: the spreadsheet claim is not yet shown.
+  await expect(page.getByTestId("claim-rc3")).toContainText("Not yet shown");
   await expect(rve).not.toContainText(/Maya|Chen|Calgary|Bow Valley|example\.com|555|Maple|2027|false/i);
   await expect(page.getByTestId("capability-card")).not.toContainText("You might talk about");
   await page.getByTestId("final-score").getByRole("button").focus();

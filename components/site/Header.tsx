@@ -26,10 +26,10 @@ export function Header() {
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-10">
           <Link href="/" aria-label="Turning Point home" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
             <span aria-hidden className="flex size-7 items-center justify-center rounded-full bg-primary text-sm text-primary-foreground">↗</span>
-            <span className="hidden min-[400px]:inline">Turning Point<span aria-hidden className="text-primary">.</span></span>
+            <span className="hidden min-[400px]:inline">Turning Point</span>
           </Link>
           <div className="flex items-center gap-1 sm:gap-4">
-            <Link href="/how-we-use-ai" className="inline-flex min-h-11 items-center rounded-md px-2 text-sm text-muted-foreground transition-colors hover:text-foreground">How we use AI</Link>
+            <Link href="/how-we-use-ai" aria-current={pathname === "/how-we-use-ai" ? "page" : undefined} className="inline-flex min-h-11 items-center rounded-md px-2 text-sm text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:font-medium aria-[current=page]:text-foreground">How we use AI</Link>
             <span aria-hidden className="hidden h-5 w-px bg-border sm:block" />
             <div className="flex items-center gap-2">
               <label htmlFor="demo-role" className="sr-only text-xs font-medium uppercase tracking-wider text-muted-foreground sm:not-sr-only">Demo role</label>

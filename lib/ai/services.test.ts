@@ -147,8 +147,9 @@ describe("Evidence Scanner", () => {
   const cp = (text: string) => ({ id: "cp1", nodeId: "n1", kind: "decision" as const, transcript: fromChunks([{ text, startS: 0, endS: 20 }]) });
   it("blind input: same levels with or without the name; quotes have real timestamps", () => {
     const text = "I cut the second weekend instead of the vendor spots, because the vendors had already paid and the team agreed.";
-    const a = scanEvidence({ targetSkills: ["prioritization"], checkpoints: [cp(text)], decisionPath: [], nodeSkills: {} }, {}, opts);
-    const b = scanEvidence({ targetSkills: ["prioritization"], checkpoints: [cp(`I'm Wei Chen. ${text}`)], decisionPath: [], nodeSkills: {} }, { name: "Wei Chen" }, opts);
+    const decisionPath = [{ nodeId: "n1", optionId: "a", optionLabel: "Cut the second weekend" }];
+    const a = scanEvidence({ targetSkills: ["prioritization"], checkpoints: [cp(text)], decisionPath, nodeSkills: {} }, {}, opts);
+    const b = scanEvidence({ targetSkills: ["prioritization"], checkpoints: [cp(`I'm Wei Chen. ${text}`)], decisionPath, nodeSkills: {} }, { name: "Wei Chen" }, opts);
     expect(a[0].level).toBe("strong");
     expect(b[0].level).toBe(a[0].level);
     expect(b[0].source?.type === "clip" && b[0].source.startS).toBeGreaterThan(0);
