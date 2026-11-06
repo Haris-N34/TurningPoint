@@ -32,4 +32,16 @@ describe("QA: console secret", () => {
     expect(consoleAllowed("GET", ["invites", "inv_123"], null)).toBe(true);
     expect(consoleAllowed("GET", ["invites"], null)).toBe(false);
   });
+
+  it("set: the read-only Second Look queue and the lock status stay open; Second Look actions do not", async () => {
+    process.env.TP_CONSOLE_SECRET = "s3cret-for-tests";
+    expect(consoleAllowed("GET", ["second-look"], null)).toBe(true);
+    expect(consoleAllowed("GET", ["lock"], null)).toBe(true);
+    expect(consoleAllowed("POST", ["second-look", "sl_1", "decide"], null)).toBe(false);
+    expect(consoleAllowed("POST", ["second-look", "sweep"], null)).toBe(false);
+    expect(consoleAllowed("GET", ["state"], null)).toBe(false);
+    const lock = await handleIntegrations("GET", ["lock"], new URLSearchParams(), undefined, ORIGIN, null);
+    expect(lock.status).toBe(200);
+    expect(lock.json).toEqual({ locked: true });
+  });
 });

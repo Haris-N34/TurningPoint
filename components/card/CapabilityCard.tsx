@@ -159,7 +159,6 @@ export function CapabilityCard({
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {card.challenge.company} · {card.challenge.title} · {new Date(card.finishedAt).toLocaleDateString("en-CA")}
-            {identity.university && !identity.anonymous ? ` · ${identity.university}` : ""}
           </p>
         </div>
         {(showFinalScore || actions) && (

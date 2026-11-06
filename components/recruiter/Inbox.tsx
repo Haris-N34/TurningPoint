@@ -287,7 +287,6 @@ export function Inbox() {
                       </Link>
                       {(isPeer(r.attemptId) || r.attemptId.startsWith(DEMO_PREFIX)) && <span className="whitespace-nowrap rounded border border-dashed border-border px-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Synthetic</span>}
                     </div>
-                    {r.university && <span className="block text-xs text-muted-foreground">{r.university}</span>}
                     {r.reused && (
                       <span className="block text-xs text-muted-foreground" data-testid={`reused-${r.attemptId}`}>
                         Reused · covers {r.covers.map(skillName).join(", ") || "none"}

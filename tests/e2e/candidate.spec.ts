@@ -3,16 +3,17 @@ import { expect, test } from "@playwright/test";
 const profile = (page: import("@playwright/test").Page) =>
   page.evaluate(() => JSON.parse(localStorage.getItem("tp:profile") ?? "{}"));
 
-test("mocked university sign-in sets verified=true (C1.5)", async ({ page }) => {
+test("mocked school sign-in sets verified=true and names no real school (C1.5)", async ({ page }) => {
   await page.goto("/candidate/verify?next=/play/sample");
-  await page.getByRole("button", { name: /Sign in with University of Calgary/ }).click();
+  await expect(page.locator("main")).not.toContainText(/University|Calgary|Mount Royal|SAIT|Bow Valley/);
+  await page.getByRole("button", { name: /Sign in with your school account/ }).click();
   await expect(page.getByTestId("mock-sso")).toBeVisible();
   await page.getByLabel("Full name").fill("Maya Chen");
   await page.getByLabel("Campus username").fill("maya.chen");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByTestId("verified")).toBeVisible();
   const p = await profile(page);
-  expect(p).toMatchObject({ verified: true, university: "University of Calgary", email: "maya.chen@ucalgary.ca" });
+  expect(p).toMatchObject({ verified: true, university: "", email: "maya.chen@school.edu" });
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(/\/play\/sample$/);
 });

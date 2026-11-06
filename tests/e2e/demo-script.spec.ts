@@ -294,6 +294,8 @@ test.describe("demo script v2 (docs/pitch/demo-script.md)", () => {
     await page.getByRole("button", { name: "Shortlist" }).click();
     await expect(page.getByTestId("decision")).toContainText("Shortlisted");
     await expect(page.getByTestId("card-name")).toHaveText("Maya Chen");
+    // No university is shown anywhere, even after the name is revealed.
+    await expect(page.getByTestId("capability-card")).not.toContainText(/University|Calgary/);
   });
 
   test("step 7b: Resume vs Evidence and the Final score breakdown", async ({ page }) => {

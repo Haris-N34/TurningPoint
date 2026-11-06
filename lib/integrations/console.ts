@@ -46,15 +46,22 @@ export async function consoleState(c: Company) {
   };
 }
 
-/** Routes a candidate's browser calls (report a finished attempt, look up an invite). Never behind the console secret. */
-const CANDIDATE_ROUTES = (method: string, path: string[]) => (method === "POST" && path.join("/") === "attempts") || (method === "GET" && path[0] === "invites" && !!path[1]);
+/**
+ * Never behind the console secret: the routes a candidate's browser calls (report a finished attempt, look up an
+ * invite), the read-only Second Look queue the recruiter screens show (ids, reasons and skill names, no personal
+ * details), and the lock status itself, so the console can ask for the secret without a failed request first.
+ */
+const OPEN_ROUTES = (method: string, path: string[]) =>
+  (method === "POST" && path.join("/") === "attempts") ||
+  (method === "GET" && path[0] === "invites" && !!path[1]) ||
+  (method === "GET" && path.length === 1 && (path[0] === "second-look" || path[0] === "lock"));
 
 /**
  * Optional console lock (QA night): with TP_CONSOLE_SECRET set (a public deploy), every console route needs the
  * same value in the x-tp-console-secret header. Unset (the local demo), the console stays open.
  */
 export function consoleAllowed(method: string, path: string[], given: string | null | undefined, secret = process.env.TP_CONSOLE_SECRET): boolean {
-  if (!secret || CANDIDATE_ROUTES(method, path)) return true;
+  if (!secret || OPEN_ROUTES(method, path)) return true;
   if (!given) return false;
   const a = Buffer.from(sha256hex(given), "hex");
   const b = Buffer.from(sha256hex(secret), "hex");
@@ -64,6 +71,7 @@ export function consoleAllowed(method: string, path: string[], given: string | n
 export async function handleIntegrations(method: string, path: string[], query: URLSearchParams, body: unknown, origin: string, consoleSecret?: string | null): Promise<Out> {
   if (!consoleAllowed(method, path, consoleSecret)) return bad(401, "Console secret required");
   const route = `${method} ${path.join("/")}`;
+  if (route === "GET lock") return ok({ locked: !!process.env.TP_CONSOLE_SECRET });
   const b = (body ?? {}) as Record<string, unknown>;
   if (route === "POST companies") {
     const c = createCompany(typeof b.name === "string" && b.name.trim() ? b.name.trim().slice(0, 80) : "Demo employer");

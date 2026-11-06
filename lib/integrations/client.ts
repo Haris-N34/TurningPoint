@@ -28,6 +28,16 @@ const consoleSecret = () => {
     return null;
   }
 };
+/** True when this deploy locks the console and this tab has no secret yet: ask for it before calling. */
+export async function consoleNeedsSecret(): Promise<boolean> {
+  if (consoleSecret()) return false;
+  try {
+    const r = await fetch("/api/integrations/lock");
+    return r.ok && ((await r.json()) as { locked?: boolean }).locked === true;
+  } catch {
+    return false;
+  }
+}
 /** The message the API returns when the console is locked; the UI can catch it and ask for the secret. */
 export const CONSOLE_LOCKED = "Console secret required";
 

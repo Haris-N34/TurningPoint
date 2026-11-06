@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { listChallenges, type Challenge } from "@/lib/challenge/challenge";
 import { seedDemo } from "@/lib/demo/seed";
-import { CONSOLE_LOCKED, integrationsApi, setCompanyId, setConsoleSecret } from "@/lib/integrations/client";
+import { CONSOLE_LOCKED, consoleNeedsSecret, integrationsApi, setCompanyId, setConsoleSecret } from "@/lib/integrations/client";
 import type { Connection, Delivery, Provider, SecondLookEntry, SimEmail, WebhookEvent } from "@/lib/integrations/store";
 import { store } from "@/lib/store/store";
 
@@ -46,7 +46,8 @@ export function IntegrationConsole() {
   const [keyOnce, setKeyOnce] = useState<string | null>(null);
   const [applicant, setApplicant] = useState({ name: "Ada Obi", email: "ada.obi@example.com", resume: true });
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
+    if (await consoleNeedsSecret()) return setError(CONSOLE_LOCKED);
     integrationsApi<State>("state")
       .then((x) => {
         setS(x);
