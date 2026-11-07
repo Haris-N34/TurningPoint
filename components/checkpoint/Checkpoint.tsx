@@ -280,10 +280,11 @@ export function Checkpoint(p: Props) {
     setPhase("review");
   }, [mode, r, text]);
 
-  // Fetch the on-device model as soon as live captions are known not to work, so it's ready at Done.
+  // Fetch the on-device caption model while the question opens (think time), so captions are live from the
+  // first words if the browser's own captions don't work. Text answers never need it.
   useEffect(() => {
-    if (phase === "answer" && (r.speech.kind === "error" || r.speech.kind === "unsupported")) warmLocalAsr();
-  }, [phase, r.speech.kind]);
+    if (mode !== "text") warmLocalAsr();
+  }, [mode]);
 
   const thinkLeft = useCountdown(t.thinkS, phase === "think" && settled && !choosing, () => void beginAnswer());
   const answerLeft = useCountdown(t.answerS, phase === "answer", finishAnswer);

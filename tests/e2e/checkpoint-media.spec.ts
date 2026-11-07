@@ -187,7 +187,7 @@ test("no speech recognition (Firefox): a heads-up before answering, the recordin
   await playToCheckpoint(page);
   const cp = page.getByTestId("checkpoint");
   await cp.locator('label:has(input[value="voice"])').click();
-  await expect(cp.getByTestId("speech-unsupported")).toContainText("can't show live captions");
+  await expect(cp.getByTestId("speech-unsupported")).toContainText("has no built-in live captions");
   await cp.getByRole("button", { name: /start answering/i }).click();
   await expect(cp).toHaveAttribute("data-phase", "answer", { timeout: 20_000 });
   await expect(cp.getByTestId("speech-status")).toHaveAttribute("data-speech", "unsupported");

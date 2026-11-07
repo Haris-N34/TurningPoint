@@ -16,18 +16,60 @@ type Hook = (audio: Float32Array) => Promise<AsrOutput>;
 
 let loading: Promise<Asr> | undefined;
 
+/** A worker running the model (asr.worker.ts); calls go through postMessage so the page never blocks. */
+function workerAsr(): Promise<Asr> {
+  const w = new Worker(new URL("./asr.worker.ts", import.meta.url), { type: "module" });
+  const threads = typeof crossOriginIsolated !== "undefined" && crossOriginIsolated ? Math.min(4, Math.max(1, (navigator.hardwareConcurrency || 2) - 1)) : 1;
+  let next = 0;
+  const waiting = new Map<number, { ok: (v: AsrOutput) => void; no: (e: Error) => void }>();
+  w.onmessage = (e: MessageEvent<{ id: number; ok: boolean; out?: AsrOutput; error?: string }>) => {
+    const p = waiting.get(e.data.id);
+    if (!p) return;
+    waiting.delete(e.data.id);
+    if (e.data.ok) p.ok(e.data.out as AsrOutput);
+    else p.no(new Error(e.data.error ?? "Transcription failed"));
+  };
+  const call = (msg: Record<string, unknown>, transfer: Transferable[] = []) =>
+    new Promise<AsrOutput>((ok, no) => {
+      const id = ++next;
+      waiting.set(id, { ok, no });
+      w.postMessage({ id, threads, ...msg }, transfer);
+    });
+  // Load the model inside the worker now; resolve once it is ready.
+  return call({ warm: true }).then(() => (audio: Float32Array, opts: Record<string, unknown>) => {
+    const copy = audio.slice(); // transfer a copy: the caller keeps its buffer
+    return call({ audio: copy, opts }, [copy.buffer]);
+  });
+}
+
+/** Same model on the page itself, for browsers that can't start a module worker. */
+function pageAsr(): Promise<Asr> {
+  return import("@huggingface/transformers").then((tf) => {
+    tf.env.allowLocalModels = false;
+    const wasm = tf.env.backends?.onnx?.wasm as { proxy?: boolean } | undefined;
+    if (wasm) wasm.proxy = true;
+    return tf.pipeline("automatic-speech-recognition", ASR_MODEL, { dtype: "q8", device: "wasm" }) as unknown as Promise<Asr>;
+  });
+}
+
 function load(): Promise<Asr> {
   // Loaded only when needed, in its own chunk, so pages that never record don't pay for it.
-  loading ??= import("@huggingface/transformers")
-    .then((tf) => {
-      tf.env.allowLocalModels = false;
-      return tf.pipeline("automatic-speech-recognition", ASR_MODEL, { dtype: "q8", device: "wasm" }) as unknown as Promise<Asr>;
-    })
-    .catch((e) => {
-      loading = undefined; // let a later answer try again
-      throw e;
-    });
+  loading ??= (typeof Worker !== "undefined" ? workerAsr().catch(() => pageAsr()) : pageAsr()).catch((e) => {
+    loading = undefined; // let a later answer try again
+    throw e;
+  });
   return loading;
+}
+
+/** Transcribe one short window (under 30 s) of 16 kHz audio. Used by the live captions (liveAsr.ts). */
+export async function runAsr(audio: Float32Array): Promise<AsrOutput> {
+  const hook = typeof window !== "undefined" ? (window as unknown as { __tpLocalAsr?: Hook }).__tpLocalAsr : undefined;
+  if (hook) return hook(audio);
+  const asr = await load();
+  const t = performance.now();
+  const out = await asr(audio, {});
+  if ((window as unknown as { __tpAsrDebug?: boolean }).__tpAsrDebug) console.log(`ASRPASS ${(audio.length / 16000).toFixed(1)}s audio in ${Math.round(performance.now() - t)}ms`);
+  return out;
 }
 
 /** Start fetching the model early (during the answer) so the transcript is ready sooner. */

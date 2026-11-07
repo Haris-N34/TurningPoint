@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Transcript } from "@/lib/card/types";
 import { createListener, speechCtor, type SpeechState } from "@/lib/checkpoint/speech";
+import { createLiveAsr, type LiveAsr } from "@/lib/checkpoint/liveAsr";
+import { warmLocalAsr } from "@/lib/checkpoint/localAsr";
 import { pickMime } from "@/lib/checkpoint/recording";
 import { fromChunks, type SpeechChunk } from "@/lib/checkpoint/transcript";
 
@@ -10,6 +12,28 @@ export type Mode = "video" | "voice" | "text";
 export type { SpeechState };
 
 export const speechSupported = () => !!speechCtor();
+
+// Remember, per browser, that its own live captions gave no words, so the on-device captions start at once next time.
+const LOCAL_KEY = "tp:live-captions";
+const captionsLocal = () => {
+  try {
+    return localStorage.getItem(LOCAL_KEY) === "local";
+  } catch {
+    return false;
+  }
+};
+const rememberLocal = (on: boolean) => {
+  try {
+    if (on) localStorage.setItem(LOCAL_KEY, "local");
+    else localStorage.removeItem(LOCAL_KEY);
+  } catch {
+    // Private mode: decide again next time.
+  }
+};
+/** Fetch the on-device caption model ahead of an answer (the interview's think time, or game start). */
+export const prepareLiveCaptions = () => warmLocalAsr();
+/** How long the browser's own captions get to produce a word before the on-device captions take over. */
+const BROWSER_GRACE_MS = 1200;
 
 /** audio: an audio-only copy, kept in memory for on-device transcription, never saved. */
 export type Recording = { blob?: Blob; audio?: Blob; durationS: number; transcript: Transcript; mimeType?: string };
@@ -66,6 +90,9 @@ export function useRecorder() {
   const rec = useRef<ReturnType<typeof recordTo> | null>(null);
   const audioRec = useRef<ReturnType<typeof recordTo> | null>(null);
   const listener = useRef<ReturnType<typeof createListener> | null>(null);
+  const live = useRef<LiveAsr | null>(null);
+  const liveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const browserWords = useRef(false);
   const speechChunks = useRef<SpeechChunk[]>([]);
   const t0 = useRef(0);
   const lastEnd = useRef(0);
@@ -81,6 +108,9 @@ export function useRecorder() {
     audioCtx.current = null;
     void listener.current?.stop(0);
     listener.current = null;
+    if (liveTimer.current) clearTimeout(liveTimer.current);
+    live.current?.cancel();
+    live.current = null;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     setStream(null);
@@ -157,23 +187,51 @@ export function useRecorder() {
     rec.current = recordTo(s, video);
     // Video answers also keep an audio-only copy: it is what on-device transcription reads.
     audioRec.current = video && s.getAudioTracks().length ? recordTo(new MediaStream(s.getAudioTracks()), false) : null;
+    // On-device captions: audio is captured from the first moment; the model only runs if the browser's own
+    // captions stay silent (no speech service, blocked, offline, Firefox). Words then appear while talking.
+    browserWords.current = false;
+    if (liveTimer.current) clearTimeout(liveTimer.current);
+    live.current?.cancel();
+    live.current = createLiveAsr(s, (committed, partial) => {
+      if (browserWords.current) return;
+      setHeard(committed);
+      setInterim(partial);
+    });
+    const goLocal = () => {
+      if (!browserWords.current) live.current?.run();
+    };
+    const browserSpoke = () => {
+      if (browserWords.current) return;
+      browserWords.current = true;
+      // The browser's captions work here: drop the on-device ones.
+      if (liveTimer.current) clearTimeout(liveTimer.current);
+      live.current?.cancel();
+      live.current = null;
+      rememberLocal(false);
+    };
     const Ctor = speechCtor();
     if (!Ctor) {
       setSpeech({ kind: "unsupported" });
+      goLocal();
       return;
     }
+    liveTimer.current = setTimeout(goLocal, captionsLocal() ? 0 : BROWSER_GRACE_MS);
     const l = createListener({
       Ctor,
       lang: (typeof navigator !== "undefined" && navigator.language) || "en-US",
       now: () => (performance.now() - t0.current) / 1000,
       onFinal: (text, now) => {
+        browserSpoke();
         const est = Math.max(0.6, text.split(/\s+/).length / 2.6);
         const startS = Math.max(lastEnd.current, now - est);
         speechChunks.current.push({ text, startS, endS: Math.max(startS + 0.1, now) });
         lastEnd.current = Math.max(startS + 0.1, now);
         setHeard(speechChunks.current.map((c) => c.text).join(" "));
       },
-      onInterim: setInterim,
+      onInterim: (t) => {
+        if (t) browserSpoke();
+        if (browserWords.current) setInterim(t);
+      },
       onState: setSpeech,
     });
     listener.current = l;
@@ -185,12 +243,22 @@ export function useRecorder() {
     const r = rec.current;
     const a = audioRec.current;
     const l = listener.current;
-    const [blob, audio] = await Promise.all([
+    const lv = live.current;
+    live.current = null;
+    if (liveTimer.current) clearTimeout(liveTimer.current);
+    const useLocal = !!lv && !browserWords.current;
+    if (lv && !useLocal) lv.cancel();
+    const [blob, audio, , local] = await Promise.all([
       r ? r.stop() : Promise.resolve(undefined),
       a ? a.stop() : Promise.resolve(undefined),
-      // Give recognition a moment to deliver its last words.
-      l ? l.stop(1500) : Promise.resolve(),
+      // Give the browser's recognition a moment to deliver its last words (not needed when it never spoke).
+      l ? l.stop(browserWords.current ? 1500 : 200) : Promise.resolve(),
+      useLocal ? lv.finish().catch(() => [] as SpeechChunk[]) : Promise.resolve([] as SpeechChunk[]),
     ]);
+    if (!speechChunks.current.length && local.length) {
+      speechChunks.current = local;
+      rememberLocal(true);
+    }
     listener.current = null;
     rec.current = null;
     audioRec.current = null;

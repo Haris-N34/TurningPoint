@@ -156,7 +156,7 @@ describe("speech listener", () => {
     expect(isFatal("audio-capture")).toBe(true);
     expect(isFatal("no-speech")).toBe(false);
     expect(speechErrorMessage("audio-capture")).toMatch(/microphone/);
-    expect(speechErrorMessage("weird")).toMatch(/turn it into text on this device/);
+    expect(speechErrorMessage("weird")).toMatch(/captions now come from this device/);
   });
 
   it("says 'starting' until the browser confirms, never 'listening' on its own", () => {

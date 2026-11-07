@@ -36,7 +36,7 @@ export type SpeechState =
   /** Stopped for good this answer. The recording continues; the candidate types or fixes the words after. */
   | { kind: "error"; code: string; message: string };
 
-const AFTER = "Keep talking: your recording is saved, and we'll turn it into text on this device when you finish.";
+const AFTER = "Keep talking: captions now come from this device as you speak.";
 const MESSAGES: Record<string, string> = {
   "not-allowed": `This browser blocked live captions. ${AFTER}`,
   "service-not-allowed": `Live captions are turned off in this browser. ${AFTER}`,
@@ -48,7 +48,7 @@ const MESSAGES: Record<string, string> = {
 };
 
 export const UNSUPPORTED_MESSAGE =
-  "This browser can't show live captions. We'll still record your answer and turn it into text on this device when you finish. You can fix any words before you submit.";
+  "This browser has no built-in live captions, so captions come from this device as you speak. You can fix any words before you submit.";
 
 /** Plain-words message for a recognition error code. */
 export function speechErrorMessage(code: string) {
